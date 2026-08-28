@@ -1001,7 +1001,7 @@ Forecasting, multi-dataset joins, scheduled runs. Out of scope until 0–14 are 
 | Phase | Name | Status | Date | Notes |
 | ----- | ----- | ----- | ----- | ----- |
 | 0 | Environment | ☐ Not started |  27/08/2026|☑ Done  |
-| 1 | Skeleton \+ connection | ☐ Not started |  |  |
+| 1 | Skeleton \+ connection | ☐ Not started | 27/08/2026 |  ☑ Dones|
 | 2 | Ingest \+ workspace isolation | ☐ Not started |  |  |
 | 3 | Ingest Spec \+ merges | ☐ Not started |  |  |
 | 4 | Contract \+ workflow state | ☐ Not started |  |  |
