@@ -278,3 +278,34 @@ Machine-local and implementation choices that are easy to forget six months late
   which defeats its purpose.
 - Pivot-dump detection needs 3+ period columns AND at least half of all
   columns. One period column among many is a variable, not a pivot.
+
+- excel.merged_ranges is deleted. One name, one implementation:
+  merges.merged_ranges streams the sheet XML at constant memory. Its
+  sheet=None default meant wb.active, so merges.active_sheet_name reads
+  activeTab from xl/workbook.xml to preserve that. activeTab is an index
+  into <sheets> order, counts hidden sheets, and is NOT the first tab --
+  verified against openpyxl on default, 2nd-active, 3rd-active,
+  reordered and hidden-sheet workbooks.
+- on_error='stop'|'null' on both loaders, default 'stop', so no existing
+  call changes behaviour. 'null' nulls the offending CELL, keeps the
+  row, and counts per column into LoadResult.coercion_failures (F9).
+- DuckDB's store_rejects was rejected for that job: it drops the whole
+  ROW (50 of 53 rows kept for 4 bad cells) and writes to persistent
+  reject_errors/reject_scans tables that accumulate across loads.
+  TRY_CAST over an all_varchar staging table does it cell-wise with no
+  side tables, which also matches how the Excel path behaves.
+- DuckDB type inference WIDENS rather than fails: a BIGINT column with
+  one 'oops' is sniffed VARCHAR. Coercion counts are therefore only
+  meaningful once types are pinned, which is what dtypes is for.
+- read_csv has no skipfooter. footer_skip_rows counts rows then applies
+  LIMIT, which is only correct because a scan preserves file order --
+  verified exact on 20,000 rows at threads=8.
+- The footer is trimmed BEFORE coercion is counted. Counting first
+  reported a failure for a TOTAL row that was then discarded.
+- Asymmetry to remember: the Excel loader trims the footer before type
+  inference (it owns the row stream), the CSV loader cannot, so a footer
+  row still drags its column to VARCHAR. Pin dtypes when a CSV has a
+  footer.
+- Excel na_values are applied to STRING cells only, before inference, so
+  a numeric 0 is never a null token and an integer column containing
+  'N/A' stays BIGINT instead of widening to VARCHAR (F5).

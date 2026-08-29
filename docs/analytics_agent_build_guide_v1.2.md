@@ -1002,8 +1002,8 @@ Forecasting, multi-dataset joins, scheduled runs. Out of scope until 0–14 are 
 | ----- | ----- | ----- | ----- | ----- |
 | 0 | Environment | ☑ Done  |  27/08/2026|☑ Done  |
 | 1 | Skeleton \+ connection | ☑ Done  | 27/08/2026 |  ☑ Dones|
-| 2 | Ingest \+ workspace isolation | ◐ In progress | 28/08/2026 | Step 1 of 9 complete. Step 0.5 detour: rebuilt olist in Homebrew PG17 cluster from CSVs, retired Postgres.app. |
-| 3 | Ingest Spec \+ merges | ☐ Not started |  |  |
+| 2 | Ingest \+ workspace isolation |  ☑ Dones | 29/08/2026 |Steps 1–9 plus Step 0.5 (olist rebuilt into Homebrew PG17). 29/20 acceptance assertions pass. |
+| 3 | Ingest Spec \+ merges | ◐ In progress | 30/08/2026 | Step 1 done: merges.py, 12/12 unit tests, bounded fill pinned. merged_multiheader.xlsx header block is rows 1-2, sheet 'Sales'. |
 | 4 | Contract \+ workflow state | ☐ Not started |  |  |
 | 5 | Profiling | ☐ Not started |  |  |
 | 6 | Cleaning gate | ☐ Not started |  |  |

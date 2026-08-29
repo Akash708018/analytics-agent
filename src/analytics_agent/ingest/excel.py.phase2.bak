@@ -1,8 +1,7 @@
 """Excel loading: openpyxl read-only streaming into DuckDB.
 
-Phase 2, Step 6; extended in Phase 3, Step 5. See build guide Section 4.2
-(read_only=True, 50,000-row batches), locked decision 4, failure modes F3, F5
-and F9.
+Phase 2, Step 6. See build guide Section 4.2 (read_only=True, 50,000-row
+batches), locked decision 4, failure modes F3 and F5.
 
 Why this is harder than CSV. DuckDB reads a CSV and infers each column's type
 itself. openpyxl hands back Python objects, so the inference has to be written
@@ -16,24 +15,16 @@ Verified against openpyxl on real files:
     Booleans must be tested BEFORE integers or every one becomes BIGINT.
   * A column of entirely empty cells yields no type information at all and
     falls back to VARCHAR.
-  * merged_cells.ranges does NOT exist on a read-only worksheet.
+  * merged_cells.ranges does NOT exist on a read-only worksheet. Phase 3's
+    bounded fill will need a second, normal open of the header block.
 
-That last point used to be served by a `merged_ranges` function here, which
-opened the workbook in NORMAL mode and carried a docstring warning nobody could
-enforce. It is gone. `ingest.merges.merged_ranges` streams the sheet XML out of
-the zip instead: constant memory, correct under tab reordering, and tested.
-Callers that used to pass `sheet=None` and get the active sheet should use
-`merges.active_sheet_name(path)`, which reads the same `activeTab` openpyxl
-does.
-
-Memory: iter_rows on a read-only worksheet is a generator. Rows are staged to a
-temporary CSV and loaded with one read_csv. Peak memory is the inference sample
-plus the footer buffer, not the file.
+Memory: iter_rows on a read-only worksheet is a generator. Rows are accumulated
+into a batch, flushed to DuckDB, and the batch is cleared. Peak memory is one
+batch, not one file, whatever the sheet's size.
 """
 
 from __future__ import annotations
 
-import collections as _collections
 import csv as _csv
 import datetime as _dt
 import os as _os
@@ -42,17 +33,10 @@ from pathlib import Path
 
 import duckdb
 
-from ..config import EXCEL_BATCH_ROWS, EXCEL_PREVIEW_ROWS  # noqa: F401
+from ..config import EXCEL_BATCH_ROWS, EXCEL_PREVIEW_ROWS
 from ..util import db
 from . import sizegate
-from .csv_loader import (
-    ON_ERROR_NULL,
-    ON_ERROR_STOP,
-    LoadRefused,
-    LoadResult,
-    validate_dataset_name,
-    validate_on_error,
-)
+from .csv_loader import LoadRefused, LoadResult, validate_dataset_name
 
 # Python type -> DuckDB type. Order matters at the call site: bool first.
 _TYPE_RANK = {
@@ -133,15 +117,21 @@ def preview_rows(
         wb.close()
 
 
-def _apply_na(value: object, na_tokens: frozenset[str]) -> object:
-    """Turn a configured null token into None. Only strings are candidates.
+def merged_ranges(path: Path | str, sheet: str | None = None) -> list[str]:
+    """Merged cell ranges, e.g. ['A1:B1', 'C1:E1'].
 
-    A numeric 0 or a real date is never a null token, whatever the token list
-    says, so the comparison is deliberately restricted to str.
+    Requires a NORMAL open -- merged_cells is absent on a read-only worksheet.
+    That is acceptable here only because the caller wants the header block;
+    never call this as a precursor to streaming a large sheet.
     """
-    if isinstance(value, str) and value.strip() in na_tokens:
-        return None
-    return value
+    from openpyxl import load_workbook
+
+    wb = load_workbook(Path(path))
+    try:
+        ws = wb[sheet] if sheet else wb.active
+        return sorted(str(r) for r in ws.merged_cells.ranges)
+    finally:
+        wb.close()
 
 
 def _infer_column_types(
@@ -160,9 +150,8 @@ def _infer_column_types(
 def _coerce(value: object, duck_type: str):
     """Prepare one value for insertion, or raise ValueError.
 
-    Never silently drops a value. A value that will not fit its column raises;
-    load_excel turns that into an instructional refusal naming the cell under
-    on_error='stop', or a counted NULL under on_error='null'.
+    Never silently drops a value. A value that will not fit its column raises,
+    and load_excel turns that into an instructional refusal naming the cell.
     """
     if value is None:
         return None
@@ -194,43 +183,24 @@ def load_excel(
     sheet: str | None = None,
     header_rows: int = 1,
     names: list[str] | None = None,
-    na_values: list[str] | None = None,
-    footer_skip_rows: int = 0,
-    on_error: str = ON_ERROR_STOP,
     all_text: bool = False,
     inference_rows: int = 5_000,
     replace: bool = True,
 ) -> LoadResult:
     """Stream a worksheet into a DuckDB table and register it.
 
-    sheet             Sheet name. Defaults to the active sheet.
-    header_rows       Rows at the top that are headers, not data.
-    names             Explicit column names. Required when header_rows != 1.
-    na_values         Tokens to read as NULL, e.g. ['N/A', '-']. Applied to
-                      string cells only, before type inference -- so a column
-                      of numbers with a few 'N/A' cells is BIGINT with NULLs
-                      rather than VARCHAR. Defaults to no tokens; an empty
-                      cell is already None from openpyxl.
-    footer_skip_rows  Data rows at the END of the sheet to drop -- a totals
-                      row, a 'generated on' line. Held in a small buffer as
-                      the sheet streams, so it costs footer_skip_rows of
-                      memory and no second pass.
-    on_error          'stop' (default) refuses the load at the first value
-                      that does not fit its column, naming the row and the
-                      column. 'null' stores that cell as NULL, keeps the row,
-                      and counts the failures per column into
-                      LoadResult.coercion_failures -- F9.
-    all_text          Load every column as VARCHAR. The blunt escape hatch
-                      when a column has mixed types partway down; on_error
-                      ='null' is usually the better answer.
-    inference_rows    Rows examined to decide column types. Raising it costs
-                      memory; lowering it risks a wrong guess.
+    sheet           Sheet name. Defaults to the active sheet.
+    header_rows     Rows at the top that are headers, not data.
+    names           Explicit column names. Required when header_rows != 1.
+    all_text        Load every column as VARCHAR. The escape hatch when a
+                    column has mixed types partway down.
+    inference_rows  Rows examined to decide column types. Raising it costs
+                    memory; lowering it risks a wrong guess.
     """
     from openpyxl import load_workbook
 
     path = Path(path)
     validate_dataset_name(dataset_name)
-    validate_on_error(on_error)
 
     gate = sizegate.check_file(path, "excel")
     if not gate.allowed:
@@ -241,12 +211,6 @@ def load_excel(
             f"BLOCKED: header_rows cannot be negative (got {header_rows}).\n"
             f"NEXT STEP: use 0 for no header, 1 for the usual case."
         )
-    if footer_skip_rows < 0:
-        raise LoadRefused(
-            f"BLOCKED: footer_skip_rows cannot be negative (got "
-            f"{footer_skip_rows}).\n"
-            f"NEXT STEP: use 0 to keep every data row."
-        )
     if header_rows != 1 and not names:
         raise LoadRefused(
             f"BLOCKED: header_rows={header_rows} but no column names were "
@@ -256,10 +220,6 @@ def load_excel(
             f"NEXT STEP: call preview_rows() to see the top of the sheet, then "
             f"pass names=[...]."
         )
-
-    na_tokens = frozenset(t.strip() for t in (na_values or []))
-
-    coercion: dict[str, int] = {}
 
     wb = load_workbook(path, read_only=True)
     try:
@@ -282,24 +242,16 @@ def load_excel(
                     f"NEXT STEP: check the sheet is the one you meant."
                 ) from None
 
-        data = _trim_footer(_apply_na_rows(stream, na_tokens), footer_skip_rows)
-
         # Buffer enough rows to infer types before creating the table.
         sample: list[tuple] = []
-        for row in data:
+        for row in stream:
             sample.append(row)
             if len(sample) >= inference_rows:
                 break
 
         if not sample:
             raise LoadRefused(
-                f"BLOCKED: {path.name} has headers but no data rows"
-                + (
-                    f" after dropping {footer_skip_rows} footer row(s)"
-                    if footer_skip_rows
-                    else ""
-                )
-                + ".\n"
+                f"BLOCKED: {path.name} has headers but no data rows.\n"
                 f"NEXT STEP: check the sheet, or set header_rows=0 if the "
                 f"first row is really data."
             )
@@ -359,35 +311,32 @@ def load_excel(
         try:
             with open(tmp_path, "w", newline="", encoding="utf-8") as tmp:
                 writer = _csv.writer(tmp)
-                for row in _chain(sample, data):
+                for row in _chain(sample, stream):
                     row_no += 1
                     padded = list(row[:n_cols]) + [None] * (n_cols - len(row))
-                    out = []
-                    for i, (value, dtype) in enumerate(zip(padded, types)):
-                        try:
-                            out.append(_coerce(value, dtype))
-                        except ValueError as exc:
-                            if on_error == ON_ERROR_NULL:
-                                out.append(None)
-                                coercion[columns[i]] = coercion.get(columns[i], 0) + 1
-                                continue
-                            raise LoadRefused(
-                                f"BLOCKED: row {row_no} of {path.name} has a "
-                                f"value that does not fit its column.\n"
-                                f"Column '{columns[i]}' was read as "
-                                f"{types[i]}, but this row holds "
-                                f"{value!r} ({exc}).\n"
-                                f"WHY: types were inferred from the first "
-                                f"{len(sample):,} rows, and this row "
-                                f"disagrees. Nothing has been dropped -- the "
-                                f"load stopped instead.\n"
-                                f"NEXT STEP: reload with on_error='null' to "
-                                f"store that cell as NULL and count how many "
-                                f"there are, with all_text=True to keep every "
-                                f"column as text, or raise inference_rows "
-                                f"above {row_no}."
-                            ) from exc
-                    writer.writerow(out)
+                    try:
+                        writer.writerow(
+                            [_coerce(v, t) for v, t in zip(padded, types)]
+                        )
+                    except ValueError as exc:
+                        col_index = next(
+                            i for i, (v, t) in enumerate(zip(padded, types))
+                            if _safe_fails(v, t)
+                        )
+                        raise LoadRefused(
+                            f"BLOCKED: row {row_no} of {path.name} has a value "
+                            f"that does not fit its column.\n"
+                            f"Column '{columns[col_index]}' was read as "
+                            f"{types[col_index]}, but this row holds "
+                            f"{padded[col_index]!r} ({exc}).\n"
+                            f"WHY: types were inferred from the first "
+                            f"{len(sample):,} rows, and this row disagrees. "
+                            f"Nothing has been dropped -- the load stopped "
+                            f"instead.\n"
+                            f"NEXT STEP: reload with all_text=True to keep "
+                            f"every column as text, or raise inference_rows "
+                            f"above {row_no}."
+                        ) from exc
                     total += 1
 
             col_spec = ", ".join(
@@ -423,10 +372,7 @@ def load_excel(
         source_detail=f"{path} [{ws.title}]",
         row_count=rows,
         column_count=cols,
-        notes=(
-            f"header_rows={header_rows}, footer_skip_rows={footer_skip_rows}, "
-            f"on_error={on_error}, all_text={all_text}"
-        ),
+        notes=f"header_rows={header_rows}, all_text={all_text}",
     )
 
     return LoadResult(
@@ -436,35 +382,7 @@ def load_excel(
         columns=result_columns,
         gate_verdict=gate.verdict.value,
         gate_message=gate.message,
-        coercion_failures=coercion,
     )
-
-
-def _apply_na_rows(stream, na_tokens: frozenset[str]):
-    """Replace configured null tokens before anything else sees the row."""
-    if not na_tokens:
-        yield from stream
-        return
-    for row in stream:
-        yield tuple(_apply_na(v, na_tokens) for v in row)
-
-
-def _trim_footer(stream, footer_skip_rows: int):
-    """
-    Yield every row except the last `footer_skip_rows`.
-
-    A deque of that size runs one step behind the stream, so the trailing rows
-    are never emitted and the sheet is still read once. Peak memory is
-    footer_skip_rows rows, not the sheet.
-    """
-    if footer_skip_rows <= 0:
-        yield from stream
-        return
-    buffer = _collections.deque(maxlen=footer_skip_rows)
-    for row in stream:
-        if len(buffer) == footer_skip_rows:
-            yield buffer[0]
-        buffer.append(row)
 
 
 def _safe_fails(value: object, duck_type: str) -> bool:

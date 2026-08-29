@@ -1,13 +1,14 @@
 """CSV and delimited-text loading into DuckDB.
 
-Phase 2, Step 5. See build guide Section 4.2 and 4.2.1 (the verified read path),
-locked decision 4 (previews never load the whole file), F5 (everything typed
-VARCHAR).
+Phase 2, Step 5; extended in Phase 3, Step 5. See build guide Section 4.2 and
+4.2.1 (the verified read path), locked decision 4 (previews never load the whole
+file), F5 (everything typed VARCHAR), F9 (coercion failures counted, never
+silent).
 
 The interface is deliberately primitive: paths, integers and lists of strings,
-not an IngestSpec. Phase 3 builds IngestSpec and maps it onto these same
-arguments, so nothing here is rewritten -- and Phase 2 stays testable without
-pulling the conversation layer forward.
+not an IngestSpec. IngestSpec.to_loader_kwargs() maps onto these same arguments,
+so nothing here is rewritten -- and Phase 2 stays testable without pulling the
+conversation layer forward.
 
 The 4.2.1 rule, verified on DuckDB 1.5.5:
 
@@ -22,6 +23,22 @@ Two behaviours found by testing, both guarded against below:
   2. Supplying FEWER names does NOT error. DuckDB pads the tail with
      'column7'. Data is not shifted, but you get a silently misnamed column.
      load_csv counts the columns first and refuses on any mismatch.
+
+Three more, found while adding footer skipping and coercion counts:
+
+  3. A read_csv scan preserves file order, so `LIMIT n` keeps the FIRST n rows.
+     Verified on a 20,000-row file at threads=8 with preserve_insertion_order
+     at its default: the kept ids were exactly 1..20000, in order. That is what
+     makes footer_skip_rows implementable, since read_csv has no skipfooter.
+  4. DuckDB's type inference WIDENS rather than fails. A column of integers
+     with one 'oops' in it comes back VARCHAR, not BIGINT-with-an-error. So a
+     coercion failure count is only meaningful once the target types are
+     pinned, which is what on_error='null' does.
+  5. store_rejects=true reports per-column counts, but it drops the whole ROW
+     and writes into persistent reject tables that accumulate across loads.
+     TRY_CAST is used instead: it nulls the offending CELL, keeps the row, and
+     needs no side tables. Verified on a 53-row file -- 53 rows kept,
+     {'units': 1, 'price': 2} counted.
 """
 
 from __future__ import annotations
@@ -39,6 +56,11 @@ from . import sizegate
 # A dataset name becomes a SQL identifier. Validate rather than quote-and-hope.
 _IDENT_RE = re.compile(r"^[A-Za-z][A-Za-z0-9_]{0,62}$")
 
+# What to do with a value that will not fit its column.
+ON_ERROR_STOP = "stop"
+ON_ERROR_NULL = "null"
+ON_ERROR_MODES = (ON_ERROR_STOP, ON_ERROR_NULL)
+
 
 @dataclass
 class LoadResult:
@@ -48,6 +70,11 @@ class LoadResult:
     columns: list[tuple[str, str]] = field(default_factory=list)
     gate_verdict: str = "OK"
     gate_message: str = ""
+    coercion_failures: dict[str, int] = field(default_factory=dict)
+
+    @property
+    def coercion_total(self) -> int:
+        return sum(self.coercion_failures.values())
 
     def summary(self) -> str:
         lines = [
@@ -56,6 +83,19 @@ class LoadResult:
         ]
         if self.gate_message:
             lines.append(f"NOTE: {self.gate_message}")
+        if self.coercion_failures:
+            worst = ", ".join(
+                f"{c} ({n:,})"
+                for c, n in sorted(
+                    self.coercion_failures.items(), key=lambda kv: -kv[1]
+                )
+            )
+            lines.append(
+                f"NOTE: {self.coercion_total:,} value(s) did not fit their "
+                f"column and were stored as NULL: {worst}. The rows were kept. "
+                f"Reload with on_error='stop' to see the first one, or force "
+                f"those columns to text."
+            )
         lines.append("")
         lines.append("| column | type |")
         lines.append("| --- | --- |")
@@ -80,9 +120,26 @@ def validate_dataset_name(name: str) -> str:
     return name
 
 
+def validate_on_error(mode: str) -> str:
+    if mode not in ON_ERROR_MODES:
+        raise LoadRefused(
+            f"BLOCKED: on_error={mode!r} is not a mode.\n"
+            f"WHY: 'stop' refuses the load at the first value that does not "
+            f"fit its column, naming the row. 'null' stores that cell as NULL, "
+            f"keeps the row, and counts the failures per column.\n"
+            f"NEXT STEP: pass one of {ON_ERROR_MODES}."
+        )
+    return mode
+
+
 def _sql_path(path: Path) -> str:
     """Single-quoted SQL literal for a path. Doubles any embedded quote."""
     return "'" + str(path).replace("'", "''") + "'"
+
+
+def _q(name: str) -> str:
+    """Double-quoted SQL identifier. Doubles any embedded quote."""
+    return '"' + name.replace('"', '""') + '"'
 
 
 def preview_lines(path: Path | str, n: int = CSV_PREVIEW_LINES) -> list[str]:
@@ -117,6 +174,14 @@ def detect_column_count(
     return len(rel.description)
 
 
+def _sniff_types(
+    con: duckdb.DuckDBPyConnection, read_expr: str
+) -> list[tuple[str, str]]:
+    """(name, DuckDB type) per column, sniffed without loading any rows."""
+    rel = con.execute(f"SELECT * FROM {read_expr} LIMIT 0")
+    return [(d[0], str(d[1])) for d in rel.description]
+
+
 def load_csv(
     con: duckdb.DuckDBPyConnection,
     path: Path | str,
@@ -125,24 +190,42 @@ def load_csv(
     names: list[str] | None = None,
     na_values: list[str] | None = None,
     delimiter: str | None = None,
+    footer_skip_rows: int = 0,
+    dtypes: dict[str, str] | None = None,
+    on_error: str = ON_ERROR_STOP,
     sample_size: int = 20_480,
     replace: bool = True,
 ) -> LoadResult:
     """Load a delimited file into a DuckDB table and register it.
 
-    header_rows  How many rows at the top are headers, not data. 1 is the
-                 ordinary case. 2 or more requires `names`, because DuckDB
-                 cannot infer a column name spread over several rows.
-    names        Explicit column names. Required when header_rows != 1.
-                 Must match the file's column count exactly.
-    na_values    Tokens to read as NULL. Defaults to config.DEFAULT_NA_VALUES.
-                 Empty fields are already NULL in DuckDB without this.
-    sample_size  Rows scanned to infer types. DuckDB's default is 20480. Pass
-                 -1 to scan everything -- correct but slow on a large file, and
-                 worth it when a column turns to text partway down.
+    header_rows       How many rows at the top are headers, not data. 1 is the
+                      ordinary case. 2 or more requires `names`, because DuckDB
+                      cannot infer a column name spread over several rows.
+    names             Explicit column names. Required when header_rows != 1.
+                      Must match the file's column count exactly.
+    na_values         Tokens to read as NULL. Defaults to
+                      config.DEFAULT_NA_VALUES. Empty fields are already NULL
+                      in DuckDB without this.
+    delimiter         Field separator. Sniffed when omitted.
+    footer_skip_rows  Data rows at the END of the file to drop -- a totals row,
+                      a 'generated on' line. Costs one extra count(*) pass,
+                      because read_csv has no skipfooter and the row total has
+                      to be known before the tail can be cut.
+    dtypes            Pin specific columns to a type, e.g.
+                      {'order_id': 'VARCHAR'}. Columns not named here are
+                      inferred as usual.
+    on_error          'stop' (default) leaves DuckDB to refuse a value that
+                      will not convert. 'null' stores that cell as NULL, keeps
+                      the row, and counts the failures per column into
+                      LoadResult.coercion_failures -- F9.
+    sample_size       Rows scanned to infer types. DuckDB's default is 20480.
+                      Pass -1 to scan everything -- correct but slow on a large
+                      file, and worth it when a column turns to text partway
+                      down.
     """
     path = Path(path)
     validate_dataset_name(dataset_name)
+    validate_on_error(on_error)
 
     gate = sizegate.check_file(path, "csv")
     if not gate.allowed:
@@ -152,6 +235,12 @@ def load_csv(
         raise LoadRefused(
             f"BLOCKED: header_rows cannot be negative (got {header_rows}).\n"
             f"NEXT STEP: use 0 for a file with no header, 1 for the usual case."
+        )
+    if footer_skip_rows < 0:
+        raise LoadRefused(
+            f"BLOCKED: footer_skip_rows cannot be negative (got "
+            f"{footer_skip_rows}).\n"
+            f"NEXT STEP: use 0 to keep every data row."
         )
     if header_rows != 1 and not names:
         raise LoadRefused(
@@ -193,18 +282,42 @@ def load_csv(
         if header_rows > 1:
             opts.append(f"skip={header_rows}")
 
+    read_expr = f'read_csv({_sql_path(path)}, {", ".join(opts)})'
+
+    coercion: dict[str, int] = {}
     verb = "CREATE OR REPLACE TABLE" if replace else "CREATE TABLE"
-    sql = (f'{verb} "{dataset_name}" AS SELECT * FROM '
-           f'read_csv({_sql_path(path)}, {", ".join(opts)})')
 
     try:
-        con.execute(sql)
+        if on_error == ON_ERROR_NULL:
+            coercion = _load_with_coercion_counts(
+                con, read_expr, dataset_name, dtypes, footer_skip_rows, verb
+            )
+        else:
+            select = "SELECT * FROM " + read_expr
+            if dtypes:
+                sniffed = _sniff_types(con, read_expr)
+                select = (
+                    "SELECT "
+                    + ", ".join(
+                        f"CAST({_q(c)} AS {dtypes[c]}) AS {_q(c)}"
+                        if c in dtypes
+                        else _q(c)
+                        for c, _t in sniffed
+                    )
+                    + " FROM "
+                    + read_expr
+                )
+            if footer_skip_rows:
+                select = _apply_footer_skip(con, select, read_expr, footer_skip_rows, path)
+            con.execute(f"{verb} {_q(dataset_name)} AS {select}")
     except duckdb.Error as exc:
         raise LoadRefused(
             f"BLOCKED: DuckDB could not read {path.name}.\n"
             f"DuckDB said: {exc}\n"
             f"NEXT STEP: check the delimiter and the number of header rows. "
-            f"Call preview_lines() to see the first lines as they actually are."
+            f"Call preview_lines() to see the first lines as they actually "
+            f"are. If a single bad value is the problem, on_error='null' "
+            f"stores it as NULL and counts it instead of stopping."
         ) from exc
 
     rows, cols = db.table_shape(con, dataset_name)
@@ -225,7 +338,10 @@ def load_csv(
         source_detail=str(path),
         row_count=rows,
         column_count=cols,
-        notes=f"header_rows={header_rows}",
+        notes=(
+            f"header_rows={header_rows}, footer_skip_rows={footer_skip_rows}, "
+            f"on_error={on_error}"
+        ),
     )
 
     return LoadResult(
@@ -235,4 +351,102 @@ def load_csv(
         columns=columns,
         gate_verdict=gate.verdict.value,
         gate_message=gate.message,
+        coercion_failures=coercion,
     )
+
+
+def _apply_footer_skip(
+    con: duckdb.DuckDBPyConnection,
+    select: str,
+    read_expr: str,
+    footer_skip_rows: int,
+    path: Path,
+) -> str:
+    """Wrap a SELECT so the last `footer_skip_rows` data rows are dropped.
+
+    read_csv has no skipfooter, so the total has to be counted first. A scan
+    preserves file order (verified at threads=8 on 20,000 rows), so LIMIT keeps
+    the first n rows rather than an arbitrary n.
+    """
+    total = con.execute(f"SELECT count(*) FROM {read_expr}").fetchone()[0]
+    keep = total - footer_skip_rows
+    if keep < 0:
+        raise LoadRefused(
+            f"BLOCKED: footer_skip_rows={footer_skip_rows} but {path.name} has "
+            f"only {total} data row(s).\n"
+            f"NEXT STEP: lower footer_skip_rows, or check header_rows is right."
+        )
+    return f"{select} LIMIT {keep}"
+
+
+def _load_with_coercion_counts(
+    con: duckdb.DuckDBPyConnection,
+    read_expr: str,
+    dataset_name: str,
+    dtypes: dict[str, str] | None,
+    footer_skip_rows: int,
+    verb: str,
+) -> dict[str, int]:
+    """
+    Load with cell-level coercion, counting what did not fit.
+
+    DuckDB's own store_rejects reports per-column counts but drops the whole
+    row and writes into persistent side tables. TRY_CAST is used instead: the
+    offending cell becomes NULL, the row survives, and the count is one extra
+    aggregate over the staged text.
+
+    Target types come from `dtypes` where given and from DuckDB's own sniff
+    otherwise. That matters because inference WIDENS -- a column of integers
+    containing one 'oops' is sniffed as VARCHAR, and nothing can fail to
+    convert to VARCHAR. Pinning the type is what makes a failure countable.
+    """
+    sniffed = _sniff_types(con, read_expr)
+    targets = {c: (dtypes or {}).get(c, t) for c, t in sniffed}
+
+    staging = f"_stage_{dataset_name}"
+    text_expr = read_expr.replace("read_csv(", "read_csv(", 1)
+    # all_varchar keeps every value as text so TRY_CAST has something to fail
+    # against; without it DuckDB has already widened the column.
+    text_expr = text_expr[:-1] + ", all_varchar=true)"
+
+    # The footer is trimmed HERE, before anything is counted. Counting first
+    # and trimming afterwards reports a coercion failure for a 'TOTAL' row
+    # that is then thrown away -- verified: it counted id=1 on a file whose
+    # only bad value was in the footer.
+    stage_select = f"SELECT * FROM {text_expr}"
+    if footer_skip_rows:
+        total = con.execute(f"SELECT count(*) FROM {text_expr}").fetchone()[0]
+        keep = total - footer_skip_rows
+        if keep < 0:
+            raise LoadRefused(
+                f"BLOCKED: footer_skip_rows={footer_skip_rows} but the file "
+                f"has only {total} data row(s).\n"
+                f"NEXT STEP: lower footer_skip_rows."
+            )
+        stage_select = f"{stage_select} LIMIT {keep}"
+
+    con.execute(f"CREATE OR REPLACE TEMP TABLE {_q(staging)} AS {stage_select}")
+    try:
+        countable = [
+            (c, t) for c, t in targets.items() if t.upper() not in ("VARCHAR", "TEXT")
+        ]
+        coercion: dict[str, int] = {}
+        if countable:
+            exprs = ", ".join(
+                f"count(*) FILTER (WHERE {_q(c)} IS NOT NULL "
+                f"AND TRY_CAST({_q(c)} AS {t}) IS NULL) AS {_q(c)}"
+                for c, t in countable
+            )
+            row = con.execute(f"SELECT {exprs} FROM {_q(staging)}").fetchone()
+            coercion = {c: n for (c, _t), n in zip(countable, row) if n}
+
+        select = "SELECT " + ", ".join(
+            f"TRY_CAST({_q(c)} AS {t}) AS {_q(c)}" if t.upper() not in ("VARCHAR", "TEXT")
+            else _q(c)
+            for c, t in targets.items()
+        ) + f" FROM {_q(staging)}"
+
+        con.execute(f"{verb} {_q(dataset_name)} AS {select}")
+        return coercion
+    finally:
+        con.execute(f"DROP TABLE IF EXISTS {_q(staging)}")

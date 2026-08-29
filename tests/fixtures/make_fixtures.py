@@ -1,6 +1,6 @@
 """Generate every test fixture the build needs.
 
-Phase 2, Step 3. Run from the repo root:
+Phase 2, Step 3; extended in Phase 3, Step 5. Run from the repo root:
 
     uv run python tests/fixtures/make_fixtures.py
     uv run python tests/fixtures/make_fixtures.py --big        # adds big_synthetic.csv
@@ -23,13 +23,30 @@ The fixtures, and what each one is for:
   merged_multiheader.xlsx  Phase 3. Merged cells spanning columns. openpyxl gives
                            the value in the top-left cell and None everywhere
                            else, which is what bounded fill has to repair.
+  mixed_types.xlsx         Phase 3 Step 5. Type coercion, F9. Bad values sit
+                           BELOW row 5000 on purpose, so the default
+                           inference_rows=5000 never sees them: the sniffer
+                           calls the column BIGINT and then meets text. That is
+                           the only way a coercion failure can happen at all,
+                           and it is what on_error='null' counts.
+  gaps_and_dupes.csv       Phase 3 Step 5. A header row with blanks and repeats,
+                           so blank-column naming and duplicate suffixing have
+                           something real to work on.
   big_synthetic.csv        Phase 3 preview performance. Gitignored. Opt-in.
+
+A note on dates. _sales_rows writes them with .isoformat(), so they are STRINGS
+in every fixture. DuckDB parses those to DATE; the Excel loader sees a str and
+leaves it VARCHAR, because _duck_type only maps a real datetime to TIMESTAMP.
+Neither loader is wrong -- they disagree about whether a date-shaped string is a
+date. mixed_types.xlsx deliberately writes real datetime objects instead, so
+there is at least one fixture where the Excel path produces TIMESTAMP.
 """
 
 from __future__ import annotations
 
 import argparse
 import csv
+import datetime as _dt
 import random
 import sys
 from datetime import date, timedelta
@@ -117,6 +134,10 @@ def make_messy_headers_xlsx(path: Path, n: int = 200) -> None:
     headers, data from row 6, then a blank and two notes rows at the bottom.
     A loader that assumes row 1 is the header gets a single column called
     'Quarterly Sales Report'.
+
+    The three rows at the bottom are why footer_skip_rows exists. A header
+    guesser can find where the data starts from a type change; nothing about
+    the top of a file says where it ends.
     """
     from openpyxl import Workbook
 
@@ -175,6 +196,95 @@ def make_merged_multiheader_xlsx(path: Path, n: int = 150) -> None:
     wb.save(path)
 
 
+# Rows carrying a value that will not fit its column. All are past 5000, so
+# the default inference_rows=5000 has already decided the type before it meets
+# them. Fixed positions, so the counts are assertable.
+_BAD_UNITS_ROWS = (5100, 5200, 5300, 5400, 5500, 5600, 5700)
+_BAD_PRICE_ROWS = (5150, 5450, 5750)
+
+
+def make_mixed_types_xlsx(path: Path, n: int = 6000) -> None:
+    """Type coercion, F9.
+
+    Six thousand rows so that the bad values can sit BELOW the default
+    inference_rows=5000. That placement is the whole point. Put them in the
+    first 5000 and the sniffer sees text in the column, widens it to VARCHAR,
+    and nothing ever fails to convert -- so nothing is counted, and the fixture
+    proves nothing.
+
+    Expected with defaults:
+
+        load_excel(...)                     -> LoadRefused naming row 5101
+        load_excel(..., on_error='null')    -> {'units': 7, 'unit_price': 3}
+        load_excel(..., all_text=True)      -> every column VARCHAR, no failures
+
+    order_date holds real datetime objects here, not isoformat strings, so this
+    is the one fixture where the Excel path produces TIMESTAMP. region carries
+    'N/A' in about 5% of rows for na_values to catch; those are declared nulls,
+    NOT coercion failures, and must never appear in the counts.
+    """
+    from openpyxl import Workbook
+
+    rng = _rng()
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Data"
+    ws.append(["order_id", "order_date", "region", "units", "unit_price",
+               "is_return"])
+
+    start = _dt.datetime(2024, 1, 1)
+    bad_units = set(_BAD_UNITS_ROWS)
+    bad_price = set(_BAD_PRICE_ROWS)
+
+    for i in range(1, n + 1):
+        units = rng.randint(1, 40)
+        price = round(rng.uniform(5.0, 250.0), 2)
+        region = "N/A" if rng.random() < 0.05 else rng.choice(REGIONS)
+        ws.append([
+            f"ORD-{i:05d}",
+            start + timedelta(days=rng.randint(0, 364)),
+            region,
+            "n/a" if i in bad_units else units,
+            "not priced" if i in bad_price else price,
+            rng.random() < 0.1,
+        ])
+    wb.save(path)
+
+
+def make_gaps_and_dupes_csv(path: Path, n: int = 200) -> None:
+    """A header row with blanks and repeats.
+
+    Header:  order_id, units, '', units, '', revenue
+
+    Two columns share the name 'units' and two have no name at all. Both have
+    to be resolved before the names reach DuckDB, which will not hold two
+    columns of the same name and silently invents 'columnN' for a short list.
+
+    Expected from headers.assemble_names:
+
+        ['order_id', 'units', 'column_3', 'units_2', 'column_5', 'revenue']
+
+    with both decisions reported: the blanks named by position, the duplicate
+    suffixed. Neither is allowed to happen quietly.
+    """
+    rng = _rng()
+    with path.open("w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        w.writerow(["order_id", "units", "", "units", "", "revenue"])
+        for i in range(n):
+            units_a = rng.randint(1, 40)
+            units_b = rng.randint(1, 40)
+            price = round(rng.uniform(5.0, 250.0), 2)
+            w.writerow([
+                f"ORD-{i + 1:05d}",
+                units_a,
+                rng.choice(REGIONS),
+                units_b,
+                rng.choice(CHANNELS),
+                round((units_a + units_b) * price, 2),
+            ])
+
+
 def make_big_synthetic_csv(path: Path, target_gb: float = 1.5) -> int:
     """A large CSV for preview-performance testing. Gitignored.
 
@@ -222,6 +332,8 @@ SMALL_FIXTURES = [
     ("clean_sales.xlsx", make_clean_sales_xlsx),
     ("messy_headers.xlsx", make_messy_headers_xlsx),
     ("merged_multiheader.xlsx", make_merged_multiheader_xlsx),
+    ("mixed_types.xlsx", make_mixed_types_xlsx),
+    ("gaps_and_dupes.csv", make_gaps_and_dupes_csv),
 ]
 
 

@@ -15,6 +15,7 @@ from openpyxl import Workbook
 
 from analytics_agent.ingest.merges import (
     MergeParseError,
+    active_sheet_name,
     fill_bounded,
     merged_ranges,
     merges_on_rows,
@@ -197,3 +198,74 @@ def test_merges_on_rows_filters_by_row_span():
     assert merges_on_rows(refs, [8]) == ["B7:C9"]
     assert merges_on_rows(refs, [1, 4]) == ["A1:B1", "C4:D4"]
     assert merges_on_rows(refs, [5]) == []
+
+
+
+# --------------------------------------------------------------------------
+# active_sheet_name -- the default that excel.merged_ranges used to provide
+# --------------------------------------------------------------------------
+
+def _workbook(tmp_path, name, n=3, active=0, reorder=False, hide=None):
+    wb = Workbook()
+    wb.active.title = "S1"
+    for i in range(2, n + 1):
+        wb.create_sheet(f"S{i}")
+    wb.active = active
+    if hide is not None:
+        wb[f"S{hide}"].sheet_state = "hidden"
+    path = tmp_path / name
+    wb.save(path)
+    if reorder:
+        tmp = tmp_path / (name + ".t")
+        with zipfile.ZipFile(path) as zin, zipfile.ZipFile(
+            tmp, "w", zipfile.ZIP_DEFLATED
+        ) as zout:
+            for item in zin.infolist():
+                data = zin.read(item.filename)
+                if item.filename == "xl/workbook.xml":
+                    text = data.decode()
+                    block = re.search(r"<sheets>(.*?)</sheets>", text, re.S).group(1)
+                    elems = re.findall(r"<sheet .*?/>", block)
+                    text = text.replace(block, "".join(reversed(elems)))
+                    data = text.encode()
+                zout.writestr(item, data)
+        tmp.replace(path)
+    return str(path)
+
+
+@pytest.mark.parametrize(
+    "label,kwargs",
+    [
+        ("default", {}),
+        ("second tab active", {"active": 1}),
+        ("third tab active", {"active": 2}),
+        ("tabs reordered", {"active": 1, "reorder": True}),
+        ("a sheet hidden", {"active": 2, "hide": 2}),
+    ],
+)
+def test_active_sheet_name_matches_openpyxl(tmp_path, label, kwargs):
+    """
+    Deleting excel.merged_ranges removed a sheet=None default that meant
+    wb.active. This has to reproduce it exactly or the wrong sheet gets read
+    on any workbook not saved from its first tab.
+    """
+    from openpyxl import load_workbook
+
+    path = _workbook(tmp_path, f"{label.replace(' ', '_')}.xlsx", **kwargs)
+    wb = load_workbook(path, read_only=True)
+    truth = wb.active.title
+    wb.close()
+
+    assert active_sheet_name(path) == truth
+
+
+def test_active_sheet_name_is_not_simply_the_first_sheet(tmp_path):
+    """If it were, this test would pass by accident everywhere else."""
+    path = _workbook(tmp_path, "third.xlsx", active=2)
+    assert active_sheet_name(path) == "S3"
+    assert sheet_names(path)[0] == "S1"
+
+
+def test_active_sheet_name_defaults_to_the_first_tab_when_unset(tmp_path):
+    path = _workbook(tmp_path, "plain.xlsx")
+    assert active_sheet_name(path) == sheet_names(path)[0]

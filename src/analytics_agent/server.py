@@ -34,7 +34,7 @@ from .config import (
 from . import workspace
 from .util import db
 from .util.formatting import format_kv
-from .ingest import csv_loader, excel, postgres, sizegate
+from .ingest import csv_loader, excel, postgres, sizegate, merges
 from .ingest.csv_loader import LoadRefused
 
 mcp = FastMCP(SERVER_NAME)
@@ -127,7 +127,7 @@ def preview_file(path: str, sheet: str | None = None, lines: int = 15) -> str:
             rows = excel.preview_rows(p, sheet, n=lines)
             head = f"{p.name} - sheets: {', '.join(sheets)}\n\n"
             body = "\n".join(f"row {i}: {r}" for i, r in enumerate(rows, 1))
-            merged = excel.merged_ranges(p, sheet)
+            merged = merges.merged_ranges(p, sheet or merges.active_sheet_name(p))
             if merged:
                 body += f"\n\nMerged cells: {', '.join(merged)}"
             return head + body

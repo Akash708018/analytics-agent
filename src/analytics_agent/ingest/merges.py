@@ -59,6 +59,41 @@ def sheet_names(path: str) -> list[str]:
         return [s.get("name") for s in sheets]
 
 
+def active_sheet_name(path: str) -> str:
+    """
+    The tab Excel opens on -- what openpyxl calls ``wb.active``.
+
+    Needed because the Phase 2 ``excel.merged_ranges`` defaulted ``sheet=None``
+    to the active sheet, and this module requires an explicit name. The active
+    tab is NOT the first tab: ``activeTab`` in ``xl/workbook.xml`` is an index
+    into <sheets> order and is wherever the file was last saved from. It counts
+    hidden sheets rather than skipping them.
+
+    Verified against openpyxl's ``wb.active`` on five workbooks: default,
+    second tab active, third tab active, tabs reordered, and one sheet hidden.
+    """
+    with _open_package(path) as z:
+        wb = ET.fromstring(z.read("xl/workbook.xml"))
+        sheets_el = wb.find(f"{NS_MAIN}sheets")
+        if sheets_el is None or len(sheets_el) == 0:
+            raise MergeParseError(f"{path} has no sheets")
+        names = [s.get("name") for s in sheets_el]
+
+        idx = 0
+        views = wb.find(f"{NS_MAIN}bookViews")
+        if views is not None:
+            for view in views:
+                raw = view.get("activeTab")
+                if raw is not None:
+                    try:
+                        idx = int(raw)
+                    except ValueError:
+                        idx = 0
+                    break
+
+        return names[idx] if 0 <= idx < len(names) else names[0]
+
+
 def _sheet_part(z: zipfile.ZipFile, sheet_name: str) -> str:
     """
     Resolve a tab name to its part name inside the zip.

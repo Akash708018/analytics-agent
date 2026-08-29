@@ -29,15 +29,29 @@ from analytics_agent.ingest.spec import (
 
 def stub_load_csv(
     con, path, dataset_name, header_rows=1, names=None, na_values=None,
-    delimiter=None, sample_size=20_480, replace=True,
+    delimiter=None, footer_skip_rows=0, dtypes=None, on_error="stop",
+    sample_size=20_480, replace=True,
 ):
     ...
 
 
 def stub_load_excel(
     con, path, dataset_name, sheet=None, header_rows=1, names=None,
-    all_text=False, inference_rows=5_000, replace=True,
+    na_values=None, footer_skip_rows=0, on_error="stop", all_text=False,
+    inference_rows=5_000, replace=True,
 ):
+    ...
+
+
+def narrow_loader(con, path, dataset_name, header_rows=1, names=None):
+    """
+    A loader that accepts only the bare minimum.
+
+    Step 5 gave the real loaders every field the spec can carry, so nothing on
+    a real spec is refused any more. The refusal mechanism still has to work
+    for the next field somebody adds to IngestSpec, so it is pinned against
+    this instead of against a real loader that has caught up.
+    """
     ...
 
 
@@ -146,18 +160,27 @@ def test_kwargs_omit_con_and_path():
 
 
 def test_unsupported_field_is_refused_by_name():
-    """na_values on the Excel path, until Step 5 adds the parameter."""
     with pytest.raises(SpecNotSupported) as exc:
-        excel_spec(na_values=["-"]).to_loader_kwargs(stub_load_excel)
+        csv_spec(na_values=["-"]).to_loader_kwargs(narrow_loader)
     msg = str(exc.value)
     assert "na_values" in msg
     assert "NEXT STEP" in msg
 
 
-def test_footer_skip_is_refused_by_both_loaders_today():
+def test_every_refused_field_is_named_not_just_the_first():
     with pytest.raises(SpecNotSupported) as exc:
-        csv_spec(footer_skip_rows=1).to_loader_kwargs(stub_load_csv)
-    assert "footer_skip_rows" in str(exc.value)
+        csv_spec(na_values=["-"], footer_skip_rows=2).to_loader_kwargs(narrow_loader)
+    msg = str(exc.value)
+    assert "na_values" in msg and "footer_skip_rows" in msg
+
+
+def test_the_real_loaders_now_accept_na_values_and_footer_skip():
+    """Step 3 left both refused. Step 5 is what makes this pass."""
+    from analytics_agent.ingest.csv_loader import load_csv
+    from analytics_agent.ingest.excel import load_excel
+
+    csv_spec(na_values=["-"], footer_skip_rows=1).to_loader_kwargs(load_csv)
+    excel_spec(na_values=["-"], footer_skip_rows=1).to_loader_kwargs(load_excel)
 
 
 def test_no_loader_means_no_signature_check():
