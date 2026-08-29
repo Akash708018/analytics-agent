@@ -3,8 +3,10 @@ Unit tests for ingest/preview.py.
 
 The three fixture shapes used throughout mirror the real files:
 
-    MESSY   title in row 1, blanks, header in row 4, data from row 5
-            (tests/fixtures/messy_headers.xlsx)
+    MESSY   a title, then blanks, then the header, then data. Shaped like
+            tests/fixtures/messy_headers.xlsx, whose real header is row 5 --
+            the exact row is deliberately not encoded here, because the point
+            of the guesser is that it reads it off the file.
     SALES   spanning labels in row 1 under merges, leaf names in row 2,
             data from row 3 (tests/fixtures/merged_multiheader.xlsx)
     SALES as CSV  the same rows with no merge metadata, which must not
@@ -64,7 +66,7 @@ def test_plain_single_row_header_is_high_confidence():
 
 
 def test_title_and_blanks_above_the_header_are_excluded():
-    """messy_headers: header is row 4 alone, not rows 1-4."""
+    """The title and the blanks above the header are dropped, not joined in."""
     g = guess_header(MESSY, source_type="excel", merge_refs=[])
     assert g.header_rows == [4]
     assert g.data_start_row == 5
