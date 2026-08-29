@@ -213,3 +213,23 @@ Machine-local and implementation choices that are easy to forget six months late
 - Still owed to Phase 2 in Step 5: na_values and footer_skip_rows on
   load_excel and load_csv, coercion_failures: dict[str, int] on
   LoadResult for F9, and deletion of excel.merged_ranges.
+
+- The header-row guesser works off one signal: the first row containing a
+  non-texty value marks where data starts, then walk up while rows are
+  text and non-blank. A blank row stops the walk, which is what cuts a
+  title away from the header below it without any special-casing.
+- Blanks count as texty. A header row with gaps under merges is still a
+  header row. Numeric strings do not: a CSV hands every cell over as str,
+  so '10' is parsed rather than trusted, or the first data row reads as a
+  header.
+- A sparse top row is a spanning header if merges cover it, a title if
+  they do not. On CSV neither can be established, so confidence is low,
+  draft_spec returns None, and the caller asks. That is the Done-When
+  clause about multiheader.csv enforced as control flow rather than as a
+  thing to remember.
+- headers._build_notes takes the join mode. Under bottom_only the merged
+  labels never reach the names, so the note says the merges were filled
+  and not used. Claiming otherwise made the assumptions list untrustworthy,
+  which defeats its purpose.
+- Pivot-dump detection needs 3+ period columns AND at least half of all
+  columns. One period column among many is a variable, not a pivot.

@@ -110,6 +110,40 @@ def test_note_counts_blanks_before_the_fill(sales_shaped):
     assert "A1:B1, C1:E1, F1:H1" in note
 
 
+def test_note_does_not_claim_the_fill_was_used_under_bottom_only(sales_shaped):
+    """
+    Under bottom_only every row above the last is discarded, so the merged
+    labels never reach the names. Saying they were "used to build column
+    names" would be false, and an assumptions list is only worth reading if it
+    can be trusted without checking.
+    """
+    refs = merged_ranges(sales_shaped, "Sales")
+    rows = _read_header(sales_shaped, "Sales", 2)
+    note = assemble_names(
+        rows,
+        header_rows_1idx=[1, 2],
+        source_type="excel",
+        join="bottom_only",
+        merge_refs=refs,
+    ).notes[0]
+
+    assert "filled but not used" in note
+    assert "do not appear" in note
+    assert "A1:B1, C1:E1, F1:H1" in note
+
+
+def test_note_still_claims_the_fill_was_used_under_space(sales_shaped):
+    refs = merged_ranges(sales_shaped, "Sales")
+    rows = _read_header(sales_shaped, "Sales", 2)
+    note = assemble_names(
+        rows, header_rows_1idx=[1, 2], source_type="excel", join="space",
+        merge_refs=refs,
+    ).notes[0]
+
+    assert "Filled them to build column names" in note
+    assert "filled but not used" not in note
+
+
 # --------------------------------------------------------------------------
 # join modes
 # --------------------------------------------------------------------------

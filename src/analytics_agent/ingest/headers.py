@@ -159,7 +159,7 @@ def assemble_names(
     result.names = _dedupe(named, result)
     # Blank counts in the note describe the row AS READ, before filling --
     # that is the number that tells you why the fill was needed at all.
-    result.notes = _build_notes(result, header_rows_1idx, source_type, rows)
+    result.notes = _build_notes(result, header_rows_1idx, source_type, rows, join)
     return result
 
 
@@ -197,6 +197,7 @@ def _build_notes(
     header_rows_1idx: list[int],
     source_type: str,
     raw_rows: list[list],
+    join: str,
 ) -> list[str]:
     notes = []
     span = (
@@ -209,14 +210,39 @@ def _build_notes(
     if result.filled_merges:
         top = raw_rows[0]
         blank_in_top = sum(1 for v in top if not _clean(v))
-        notes.append(
+        plural = "s" if len(result.filled_merges) != 1 else ""
+        found = (
             f"Row{'s' if len(header_rows_1idx) > 1 else ''} {span} contain "
-            f"{len(result.filled_merges)} merged range"
-            f"{'s' if len(result.filled_merges) != 1 else ''} "
-            f"({', '.join(result.filled_merges)}). Filled them to build column "
-            f"names. Row {header_rows_1idx[0]} alone showed {blank_in_top} of "
-            f"{width} columns blank. Check the assembled names before confirming."
+            f"{len(result.filled_merges)} merged range{plural} "
+            f"({', '.join(result.filled_merges)})."
         )
+        # Whether the fill reached the output depends on the join mode. Under
+        # bottom_only every row above the last is discarded, so saying the
+        # merges were "used to build the names" would be false -- and the
+        # assumptions list is only worth reading if it can be trusted without
+        # checking.
+        if join == "bottom_only" and len(header_rows_1idx) > 1:
+            notes.append(
+                f"{found} They were filled but not used: header_join is "
+                f"bottom_only, so the names come from row "
+                f"{header_rows_1idx[-1]} alone and the merged labels do not "
+                f"appear in them."
+            )
+        elif join == "top_only" and len(header_rows_1idx) > 1:
+            notes.append(
+                f"{found} Filled them to build column names from row "
+                f"{header_rows_1idx[0]} alone. Row {header_rows_1idx[0]} as "
+                f"read showed {blank_in_top} of {width} columns blank, so "
+                f"every name here came from a merge. Check them before "
+                f"confirming."
+            )
+        else:
+            notes.append(
+                f"{found} Filled them to build column names. Row "
+                f"{header_rows_1idx[0]} alone showed {blank_in_top} of "
+                f"{width} columns blank. Check the assembled names before "
+                f"confirming."
+            )
 
     if result.ambiguous_blanks:
         cols = ", ".join(str(c + 1) for c in result.ambiguous_blanks)
