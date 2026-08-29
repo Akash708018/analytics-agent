@@ -193,3 +193,23 @@ Machine-local and implementation choices that are easy to forget six months late
   make the note useless.
 - Dedup skips a suffix that is already taken: 'units', 'units_2',
   'units' yields 'units_3', not a second 'units_2'.
+
+- IngestSpec stores sheet coordinates (header_rows, data_start_row as
+  1-indexed row numbers); the Phase 2 loaders take a count of rows to
+  skip. The conversion is data_start_row - 1 and lives only in
+  IngestSpec.loader_header_rows. It is NOT len(header_rows): for
+  messy_headers.xlsx that is 1 where the loader needs 4.
+- to_loader_kwargs(loader) inspects the real signature and raises
+  SpecNotSupported naming any field the loader cannot accept, rather
+  than dropping it. A spec that promises what the loader ignores is
+  worse than one that refuses, because the user confirmed terms that
+  were never applied.
+- Five conventions locked, industry-standard: delete the duplicate
+  merged_ranges in excel.py (deferred to Step 5, same edit as the other
+  loader changes); header_join bottom_only for merged_multiheader.xlsx;
+  propose the join mode with reasoning rather than asking; na_values on
+  both loaders for parity; footer_skip_rows yes, skip_columns dropped
+  because the columns list already expresses column selection.
+- Still owed to Phase 2 in Step 5: na_values and footer_skip_rows on
+  load_excel and load_csv, coercion_failures: dict[str, int] on
+  LoadResult for F9, and deletion of excel.merged_ranges.
