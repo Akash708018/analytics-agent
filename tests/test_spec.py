@@ -37,8 +37,8 @@ def stub_load_csv(
 
 def stub_load_excel(
     con, path, dataset_name, sheet=None, header_rows=1, names=None,
-    na_values=None, footer_skip_rows=0, on_error="stop", all_text=False,
-    inference_rows=5_000, replace=True,
+    na_values=None, footer_skip_rows=0, dtypes=None, on_error="stop",
+    all_text=False, inference_rows=5_000, replace=True,
 ):
     ...
 

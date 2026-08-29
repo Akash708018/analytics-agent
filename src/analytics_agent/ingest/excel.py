@@ -180,9 +180,18 @@ def _coerce(value: object, duck_type: str):
         if isinstance(value, bool) or not isinstance(value, (int, float)):
             raise ValueError(f"{value!r} is not a number")
         return float(value)
-    if duck_type == "TIMESTAMP":
+    if duck_type in ("TIMESTAMP", "DATE"):
         if isinstance(value, (_dt.datetime, _dt.date)):
             return value
+        if isinstance(value, str):
+            # Only reachable when dtypes pinned the column: inference never
+            # produces TIMESTAMP from a str. Parsed here rather than handed to
+            # DuckDB so a bad value is counted like any other coercion failure.
+            for fmt in ("%Y-%m-%d", "%Y-%m-%d %H:%M:%S", "%d/%m/%Y", "%m/%d/%Y"):
+                try:
+                    return _dt.datetime.strptime(value.strip(), fmt)
+                except ValueError:
+                    continue
         raise ValueError(f"{value!r} is not a date")
     return value
 
@@ -196,6 +205,7 @@ def load_excel(
     names: list[str] | None = None,
     na_values: list[str] | None = None,
     footer_skip_rows: int = 0,
+    dtypes: dict[str, str] | None = None,
     on_error: str = ON_ERROR_STOP,
     all_text: bool = False,
     inference_rows: int = 5_000,
@@ -215,6 +225,13 @@ def load_excel(
                       row, a 'generated on' line. Held in a small buffer as
                       the sheet streams, so it costs footer_skip_rows of
                       memory and no second pass.
+    dtypes            Pin specific columns to a DuckDB type, e.g.
+                      {'order_date': 'TIMESTAMP'}. Keyed on the FINAL column
+                      name -- the one in `names` if names were given. Columns
+                      not named here are inferred as usual. This is the only
+                      way to say 'that text column is really a date', because
+                      inference maps a str to VARCHAR and never guesses at its
+                      contents.
     on_error          'stop' (default) refuses the load at the first value
                       that does not fit its column, naming the row and the
                       column. 'null' stores that cell as NULL, keeps the row,
@@ -334,6 +351,18 @@ def load_excel(
         columns = final
 
         types = _infer_column_types(sample, n_cols, all_text)
+
+        if dtypes:
+            unknown = sorted(set(dtypes) - set(columns))
+            if unknown:
+                raise LoadRefused(
+                    f"BLOCKED: dtypes names column(s) that are not in this "
+                    f"sheet: {', '.join(unknown)}.\n"
+                    f"Columns present: {', '.join(columns)}\n"
+                    f"NEXT STEP: dtypes is keyed on the final column name, "
+                    f"which is the name from `names` when you supply one."
+                )
+            types = [dtypes.get(c, t) for c, t in zip(columns, types)]
 
         cols_ddl = ", ".join(f'"{c}" {t}' for c, t in zip(columns, types))
         verb = "CREATE OR REPLACE TABLE" if replace else "CREATE TABLE"

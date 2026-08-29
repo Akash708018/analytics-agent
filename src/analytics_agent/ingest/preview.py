@@ -46,6 +46,13 @@ SPARSE_RATIO = 0.5
 # pivot dump.
 PIVOT_COLUMN_RATIO = 0.5
 
+# A trailing row this sparse relative to the data width is a note or a totals
+# line, not a record.
+FOOTER_FILL_RATIO = 0.5
+
+# How many rows at the end of a sheet are examined for a footer.
+FOOTER_SCAN_ROWS = 20
+
 _MONTHS = (
     "jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec|"
     "january|february|march|april|june|july|august|september|october|"
@@ -285,6 +292,52 @@ def _sparse_row_verdict(row, row_num_1idx, source_type, merge_refs, widest):
 
 
 # --------------------------------------------------------------------------
+# footer detection -- Excel only
+# --------------------------------------------------------------------------
+
+def count_trailing_junk(tail_rows: list, width: int) -> int:
+    """
+    How many rows at the end are notes or totals rather than records.
+
+    Counts upwards from the last row while each one is blank or filled in
+    fewer than half its columns. A record with a couple of empty fields is not
+    junk; a one-cell "Source: internal ERP extract." line is.
+
+    This is Excel-only by design. The row count of a sheet is known, so reading
+    the last twenty rows is free. A CSV would have to be seeked to the end, and
+    on a 1.6 GB file that is not free -- so there the question is asked instead
+    of answered.
+    """
+    if width <= 0:
+        return 0
+    threshold = width * FOOTER_FILL_RATIO
+    count = 0
+    for row in reversed(tail_rows):
+        if _fill(row) >= threshold:
+            break
+        count += 1
+    return count
+
+
+def describe_footer(n: int, tail_rows: list) -> str:
+    """The assumption line for a detected footer."""
+    shown = []
+    for row in tail_rows[-n:]:
+        first = next((_c(v) for v in row if not _is_blank(v)), "")
+        shown.append(f"'{first[:40]}'" if first else "(blank)")
+    return (
+        f"The last {n} row{'s' if n != 1 else ''} of the sheet "
+        f"({', '.join(shown)}) are filled in fewer than half their columns, so "
+        f"they read as notes rather than records and footer_skip_rows is set to "
+        f"{n}. Say so if any of them is real data."
+    )
+
+
+def _c(v) -> str:
+    return str(v).strip()
+
+
+# --------------------------------------------------------------------------
 # join proposal
 # --------------------------------------------------------------------------
 
@@ -386,6 +439,7 @@ def draft_spec(
     sheet: str | None = None,
     merge_refs: list[str] | None = None,
     delimiter: str | None = None,
+    tail_rows: list | None = None,
 ) -> tuple[IngestSpec | None, HeaderGuess, PivotVerdict]:
     """
     Everything above, assembled.
@@ -412,6 +466,20 @@ def draft_spec(
     pivot = detect_pivot_dump(result.names)
 
     assumptions = list(guess.reasons) + [join_reason] + list(result.notes)
+
+    footer = 0
+    if source_type == "excel" and tail_rows:
+        footer = count_trailing_junk(tail_rows, len(result.names))
+        if footer:
+            assumptions.append(describe_footer(footer, tail_rows))
+    elif source_type == "csv":
+        assumptions.append(
+            "The end of this file was not examined. A CSV has to be read to "
+            "its last byte to see how it ends, which is not worth doing on a "
+            "large file just to look for a totals row. If it ends with totals "
+            "or notes, say how many rows and they will be dropped."
+        )
+
     if pivot.is_pivot_dump:
         assumptions.append(pivot.message)
 
@@ -424,6 +492,7 @@ def draft_spec(
         header_rows=guess.header_rows,
         data_start_row=guess.data_start_row,
         header_join=join,
+        footer_skip_rows=footer,
         delimiter=delimiter if source_type == "csv" else None,
     )
     spec.assumptions = assumptions
@@ -433,6 +502,8 @@ def draft_spec(
 __all__ = [
     "HeaderGuess",
     "PivotVerdict",
+    "count_trailing_junk",
+    "describe_footer",
     "detect_pivot_dump",
     "draft_spec",
     "guess_header",
