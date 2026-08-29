@@ -330,3 +330,24 @@ Machine-local and implementation choices that are easy to forget six months late
   counted like any other coercion failure rather than handed to DuckDB.
 - propose_ingest_spec is annotated readOnly. Proposing is not loading,
   and Claude Desktop should not ask permission to think.
+
+- The ingest spec round-trips as JSON rather than living in a
+  server-side draft store. A stored draft has to be mutated when the
+  user asks for a change, and from that moment what they were shown and
+  what will run are two different objects. Handing the JSON out keeps
+  them the same object.
+- Footer detection is proposed on Excel and asked about on CSV. A sheet
+  knows its own row count, so reading the last 20 rows is free; a CSV
+  would have to be seeked to its last byte, which on 1.6 GB is not worth
+  it to look for a totals row.
+- A trailing row counts as junk when fewer than half its columns are
+  filled, walking up from the bottom and stopping at the first real row.
+  A record with a couple of empty fields is not junk: row 200 of
+  messy_headers.xlsx has a blank region and stays.
+- load_excel takes dtypes, keyed on the final column name. Without it
+  there is no way to say a text column is a date, because inference maps
+  a str to VARCHAR and never looks inside it. _coerce parses a string
+  into a TIMESTAMP only when the column was pinned, so a bad value is
+  counted like any other coercion failure rather than handed to DuckDB.
+- propose_ingest_spec is annotated readOnly. Proposing is not loading,
+  and Claude Desktop should not ask permission to think.
