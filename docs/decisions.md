@@ -93,3 +93,28 @@ Machine-local and implementation choices that are easy to forget six months late
   make the note useless.
 - Dedup skips a suffix that is already taken: 'units', 'units_2',
   'units' yields 'units_3', not a second 'units_2'.
+
+- Sheet-to-part resolution in the .xlsx zip goes via r:id ->
+  xl/_rels/workbook.xml.rels -> Target, never via position in <sheets>.
+  Build guide 6.6 used position. On a workbook whose tabs had been
+  reordered that returned a different sheet's merge ranges, with no
+  error. Rel Targets appear both absolute ("/xl/worksheets/sheet1.xml")
+  and relative to xl/ ("worksheets/sheet1.xml"); handle both.
+- ET.iterparse must clear on <row>, not on <sheetData>. Rows are
+  children of sheetData, so clearing at sheetData's end event frees them
+  only after the whole tree is built. On a 200k-row sheet (32 MB of
+  XML): 440 MB peak vs 16 MB, and 16.4s vs 7.8s.
+- <mergeCells> is written after </sheetData> in OOXML, so the merge scan
+  cannot early-exit; every row is streamed past regardless of sheet
+  size. That is why the clear-tag choice above matters at all.
+- fill_bounded pads rows shorter than the merge extent rather than
+  raising IndexError. openpyxl pads to the sheet's declared dimension,
+  which tool-generated files can under-report.
+- Peak memory is not asserted in the test suite; it is machine-dependent
+  and would be flaky. tests/bench_merges.py is run by hand.
+- Fixture shapes: merged_multiheader.xlsx is one sheet 'Sales', 8 cols
+  A-H, header block rows 1-2, merges A1:B1 C1:E1 F1:H1.
+  messy_headers.xlsx is one sheet 'Report' with no merges at all.
+- zsh history expansion rewrites !r inside double quotes. All python -c
+  one-liners containing f-string !r conversions use the <<'PY' heredoc
+  form instead.
