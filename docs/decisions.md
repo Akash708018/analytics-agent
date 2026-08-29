@@ -78,3 +78,18 @@ Machine-local and implementation choices that are easy to forget six months late
 - zsh history expansion rewrites !r inside double quotes. All python -c
   one-liners containing f-string !r conversions use the <<'PY' heredoc
   form instead.
+
+- Header naming conventions, Phase 3 Step 2. Blank columns are named
+  column_N by 1-indexed position. Repeated names take _2, _3 with the
+  first occurrence keeping the bare name; DuckDB's own _1-on-the-second
+  convention reads as though a _0 exists. Target names are lowercase
+  snake_case with %->pct, #->num, &->and, and a col_ prefix when the
+  name starts with a digit.
+- assemble_names refuses merge_refs when source_type='csv' rather than
+  ignoring them. There is no argument combination that fills a CSV
+  header, so no later step can quietly enable it.
+- The merged-cell NOTE counts blanks in the header row as read, not
+  after filling. After filling that count is always zero, which would
+  make the note useless.
+- Dedup skips a suffix that is already taken: 'units', 'units_2',
+  'units' yields 'units_3', not a second 'units_2'.
