@@ -23,3 +23,34 @@ Machine-local and implementation choices that are easy to forget six months late
 5. Delete Postgres.app’s leftover data directory (`var-18`, **418 MB**).
 
 **Outcome.** Postgres.app is gone, `var-18` is gone, and a single PostgreSQL 17 cluster on 5432 serves both `olist` and `testdb`. Source alias `olist` in `~/.analytics-agent/sources.yaml` stays `host=localhost port=5432 dbname=olist`.
+
+- openpyxl merged_cells.ranges is unavailable in read_only=True mode.
+  Phase 3 bounded fill must open the workbook twice: normally for merge
+  ranges from the header block, read-only for streaming the data.
+- DuckDB does not error when read_csv gets FEWER names than the file has
+  columns; it silently appends 'columnN'. Loaders count columns first.
+- DuckDB parameter binding measured ~3,000 rows/s on this Mac versus
+  ~900,000 for staging through a temp CSV and one read_csv. Bulk inserts
+  stage; they do not bind.
+- Postgres sources attach under their own alias, never a shared "pg".
+  A shared name silently reused the first attachment and queried the
+  wrong database with no error.
+
+  - Sheet-to-part resolution in the .xlsx zip goes via r:id ->
+  xl/_rels/workbook.xml.rels -> Target, never via position in <sheets>.
+  Build guide 6.6 used position. On a workbook whose tabs had been
+  reordered that returned a different sheet's merge ranges, with no
+  error. Rel Targets appear both absolute ("/xl/worksheets/sheet1.xml")
+  and relative to xl/ ("worksheets/sheet1.xml"); handle both.
+- ET.iterparse must clear on <row>, not on <sheetData>. Rows are
+  children of sheetData, so clearing at sheetData's end event frees them
+  only after the whole tree is built. On a 200k-row sheet (32 MB of
+  XML): 440 MB peak vs 16 MB, and 16.4s vs 7.8s.
+- <mergeCells> is written after </sheetData> in OOXML, so the merge scan
+  cannot early-exit; every row is streamed past regardless of sheet
+  size. That is why the clear-tag choice above matters at all.
+- fill_bounded pads rows shorter than the merge extent rather than
+  raising IndexError. openpyxl pads to the sheet's declared dimension,
+  which tool-generated files can under-report.
+- Peak memory is not asserted in the test suite; it is machine-dependent
+  and would be flaky. tests/bench_merges.py is run by hand.
