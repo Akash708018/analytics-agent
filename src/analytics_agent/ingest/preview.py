@@ -32,7 +32,7 @@ import csv
 import datetime as _dt
 import io
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 from analytics_agent.ingest.headers import JOIN_MODES, assemble_names
 from analytics_agent.ingest.merges import merged_ranges, merges_on_rows
@@ -440,32 +440,76 @@ def draft_spec(
     merge_refs: list[str] | None = None,
     delimiter: str | None = None,
     tail_rows: list | None = None,
+    header_rows: list[int] | None = None,
+    header_join: str | None = None,
+    authorised_fill: bool = False,
 ) -> tuple[IngestSpec | None, HeaderGuess, PivotVerdict]:
     """
     Everything above, assembled.
 
-    Returns (spec, guess, pivot). The spec is None when the guess is not
-    confident enough to propose one -- the caller then asks the questions in
-    `guess.questions` rather than presenting a spec that was invented.
+    Returns (spec, guess, pivot).
+
+    When the file cannot settle where the header is, a spec is still returned
+    -- with a default filled in, the questions attached, and `unresolved`
+    naming the guessed field. It is deliberately un-loadable in that state:
+    `IngestSpec.is_confirmable` is False and `confirm_ingest_spec` refuses.
+
+    That is a change from returning nothing. Returning nothing was safe and
+    left the caller with no way to answer its own question except by
+    hand-building a load, which is what happened in the Step 7 live run. A
+    provisional spec keeps one mechanism -- edit the JSON, hand it back --
+    while `unresolved` keeps the guarantee in the code rather than in a
+    docstring.
+
+    `header_rows`, `header_join` and `authorised_fill` are the answers coming
+    back. Supplying header_rows overrides the guess and clears `unresolved`,
+    because at that point a person has settled it.
     """
     guess = guess_header(rows, source_type=source_type, merge_refs=merge_refs)
-    if guess.confidence == "low" or not guess.header_rows:
+
+    answered = header_rows is not None
+    chosen_rows = header_rows if answered else guess.header_rows
+    if not chosen_rows:
         return None, guess, PivotVerdict(False)
 
-    header_values = [list(rows[r - 1]) for r in guess.header_rows]
+    unresolved: list[str] = []
+    if guess.confidence == "low" and not answered:
+        unresolved.append("header_rows")
+
+    header_values = [list(rows[r - 1]) for r in chosen_rows]
     join, join_reason = propose_join(header_values)
+    if authorised_fill and source_type == "csv" and header_join is None:
+        # propose_join looks at the RAW rows, where the bottom row is unique,
+        # so it proposes bottom_only -- which throws away the very labels the
+        # authorisation was given to keep. Asking to use the group labels and
+        # then discarding them would be absurd.
+        join, join_reason = (
+            "space",
+            "The upper row was authorised as group labels, so it is joined "
+            "into the names rather than discarded. bottom_only would have "
+            "thrown away the labels you just confirmed.",
+        )
+    if header_join is not None:
+        join = header_join
+        join_reason = f"header_join was set to {join!r} rather than proposed."
 
     result = assemble_names(
         header_values,
-        header_rows_1idx=guess.header_rows,
+        header_rows_1idx=chosen_rows,
         source_type=source_type,
         join=join,
         merge_refs=merge_refs if source_type == "excel" else None,
+        authorised_fill=authorised_fill and source_type == "csv",
     )
 
     pivot = detect_pivot_dump(result.names)
 
     assumptions = list(guess.reasons) + [join_reason] + list(result.notes)
+    if answered:
+        assumptions.append(
+            f"header_rows was given as {chosen_rows} rather than worked out "
+            f"from the file, so the ambiguity above is settled."
+        )
 
     footer = 0
     if source_type == "excel" and tail_rows:
@@ -483,17 +527,31 @@ def draft_spec(
     if pivot.is_pivot_dump:
         assumptions.append(pivot.message)
 
+    if answered:
+        # Confidence describes how well the header is known, not how well the
+        # FILE stated it. Leaving it at 'low' after a person has settled the
+        # one ambiguity reports a doubt nobody holds any more.
+        guess = replace(
+            guess,
+            confidence="high" if guess.confidence == "low" else guess.confidence,
+            questions=[],
+            reasons=list(guess.reasons),
+        )
+
     spec = IngestSpec.from_header_result(
         result,
         path=path,
         source_type=source_type,
         dataset_name=dataset_name,
         sheet=sheet,
-        header_rows=guess.header_rows,
-        data_start_row=guess.data_start_row,
+        header_rows=chosen_rows,
+        data_start_row=max(guess.data_start_row, chosen_rows[-1] + 1),
         header_join=join,
         footer_skip_rows=footer,
         delimiter=delimiter if source_type == "csv" else None,
+        authorised_fill=bool(authorised_fill and source_type == "csv"),
+        questions=list(guess.questions) if unresolved else [],
+        unresolved=unresolved,
     )
     spec.assumptions = assumptions
     return spec, guess, pivot

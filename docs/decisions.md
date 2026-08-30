@@ -351,3 +351,35 @@ Machine-local and implementation choices that are easy to forget six months late
   counted like any other coercion failure rather than handed to DuckDB.
 - propose_ingest_spec is annotated readOnly. Proposing is not loading,
   and Claude Desktop should not ask permission to think.
+
+- An ambiguous file now yields a PROVISIONAL spec rather than nothing.
+  It carries questions and an `unresolved` list; is_confirmable is False
+  while that list is non-empty and confirm_ingest_spec refuses it. The
+  guarantee is structural, not a docstring.
+- That needed override parameters on propose_ingest_spec after all
+  (header_rows, header_join, authorised_fill). A provisional spec's
+  columns are DERIVED from its header rows, so editing header_rows in
+  the JSON would leave names that disagree with it. The answer has to
+  come back the way the question went out. C makes it safe, A makes it
+  usable; neither works alone.
+- assemble_names gains authorised_fill for CSV. Locked decision 8 bans
+  filling a CSV header on the FILE's say-so, because the file cannot
+  distinguish a spanning label from an empty column. It does not ban
+  filling on a human's, which is the point of having asked. Excel plus
+  authorised_fill raises, and the note names who authorised it.
+- An authorised fill defaults header_join to space. propose_join reads
+  the raw rows, where the bottom row is unique, so it would propose
+  bottom_only -- discarding the labels the authorisation was given to
+  keep.
+- na_values=[] built nullstr=[], which DuckDB rejects outright. An empty
+  list means the option is omitted. gaps_and_dupes.csv now carries a
+  literal 'N/A'; before that no CSV fixture had a sentinel, so nothing
+  in the suite exercised na_values on the CSV path at all.
+- The Excel loader's dtypes accepts DATE as well as TIMESTAMP, parses an
+  ISO string, and leaves a blank cell NULL. Prefer DATE for a date-only
+  column: TIMESTAMP invents a midnight component that shows up in every
+  later group-by. Both were true before Step 8; only the docstring was
+  missing, and two live conversations hedged for want of it.
+- Fixture note: SEED 20260829 draws blank regions at about 6.4%, not the
+  4% the comment in _sales_rows implies. Every fixture shares one seed
+  and one call sequence, so they run high together.

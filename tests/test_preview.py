@@ -308,17 +308,52 @@ def test_draft_spec_on_the_messy_shape():
     assert guess.confidence == "high"
 
 
-def test_draft_spec_returns_none_when_the_guess_is_low():
-    """The Done-When clause: multiheader.csv prompts rather than guessing."""
+def test_a_low_confidence_guess_yields_a_provisional_unloadable_spec():
+    """
+    The Done-When clause. It used to be served by returning nothing, which was
+    safe and left the caller no way to answer its own question. Now a spec
+    comes back with the guessed field named in `unresolved`, and it cannot be
+    loaded until a person settles it.
+    """
     spec, guess, _pivot = draft_spec(
         [list(r) for r in SALES],
         path="tests/fixtures/multiheader.csv",
         source_type="csv",
         dataset_name="multi",
     )
-    assert spec is None
+    assert spec is not None
+    assert spec.unresolved == ["header_rows"]
+    assert not spec.is_confirmable
+    assert spec.questions
     assert guess.needs_confirmation
-    assert guess.questions
+
+
+def test_an_answer_clears_the_unresolved_field():
+    spec, _guess, _pivot = draft_spec(
+        [list(r) for r in SALES],
+        path="tests/fixtures/multiheader.csv",
+        source_type="csv",
+        dataset_name="multi",
+        header_rows=[1, 2],
+        authorised_fill=True,
+    )
+    assert spec.unresolved == []
+    assert spec.is_confirmable
+    assert spec.authorised_fill
+    assert spec.target_names[0] == "identifiers_order_id"
+
+
+def test_answering_that_row_one_was_a_title_gives_bare_names():
+    spec, _guess, _pivot = draft_spec(
+        [list(r) for r in SALES],
+        path="tests/fixtures/multiheader.csv",
+        source_type="csv",
+        dataset_name="multi",
+        header_rows=[2],
+    )
+    assert spec.is_confirmable
+    assert spec.target_names[0] == "order_id"
+    assert spec.loader_header_rows == 2
 
 
 def test_draft_spec_flags_a_pivot_dump_in_the_assumptions():

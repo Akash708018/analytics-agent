@@ -39,7 +39,7 @@ class Draft:
 
     @property
     def needs_answer(self) -> bool:
-        return self.spec is None
+        return self.spec is None or not self.spec.is_confirmable
 
 
 def _default_dataset_name(path: Path) -> str:
@@ -70,8 +70,17 @@ def draft_for_path(
     path: str | Path,
     dataset_name: str | None = None,
     sheet: str | None = None,
+    header_rows: list[int] | None = None,
+    header_join: str | None = None,
+    authorised_fill: bool = False,
 ) -> Draft:
-    """Build a draft spec for one file. Reads only the top and tail."""
+    """
+    Build a draft spec for one file. Reads only the top and tail.
+
+    `header_rows`, `header_join` and `authorised_fill` carry a person's answer
+    back in. Supplying `header_rows` settles an ambiguous file, which is the
+    only way `unresolved` gets cleared.
+    """
     p = Path(path)
     if not p.exists():
         raise LoadRefused(
@@ -106,13 +115,17 @@ def draft_for_path(
             sheet=chosen,
             merge_refs=merges.merged_ranges(str(p), chosen),
             tail_rows=_excel_tail(p, chosen),
+            header_rows=header_rows,
+            header_join=header_join,
         )
         return Draft(spec, guess, pivot, "excel", chosen, sheets)
 
     lines = csv_loader.preview_lines(p, n=CSV_PREVIEW_LINES)
     rows = preview.parse_csv_preview(lines)
     spec, guess, pivot = preview.draft_spec(
-        rows, path=str(p), source_type="csv", dataset_name=name
+        rows, path=str(p), source_type="csv", dataset_name=name,
+        header_rows=header_rows, header_join=header_join,
+        authorised_fill=authorised_fill,
     )
     return Draft(spec, guess, pivot, "csv", None, [])
 
@@ -157,10 +170,33 @@ def render(draft: Draft) -> str:
     if draft.spec.assumptions:
         out.append("Every assumption above is yours to overrule.")
 
-    if draft.guess.questions:
+    if draft.spec.unresolved:
+        out.append("")
+        out.append("THIS SPEC CANNOT BE LOADED AS IT STANDS.")
+        out.append(
+            f"{', '.join(draft.spec.unresolved)} below is a default, not a "
+            f"reading of the file. What is shown is what a load WOULD do."
+        )
+        out.append("")
+        out.append("Put these to the user:")
+        out += [f"  - {q}" for q in draft.spec.questions]
+        out.append("")
+        out.append(
+            "Then call propose_ingest_spec again with their answer -- "
+            "header_rows=[...], and header_join or authorised_fill if "
+            "relevant. It returns a spec with nothing outstanding, and that "
+            "one can be confirmed."
+        )
+        return "\n".join(out)
+
+    # spec.questions, NOT guess.questions. The guess describes what the FILE
+    # could settle and never changes; the spec describes what is still
+    # outstanding after a person has spoken. Reading the guess here printed
+    # "Open questions" at someone who had just answered them.
+    if draft.spec.questions:
         out.append("")
         out.append("Open questions:")
-        out += [f"  - {q}" for q in draft.guess.questions]
+        out += [f"  - {q}" for q in draft.spec.questions]
 
     out.append("")
     out.append(

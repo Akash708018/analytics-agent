@@ -31,7 +31,11 @@ The fixtures, and what each one is for:
                            and it is what on_error='null' counts.
   gaps_and_dupes.csv       Phase 3 Step 5. A header row with blanks and repeats,
                            so blank-column naming and duplicate suffixing have
-                           something real to work on.
+                           something real to work on. Also the only CSV
+                           carrying a literal null sentinel: every other one
+                           writes an empty field, which DuckDB nulls without
+                           na_values doing anything, so the CSV side of that
+                           argument had never met a fixture.
   big_synthetic.csv        Phase 3 preview performance. Gitignored. Opt-in.
 
 A note on dates. _sales_rows writes them with .isoformat(), so they are STRINGS
@@ -266,6 +270,11 @@ def make_gaps_and_dupes_csv(path: Path, n: int = 200) -> None:
 
     with both decisions reported: the blanks named by position, the duplicate
     suffixed. Neither is allowed to happen quietly.
+
+    Column 3 also carries a literal 'N/A' in about 8% of rows -- a token, not
+    an empty field. An empty field is already NULL to DuckDB whatever
+    na_values says, so a sentinel is the only thing that argument can actually
+    catch, and until this fixture had one no CSV test exercised it.
     """
     rng = _rng()
     with path.open("w", newline="", encoding="utf-8") as f:
@@ -275,10 +284,11 @@ def make_gaps_and_dupes_csv(path: Path, n: int = 200) -> None:
             units_a = rng.randint(1, 40)
             units_b = rng.randint(1, 40)
             price = round(rng.uniform(5.0, 250.0), 2)
+            region = "N/A" if rng.random() < 0.08 else rng.choice(REGIONS)
             w.writerow([
                 f"ORD-{i + 1:05d}",
                 units_a,
-                rng.choice(REGIONS),
+                region,
                 units_b,
                 rng.choice(CHANNELS),
                 round((units_a + units_b) * price, 2),

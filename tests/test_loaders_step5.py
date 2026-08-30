@@ -210,6 +210,23 @@ def test_the_fixture_gives_a_workspace_connection(con, tmp_path):
     ).fetchone()[0] == 1
 
 
+def test_an_empty_na_values_list_means_no_token_is_null(con, tmp_path):
+    """
+    DuckDB rejects nullstr=[] outright -- "requires a non-empty list of
+    possible null strings" -- so an empty list has to mean the option is
+    omitted. It is a legitimate way to say a literal 'N/A' is data.
+    """
+    p = tmp_path / "tok.csv"
+    p.write_text("id,region\n1,N/A\n2,North\n")
+
+    kept = load_csv(con, str(p), "kept", na_values=[])
+    assert kept.row_count == 2
+    assert con.execute("SELECT region FROM kept WHERE id=1").fetchone()[0] == "N/A"
+
+    nulled = load_csv(con, str(p), "nulled", na_values=["N/A"])
+    assert con.execute("SELECT region FROM nulled WHERE id=1").fetchone()[0] is None
+
+
 def test_load_result_defaults_keep_old_callers_working():
     r = LoadResult(dataset_name="x", row_count=1, column_count=1)
     assert r.coercion_failures == {}

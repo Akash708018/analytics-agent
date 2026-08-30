@@ -46,12 +46,27 @@ class HeaderResult:
     blank_columns: list[int] = field(default_factory=list)
     renamed_duplicates: list[tuple[str, str]] = field(default_factory=list)
     filled_merges: list[str] = field(default_factory=list)
+    authorised_fill: bool = False
     ambiguous_blanks: list[int] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)
 
     @property
     def column_count(self) -> int:
         return len(self.names)
+
+
+def _fill_forward(row) -> list:
+    """Carry each value rightwards until the next non-blank one."""
+    out, last = [], None
+    for v in row:
+        if not _is_empty(v):
+            last = v
+        out.append(last)
+    return out
+
+
+def _is_empty(v) -> bool:
+    return _clean(v) == ""
 
 
 def _clean(value) -> str:
@@ -85,6 +100,7 @@ def assemble_names(
     source_type: str,
     join: str = "space",
     merge_refs: list[str] | None = None,
+    authorised_fill: bool = False,
 ) -> HeaderResult:
     """
     Build one name per column from one or more header rows.
@@ -98,6 +114,14 @@ def assemble_names(
     join -- one of JOIN_MODES.
     merge_refs -- every merged range on the sheet. Only those intersecting the
         header rows are used.
+    authorised_fill -- CSV only. A person has stated that an upper header row
+        holds spanning group labels, so its values are carried rightwards until
+        the next label. Locked decision 10 bans filling a CSV header on the
+        FILE's say-so, because the file cannot distinguish a spanning label
+        from an empty column. It does not ban filling on a human's, which is
+        the entire purpose of having asked. Reaching this requires a caller to
+        state that the question was answered, and the fill is recorded in the
+        notes naming who authorised it.
     """
     if join not in JOIN_MODES:
         raise ValueError(f"header_join must be one of {JOIN_MODES}, got {join!r}")
@@ -110,6 +134,11 @@ def assemble_names(
         )
     if source_type not in ("excel", "csv"):
         raise ValueError(f"source_type must be 'excel' or 'csv', got {source_type!r}")
+    if source_type == "excel" and authorised_fill:
+        raise ValueError(
+            "authorised_fill is for CSV headers. An Excel header is filled "
+            "from its merge ranges, which the file itself provides."
+        )
     if source_type == "csv" and merge_refs:
         raise ValueError(
             "merge_refs supplied for a CSV. CSV files carry no merge metadata, "
@@ -131,13 +160,19 @@ def assemble_names(
         # fill_bounded pads out to a merge that runs past the row; re-level.
         width = max(width, max(len(r) for r in filled))
         filled = _pad(filled, width)
+    elif source_type == "csv" and authorised_fill and len(rows) > 1:
+        # Unbounded by necessity: a CSV has no range to stop at. Legitimate
+        # only because a person said these are group labels.
+        filled = [_fill_forward(r) for r in rows[:-1]] + [list(rows[-1])]
+        result.authorised_fill = True
     else:
         filled = rows
 
     result.filled_rows = filled
 
-    # CSV blanks above the bottom row are ambiguous and must be surfaced.
-    if source_type == "csv" and len(filled) > 1:
+    # CSV blanks above the bottom row are ambiguous and must be surfaced --
+    # unless a person has already resolved them.
+    if source_type == "csv" and len(filled) > 1 and not authorised_fill:
         for col in range(width):
             upper = [_clean(filled[r][col]) for r in range(len(filled) - 1)]
             if not any(upper):
@@ -243,6 +278,15 @@ def _build_notes(
                 f"{width} columns blank. Check the assembled names before "
                 f"confirming."
             )
+
+    if result.authorised_fill:
+        notes.append(
+            f"Row(s) {span} were forward-filled because you said the upper "
+            f"row holds group labels spanning columns. A CSV cannot state "
+            f"that itself -- this fill exists only because it was asked about "
+            f"and answered. Each label was carried rightwards to the column "
+            f"before the next label."
+        )
 
     if result.ambiguous_blanks:
         cols = ", ".join(str(c + 1) for c in result.ambiguous_blanks)

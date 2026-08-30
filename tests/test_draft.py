@@ -129,12 +129,32 @@ def test_merged_multiheader_resolves_to_bottom_only():
     assert not any(n.startswith("identifiers") for n in d.spec.target_names)
 
 
-def test_multiheader_csv_proposes_nothing_and_asks():
+def test_multiheader_csv_is_provisional_and_cannot_be_loaded():
     """The Phase 3 Done-When clause, at the layer the tool calls."""
     d = draft.draft_for_path(MULTI)
-    assert d.spec is None
     assert d.needs_answer
-    assert d.guess.questions
+    assert d.spec.unresolved == ["header_rows"]
+    assert not d.spec.is_confirmable
+    assert d.spec.questions
+
+
+def test_answering_multiheader_csv_makes_it_confirmable():
+    d = draft.draft_for_path(MULTI, header_rows=[1, 2], authorised_fill=True)
+    assert not d.needs_answer
+    assert d.spec.is_confirmable
+    assert d.spec.target_names == [
+        "identifiers_order_id", "identifiers_order_date", "dimensions_region",
+        "dimensions_product", "dimensions_channel", "measures_units",
+        "measures_unit_price", "measures_revenue",
+    ]
+
+
+def test_the_blocking_message_names_the_field_and_the_question():
+    d = draft.draft_for_path(MULTI)
+    msg = d.spec.blocking_message()
+    assert "header_rows" in msg
+    assert "NEXT STEP" in msg
+    assert "Do not simply delete" in msg
 
 
 def test_gaps_and_dupes_names_are_resolved_and_reported():
@@ -192,11 +212,49 @@ def test_render_lists_the_assumptions_once_in_prose():
     assert text.count("Row 4 is blank") == 2  # prose + payload
 
 
-def test_render_of_an_ambiguous_file_has_questions_and_no_json():
+def test_render_of_an_ambiguous_file_says_it_cannot_be_loaded():
     text = draft.render(draft.draft_for_path(MULTI))
-    assert "No spec proposed" in text
-    assert "```json" not in text
-    assert "nothing has been assumed" in text
+    assert "CANNOT BE LOADED" in text
+    assert "PROVISIONAL" in text
+    assert "Put these to the user:" in text
+    assert "propose_ingest_spec again" in text
+
+
+def test_an_answered_file_does_not_still_print_open_questions():
+    """
+    Found in the Step 8 live run. render read guess.questions -- what the FILE
+    could not settle, which never changes -- instead of spec.questions, what
+    is still outstanding after a person has spoken. It printed "Open
+    questions" at a user who had just answered them.
+    """
+    answered = draft.draft_for_path(MULTI, header_rows=[1, 2], authorised_fill=True)
+    text = draft.render(answered)
+
+    assert answered.spec.questions == []
+    assert "Open questions" not in text
+    assert "CANNOT BE LOADED" not in text
+
+    unanswered = draft.render(draft.draft_for_path(MULTI))
+    assert "Put these to the user:" in unanswered
+
+
+def test_an_answer_raises_confidence_off_low():
+    """
+    Also found live. Confidence describes how well the header is known, not
+    how well the file stated it. Reporting 'low' after the one ambiguity has
+    been settled reports a doubt nobody holds.
+    """
+    assert draft.draft_for_path(MULTI).guess.confidence == "low"
+    answered = draft.draft_for_path(MULTI, header_rows=[1, 2], authorised_fill=True)
+    assert answered.guess.confidence == "high"
+
+
+def test_answering_does_not_inflate_an_already_good_guess():
+    """A file that was never ambiguous keeps whatever it had."""
+    before = draft.draft_for_path(MERGED).guess.confidence
+    after = draft.draft_for_path(MERGED, header_rows=[1, 2]).guess.confidence
+    assert before == "medium"
+    assert after == "medium"
 
 
 def test_render_names_the_other_sheets_when_there_are_several():
@@ -285,6 +343,34 @@ def test_the_proposed_spec_loads_gaps_and_dupes(con):
     assert names == [
         "order_id", "units", "column_3", "units_2", "column_5", "revenue",
     ]
+
+
+def test_the_csv_sentinel_is_only_caught_when_na_values_asks(con):
+    """
+    gaps_and_dupes.csv is the only CSV fixture carrying a literal 'N/A'. Every
+    other one writes an empty field, which DuckDB nulls whatever na_values
+    says -- so before this, no CSV test could tell whether na_values did
+    anything at all.
+    """
+    d = draft.draft_for_path(GAPS)
+    spec = draft.spec_from_json(d.spec.model_dump_json())
+
+    spec.na_values = []
+    spec.dataset_name = "kept"
+    load_csv(con, spec.path, **spec.to_loader_kwargs(load_csv))
+    kept = con.execute(
+        "SELECT count(*) FILTER (WHERE column_3 IS NULL) FROM kept"
+    ).fetchone()[0]
+
+    spec.na_values = ["N/A"]
+    spec.dataset_name = "nulled"
+    load_csv(con, spec.path, **spec.to_loader_kwargs(load_csv))
+    nulled = con.execute(
+        "SELECT count(*) FILTER (WHERE column_3 IS NULL) FROM nulled"
+    ).fetchone()[0]
+
+    assert kept == 0
+    assert nulled > 0
 
 
 def test_a_clean_file_still_drafts_and_loads(con):

@@ -85,9 +85,25 @@ class IngestSpec(BaseModel):
     na_values: list[str] | None = None
     delimiter: str | None = None
 
+    authorised_fill: bool = Field(
+        default=False,
+        description="A person said an upper CSV header row is a spanning "
+        "group label. The file cannot establish this; only a human can.",
+    )
+
     columns: list[ColumnSpec] = Field(min_length=1)
 
     assumptions: list[str] = Field(default_factory=list)
+
+    questions: list[str] = Field(
+        default_factory=list,
+        description="What could not be worked out from the file. Ask these.",
+    )
+    unresolved: list[str] = Field(
+        default_factory=list,
+        description="Field names whose values are a guess, not a reading. "
+        "While this is non-empty the spec must not be loaded.",
+    )
 
     # ---------------------------------------------------------------- checks
 
@@ -171,6 +187,35 @@ class IngestSpec(BaseModel):
         return self.data_start_row - 1
 
     @property
+    def is_confirmable(self) -> bool:
+        """
+        False while anything in `unresolved` is outstanding.
+
+        This is the guarantee, and it is deliberately structural rather than a
+        line in a docstring. A provisional spec is a guess with a default
+        filled in; making it un-loadable until a person clears the field means
+        no amount of eagerness can turn a guess into a load.
+        """
+        return not self.unresolved
+
+    def blocking_message(self) -> str:
+        """Why this spec cannot be loaded yet, and what to do."""
+        fields = ", ".join(self.unresolved)
+        asks = "\n".join(f"  - {q}" for q in self.questions) or "  - (none recorded)"
+        return (
+            f"BLOCKED: this spec is provisional. {fields} was guessed, not read "
+            f"from the file.\n"
+            f"WHY: nothing in the file settles it, so a default was filled in "
+            f"to show you what a load would look like. Loading it now would "
+            f"make that guess permanent without anyone having agreed to it.\n"
+            f"OUTSTANDING:\n{asks}\n"
+            f"NEXT STEP: put the question to the user. Then call "
+            f"propose_ingest_spec again with their answer -- header_rows=[...], "
+            f"header_join=..., authorised_fill=true/false -- and confirm the "
+            f"spec it returns. Do not simply delete the unresolved field."
+        )
+
+    @property
     def column_count(self) -> int:
         return len(self.columns)
 
@@ -241,6 +286,11 @@ class IngestSpec(BaseModel):
         ]
         if self.footer_skip_rows:
             lines.append(f"footer skip    {self.footer_skip_rows} row(s)")
+        if self.unresolved:
+            lines.append(
+                f"PROVISIONAL    {', '.join(self.unresolved)} is a guess; "
+                f"this spec cannot be loaded as it stands"
+            )
         if self.na_values:
             lines.append(f"null tokens    {self.na_values}")
         lines.append("")
@@ -269,6 +319,8 @@ class IngestSpec(BaseModel):
         data_start_row: int,
         sheet: str | None = None,
         header_join: HeaderJoin = "space",
+        questions: list[str] | None = None,
+        unresolved: list[str] | None = None,
         **extra: Any,
     ) -> IngestSpec:
         """
@@ -299,6 +351,8 @@ class IngestSpec(BaseModel):
             header_join=header_join,
             columns=columns,
             assumptions=list(result.notes),
+            questions=list(questions or []),
+            unresolved=list(unresolved or []),
             **extra,
         )
 
