@@ -383,3 +383,67 @@ Machine-local and implementation choices that are easy to forget six months late
 - Fixture note: SEED 20260829 draws blank regions at about 6.4%, not the
   4% the comment in _sales_rows implies. Every fixture shares one seed
   and one call sequence, so they run high together.
+
+- An ambiguous file now yields a PROVISIONAL spec rather than nothing.
+  It carries questions and an `unresolved` list; is_confirmable is False
+  while that list is non-empty and confirm_ingest_spec refuses it. The
+  guarantee is structural, not a docstring.
+- That needed override parameters on propose_ingest_spec after all
+  (header_rows, header_join, authorised_fill). A provisional spec's
+  columns are DERIVED from its header rows, so editing header_rows in
+  the JSON would leave names that disagree with it. The answer has to
+  come back the way the question went out. C makes it safe, A makes it
+  usable; neither works alone.
+- assemble_names gains authorised_fill for CSV. Locked decision 8 bans
+  filling a CSV header on the FILE's say-so, because the file cannot
+  distinguish a spanning label from an empty column. It does not ban
+  filling on a human's, which is the point of having asked. Excel plus
+  authorised_fill raises, and the note names who authorised it.
+- An authorised fill defaults header_join to space. propose_join reads
+  the raw rows, where the bottom row is unique, so it would propose
+  bottom_only -- discarding the labels the authorisation was given to
+  keep.
+- na_values=[] built nullstr=[], which DuckDB rejects outright. An empty
+  list means the option is omitted. gaps_and_dupes.csv now carries a
+  literal 'N/A'; before that no CSV fixture had a sentinel, so nothing
+  in the suite exercised na_values on the CSV path at all.
+- The Excel loader's dtypes accepts DATE as well as TIMESTAMP, parses an
+  ISO string, and leaves a blank cell NULL. Prefer DATE for a date-only
+  column: TIMESTAMP invents a midnight component that shows up in every
+  later group-by. Both were true before Step 8; only the docstring was
+  missing, and two live conversations hedged for want of it.
+- Fixture note: SEED 20260829 draws blank regions at about 6.4%, not the
+  4% the comment in _sales_rows implies. Every fixture shares one seed
+  and one call sequence, so they run high together.
+
+- Phase 4 splits the contract in two. contract/evidence.py does only what can
+  be checked against the data; everything a person has to state (grain,
+  measure definitions, exclusions, the analysis window) belongs to the
+  proposal layer in Step 3. The split means the evidence can be read without
+  being shown a conclusion first.
+- count(DISTINCT c) drops nulls; count(DISTINCT (a,b)) does not. So a single
+  column is tested against count(*), and a composite can pass uniqueness
+  while one of its columns is entirely NULL. Verified on DuckDB 1.5.5: rows
+  (1,NULL),(2,NULL) give distinct=2=row count. Unique and usable are separate
+  properties and are reported separately.
+- Pair search is pruned three ways: a column already unique on its own is
+  dropped (a key with a spare column is not a key), a pair needs
+  d_a * d_b >= row_count to be possible at all, and what survives is ranked
+  and capped at 200 probes with the remainder counted and reported. On a
+  200k x 14 table: 91 probes 1.85s -> 25 -> 12 probes 0.52s, and the 22
+  "unique pairs" the naive version reported became 9.
+- Columns whose suggested role is measure or free_text are excluded from pair
+  search. On clean_sales.csv, where unit_price holds 498 distinct values in
+  500 rows, 10 of 11 candidates were a near-continuous number paired with
+  something irrelevant. A unique measure is still reported as a single, with
+  the reason it is unconvincing attached.
+- Roles are suggested from counts and names, never asserted: an identifier-
+  shaped name outranks cardinality (customer_id repeating 90 ways is still a
+  foreign key, and summing it is meaningless), and a numeric column with 12 or
+  fewer distinct values is offered as a dimension rather than a measure --
+  Olist review scores are 1-5 and J-shaped.
+- Known hole, closed in Step 3: a sequence column that is numeric, has more
+  than 12 distinct values and is not identifier-named reads as a measure and
+  is excluded from pair search, so its composite key is missed. The fix is
+  verify_key() -- a stated key is checked, not searched for -- which follows
+  Phase 3's rule that the answer comes back the way the question went out.
