@@ -555,3 +555,34 @@ Machine-local and implementation choices that are easy to forget six months late
 - A stated primary_key is verified before it reaches the contract, so a key
   that does not hold is refused at proposal time rather than at the gate
   three steps later.
+
+- Contracts are stored SCD2 in _agent_contracts: a new confirmation writes a
+  new version and closes the previous one with valid_to, rather than
+  overwriting it. Exactly one row per dataset is is_current. Locked decision
+  18 wants the ledger inside every report, and an in-place edit makes "what
+  did we agree, and when did it change" unanswerable.
+- Confirming an unchanged contract is idempotent -- it returns the version in
+  force and writes nothing. Versions are for changes; a history half made of
+  re-confirmations is one nobody reads twice.
+- The database is authoritative and docs/contracts/<name>.yaml is an export:
+  regenerated on every confirm, never read back, carrying a DO-NOT-EDIT
+  header. Definitions belong in version control because that is what makes a
+  number in a report reviewable in a pull request -- the semantic-layer
+  convention (dbt MetricFlow, Cube, LookML).
+- A contract may EXIST unbound so it can be read back on a machine that never
+  loaded the table; it may not be CONFIRMED unbound, because Step 3 would then
+  have nothing to compare the table against.
+- store.py creates _agent_contracts lazily rather than in db.connect(). The
+  ingest layer should not have to know contracts exist. Cost is one CREATE
+  TABLE IF NOT EXISTS per call, answered from DuckDB's catalog.
+- changed_fields() and history_text() were written after reading a rendered
+  history and finding it useless: two versions differing only in a measure
+  definition printed identical lines apart from timestamps, because line()
+  showed grain and fingerprint and neither had moved. The differences are
+  reported as field paths, the same paths unresolved uses.
+- PyYAML is imported inside write_export, not at module top, so nothing on the
+  ingest path acquires the dependency because the contract layer wanted it.
+- The confirm/supersede pair runs inside an explicit BEGIN/COMMIT with a
+  rollback on failure. Without it a crash between the UPDATE and the INSERT
+  leaves a dataset with no current contract at all, which reads as "never
+  agreed" rather than as "half written".
