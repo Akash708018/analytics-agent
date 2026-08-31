@@ -1,0 +1,519 @@
+"""
+The Dataset Contract: what a person has agreed a table means.
+
+Build guide Section 7. `evidence.py` says what the data can be made to say;
+this says what it is FOR, and almost none of that is derivable. The grain, the
+definition of a measure, which rows were excluded on purpose and why -- these
+are the eight decisions locked on Olist, generalised so they work on any
+dataset. Locked decision 12: no analysis without one.
+
+Three rules shape the model.
+
+**Nothing is filled in silently.** `unresolved` holds the field paths whose
+values are a guess or a blank rather than something a person stated, and
+`is_confirmable` is False while it is non-empty -- exactly `IngestSpec`. The
+guarantee is structural rather than a line in a docstring, and it goes further
+here: a contract whose grain is blank and which does NOT list "grain" as
+unresolved will not construct at all. There is no way to hold a contract that
+claims to be settled and is not.
+
+**A contract is bound to a structure, not to a moment.** `bound_to` records
+the ordered columns and their types as they were when the contract was
+confirmed, plus a fingerprint over them. Row count and load time are recorded
+too, but they are NOT part of the fingerprint: a table that gained ten
+thousand rows is the same table, and one that lost a column is not. F13 is
+why this exists -- the server outlives the chat, so `sales_2024` can be
+reloaded from a different file under the same name and inherit an agreement
+nobody made about it. What the classes of drift MEAN is Step 3's problem; this
+module only records enough for that question to be answerable.
+
+**A reference to a column that does not exist is an error, not a warning.**
+If `bound_to` is present, every column named by the primary key, the date
+column, a measure or a dimension must appear in it. A measure naming a
+dropped column is not a caveat to attach to a result -- the SQL cannot run,
+and finding that out at the gate beats finding it out three layers into an
+analysis.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import re
+from datetime import date, datetime
+from typing import Any, Literal
+
+from pydantic import BaseModel, Field, field_validator, model_validator
+
+from analytics_agent.contract.refusals import Reason, Refusal
+
+# Mirrors _IDENT_RE in ingest/spec.py. A name that reaches SQL is validated,
+# never quoted and hoped for.
+_IDENT_RE = re.compile(r"^[A-Za-z][A-Za-z0-9_]{0,62}$")
+
+# Types a date_column may have. A date written into a sheet as text stays text
+# (Phase 3), and text sorts lexically -- '2024-10-01' before '2024-9-01'.
+_TEMPORAL_PREFIXES = ("DATE", "TIMESTAMP", "DATETIME")
+
+Aggregation = Literal[
+    "sum", "mean", "median", "min", "max", "count", "count_distinct", "none"
+]
+
+
+class Measure(BaseModel):
+    """A column to aggregate, and the sentence that says what it means."""
+
+    name: str
+    agg: Aggregation = "sum"
+    definition: str = Field(
+        default="",
+        description="What this number IS -- net of tax, excludes cancelled. "
+        "Cannot be derived from the column. Blank is only legal while the "
+        "contract lists it as unresolved.",
+    )
+    unit: str | None = None
+
+    @field_validator("name")
+    @classmethod
+    def _name_is_an_identifier(cls, v: str) -> str:
+        if not _IDENT_RE.match(v):
+            raise ValueError(f"measure name {v!r} is not a valid column name.")
+        return v
+
+    @property
+    def definition_path(self) -> str:
+        """How this measure's missing definition is named in `unresolved`."""
+        return f"measures[{self.name}].definition"
+
+
+class Exclusion(BaseModel):
+    """Rows deliberately left out, and how many there were."""
+
+    rule: str
+    reason: str
+    row_count: int | None = None
+
+    @field_validator("rule", "reason")
+    @classmethod
+    def _not_blank(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError(
+                "an exclusion needs both a rule and a reason. A rule with no "
+                "reason is a number nobody can defend later."
+            )
+        return v
+
+    @field_validator("row_count")
+    @classmethod
+    def _not_negative(cls, v: int | None) -> int | None:
+        if v is not None and v < 0:
+            raise ValueError(f"row_count cannot be negative; got {v}.")
+        return v
+
+
+class AnalysisWindow(BaseModel):
+    """The period the analysis covers. Both ends inclusive."""
+
+    start: date
+    end: date
+
+    @model_validator(mode="after")
+    def _end_is_not_before_start(self) -> AnalysisWindow:
+        if self.end < self.start:
+            raise ValueError(
+                f"analysis_window ends {self.end} which is before it starts "
+                f"{self.start}."
+            )
+        return self
+
+    def to_text(self) -> str:
+        return f"{self.start.isoformat()} to {self.end.isoformat()}"
+
+
+class ColumnBinding(BaseModel):
+    """One column as it stood when the contract was confirmed."""
+
+    name: str
+    dtype: str
+
+
+class Binding(BaseModel):
+    """
+    The table a contract was agreed against.
+
+    `fingerprint` covers the ordered column list and types and NOTHING else.
+    Structure is identity; volume is not. A table that gained rows is the same
+    table and the contract still describes it -- with a caveat, because the
+    numbers were agreed against different data. A table that lost a column is
+    a different table.
+
+    `row_count` and `loaded_at` are recorded beside it as the trigger for that
+    caveat, and as a cache key: a fingerprint hit with the same row count
+    means nothing has moved and the gate can skip re-validating.
+    """
+
+    columns: list[ColumnBinding] = Field(min_length=1)
+    row_count: int
+    loaded_at: datetime | None = None
+
+    @property
+    def column_names(self) -> list[str]:
+        return [c.name for c in self.columns]
+
+    @property
+    def dtypes(self) -> dict[str, str]:
+        return {c.name: c.dtype for c in self.columns}
+
+    @property
+    def fingerprint(self) -> str:
+        """
+        Twelve hex characters over name:type, in order.
+
+        Short on purpose: it is printed in refusals and read by people, and
+        the full digest buys nothing when the thing it protects against is a
+        reload rather than an adversary.
+        """
+        payload = "|".join(f"{c.name}:{c.dtype.upper()}" for c in self.columns)
+        return hashlib.sha256(payload.encode()).hexdigest()[:12]
+
+    @classmethod
+    def from_pairs(
+        cls,
+        columns: list[tuple[str, str]],
+        row_count: int,
+        loaded_at: datetime | None = None,
+    ) -> Binding:
+        """Build from what information_schema returns, in ordinal order."""
+        return cls(
+            columns=[ColumnBinding(name=n, dtype=t) for n, t in columns],
+            row_count=row_count,
+            loaded_at=loaded_at,
+        )
+
+
+class DatasetContract(BaseModel):
+    """What one dataset means. Proposed by the agent, confirmed by a person."""
+
+    dataset_name: str
+
+    grain: str = Field(
+        default="",
+        description="What ONE ROW is. 'one row = one order line item'. The "
+        "single most load-bearing sentence here: it decides whether summing "
+        "a column double-counts.",
+    )
+    primary_key: list[str] = Field(default_factory=list)
+    date_column: str | None = None
+    analysis_window: AnalysisWindow | None = None
+
+    measures: list[Measure] = Field(default_factory=list)
+    dimensions: list[str] = Field(default_factory=list)
+    known_exclusions: list[Exclusion] = Field(default_factory=list)
+    caveats: list[str] = Field(default_factory=list)
+
+    bound_to: Binding | None = None
+
+    questions: list[str] = Field(
+        default_factory=list,
+        description="What the data cannot settle. Ask these.",
+    )
+    unresolved: list[str] = Field(
+        default_factory=list,
+        description="Field paths whose value is a guess or a blank: 'grain', "
+        "'analysis_window', 'measures[revenue].definition'. While this is "
+        "non-empty the contract must not be confirmed.",
+    )
+
+    # Written by the store on confirm (Step 4), not by whoever drafts it.
+    version: int = 0
+    confirmed_at: datetime | None = None
+
+    # ---------------------------------------------------------------- checks
+
+    @field_validator("dataset_name")
+    @classmethod
+    def _dataset_name_is_an_identifier(cls, v: str) -> str:
+        if not _IDENT_RE.match(v):
+            raise ValueError(
+                f"dataset_name {v!r} must start with a letter and contain only "
+                f"letters, digits and underscores."
+            )
+        return v
+
+    @field_validator("primary_key", "dimensions")
+    @classmethod
+    def _columns_are_identifiers(cls, v: list[str]) -> list[str]:
+        for name in v:
+            if not _IDENT_RE.match(name):
+                raise ValueError(f"{name!r} is not a valid column name.")
+        if len(set(v)) != len(v):
+            dupes = sorted({n for n in v if v.count(n) > 1})
+            raise ValueError(f"repeated column(s): {dupes}.")
+        return v
+
+    @model_validator(mode="after")
+    def _cross_field_checks(self) -> DatasetContract:
+        names = [m.name for m in self.measures]
+        if len(set(names)) != len(names):
+            dupes = sorted({n for n in names if names.count(n) > 1})
+            raise ValueError(f"measure names must be unique; repeated: {dupes}.")
+
+        both = sorted(set(names) & set(self.dimensions))
+        if both:
+            raise ValueError(
+                f"{both} appear as both a measure and a dimension. A column is "
+                f"aggregated or grouped by, not both -- and an agent handed "
+                f"both will pick one without telling you which."
+            )
+
+        if self.analysis_window is not None and self.date_column is None:
+            raise ValueError(
+                "analysis_window is set but date_column is not, so nothing "
+                "says which column the window applies to."
+            )
+
+        # Blank values are legal ONLY while declared unresolved. This is the
+        # whole of D2, enforced where it cannot be forgotten.
+        if not self.grain.strip() and "grain" not in self.unresolved:
+            raise ValueError(
+                "grain is blank and is not listed in unresolved. A contract "
+                "either states what one row is, or says out loud that nobody "
+                "has yet."
+            )
+        for m in self.measures:
+            if not m.definition.strip() and m.definition_path not in self.unresolved:
+                raise ValueError(
+                    f"measure {m.name!r} has no definition and "
+                    f"{m.definition_path!r} is not listed in unresolved. What "
+                    f"a number means cannot be read off the column."
+                )
+
+        if self.bound_to is not None:
+            self._check_against_binding()
+        return self
+
+    def _check_against_binding(self) -> None:
+        """Every column this contract names must exist in the bound table."""
+        known = set(self.bound_to.column_names)
+        referenced: list[tuple[str, str]] = []
+        referenced += [("primary_key", c) for c in self.primary_key]
+        referenced += [("dimensions", c) for c in self.dimensions]
+        referenced += [("measures", m.name) for m in self.measures]
+        if self.date_column:
+            referenced.append(("date_column", self.date_column))
+
+        missing = sorted({f"{c} ({where})" for where, c in referenced if c not in known})
+        if missing:
+            raise ValueError(
+                f"these columns are named by the contract but are not in the "
+                f"table it is bound to: {', '.join(missing)}. Present: "
+                f"{', '.join(sorted(known))}."
+            )
+
+        if self.date_column:
+            dtype = self.bound_to.dtypes[self.date_column].upper()
+            if not dtype.startswith(_TEMPORAL_PREFIXES):
+                raise ValueError(
+                    f"date_column {self.date_column!r} is {dtype}, not a date. "
+                    f"A date held as text sorts lexically and cannot carry an "
+                    f"analysis window. Reload with "
+                    f"dtypes={{'{self.date_column}': 'DATE'}} first."
+                )
+
+    # ------------------------------------------------------------ properties
+
+    @property
+    def is_confirmable(self) -> bool:
+        """False while anything in `unresolved` is outstanding."""
+        return not self.unresolved
+
+    @property
+    def fingerprint(self) -> str | None:
+        return self.bound_to.fingerprint if self.bound_to else None
+
+    @property
+    def measure_names(self) -> list[str]:
+        return [m.name for m in self.measures]
+
+    def measure(self, name: str) -> Measure:
+        for m in self.measures:
+            if m.name == name:
+                return m
+        raise KeyError(name)
+
+    def columns_used(self) -> list[str]:
+        """Every column this contract names, deduped, in a stable order."""
+        seen: dict[str, None] = {}
+        for c in (
+            self.primary_key
+            + ([self.date_column] if self.date_column else [])
+            + self.measure_names
+            + self.dimensions
+        ):
+            seen.setdefault(c, None)
+        return list(seen)
+
+    # ------------------------------------------------------------- refusals
+
+    def blocking_refusal(self) -> Refusal:
+        """Why this contract cannot be confirmed yet, as a Refusal."""
+        return Refusal(
+            reason=Reason.CONTRACT_PROVISIONAL,
+            what=(
+                f"the contract for '{self.dataset_name}' is provisional. "
+                f"{', '.join(self.unresolved)} "
+                f"{'was' if len(self.unresolved) == 1 else 'were'} guessed or "
+                f"left blank, not stated."
+            ),
+            why=(
+                "nothing in the data settles these, so a value was filled in "
+                "to show what the contract would look like. Confirming it now "
+                "would make that guess the definition every later number is "
+                "traced back to."
+            ),
+            outstanding=list(self.questions) or ["(none recorded)"],
+            next_call=(
+                f'propose_dataset_contract(dataset_name="{self.dataset_name}", '
+                f"grain=..., measure_definitions=...) with the answers, then "
+                f"confirm the contract it returns"
+            ),
+        )
+
+    def blocking_message(self) -> str:
+        return self.blocking_refusal().to_text()
+
+    # ------------------------------------------------------------ rendering
+
+    def to_text(self) -> str:
+        """A plain reading, for the confirmation step."""
+        lines = [
+            f"dataset        {self.dataset_name}",
+            f"grain          {self.grain or '(not stated)'}",
+            f"primary key    {' + '.join(self.primary_key) or '(none)'}",
+            f"date column    {self.date_column or '(none)'}",
+            f"window         "
+            f"{self.analysis_window.to_text() if self.analysis_window else '(not set)'}",
+        ]
+        if self.bound_to:
+            lines.append(
+                f"bound to       {len(self.bound_to.columns)} columns, "
+                f"{self.bound_to.row_count:,} rows, "
+                f"fingerprint {self.bound_to.fingerprint}"
+            )
+        if self.version:
+            lines.append(f"version        {self.version}")
+        if self.unresolved:
+            lines.append(
+                f"PROVISIONAL    {', '.join(self.unresolved)} -- this contract "
+                f"cannot be confirmed as it stands"
+            )
+
+        if self.measures:
+            lines += ["", f"{len(self.measures)} measure(s):",
+                      "| column | agg | unit | definition |",
+                      "| --- | --- | --- | --- |"]
+            for m in self.measures:
+                lines.append(
+                    f"| {m.name} | {m.agg} | {m.unit or '-'} | "
+                    f"{m.definition or '(NOT STATED)'} |"
+                )
+        if self.dimensions:
+            lines += ["", f"dimensions     {', '.join(self.dimensions)}"]
+        if self.known_exclusions:
+            lines += ["", "Known exclusions:"]
+            for e in self.known_exclusions:
+                count = f" ({e.row_count:,} rows)" if e.row_count is not None else ""
+                lines.append(f"  - {e.rule}{count} -- {e.reason}")
+        if self.caveats:
+            lines += ["", "Caveats:"] + [f"  - {c}" for c in self.caveats]
+        if self.questions:
+            lines += ["", "Open questions:"] + [f"  - {q}" for q in self.questions]
+        return "\n".join(lines)
+
+    def to_yaml_dict(self) -> dict[str, Any]:
+        """
+        The export written to docs/contracts/<dataset>.yaml on confirm.
+
+        Definitions belong in version control -- that is where the semantic
+        layer world put them, and it is what makes a report's numbers
+        reviewable in a pull request rather than only inside a database. The
+        stored row stays authoritative; this is a copy, regenerated every
+        time, never hand-edited.
+        """
+        return {
+            "dataset_name": self.dataset_name,
+            "version": self.version,
+            "confirmed_at": (
+                self.confirmed_at.isoformat() if self.confirmed_at else None
+            ),
+            "fingerprint": self.fingerprint,
+            "grain": self.grain,
+            "primary_key": list(self.primary_key),
+            "date_column": self.date_column,
+            "analysis_window": (
+                {
+                    "start": self.analysis_window.start.isoformat(),
+                    "end": self.analysis_window.end.isoformat(),
+                }
+                if self.analysis_window
+                else None
+            ),
+            "measures": [
+                {
+                    "name": m.name,
+                    "agg": m.agg,
+                    "unit": m.unit,
+                    "definition": m.definition,
+                }
+                for m in self.measures
+            ],
+            "dimensions": list(self.dimensions),
+            "known_exclusions": [
+                {"rule": e.rule, "reason": e.reason, "row_count": e.row_count}
+                for e in self.known_exclusions
+            ],
+            "caveats": list(self.caveats),
+        }
+
+
+def contract_from_json(payload: str) -> DatasetContract:
+    """
+    Parse a confirmed contract, turning any validation error into a refusal.
+
+    Same trip `IngestSpec` makes: the contract goes out as JSON and comes back
+    as JSON, so the thing confirmed is the thing stored and any field can be
+    edited in between. What cannot be edited in is a blank definition -- the
+    validators above refuse it, so deleting an `unresolved` entry by hand
+    fails instead of silently confirming a guess.
+    """
+    text = payload.strip()
+    if text.startswith("```"):
+        text = text.split("\n", 1)[1] if "\n" in text else ""
+        text = text.rsplit("```", 1)[0]
+    try:
+        return DatasetContract.model_validate_json(text)
+    except Exception as exc:
+        raise ValueError(
+            Refusal(
+                reason=Reason.CONTRACT_INVALID,
+                what="that is not a usable dataset contract.",
+                why="it did not validate, so it was not stored.",
+                detail=str(exc),
+                next_call=(
+                    "propose_dataset_contract(dataset_name=...) to get a valid "
+                    "one, edit the fields you want to change, and pass the "
+                    "whole JSON object back"
+                ),
+            ).to_text()
+        ) from exc
+
+
+__all__ = [
+    "Aggregation",
+    "AnalysisWindow",
+    "Binding",
+    "ColumnBinding",
+    "DatasetContract",
+    "Exclusion",
+    "Measure",
+    "contract_from_json",
+]

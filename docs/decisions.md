@@ -447,3 +447,43 @@ Machine-local and implementation choices that are easy to forget six months late
   is excluded from pair search, so its composite key is missed. The fix is
   verify_key() -- a stated key is checked, not searched for -- which follows
   Phase 3's rule that the answer comes back the way the question went out.
+
+- D1 locked: a contract is keyed on dataset_name (locked decision 13) and
+  bound to a STRUCTURE -- ordered column names and types -- with row count
+  and load time recorded beside it. The fingerprint covers structure only:
+  a table that gained rows is the same table, one that lost a column is not.
+- Drift is classified, not compared: identical / additive / neutral /
+  destructive, after schema-registry compatibility modes. Destructive
+  (a named column gone or retyped) refuses with CONTRACT_STALE, because the
+  SQL cannot run. Neutral (row count moved) proceeds with a caveat on every
+  result. Step 3 implements it.
+- The fingerprint is a CACHE KEY, not a truth claim. The industrial pattern
+  (Great Expectations checkpoints, dbt tests) is to re-run the cheap
+  invariants -- is the key still unique, do the measure columns still exist
+  -- and skip that work only on a fingerprint hit. Comparing a stored row
+  count answers "did something change" and never "is the agreement still
+  true".
+- D2 locked, and split. Grain is GUESSED mechanically from the key candidate,
+  in the table's own column names ("one row = one (order_id, order_item_id)"),
+  and marked unresolved. A measure definition is left BLANK and marked
+  unresolved, because no derivation of "net of tax, excludes cancelled"
+  exists. A guessed grain that reaches for business words is worse than a
+  blank one: people nod along to a plausible grain in a way they never did
+  to a guessed header row.
+- unresolved holds FIELD PATHS, not field names: "grain",
+  "measures[price].definition". Definitions are missing per-measure.
+- Blank values are legal only while declared. A contract whose grain is empty
+  and which does not list "grain" in unresolved will not construct. This
+  closes the hole Phase 3 left: an IngestSpec could be confirmed by
+  hand-deleting the unresolved entry, because the ban lived in a docstring.
+- Every refusal carries a stable reason code on its last line
+  (reason: NO_CONTRACT), after RFC 7807 and Google's ErrorInfo. Tests and the
+  Phase 13 eval assert on the code; the prose stays free to be rewritten.
+  Refusal.__post_init__ rejects a next_call without parentheses -- an
+  instruction the agent cannot execute is what F1 is.
+- A contract with bound_to=None is valid on purpose. Reading one back from
+  storage must not require the table to be loaded.
+- D3 locked: SCD2. D4 locked as a gate-only stub, with the post-contract
+  return still to be decided at Step 7 -- a state report, or one real
+  analysis. A stub that refuses twice is the apology loop the Done-When is
+  meant to catch.
