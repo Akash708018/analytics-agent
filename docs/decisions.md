@@ -586,3 +586,35 @@ Machine-local and implementation choices that are easy to forget six months late
   rollback on failure. Without it a crash between the UPDATE and the INSERT
   leaves a dataset with no current contract at all, which reads as "never
   agreed" rather than as "half written".
+
+- require_contract runs four checks in order -- loaded, contract in force,
+  structure not broken, key still holding -- and the last two are EXECUTED
+  against the live table rather than compared against stored values. A stored
+  hash says something changed; only running the count says the agreement
+  still holds.
+- The fingerprint is used in exactly one place: when structure AND row count
+  both match, the key re-check is skipped. Everywhere else it is inert. That
+  is what "cache key, not a truth claim" means in code.
+- Demonstrated: ten duplicated rows produce identical columns, identical
+  types and no drift of any kind, and the primary key stops holding. Every
+  structural check passes it. Only verify_key catches it, and without that
+  check every later group-by double-counts with nothing saying so.
+- A passed gate carries caveats, not just permission: the drift caveat, the
+  contract's own caveats, and one line per known exclusion with its row
+  count. A total computed with 100 rows deliberately removed is a different
+  number wearing the same name.
+- dataset_states filters underscore-prefixed tables itself as well as relying
+  on db.user_tables. _agent_contracts did not exist when that filter was
+  written, so whether it is excluded depends on whether it tests one known
+  name or the convention. Listing the contract log as a dataset with no
+  contract would be absurd in the one tool whose job is saying where you are.
+- get_workflow_state lists every dataset with its load time, its stage and the
+  exact next call. There is no fix for F13 -- the server cannot see chat
+  boundaries -- so the mitigation is that a leftover reads as
+  "Loaded 3 hour(s) ago" rather than as something fresh.
+- A table with no load record (a view, something hand-made) is still listed,
+  marked as not created by a loader. Hiding it would make get_workflow_state
+  lie about the contents of the workspace.
+- state.py lives at src/analytics_agent/state.py, not under contract/. The
+  gate belongs to the workflow, not to the contract, and Section 10 puts it
+  there.
