@@ -519,3 +519,39 @@ Machine-local and implementation choices that are easy to forget six months late
   ContractRefused with a plain BLOCKED string and no reason code, because it
   was written before refusals.py existed. Every refusal path gets audited when
   server.py wires the tools and test_tool_docs.py pins them.
+
+- A proposal may restate what the data says and may never state what only a
+  person can. Grain is DERIVED from the key in the table's own column names
+  ("one row = one (order_id, order_item_id)") and still marked unresolved.
+  A grain in business words ("one order line item") is invented, and it is
+  worse than a blank because people nod along to it.
+- The analysis window is reported, never proposed. A date column's span is a
+  fact and the window is a different question: on olist,
+  shipping_limit_date runs to 2020-04-09, past the end of the order data, so
+  a window taken from the span would look defensible and include a tail
+  nobody wants.
+- One temporal column is taken silently; more than one is offered and marked
+  unresolved. Which date a trend runs on changes the numbers.
+- Known exclusions are never invented. The test fixture carries a status
+  column with a literal 'cancelled' so that a future version inventing one
+  fails a test rather than passing quietly.
+- Key candidates are ranked by ROLE before position. Evidence returns unique
+  singles before pairs in column order, so taking the first produced
+  "one row = one order_date" on a fixture where order_date happened to hold
+  300 distinct values in 300 rows -- the same coincidental uniqueness the
+  200k probe found, arriving through the front door. Candidates whose columns
+  all read as identifiers rank first, and the losers are listed rather than
+  dropped.
+- Repeating identifiers ARE dimensions. Excluding every identifier left one
+  groupable column on a seven-column table, which is not a description anyone
+  would recognise -- seller_id is a foreign key and grouping by it is the
+  normal thing to do. Columns that are IN the key stay out: grouping by the
+  key returns the table.
+- DatasetContract.to_text() no longer renders `questions`. The contract body
+  and the proposal render both had a list, so a first-turn proposal printed
+  all four questions twice in one tool result -- Phase 3 Step 8's duplicated
+  assumptions, exactly. Questions belong to the conversation, and the
+  conversation puts them at the bottom, where an answer gets given.
+- A stated primary_key is verified before it reaches the contract, so a key
+  that does not hold is refused at proposal time rather than at the gate
+  three steps later.

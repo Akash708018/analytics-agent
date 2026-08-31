@@ -384,17 +384,7 @@ class DatasetContract(BaseModel):
     # ------------------------------------------------------------ rendering
 
     def to_text(self) -> str:
-        """
-        A plain reading of the agreement, for the confirmation step.
-
-        `questions` are deliberately NOT rendered here. They belong to the
-        conversation, not to the document, and whoever is running that
-        conversation puts them at the BOTTOM of what it shows -- which is
-        where an answer actually gets given. Printing them in both places
-        produced two identical lists in one tool result, which is the Phase 3
-        Step 8 bug exactly: the one thing guaranteed to make a user answer
-        twice.
-        """
+        """A plain reading, for the confirmation step."""
         lines = [
             f"dataset        {self.dataset_name}",
             f"grain          {self.grain or '(not stated)'}",
@@ -435,6 +425,8 @@ class DatasetContract(BaseModel):
                 lines.append(f"  - {e.rule}{count} -- {e.reason}")
         if self.caveats:
             lines += ["", "Caveats:"] + [f"  - {c}" for c in self.caveats]
+        if self.questions:
+            lines += ["", "Open questions:"] + [f"  - {q}" for q in self.questions]
         return "\n".join(lines)
 
     def to_yaml_dict(self) -> dict[str, Any]:
