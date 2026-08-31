@@ -487,3 +487,35 @@ Machine-local and implementation choices that are easy to forget six months late
   return still to be decided at Step 7 -- a state report, or one real
   analysis. A stub that refuses twice is the apology loop the Done-When is
   meant to catch.
+
+- Drift is classified against the columns the CONTRACT NAMES, not against the
+  table. Dropping a column no contract mentions is ADDITIVE, not destructive.
+  A gate that fires when it does not have to teaches the reader to skim past
+  it, which is F1's mechanism rather than merely bad manners.
+- ADDITIVE also covers an unnamed column being dropped and a column reorder.
+  Neither is additive literally; both are non-breaking for a contract that
+  refers to columns by name, and a fifth class would mean branching on
+  something no caller acts on differently. The name is inherited from
+  schema-registry vocabulary and is kept for that reason alone.
+- A reorder is non-breaking at the contract layer and breaking at the ingest
+  layer, because IngestSpec carries `names` positionally. Same event, two
+  correct and opposite answers. Both are tested in their own files.
+- caveat() lost a fact when two kinds of drift happened at once: a table that
+  had dropped an unnamed column AND gained 30 rows reported only the column.
+  The classes are exclusive, the sentences must not be. Found by walking one
+  table through all four classes; every unit test changed one thing at a time
+  and all of them passed.
+- verify_key checks a key a person STATED instead of searching for one, and it
+  is the more important half. On a 420-row invoices table, search returned
+  ['amount'] -- a DOUBLE that happens not to repeat -- and missed
+  invoice_ref + line entirely, because `line` is numeric with 21 distinct
+  values and is not identifier-named. Verification found it in one query.
+  Phase 3's rule at another layer: the answer comes back the way the question
+  went out.
+- A failing key reports HOW MANY rows repeat, not just that it is not unique.
+  400 duplicates across 20 values says the grain is wrong; two duplicates says
+  the data is dirty. The refusal offers both repairs.
+- Known inconsistency, scheduled for Step 7: contract/evidence.py raises
+  ContractRefused with a plain BLOCKED string and no reason code, because it
+  was written before refusals.py existed. Every refusal path gets audited when
+  server.py wires the tools and test_tool_docs.py pins them.
