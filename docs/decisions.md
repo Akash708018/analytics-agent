@@ -618,3 +618,12 @@ Machine-local and implementation choices that are easy to forget six months late
 - state.py lives at src/analytics_agent/state.py, not under contract/. The
   gate belongs to the workflow, not to the contract, and Section 10 puts it
   there.
+
+- tests/test_contract_tool_docs.py distinguishes three states, not two: none
+  of the four contract tools present is a SKIP (not wired yet), SOME present
+  is a FAIL naming what is missing (wired, and something was lost), all four
+  present runs everything. A blanket skip would hide the middle case, which
+  is the silent damage the guard exists to catch.
+- The first version skipped only when server.py was ABSENT, so on a real repo
+  it failed 25 times instead of skipping. A step guide that leaves the suite
+  red between its own parts teaches you to ignore a red suite.

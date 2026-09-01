@@ -57,7 +57,6 @@ import re
 from dataclasses import dataclass, field
 
 from analytics_agent.contract import ContractRefused
-from analytics_agent.contract.refusals import Reason, Refusal
 
 # Pair probing costs one query each. Ranked and capped rather than unbounded,
 # because C(k, 2) on a 60-column table is 1,770 scans.
@@ -409,12 +408,8 @@ def column_stats(con, dataset_name: str) -> list[ColumnEvidence]:
     ).fetchall()
     if not cols:
         raise ContractRefused(
-            Refusal(
-                reason=Reason.DATASET_NOT_LOADED,
-                what=f"'{dataset_name}' has no columns.",
-                why="there is nothing to count.",
-                next_call=f'describe_dataset(dataset_name="{dataset_name}")',
-            ).to_text()
+            f"BLOCKED: '{dataset_name}' has no columns.\n"
+            f"NEXT STEP: call describe_dataset to see what was loaded."
         )
 
     exprs = ["count(*)"]
@@ -611,19 +606,12 @@ def gather(
     if not _table_exists(con, dataset_name):
         available = ", ".join(_user_tables(con)) or "(none loaded)"
         raise ContractRefused(
-            Refusal(
-                reason=Reason.DATASET_NOT_LOADED,
-                what=f"no dataset called '{dataset_name}' in this workspace.",
-                why=(
-                    "evidence is gathered from a loaded table, not from a file. "
-                    "Nothing is read from disk here."
-                ),
-                state=f"loaded: {available}",
-                next_call=(
-                    "list_datasets(), or propose_ingest_spec(path=\"...\") then "
-                    "confirm_ingest_spec to load the file first"
-                ),
-            ).to_text()
+            f"BLOCKED: no dataset called '{dataset_name}' in this workspace.\n"
+            f"WHY: evidence is gathered from a loaded table, not from a file. "
+            f"Nothing is read from disk here.\n"
+            f"Loaded: {available}\n"
+            f"NEXT STEP: call list_datasets, or load the file first with "
+            f"propose_ingest_spec then confirm_ingest_spec."
         )
 
     stats = column_stats(con, dataset_name)
