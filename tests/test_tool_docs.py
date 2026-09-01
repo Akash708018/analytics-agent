@@ -12,6 +12,12 @@ anywhere else would notice.
 
 Read from source with `ast` rather than by importing the module, so this runs
 without a FastMCP install and does not care how the decorator wraps a function.
+
+Phase 4 note: the four contract tools are in the roster below, and their own
+sentences are pinned in tests/test_contract_tool_docs.py rather than here.
+This file keeps the Phase 3 conversation and the tool surface as a whole; that
+one keeps the contract conversation. Splitting them means a Phase 5 tool adds
+a file rather than lengthening this one indefinitely.
 """
 
 from __future__ import annotations
@@ -67,11 +73,28 @@ EXPECTED_TOOLS = {
     "list_datasets",
     "describe_dataset",
     "show_limits",
+    # Phase 4, Step 7.
+    "propose_dataset_contract",
+    "confirm_dataset_contract",
+    "get_workflow_state",
+    "run_analysis",
 }
 
 
-def test_the_expected_fifteen_tools_are_registered(docs):
-    assert set(docs) == EXPECTED_TOOLS
+def test_the_registered_tools_are_exactly_the_expected_ones(docs):
+    """
+    A CLOSED set, deliberately. Not "these are present" but "these and nothing
+    else" -- registering a tool without declaring it here changes what Claude
+    Desktop sees, and this refuses to let that happen quietly. It is the check
+    that fired when Phase 4 added four tools, which is the behaviour working.
+
+    Adding a tool is therefore two edits: the tool, and this set. That is the
+    intended friction.
+    """
+    extra = sorted(set(docs) - EXPECTED_TOOLS)
+    missing = sorted(EXPECTED_TOOLS - set(docs))
+    assert not extra, f"registered but not declared here: {extra}"
+    assert not missing, f"declared here but not registered: {missing}"
 
 
 def test_every_tool_has_a_docstring(docs):

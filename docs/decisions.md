@@ -627,3 +627,32 @@ Machine-local and implementation choices that are easy to forget six months late
 - The first version skipped only when server.py was ABSENT, so on a real repo
   it failed 25 times instead of skipping. A step guide that leaves the suite
   red between its own parts teaches you to ignore a red suite.
+
+- DEFAULT_AGG stays "sum" for every measure, including prices. The live run
+  pushed back on it correctly -- summing a unit price is meaningless -- and
+  the question attached to each measure asks about the aggregation for exactly
+  that reason. What protects the contract is that the definition is
+  unresolved, so a wrong agg cannot be STORED without a person answering: the
+  bad default is visible and blocked, not quiet. Choosing 'mean' for anything
+  named price is the name-heuristic trap that nearly lost order_item_id in
+  Step 1. A dumb default plus a mandatory question beats a clever default that
+  is confidently wrong.
+- Live run, Step 7b: gate refused with NO_CONTRACT, agent called
+  propose_dataset_contract unprompted, read the PROVISIONAL draft back
+  accurately, and said it would re-propose with the answers rather than edit
+  the JSON. Two Done-When behaviours observed before Step 8 formally tests
+  them.
+- server.py was merged into, not retyped. Three anchors -- the module
+  docstring, the import line, the point before main() -- and then a line-level
+  diff against the original: exactly one line differs (the docstring line that
+  was deliberately rewritten), no function lost, four added. Reconstructing a
+  548-line file from a copy inside a step guide would have had no such check.
+- tests/test_contract_tool_docs.py distinguishes three states rather than two:
+  none of the four tools present is a SKIP (the block has not been added),
+  some present is a FAIL naming what is missing (the block was added and
+  something was lost), all present runs everything. A blanket skip would hide
+  the middle case, which is the failure the file exists to catch.
+- Step 7a claimed the guard would report 40 skipped before wiring. It reported
+  25 failed, because the skip only fired when server.py was ABSENT and the
+  file exists. A step guide that leaves the suite red between its own parts
+  teaches you to ignore a red suite, which is worse than having none.
