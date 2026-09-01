@@ -48,10 +48,6 @@ class Reason(str, Enum):
     CONTRACT_INVALID = "CONTRACT_INVALID"
     KEY_NOT_UNIQUE = "KEY_NOT_UNIQUE"
     NOT_IMPLEMENTED_YET = "NOT_IMPLEMENTED_YET"
-    # a result file was named and is not there.
-    RESULT_NOT_FOUND = "RESULT_NOT_FOUND"
-    # a path resolved outside this workspace's results, or a page was asked for that cannot exist.
-    RESULT_OUT_OF_SCOPE = "RESULT_OUT_OF_SCOPE"
 
 
 _REASON_LINE = re.compile(r"^reason:\s*([A-Z_]+)\s*$", re.M)

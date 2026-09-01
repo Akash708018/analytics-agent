@@ -852,3 +852,34 @@ Machine-local and implementation choices that are easy to forget six months late
   and the reason to check what the reference implementations do BEFORE
   reasoning from first principles: I offered three options and recommended the
   middle one, and the industry answer was a fourth that none of them was.
+
+## Phase 5, Step 1 — util/results.py
+
+- P5-D4 answered. Result files are CSV, under workspace/<id>/results/, named
+  <label>_<YYYYMMDD-HHMMSS>.csv with a counter on collision, never overwritten,
+  never auto-deleted. reset_workspace is the only thing that removes them, and
+  that is only true because the directory is INSIDE the workspace directory --
+  verified with a canary file before the code was written, not assumed.
+- A path is never returned on its own. write_result returns a Result, and there
+  is deliberately no accessor that yields just the path as a string: the one
+  that exists is the one that gets used. F7 is the agent reporting on data it
+  never opened, and it leaves no trace in the transcript.
+- results.py slices the preview to 20 rows and 12 columns BEFORE calling
+  format_table, which caps at 50 and 50. If the cap did the truncating, the cap
+  would decide what the model sees and nothing would say a cap had happened.
+  Truncating first also means format_table's behaviour at its own limits stops
+  mattering to this phase. Asserted directly: PREVIEW_ROWS < MAX_ROWS.
+- A page past the end of a file is NOT a refusal. It carries no reason code and
+  names the page that does exist. Asking for row 500 of a 30-row file is a wrong
+  guess, not a broken call, and an agent handed a BLOCKED there starts
+  apologising -- the Phase 4 D4 reasoning, one layer down.
+- start=0 IS refused rather than nudged to 1. An off-by-one that silently
+  becomes row 1 returns a page that does not begin where it was asked to and
+  says nothing about it.
+- Two Reason members added: RESULT_NOT_FOUND, RESULT_OUT_OF_SCOPE. Additive, so
+  every Phase 4 test still passes. refusals.py lives under contract/ for
+  historical reasons and is now imported by util/ -- if a later phase wants it
+  under util/, that is a move, not a rewrite.
+- read_result_file is a function in Step 1 and a registered MCP tool in Step 6.
+  The refusals here name it, and the Phase 5 acceptance test asserts every call
+  a refusal names is registered -- so forgetting Step 6 fails loudly at Step 9.

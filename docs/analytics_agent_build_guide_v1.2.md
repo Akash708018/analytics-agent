@@ -1005,7 +1005,7 @@ Forecasting, multi-dataset joins, scheduled runs. Out of scope until 0–14 are 
 | 2 | Ingest \+ workspace isolation |  ☑ Dones | 29/08/2026 |Steps 1–9 plus Step 0.5 (olist rebuilt into Homebrew PG17). 29/20 acceptance assertions pass. |
 | 3 | Ingest Spec \+ merges |  ☑ Dones | 30/08/2026 | Steps 1-8. 197 unit assertions, 31 acceptance assertions (35 with big_synthetic), Phase 2's 20 still passing. Live run recorded in phase3_step7.md. |
 | 4 | Contract \+ workflow state | ☐ Not started |  |  |
-| 5 | Profiling | ☐ Not started |  |  |
+| 5 | Profiling | ☐ Not started |  ☑ Dones | 01/09/2026 |
 | 6 | Cleaning gate | ☐ Not started |  |  |
 | 7 | Validation | ☐ Not started |  |  |
 | 8 | Analysis T1–2 | ☐ Not started |  |  |
