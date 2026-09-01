@@ -83,6 +83,7 @@ def _confirmed(con, name="order_items", **overrides):
     kwargs = dict(
         grain="one row = one item on one order",
         measure_definitions={"price": "item price, excludes freight"},
+        aggregations={"price": "none"},
         analysis_window=(date(2024, 1, 1), date(2024, 10, 26)),
     )
     kwargs.update(overrides)

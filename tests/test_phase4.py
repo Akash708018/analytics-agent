@@ -102,7 +102,7 @@ ANSWERS = dict(
         "unit_price": "price per item in INR, excludes tax",
         "revenue": "units x unit_price, excludes tax and freight",
     },
-    aggregations={"unit_price": "mean"},
+    aggregations={"units": "sum", "unit_price": "none", "revenue": "sum"},
     analysis_window_start="2024-01-01",
     analysis_window_end="2024-12-30",
 )
@@ -186,7 +186,29 @@ def clause_2b_after_confirming(con) -> None:
     check("it does not hand back JSON to confirm", "```json" not in proposal)
 
     answered = tools.propose(con, "clean_sales", **ANSWERS)
-    check("answering makes it confirmable", "```json" in answered)
+    confirmable = "```json" in answered
+    check("answering makes it confirmable", confirmable)
+    if not confirmable:
+        # Print what is still outstanding rather than crashing on the missing
+        # JSON block. The first version indexed straight into the split and
+        # raised IndexError, which says nothing about WHY -- and this check
+        # failing means the answers did not cover everything the proposal
+        # asked, which is precisely the thing worth seeing.
+        print()
+        print("        still provisional. What it is still asking:")
+        asking = False
+        for line in answered.splitlines():
+            if line.startswith("PROVISIONAL"):
+                print(f"          {line.strip()}")
+            if line.startswith("Put these to the user:"):
+                asking = True
+                continue
+            if asking:
+                if not line.strip():
+                    break
+                print(f"          {line.strip()}")
+        print()
+        return
     payload = answered.split("```json")[1].split("```")[0]
 
     stored = tools.confirm(con, payload, export_root=Path("docs/contracts"))
@@ -204,7 +226,9 @@ def clause_2b_after_confirming(con) -> None:
     check("it is honest that nothing was computed",
           "No analysis has been computed" in result)
     check("the aggregation the user chose survived",
-          "| unit_price | mean |" in result)
+          "| unit_price | none |" in result)
+    check("an unstated aggregation would have blocked it",
+          "measures[unit_price].agg" in tools.propose(con, "clean_sales"))
 
 
 def clause_3_machinery(con) -> None:
@@ -251,6 +275,10 @@ def clause_3b_history(con) -> None:
     changed["measure_definitions"] = dict(ANSWERS["measure_definitions"])
     changed["measure_definitions"]["revenue"] = "units x unit_price, INCLUDES tax"
     answered = tools.propose(con, "clean_sales", **changed)
+    if "```json" not in answered:
+        check("the revised contract is confirmable", False,
+              "see Clause 2 continued")
+        return
     payload = answered.split("```json")[1].split("```")[0]
     text = tools.confirm(con, payload, export_root=Path("docs/contracts"))
 

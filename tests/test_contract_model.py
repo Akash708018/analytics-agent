@@ -143,6 +143,46 @@ def test_a_measure_without_a_definition_must_be_declared():
     assert "measures[price].definition" in str(exc.value)
 
 
+def test_a_measure_without_an_aggregation_must_be_declared():
+    """
+    No default, matching every production semantic layer: LookML requires
+    `type:`, Cube requires `type`, dbt MetricFlow requires `agg`. The guess
+    that gets guessed is sum, and summing a unit price is meaningless in a way
+    nothing downstream can detect.
+    """
+    with pytest.raises(ValidationError) as exc:
+        settled(measures=[Measure(name="price", definition="item price")])
+    assert "measures[price].agg" in str(exc.value)
+    assert "not a default" in str(exc.value)
+
+
+def test_an_unstated_aggregation_is_fine_once_declared():
+    c = settled(
+        measures=[Measure(name="price", definition="item price")],
+        unresolved=["measures[price].agg"],
+    )
+    assert not c.is_confirmable
+    assert c.measure("price").agg_path == "measures[price].agg"
+
+
+def test_non_additive_is_a_statement_not_an_absence():
+    """
+    'none' means a person decided the column must not be combined. It is a
+    different thing from nobody having said, and only one of them confirms.
+    """
+    c = settled(measures=[Measure(name="price", agg="none", definition="d")])
+    assert c.is_confirmable
+    assert c.measure("price").agg == "none"
+
+
+def test_an_unstated_aggregation_renders_as_not_stated():
+    text = settled(
+        measures=[Measure(name="price", definition="d")],
+        unresolved=["measures[price].agg"],
+    ).to_text()
+    assert "| price | (NOT STATED) | - | d |" in text
+
+
 def test_a_measure_without_a_definition_is_fine_once_declared():
     c = settled(
         measures=[Measure(name="price", agg="sum")],

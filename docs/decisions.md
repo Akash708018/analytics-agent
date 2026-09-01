@@ -806,3 +806,49 @@ Machine-local and implementation choices that are easy to forget six months late
   merely that history was kept. Contiguous windows are what make "which
   definition produced this number" answerable for a number computed last
   Tuesday.
+
+- A measure's aggregation has NO DEFAULT. Every production semantic layer
+  requires it -- LookML `type:`, Cube `type`, dbt MetricFlow `agg` -- and none
+  of them guesses, because the guess that gets guessed is sum and summing a
+  price, a rate or a balance is wrong in a way nothing downstream can detect.
+  A NULL propagates; a wrong total does not.
+- This supersedes the Step 7b entry claiming a wrong agg could not be stored.
+  It could: only measures[x].definition was unresolved. A person could answer
+  every definition, never mention aggregation, and confirm unit_price with
+  agg="sum". Two independent live runs flagged it, the second describing it as
+  "the plausible-looking default is the kind of thing that gets confirmed
+  without being read".
+- agg="none" is a STATEMENT that a column must not be combined, not an
+  absence. It is the right answer for a unit price -- not mean, which averages
+  across orders of different sizes and is its own quiet mistake. Only a stated
+  value confirms; None does not.
+- One question settles both measures[x].definition and measures[x].agg. They
+  are the same question about the same column, and the question now lists the
+  allowed aggregations so an answer needs no guessing at the vocabulary.
+- Removing a default touched seven files. That is the cost of having had one,
+  and the reason to check what the reference implementations do BEFORE
+  reasoning from first principles: I offered three options and recommended the
+  middle one, and the industry answer was a fourth that none of them was.
+
+- A measure's aggregation has NO DEFAULT. Every production semantic layer
+  requires it -- LookML `type:`, Cube `type`, dbt MetricFlow `agg` -- and none
+  of them guesses, because the guess that gets guessed is sum and summing a
+  price, a rate or a balance is wrong in a way nothing downstream can detect.
+  A NULL propagates; a wrong total does not.
+- This supersedes the Step 7b entry claiming a wrong agg could not be stored.
+  It could: only measures[x].definition was unresolved. A person could answer
+  every definition, never mention aggregation, and confirm unit_price with
+  agg="sum". Two independent live runs flagged it, the second describing it as
+  "the plausible-looking default is the kind of thing that gets confirmed
+  without being read".
+- agg="none" is a STATEMENT that a column must not be combined, not an
+  absence. It is the right answer for a unit price -- not mean, which averages
+  across orders of different sizes and is its own quiet mistake. Only a stated
+  value confirms; None does not.
+- One question settles both measures[x].definition and measures[x].agg. They
+  are the same question about the same column, and the question now lists the
+  allowed aggregations so an answer needs no guessing at the vocabulary.
+- Removing a default touched seven files. That is the cost of having had one,
+  and the reason to check what the reference implementations do BEFORE
+  reasoning from first principles: I offered three options and recommended the
+  middle one, and the industry answer was a fourth that none of them was.

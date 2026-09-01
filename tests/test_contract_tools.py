@@ -60,6 +60,7 @@ def loaded(con):
 ANSWERS = dict(
     grain="one row = one item on one order",
     measure_definitions={"price": "item price in BRL, excludes freight"},
+    aggregations={"price": "none"},
     analysis_window_start="2024-01-01",
     analysis_window_end="2024-10-26",
 )
@@ -243,7 +244,7 @@ def test_the_report_names_the_contract_it_would_compute_under(loaded, tmp_path):
     text = tools.analyse(loaded, "order_items")
     assert "Under contract v1 for order_items" in text
     assert "one row = one item on one order" in text
-    assert "| price | sum | item price in BRL, excludes freight |" in text
+    assert "| price | none | item price in BRL, excludes freight |" in text
 
 
 def test_the_report_says_what_can_be_called_today(loaded, tmp_path):

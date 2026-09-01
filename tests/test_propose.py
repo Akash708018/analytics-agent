@@ -204,8 +204,16 @@ def test_no_exclusions_are_ever_invented(items):
 
 
 def test_every_unresolved_entry_has_a_question(items):
+    """
+    One question may settle two entries -- a measure's definition and its
+    aggregation are asked together, because they are the same question about
+    the same column.
+    """
     c = propose_contract(items, "order_items").contract
-    assert len(c.questions) >= len(c.unresolved)
+    for entry in c.unresolved:
+        column = entry.split("[")[1].split("]")[0] if "[" in entry else None
+        assert any((column or "one row") in q or "one row" in q
+                   for q in c.questions), f"nothing asks about {entry}"
     assert all(q.strip().endswith(("?", ".")) for q in c.questions)
 
 
@@ -222,6 +230,7 @@ def test_answering_everything_makes_it_confirmable(items):
             "price": "item price, excludes freight",
             "freight_value": "shipping charged to the customer",
         },
+        aggregations={"price": "none", "freight_value": "sum"},
         analysis_window=(date(2024, 1, 1), date(2024, 10, 26)),
     )
     assert p.contract.is_confirmable
@@ -283,17 +292,58 @@ def test_a_stated_key_search_would_have_missed(con):
 
 def test_a_stated_aggregation_is_honoured(items):
     c = propose_contract(
-        items, "order_items", aggregations={"price": "mean"},
+        items, "order_items",
+        aggregations={"price": "mean", "freight_value": "sum"},
         measure_definitions={"price": "d", "freight_value": "d"},
     ).contract
     assert c.measure("price").agg == "mean"
     assert c.measure("freight_value").agg == "sum"
 
 
+def test_an_unstated_aggregation_blocks_the_contract(items):
+    """
+    No default. Every semantic layer in production requires this field --
+    LookML `type:`, Cube `type`, MetricFlow `agg` -- because the guess that
+    gets guessed is sum, and summing a unit price is meaningless in a way
+    nothing downstream can detect.
+    """
+    c = propose_contract(
+        items, "order_items", grain="g",
+        measure_definitions={"price": "d", "freight_value": "d"},
+        analysis_window=(date(2024, 1, 1), date(2024, 10, 26)),
+    ).contract
+    assert c.measure("price").agg is None
+    assert "measures[price].agg" in c.unresolved
+    assert not c.is_confirmable
+
+
+def test_the_aggregation_question_lists_the_vocabulary(items):
+    """An answer is easier to give when the allowed values are in the ask."""
+    q = " ".join(propose_contract(items, "order_items").contract.questions)
+    assert "count_distinct" in q
+    assert "'none' if it must not be combined" in q
+
+
+def test_non_additive_is_statable(items):
+    """
+    A price is not summed and not averaged either, necessarily -- 'none' says
+    the column is meaningful per row and must not be combined.
+    """
+    c = propose_contract(
+        items, "order_items", grain="g",
+        measure_definitions={"price": "d", "freight_value": "d"},
+        aggregations={"price": "none", "freight_value": "sum"},
+        analysis_window=(date(2024, 1, 1), date(2024, 10, 26)),
+    ).contract
+    assert c.measure("price").agg == "none"
+    assert c.is_confirmable
+
+
 def test_stated_measures_override_the_roles(items):
     c = propose_contract(
         items, "order_items", measures=["price"],
         measure_definitions={"price": "item price"},
+        aggregations={"price": "sum"},
     ).contract
     assert c.measure_names == ["price"]
     assert "freight_value" not in c.dimensions
@@ -306,6 +356,7 @@ def test_a_column_promoted_to_measure_leaves_the_dimensions(items):
         items, "order_items",
         measures=["order_item_id"], dimensions=["seller_id", "order_item_id"],
         measure_definitions={"order_item_id": "line position"},
+        aggregations={"order_item_id": "count"},
     ).contract
     assert c.measure_names == ["order_item_id"]
     assert c.dimensions == ["seller_id"]
@@ -316,6 +367,7 @@ def test_exclusions_and_caveats_are_carried_through(items):
         items, "order_items",
         grain="one row = one item",
         measure_definitions={"price": "d", "freight_value": "d"},
+        aggregations={"price": "none", "freight_value": "sum"},
         analysis_window=(date(2024, 1, 1), date(2024, 6, 30)),
         known_exclusions=[
             Exclusion(rule="status = 'cancelled'", reason="not real revenue",
@@ -371,6 +423,7 @@ def test_an_answered_proposal_renders_the_json_and_no_questions(items):
         items, "order_items",
         grain="one row = one item on one order",
         measure_definitions={"price": "d", "freight_value": "d"},
+        aggregations={"price": "none", "freight_value": "sum"},
         analysis_window=(date(2024, 1, 1), date(2024, 10, 26)),
     )
     text = p.to_text()
@@ -384,6 +437,7 @@ def test_the_rendered_json_parses_back_to_the_same_contract(items):
     p = propose_contract(
         items, "order_items", grain="g",
         measure_definitions={"price": "d", "freight_value": "d"},
+        aggregations={"price": "none", "freight_value": "sum"},
         analysis_window=(date(2024, 1, 1), date(2024, 10, 26)),
     )
     body = p.to_text().split("```json")[1].split("```")[0]

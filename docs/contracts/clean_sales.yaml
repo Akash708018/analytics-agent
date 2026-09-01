@@ -6,7 +6,7 @@
 # call propose_dataset_contract with the correction and confirm the result.
 dataset_name: clean_sales
 version: 2
-confirmed_at: '2026-09-01T14:55:02.655491'
+confirmed_at: '2026-09-01T20:30:26.316892'
 fingerprint: facdb163024e
 grain: one row = one order
 primary_key:
@@ -21,7 +21,7 @@ measures:
   unit: null
   definition: items ordered on this line
 - name: unit_price
-  agg: mean
+  agg: none
   unit: null
   definition: price per item in INR, excludes tax
 - name: revenue
