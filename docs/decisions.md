@@ -656,3 +656,153 @@ Machine-local and implementation choices that are easy to forget six months late
   25 failed, because the skip only fired when server.py was ABSENT and the
   file exists. A step guide that leaves the suite red between its own parts
   teaches you to ignore a red suite, which is worse than having none.
+
+- CORRECTION to the Step 7b entry: a wrong aggregation CAN be stored. Only
+  measures[x].definition is unresolved; agg is not. A person can answer every
+  definition, never mention aggregation, confirm, and store unit_price with
+  agg="sum". The question asks about it; nothing enforces it. Two independent
+  live runs flagged the sum default, the second describing it as "the kind of
+  thing that gets confirmed without being read". The recommended fix is to add
+  measures[x].agg to unresolved -- smallest change, no new question, and it
+  puts the block where the prose already points. Deferred to a Step 9 rather
+  than slipped into the close of Phase 4.
+- Live run 2 confirmed three behaviours beyond the clause: the evidence notes
+  (measure exclusion from key probing, minimality pruning) were read back
+  accurately by something that had never seen the code; the agent set
+  expectations that run_analysis returns no number, from the docstring
+  sentence pinned by test_run_analysis_is_honest_about_phase_8; and it tied a
+  null in `region` to known_exclusions unprompted.
+- Twice now, a contract-layer test has asserted on wording owned by
+  util/db.py: Step 6 hard-coded a `loaded_at` column name, and the Phase 4
+  acceptance script counted the literal word "Loaded" in a report. Both passed
+  locally and failed on the real repository. The rule: assert that another
+  module's output REACHES yours, never what it says. age_phrase()'s wording is
+  util/db.py's business.
+- The agent does not see all nineteen tools at once -- it calls tool_search
+  and matches on descriptions. A docstring's first line therefore does double
+  duty: it instructs, and it is what a search has to match. A tool that cannot
+  be found fails before its gate ever runs, and the failure looks like a gate
+  problem. Every tool Phase 5 adds needs a first line that reads as a search
+  target as well as an instruction.
+- Live run 3: the agent declined to call confirm_dataset_contract on a
+  PROVISIONAL draft WITHOUT being refused -- "nothing to confirm, the draft is
+  PROVISIONAL and would be refused". The docstring said what would happen and
+  it was believed. A refusal never issued is better than one recovered from,
+  and it is the one behaviour test_phase4.py cannot assert.
+- The live runs went to load_csv directly rather than propose_ingest_spec,
+  correctly: clean_sales.csv is a plain one-header table and load_csv's
+  docstring says to use it directly when the shape is known. Phase 3's
+  two-step is therefore NOT exercised by the Phase 4 live run; multiheader.csv
+  is the fixture that forces it.
+- GAP for Phase 5: a column can be left out of `measures`, and nothing
+  records why. known_exclusions covers ROWS only (rule, reason, row_count).
+  Omitting a column is the same kind of decision as excluding rows and is
+  currently as silent as the load-time drop it was chosen to avoid --
+  "deliberately excluded" and "nobody got round to it" are indistinguishable
+  in a stored contract. Fix is a scope on Exclusion (row|column) or a separate
+  excluded_columns list. Not patched in Phase 4.
+- Live run 4 assessed load_csv as capable of silently mislabelling columns if
+  a short `names` list were passed. Not true on this repo: load_csv counts the
+  file's columns first and refuses a mismatch, naming both counts -- the Phase
+  2 Step 5 guard added for exactly that trap. The agent described raw DuckDB
+  behaviour rather than the loader's. Its conclusion (there is no column
+  selection parameter, do not invent one) was right anyway.
+- Rejected suggestion: that the evidence block distinguish columns present in
+  the table from columns admitted as measures. Evidence describes the TABLE,
+  deliberately; folding contract state into it collapses the separation Step 1
+  was built on. If the output reads confusingly, the fix belongs in the
+  contract's rendering.
+- revenue in clean_sales.csv is derived -- units * unit_price, verified on two
+  rows. The contract has no derived_measures concept, so excluding revenue
+  makes revenue-by-region a computed expression. Phase 8's problem, worth
+  recording now.
+- Phase 4 acceptance adds a check the Done-When does not name: every refusal's
+  NEXT STEP must name a tool that is actually registered in server.py. A
+  refusal instructing the agent to call something that does not exist looks
+  well-formed, passes every wording check, and is unrecoverable. The refusal
+  strings and the tool registry are written in different files by different
+  steps, so being careful in each separately still leaves you wrong.
+- Clause 3 is asserted in two halves: the script checks everything the
+  recovery DEPENDS on -- reason code, a call with arguments, that call
+  existing -- and the live run checks whether the model acts on it. If the
+  machinery passes and the agent still loops, the problem is wording; if the
+  machinery fails, the wording never had a chance.
+- The SCD2 span assertion is that v1.valid_to == v2.valid_from exactly, not
+  merely that history was kept. Contiguous windows are what make "which
+  definition produced this number" answerable for a number computed last
+  Tuesday.
+
+- CORRECTION to the Step 7b entry: a wrong aggregation CAN be stored. Only
+  measures[x].definition is unresolved; agg is not. A person can answer every
+  definition, never mention aggregation, confirm, and store unit_price with
+  agg="sum". The question asks about it; nothing enforces it. Two independent
+  live runs flagged the sum default, the second describing it as "the kind of
+  thing that gets confirmed without being read". The recommended fix is to add
+  measures[x].agg to unresolved -- smallest change, no new question, and it
+  puts the block where the prose already points. Deferred to a Step 9 rather
+  than slipped into the close of Phase 4.
+- Live run 2 confirmed three behaviours beyond the clause: the evidence notes
+  (measure exclusion from key probing, minimality pruning) were read back
+  accurately by something that had never seen the code; the agent set
+  expectations that run_analysis returns no number, from the docstring
+  sentence pinned by test_run_analysis_is_honest_about_phase_8; and it tied a
+  null in `region` to known_exclusions unprompted.
+- Twice now, a contract-layer test has asserted on wording owned by
+  util/db.py: Step 6 hard-coded a `loaded_at` column name, and the Phase 4
+  acceptance script counted the literal word "Loaded" in a report. Both passed
+  locally and failed on the real repository. The rule: assert that another
+  module's output REACHES yours, never what it says. age_phrase()'s wording is
+  util/db.py's business.
+- The agent does not see all nineteen tools at once -- it calls tool_search
+  and matches on descriptions. A docstring's first line therefore does double
+  duty: it instructs, and it is what a search has to match. A tool that cannot
+  be found fails before its gate ever runs, and the failure looks like a gate
+  problem. Every tool Phase 5 adds needs a first line that reads as a search
+  target as well as an instruction.
+- Live run 3: the agent declined to call confirm_dataset_contract on a
+  PROVISIONAL draft WITHOUT being refused -- "nothing to confirm, the draft is
+  PROVISIONAL and would be refused". The docstring said what would happen and
+  it was believed. A refusal never issued is better than one recovered from,
+  and it is the one behaviour test_phase4.py cannot assert.
+- The live runs went to load_csv directly rather than propose_ingest_spec,
+  correctly: clean_sales.csv is a plain one-header table and load_csv's
+  docstring says to use it directly when the shape is known. Phase 3's
+  two-step is therefore NOT exercised by the Phase 4 live run; multiheader.csv
+  is the fixture that forces it.
+- GAP for Phase 5: a column can be left out of `measures`, and nothing
+  records why. known_exclusions covers ROWS only (rule, reason, row_count).
+  Omitting a column is the same kind of decision as excluding rows and is
+  currently as silent as the load-time drop it was chosen to avoid --
+  "deliberately excluded" and "nobody got round to it" are indistinguishable
+  in a stored contract. Fix is a scope on Exclusion (row|column) or a separate
+  excluded_columns list. Not patched in Phase 4.
+- Live run 4 assessed load_csv as capable of silently mislabelling columns if
+  a short `names` list were passed. Not true on this repo: load_csv counts the
+  file's columns first and refuses a mismatch, naming both counts -- the Phase
+  2 Step 5 guard added for exactly that trap. The agent described raw DuckDB
+  behaviour rather than the loader's. Its conclusion (there is no column
+  selection parameter, do not invent one) was right anyway.
+- Rejected suggestion: that the evidence block distinguish columns present in
+  the table from columns admitted as measures. Evidence describes the TABLE,
+  deliberately; folding contract state into it collapses the separation Step 1
+  was built on. If the output reads confusingly, the fix belongs in the
+  contract's rendering.
+- revenue in clean_sales.csv is derived -- units * unit_price, verified on two
+  rows. The contract has no derived_measures concept, so excluding revenue
+  makes revenue-by-region a computed expression. Phase 8's problem, worth
+  recording now.
+- Phase 4 acceptance adds a check the Done-When does not name: every refusal's
+  NEXT STEP must name a tool that is actually registered in server.py. A
+  refusal instructing the agent to call something that does not exist looks
+  well-formed, passes every wording check, and is unrecoverable. The refusal
+  strings and the tool registry are written in different files by different
+  steps, so being careful in each separately still leaves you wrong.
+- Clause 3 is asserted in two halves: the script checks everything the
+  recovery DEPENDS on -- reason code, a call with arguments, that call
+  existing -- and the live run checks whether the model acts on it. If the
+  machinery passes and the agent still loops, the problem is wording; if the
+  machinery fails, the wording never had a chance.
+- The SCD2 span assertion is that v1.valid_to == v2.valid_from exactly, not
+  merely that history was kept. Contiguous windows are what make "which
+  definition produced this number" answerable for a number computed last
+  Tuesday.
