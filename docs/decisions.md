@@ -1070,3 +1070,43 @@ Machine-local and implementation choices that are easy to forget six months late
   guessing at a file's structure produced two corrections in this phase
   already. The tests build wide tables in DuckDB. Step 9 can add the CSV if
   the acceptance test wants one on disk.
+
+## Phase 5, Step 5 — profile_column
+
+- This is where the Step 2 promise is kept. 'unknown', 'none', '-' and '?' are
+  excluded from the missing-value vocabulary and appear in the column's
+  frequency table instead, with a note telling the reader to judge that list.
+  The note does NOT name candidates -- naming them is the judgement list again,
+  one layer down.
+- profile_column WRITES NOTHING, which is not an inconsistency with Step 4's
+  "every table profile writes". A table profile is unbounded in the dimension
+  that matters (one row per column, and tables have sixty). A column profile is
+  bounded by construction: ten values, ten bins, a few counts. The one
+  truncation ends in profile_column(..., top_n=N), which is an executable next
+  step rather than a dead end -- and Step 1's rule was never "always write a
+  file", it was "never leave a truncation with no way to reach the rest".
+- The binning is DuckDB's: equi_width_bins(lo, hi, n, true) for rounded
+  boundaries, histogram(col, bins) to fill them. Verified on 1.5.5 including
+  the crashes that did not happen -- a constant column returns a single bin,
+  an all-null column returns NULL rather than an empty map, nulls are excluded
+  from the counts. Hand-rolled bucketing would have got the empty cases wrong.
+- Bin boundaries render with six significant figures, not .4g. .4g turns 10000
+  into 1e+04, which is correct and unreadable in a table of prices. Found by
+  reading the output; no test would have caught it, because the value was
+  right.
+- A unique column gets NO frequency table. Ten rows of count 1 is noise. It
+  gets a sentence and the fixed-width finding instead, which is the useful
+  thing to know about an identifier -- a nine-character code that later gets
+  summed is a specific kind of wrong.
+- Date coverage is bucketed to whole days. A TIMESTAMP column has a distinct
+  value almost every row, and "3,412 distinct timestamps" answers nothing about
+  whether a week is missing. Reports days present, days missing and the longest
+  unbroken gap, and says explicitly that a closed weekend and a broken feed
+  look identical from here. This is the cheap ancestor of Phase 9's
+  calendar_coverage (F10).
+- profile_column takes an optional table= so a caller holding a TableProfile
+  does not pay for a second scan. When omitted it computes one rather than
+  recomputing the column's numbers with different SQL, because two views of one
+  column disagreeing inside one conversation is unrecoverable for a reader.
+- One Reason member added: COLUMN_NOT_FOUND. Additive, so every earlier test
+  still passes.

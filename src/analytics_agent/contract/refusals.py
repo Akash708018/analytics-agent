@@ -52,6 +52,8 @@ class Reason(str, Enum):
     RESULT_NOT_FOUND = "RESULT_NOT_FOUND"
     # a path resolved outside this workspace's results, or a page was asked for that cannot exist.
     RESULT_OUT_OF_SCOPE = "RESULT_OUT_OF_SCOPE"
+    # a column was named and the loaded table does not have it.
+    COLUMN_NOT_FOUND = "COLUMN_NOT_FOUND"
 
 
 _REASON_LINE = re.compile(r"^reason:\s*([A-Z_]+)\s*$", re.M)
