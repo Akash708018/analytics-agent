@@ -1215,3 +1215,32 @@ Machine-local and implementation choices that are easy to forget six months late
   by parsing the rendered text would mean parsing prose that exists to be read.
   All 24 Step 4 tests passed unchanged, which is the check that the split was
   behaviour-preserving.
+
+## Phase 5, Step 7b — the profiling stage in the workflow state
+
+- state.py needed NO change to hide _agent_profiles. _loadable_tables filters
+  on the leading underscore rather than listing names, which is the belt and
+  braces someone added after _agent_contracts was listed as a dataset. A third
+  bookkeeping table cost nothing. Pinned by a test anyway, because a property
+  that holds by accident of an earlier fix should not depend on nobody tidying
+  the filter into a list of three names.
+- A LAYERING EXCEPTION, made deliberately: state.py (Phase 4) imports
+  profile.runs (Phase 5). describe_workflow_state is the orientation tool, its
+  job is to report every stage, and a tool that reports every stage knows about
+  every stage -- it already imports contract.store for the same reason. What
+  would be wrong is contract/ or evidence.py importing profile: those describe
+  one layer and should not know there is another above them.
+- The profile lines go in the per-dataset DETAIL block, after Source and before
+  the contract line. Loaded, profiled, contracted is the order the work happens
+  in, and a reader should not have to reassemble it.
+- The stage COLUMN is untouched. Adding "profiled" to it would match 8.2's
+  example string and would widen every row of a scannable index to carry a
+  state the detail block already gives in full. 8.2's string belongs to
+  require_contract's refusal, which is a different function.
+- Exactly one NEXT STEP per dataset, still. Phase 4 decided what the next call
+  is; this adds a line, not a competing instruction. An agent handed two NEXT
+  STEPs picks one at random, which is worse than a missing suggestion.
+- A stale profile WITHDRAWS the offer of its own counts and offers a re-run
+  instead. Counts taken against 200 rows are not what anyone wants when 230 are
+  loaded, and leaving the read call there invites the agent to fetch them
+  anyway.

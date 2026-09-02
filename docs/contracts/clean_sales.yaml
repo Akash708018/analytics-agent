@@ -6,7 +6,7 @@
 # call propose_dataset_contract with the correction and confirm the result.
 dataset_name: clean_sales
 version: 2
-confirmed_at: '2026-09-02T21:29:31.056943'
+confirmed_at: '2026-09-03T00:28:30.536913'
 fingerprint: facdb163024e
 grain: one row = one order
 primary_key:

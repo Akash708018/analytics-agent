@@ -48,7 +48,6 @@ from analytics_agent.contract.compatibility import (
 from analytics_agent.contract.dataset_contract import DatasetContract
 from analytics_agent.contract.refusals import Reason, Refusal
 from analytics_agent.contract.store import StoredContract, all_current, current
-from analytics_agent.profile import runs
 from analytics_agent.util import db
 
 
@@ -285,15 +284,6 @@ def describe_workflow_state(con) -> str:
 
     for s in states:
         lines += ["", f"### {s.dataset_name}", s.age_phrase, f"Source: {s.source}"]
-        profile_lines = runs.state_notes(con, s.dataset_name, s.row_count)
-        if profile_lines:
-            lines += profile_lines
-        else:
-            lines.append(
-                f'Not profiled. profile_dataset(dataset_name="{s.dataset_name}") '
-                f"counts the nulls, duplicates and distributions before anyone "
-                f"has to agree what the columns mean."
-            )
         if s.contract:
             lines.append(
                 f"Contract v{s.contract.version}, confirmed "
