@@ -1110,3 +1110,32 @@ Machine-local and implementation choices that are easy to forget six months late
   column disagreeing inside one conversation is unrecoverable for a reader.
 - One Reason member added: COLUMN_NOT_FOUND. Additive, so every earlier test
   still passes.
+
+## Phase 5, Step 6a — profile/tools.py
+
+- The tool layer is where ContractRefused stops being an exception and becomes
+  text. A raised exception inside a FastMCP tool becomes a traceback, and a
+  traceback is not an instruction: the agent reads it, learns nothing it can
+  act on, and retries the same call. Same split as Phase 4's contract/tools.py,
+  for the same reason.
+- profile_column accepts workspace_id and does not use it. A signature that
+  varies by tool is a thing the agent has to remember rather than
+  pattern-match, and remembering is where it invents. A test pins the first
+  three parameters of both profiling tools.
+- profile_column computes the TableProfile once and hands it to the column
+  profiler, so the nulls and missing counts it shows are identical to
+  profile_dataset's. Two views of one column disagreeing inside a single
+  conversation is unrecoverable: after that, neither number can be trusted.
+- The round-trip test asserts that THE CALL PRINTED IN THE ENVELOPE opens, not
+  merely that some path opens. Those drift apart when one of the two strings is
+  built by hand, and the result is a well-formed envelope pointing at nothing --
+  F7 with a clean conscience.
+- missing_values is exposed on both profiling tools as a per-call override, and
+  an empty list switches detection off. Frictionless' model reaching the tool
+  surface: the vocabulary is a property of the data, so a feed that writes
+  'unknown' for absence is handled by declaring it rather than by widening the
+  default for every other source.
+- Step 6 was split. The server.py registration and the docstring guard need two
+  files I had not read, and writing a registration block against a remembered
+  signature is how a loaded_at column name got hard-coded into a contract test
+  twice.
