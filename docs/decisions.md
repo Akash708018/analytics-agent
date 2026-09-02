@@ -1139,3 +1139,27 @@ Machine-local and implementation choices that are easy to forget six months late
   files I had not read, and writing a registration block against a remembered
   signature is how a loaded_at column name got hard-coded into a contract test
   twice.
+
+## Phase 5, Step 6b — the profiling docstring guard
+
+- tests/test_profile_tool_docs.py mirrors test_contract_tool_docs.py rather
+  than inventing a structure: same ast parsing instead of importing, same
+  helpers, same three-state fixture. A reader who knows the Phase 4 file knows
+  this one, and copying a shape that works costs nothing.
+- All three states were RUN against a mock server.py rather than reasoned
+  about: none registered skips (19 passed, 20 skipped), two of three fails
+  naming the third, all three passes (39 passed). A partial block surfaces as
+  pytest ERRORS rather than failures because pytest.fail inside a fixture is a
+  setup error -- the Phase 4 file behaves identically.
+- The guard caught a real gap while being verified. The drafted profile_column
+  docstring said "anything that MEANS absent" and never used the word
+  "missing", which is the term every other output this phase uses. A docstring
+  that switches vocabulary for one concept does not connect to anything the
+  agent has already read. Fixed the docstring, not the assertion -- that is the
+  point of pinning prose.
+- profile_dataset's docstring must NOT contain the word "error". Outside a
+  Tukey fence is not wrong, and a docstring promising to find problems invites
+  the agent to present findings as faults.
+- All three profiling tools are READ_ONLY. Writing a result file is not a
+  change to the workspace: the file IS the answer. None of them should ever
+  prompt the user for confirmation.
