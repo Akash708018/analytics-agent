@@ -883,3 +883,117 @@ Machine-local and implementation choices that are easy to forget six months late
 - read_result_file is a function in Step 1 and a registered MCP tool in Step 6.
   The refusals here name it, and the Phase 5 acceptance test asserts every call
   a refusal names is registered -- so forgetting Step 6 fails loudly at Step 9.
+
+## Phase 5, Step 2 — profile/table_profile.py
+
+- P5-D1 answered: profiling depends on evidence.column_stats, NOT on
+  evidence.gather. gather() also runs the key search (up to 200 pair probes)
+  and appends contract-flavoured notes that have no business in a profile.
+  column_stats is public, already batches four aggregates per column into one
+  SELECT, and is the whole of what profiling needs. The arrow points
+  profile -> evidence and never back; Phase 4 gains no dependency.
+- A null count is not a missing-data count. gaps_and_dupes.csv holds 'N/A' in a
+  column with zero nulls, so "0% null" is true and misleading. Blanks and
+  standard tokens are counted separately, reported beside the nulls, and never
+  rewritten.
+- The missing-value vocabulary is the pandas 3.0.2 / pyarrow 25.0.1
+  INTERSECTION, upper-cased, minus the empty string. Verified by running both.
+  Where they disagree (None, <NA>) both are excluded -- that is the edge of
+  consensus, and 'None' can be a real payment type.
+- My own first list included unknown, missing, none, nil, -, --, ?. None of
+  those is in any reference implementation, and including them reported a
+  six-row fixture as 83% missing when 67% was defensible. A tool built to stop
+  confidently wrong numbers produced one on its first run. Check the reference
+  implementations BEFORE reasoning from first principles -- the same lesson as
+  Phase 4 Step 9, learned again.
+- The failure modes are asymmetric and that is the argument. Over-detection
+  puts a wrong number in a headline; under-detection leaves the value in a
+  frequency table where a person rules on it. Tune toward the recoverable one.
+- Ownership follows Frictionless Table Schema: missingValues is a DECLARED
+  property, default [''], and [] disables conversion entirely rather than
+  meaning "use the default". So missing_values is a parameter here, [] really
+  does switch detection off, and Step 8 puts it on the contract so Phase 6 and
+  Phase 8 read one declared list instead of re-deriving one each.
+- Matching is case-insensitive. One deliberate widening: pandas ships 'NA',
+  'n/a' and 'nan' as separate entries, implying exact matching, so 'Null' slips
+  through it. This widens case and never vocabulary.
+- Duplicate rows use SELECT DISTINCT *, the THIRD null rule in this codebase.
+  count(DISTINCT c) drops nulls; count(DISTINCT (a,b)) does not; DISTINCT *
+  does not either, and two rows identical INCLUDING their nulls collapse to
+  one. Verified on 1.5.5: five rows with one exact NULL-bearing duplicate
+  return four. Here that is the behaviour we want, so it is used deliberately
+  and said out loud.
+- The try/except around the duplicate count has never fired. LIST, MAP and
+  UNION all survive DISTINCT * on 1.5.5 -- I could not find a type that breaks
+  it. It stays because one uncomputable number should not cost the other
+  thirty, and the test that covers it induces the failure rather than
+  pretending a type does.
+- quantile_cont INTERPOLATES; it does not return an observed value.
+  quantile_cont over [2829.54, 5841.66] at 0.25 gives 3582.57, not 2829.54 --
+  quantile_disc gives the latter. cont matches numpy's and pandas' default and
+  is the right choice for fences, but it means q1 and q3 are computed positions
+  rather than rows that exist. Step 3's IQR fences inherit that, and the effect
+  is largest on columns with few distinct values.
+- All-null and single-row columns return None for mean/stddev/quantiles, not
+  zero. A zero would be a number nobody computed sitting in a table looking
+  exactly like a real one.
+- HEADERS puts the missing-data story in the first twelve columns because the
+  envelope previews twelve inline. The numeric summary is in the file, behind
+  it. That ordering is a decision, not an accident of how it was typed.
+
+## Phase 5, Step 2 — profile/table_profile.py
+
+- P5-D1 answered: profiling depends on evidence.column_stats, NOT on
+  evidence.gather. gather() also runs the key search (up to 200 pair probes)
+  and appends contract-flavoured notes that have no business in a profile.
+  column_stats is public, already batches four aggregates per column into one
+  SELECT, and is the whole of what profiling needs. The arrow points
+  profile -> evidence and never back; Phase 4 gains no dependency.
+- A null count is not a missing-data count. gaps_and_dupes.csv holds 'N/A' in a
+  column with zero nulls, so "0% null" is true and misleading. Blanks and
+  standard tokens are counted separately, reported beside the nulls, and never
+  rewritten.
+- The missing-value vocabulary is the pandas 3.0.2 / pyarrow 25.0.1
+  INTERSECTION, upper-cased, minus the empty string. Verified by running both.
+  Where they disagree (None, <NA>) both are excluded -- that is the edge of
+  consensus, and 'None' can be a real payment type.
+- My own first list included unknown, missing, none, nil, -, --, ?. None of
+  those is in any reference implementation, and including them reported a
+  six-row fixture as 83% missing when 67% was defensible. A tool built to stop
+  confidently wrong numbers produced one on its first run. Check the reference
+  implementations BEFORE reasoning from first principles -- the same lesson as
+  Phase 4 Step 9, learned again.
+- The failure modes are asymmetric and that is the argument. Over-detection
+  puts a wrong number in a headline; under-detection leaves the value in a
+  frequency table where a person rules on it. Tune toward the recoverable one.
+- Ownership follows Frictionless Table Schema: missingValues is a DECLARED
+  property, default [''], and [] disables conversion entirely rather than
+  meaning "use the default". So missing_values is a parameter here, [] really
+  does switch detection off, and Step 8 puts it on the contract so Phase 6 and
+  Phase 8 read one declared list instead of re-deriving one each.
+- Matching is case-insensitive. One deliberate widening: pandas ships 'NA',
+  'n/a' and 'nan' as separate entries, implying exact matching, so 'Null' slips
+  through it. This widens case and never vocabulary.
+- Duplicate rows use SELECT DISTINCT *, the THIRD null rule in this codebase.
+  count(DISTINCT c) drops nulls; count(DISTINCT (a,b)) does not; DISTINCT *
+  does not either, and two rows identical INCLUDING their nulls collapse to
+  one. Verified on 1.5.5: five rows with one exact NULL-bearing duplicate
+  return four. Here that is the behaviour we want, so it is used deliberately
+  and said out loud.
+- The try/except around the duplicate count has never fired. LIST, MAP and
+  UNION all survive DISTINCT * on 1.5.5 -- I could not find a type that breaks
+  it. It stays because one uncomputable number should not cost the other
+  thirty, and the test that covers it induces the failure rather than
+  pretending a type does.
+- quantile_cont INTERPOLATES; it does not return an observed value.
+  quantile_cont over [2829.54, 5841.66] at 0.25 gives 3582.57, not 2829.54 --
+  quantile_disc gives the latter. cont matches numpy's and pandas' default and
+  is the right choice for fences, but it means q1 and q3 are computed positions
+  rather than rows that exist. Step 3's IQR fences inherit that, and the effect
+  is largest on columns with few distinct values.
+- All-null and single-row columns return None for mean/stddev/quantiles, not
+  zero. A zero would be a number nobody computed sitting in a table looking
+  exactly like a real one.
+- HEADERS puts the missing-data story in the first twelve columns because the
+  envelope previews twelve inline. The numeric summary is in the file, behind
+  it. That ordering is a decision, not an accident of how it was typed.

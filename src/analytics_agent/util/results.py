@@ -134,7 +134,8 @@ class Result:
         lines.append(f"created        {self.created_at:%Y-%m-%d %H:%M:%S}")
 
         if self.summary:
-            lines += [""] + [f"  - {s}" for s in self.summary]
+            lines += ["", "What this shows:"]
+            lines += [f"  - {s}" for s in self.summary]
 
         if shown:
             lines += ["", f"First {shown} of {self.row_count:,} rows:", ""]
