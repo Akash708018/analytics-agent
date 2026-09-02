@@ -22,6 +22,9 @@ from analytics_agent.contract import ContractRefused
 from analytics_agent.profile.table_profile import (
     MISSING_VALUES,
     MOSTLY_MISSING,
+    OUTLIER_K,
+    TYPE_MISMATCH_SHARE,
+    OutlierSummary,
     TableProfile,
     profile_table,
 )
@@ -367,7 +370,11 @@ def test_the_missing_story_comes_before_the_numeric_one(gaps):
         "reads_missing", "missing_pct", "distinct", "distinct_pct",
         "min", "max",
     ]
-    assert set(TableProfile.HEADERS[12:]) == {"mean", "median", "stddev", "q1", "q3"}
+    assert set(TableProfile.HEADERS[12:]) == {
+        "mean", "median", "stddev", "q1", "q3",
+        "reads_as", "reads_as_pct", "parse_failures",
+        "outliers_below", "outliers_above", "fence_low", "fence_high",
+    }
 
 
 def test_the_summary_leads_with_shape_and_duplicates(gaps):
@@ -422,3 +429,259 @@ def test_to_text_reads_as_a_profile(gaps):
     assert "Columns:" in text
     assert "Notes:" in text
     assert text.count("region (VARCHAR)") == 1
+
+
+# --------------------------------------------------------------------------
+# what a text column actually holds -- Step 3
+# --------------------------------------------------------------------------
+
+def _one_column(con, values, name="t"):
+    body = ", ".join("(NULL)" if v is None else f"('{v}')" for v in values)
+    con.execute(f"CREATE OR REPLACE TABLE {name} AS SELECT * FROM (VALUES {body}) v(a)")
+    return profile_table(con, name).column("a")
+
+
+def test_a_text_column_of_integers_reads_as_bigint(con):
+    t = _one_column(con, ["1", "2", "3", "40"]).type_reading
+    assert t.best == "BIGINT"
+    assert t.is_total
+    assert t.ratio == 1.0
+
+
+def test_a_decimal_string_does_not_read_as_an_integer(con):
+    """
+    TRY_CAST('4.5' AS BIGINT) returns 5. It succeeds, it rounds, and without a
+    guard this module would report a decimal column as an integer one.
+    """
+    t = _one_column(con, ["1", "2", "4.5"]).type_reading
+    assert t.best == "DOUBLE"
+    assert t.is_total
+    assert t.ratios.get("BIGINT", 0) < 1.0
+
+
+def test_padded_and_exponent_integers_still_read_as_integers(con):
+    """The guard must not be so strict it rejects things that are integers."""
+    t = _one_column(con, ["007", " 7 ", "1e3", "42"]).type_reading
+    assert t.best == "BIGINT"
+    assert t.is_total
+
+
+def test_a_timestamp_does_not_read_as_a_date(con):
+    """
+    TRY_CAST('2024-01-01 10:30:00' AS DATE) returns 2024-01-01 -- it drops the
+    time. Same shape of trap as the integer one, one type along.
+    """
+    t = _one_column(con, ["2024-01-01 10:30:00", "2024-06-05 09:15:00"]).type_reading
+    assert t.best == "TIMESTAMP"
+    assert t.ratios.get("DATE", 0) == 0.0
+
+
+def test_a_midnight_timestamp_does_read_as_a_date(con):
+    """Nothing is lost, so the narrower reading is honest."""
+    t = _one_column(con, ["2024-01-01 00:00:00", "2024-06-05"]).type_reading
+    assert t.best == "DATE"
+
+
+def test_plain_dates_read_as_dates(con):
+    assert _one_column(con, ["2024-01-01", "2024-06-05"]).type_reading.best == "DATE"
+
+
+def test_a_tie_goes_to_the_narrowest_reading(con):
+    """
+    '1' and '0' parse as BIGINT and as BOOLEAN. CAST_CANDIDATES is ordered
+    narrowest first and the integer reading assumes less about intent.
+    """
+    t = _one_column(con, ["1", "0", "1", "0"]).type_reading
+    assert t.ratios["BIGINT"] == 1.0 and t.ratios["BOOLEAN"] == 1.0
+    assert t.best == "BIGINT"
+
+
+def test_a_mostly_numeric_column_reports_the_share_and_the_exceptions(con):
+    values = [str(i) for i in range(19)] + ["n/a-ish junk"]
+    t = _one_column(con, values).type_reading
+    assert t.best == "BIGINT"
+    assert not t.is_total
+    assert t.ratio == pytest.approx(0.95)
+    assert t.examples == ["n/a-ish junk"]
+
+
+def test_missing_tokens_are_not_counted_as_parse_failures(con):
+    """
+    'N/A' is already reported as missing. Counting it again as a cast failure
+    describes one problem twice and understates the ratio.
+    """
+    t = _one_column(con, ["1", "2", "3", "N/A", "", "  ", None]).type_reading
+    assert t.considered == 3
+    assert t.is_total and t.best == "BIGINT"
+
+
+def test_a_genuinely_textual_column_reads_as_nothing(con):
+    t = _one_column(con, ["North", "South", "East"]).type_reading
+    assert t.best is None
+    assert not t.is_worth_naming
+
+
+def test_a_column_below_the_threshold_is_not_named_but_is_still_counted(con):
+    """
+    The threshold governs the summary, not the truth. The ratio reaches the
+    table either way.
+    """
+    values = [str(i) for i in range(5)] + ["a", "b", "c", "d", "e"]
+    c = _one_column(con, values)
+    assert c.type_reading.ratio == pytest.approx(0.5)
+    assert c.type_reading.ratio < TYPE_MISMATCH_SHARE
+    assert not c.type_reading.is_worth_naming
+
+
+def test_numeric_columns_are_not_given_a_type_reading(items):
+    assert profile_table(items, "order_items").column("price").type_reading is None
+
+
+def test_the_summary_separates_total_from_partial(con):
+    con.execute(
+        """CREATE TABLE t AS SELECT
+             i::VARCHAR AS all_ints,
+             CASE WHEN i < 19 THEN i::VARCHAR ELSE 'oops' END AS mostly_ints
+           FROM range(20) s(i)"""
+    )
+    text = " ".join(profile_table(con, "t").summary_lines())
+    assert "hold nothing but values of another type: all_ints -> BIGINT" in text
+    assert "mostly another type with exceptions: mostly_ints -> BIGINT (95.0%)" in text
+    assert "The exceptions are the interesting part." in text
+
+
+def test_nothing_is_converted_and_the_note_says_so(con):
+    con.execute("CREATE TABLE t AS SELECT i::VARCHAR AS a FROM range(20) s(i)")
+    p = profile_table(con, "t")
+    assert p.column("a").dtype == "VARCHAR"
+    assert any("was NOT converted" in n for n in p.notes)
+    assert any("Phase 6" in n for n in p.notes)
+
+
+# --------------------------------------------------------------------------
+# outliers -- Tukey, and where it breaks down
+# --------------------------------------------------------------------------
+
+def test_a_value_far_above_the_others_is_counted(con):
+    con.execute(
+        "CREATE TABLE t AS SELECT CASE WHEN i = 99 THEN 10000.0 ELSE i::DOUBLE END "
+        "AS n FROM range(100) s(i)"
+    )
+    o = profile_table(con, "t").column("n").outliers
+    assert o.above == 1 and o.below == 0
+    assert o.total == 1
+
+
+def test_a_value_far_below_the_others_is_counted(con):
+    con.execute(
+        "CREATE TABLE t AS SELECT CASE WHEN i = 0 THEN -10000.0 ELSE i::DOUBLE END "
+        "AS n FROM range(100) s(i)"
+    )
+    assert profile_table(con, "t").column("n").outliers.below == 1
+
+
+def test_the_fences_are_tukeys(con):
+    con.execute("CREATE TABLE t AS SELECT i::DOUBLE AS n FROM range(1, 101) s(i)")
+    c = profile_table(con, "t").column("n")
+    n, o = c.numeric, c.outliers
+    assert o.lower_fence == pytest.approx(n.q1 - OUTLIER_K * n.iqr)
+    assert o.upper_fence == pytest.approx(n.q3 + OUTLIER_K * n.iqr)
+
+
+def test_evenly_spread_data_has_no_outliers(con):
+    con.execute("CREATE TABLE t AS SELECT i::DOUBLE AS n FROM range(1, 101) s(i)")
+    assert profile_table(con, "t").column("n").outliers.total == 0
+
+
+def test_a_zero_iqr_suppresses_the_count_rather_than_flagging_everything(con):
+    """
+    A column that is 95% one value has coincident quartiles, so the fences
+    collapse to a point and every other row falls outside them. Tukey says
+    that; nobody should act on it. Measured: 5 of 100 flagged, and the five
+    were the values 1, 2 and 3.
+    """
+    con.execute(
+        "CREATE TABLE t AS SELECT CASE WHEN i < 95 THEN 0.0 ELSE ((i % 3) + 1)::DOUBLE "
+        "END AS n FROM range(100) s(i)"
+    )
+    o = profile_table(con, "t").column("n").outliers
+    assert o.suppressed is not None
+    assert "collapse to a point" in o.suppressed
+    assert o.total == 0
+
+
+def test_an_all_null_column_gets_no_outlier_count(con):
+    con.execute("CREATE TABLE t AS SELECT CAST(NULL AS DOUBLE) AS n FROM range(5)")
+    o = profile_table(con, "t").column("n").outliers
+    assert o.suppressed is not None
+    assert "no quantiles" in o.suppressed
+
+
+def test_text_columns_get_no_outlier_count(items):
+    assert profile_table(items, "order_items").column("seller_id").outliers is None
+
+
+def test_the_summary_names_measures_only(con):
+    """
+    A rating of 1 to 5 with one 5 is not an outlier story. evidence already
+    calls a low-cardinality numeric column a dimension; this follows it.
+    """
+    con.execute(
+        """CREATE TABLE t AS SELECT
+             CASE WHEN i = 99 THEN 10000.0 ELSE i::DOUBLE END AS revenue,
+             ((i % 5) + 1)::INTEGER                           AS rating
+           FROM range(100) s(i)"""
+    )
+    p = profile_table(con, "t")
+    assert p.column("revenue").role == "measure"
+    line = next(l for l in p.summary_lines() if "outside" in l)
+    assert "revenue (1)" in line
+    assert "rating" not in line
+
+
+def test_the_summary_reports_what_it_could_not_count(con):
+    con.execute("CREATE TABLE t AS SELECT 5.0::DOUBLE AS flat FROM range(20)")
+    text = " ".join(profile_table(con, "t").summary_lines())
+    assert "got no outlier count: flat" in text
+
+
+def test_the_note_says_outside_a_fence_is_not_wrong(con):
+    con.execute(
+        "CREATE TABLE t AS SELECT CASE WHEN i = 99 THEN 10000.0 ELSE i::DOUBLE END "
+        "AS n FROM range(100) s(i)"
+    )
+    note = " ".join(profile_table(con, "t").notes)
+    assert "is not an error" in note
+    assert "Phase 9" in note
+
+
+def test_the_method_is_named_in_the_output(con):
+    con.execute(
+        "CREATE TABLE t AS SELECT CASE WHEN i = 99 THEN 10000.0 ELSE i::DOUBLE END "
+        "AS n FROM range(100) s(i)"
+    )
+    assert f"k={OUTLIER_K}" in OutlierSummary.method
+    assert OutlierSummary.method in profile_table(con, "t").column("n").sentence()
+
+
+def test_the_new_findings_reach_the_table(con):
+    con.execute(
+        """CREATE TABLE t AS SELECT
+             i::VARCHAR                                       AS looks_numeric,
+             CASE WHEN i = 99 THEN 10000.0 ELSE i::DOUBLE END AS n
+           FROM range(100) s(i)"""
+    )
+    p = profile_table(con, "t")
+    row = dict(zip(TableProfile.HEADERS, p.to_rows()[0]))
+    assert row["reads_as"] == "BIGINT" and row["reads_as_pct"] == 100.0
+    row = dict(zip(TableProfile.HEADERS, p.to_rows()[1]))
+    assert row["outliers_above"] == 1
+    assert row["fence_high"] is not None
+
+
+def test_a_suppressed_count_leaves_the_table_blank_not_zero(con):
+    """A zero here would read as 'checked, none found'. Nothing was checked."""
+    con.execute("CREATE TABLE t AS SELECT 5.0::DOUBLE AS flat FROM range(20)")
+    row = dict(zip(TableProfile.HEADERS, profile_table(con, "t").to_rows()[0]))
+    assert row["outliers_above"] is None
+    assert row["fence_low"] is None

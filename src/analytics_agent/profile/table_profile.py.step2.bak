@@ -61,24 +61,6 @@ behaviour is the one we want, because two identical rows ARE duplicates
 whatever their nulls. It is used deliberately and said out loud, or someone
 reads it as the same bug a third time.
 
-**A narrower type is only claimed when the wider one round-trips.** DuckDB's
-`TRY_CAST` converts rather than refusing where it can: `TRY_CAST('4.5' AS
-BIGINT)` returns 5, and `TRY_CAST('2024-01-01 10:30:00' AS DATE)` returns
-2024-01-01. Both succeed, both lose information, and both would have made this
-module report a column as something it is not -- a decimal column reading as
-integer, a timestamp column reading as date. So `BIGINT` and `DATE` carry a
-guard: the value must survive the wider cast unchanged. `007`, `' 7 '` and
-`1e3` still read as integers; `4.5` does not. A midnight timestamp still reads
-as a date; 10:30 does not.
-
-**An IQR of zero is not a licence to flag everything.** Tukey's fences are
-Q1 - 1.5*IQR and Q3 + 1.5*IQR, and matplotlib's `boxplot.whiskers` default of
-1.5 is where the constant comes from. On a column that is 95% one value the
-quartiles coincide, the fences collapse to a point, and every remaining row is
-technically outside them -- 5 of 100 in a probe where the five "outliers" were
-1, 2 and 3. That is arithmetic nobody should act on, so a zero IQR suppresses
-the count and says why instead.
-
 Note on the package name: `profile` shadows a stdlib module. Every import here
 is absolute, so nothing resolves to the stdlib profiler, but a bare
 `import profile` anywhere in this tree would.
@@ -116,32 +98,6 @@ MAX_BREAKDOWN_COLUMNS = 20
 # rather than left for the reader to find in the table.
 MOSTLY_MISSING = 0.5
 
-# Types a text column is tested against, narrowest first. BIGINT and DATE are
-# guarded (see _cast_ok): TRY_CAST will round '4.5' to 5 and drop the time from
-# a timestamp, so an unguarded test claims a narrower type than the data has.
-CAST_CANDIDATES = ("BIGINT", "DOUBLE", "DATE", "TIMESTAMP", "BOOLEAN")
-
-# At or above this share, a text column that parses as something else is named
-# in the summary. This is a DISPLAY threshold and not a claim about the data --
-# the exact ratio is in the table for every text column either way.
-#
-# pandas, DuckDB's CSV sniffer and Frictionless all infer types all-or-nothing:
-# one unparseable value and the column stays text, because they must choose a
-# storage type and a lossy one is worse than a wide one. They are answering a
-# different question. A profile reports, and the case worth reporting is
-# precisely the one they stay silent about -- 99.8% numeric with three pieces
-# of junk in it. Great Expectations' `mostly` parameter is the same idea for
-# the same reason, though I have not verified its default here.
-TYPE_MISMATCH_SHARE = 0.9
-
-# Tukey's constant. matplotlib 3.10.8 ships boxplot.whiskers = 1.5, verified
-# rather than recalled, and pandas and seaborn follow it.
-OUTLIER_K = 1.5
-
-# Values shown as examples of what would not cast. Three is enough to see the
-# shape of the problem and short enough to sit in a summary line.
-CAST_EXAMPLE_LIMIT = 3
-
 
 def _lit(value: str) -> str:
     """A single-quoted SQL literal. Doubles any embedded quote.
@@ -150,75 +106,6 @@ def _lit(value: str) -> str:
     which means it is not put into a query unescaped.
     """
     return "'" + value.replace("'", "''") + "'"
-
-
-@dataclass(frozen=True)
-class TypeReading:
-    """What a text column parses as, if anything, and how completely.
-
-    `considered` excludes nulls, blanks and the missing tokens -- those are
-    already reported as missing, and counting them again as cast failures
-    would describe one problem twice and understate the ratio.
-    """
-
-    considered: int = 0
-    ratios: dict[str, float] = field(default_factory=dict)
-    best: str | None = None
-    ratio: float = 0.0
-    examples: list[str] = field(default_factory=list)
-
-    @property
-    def is_total(self) -> bool:
-        """Every value parses. This is the claim pandas or DuckDB would act on."""
-        return self.best is not None and self.considered > 0 and self.ratio >= 1.0
-
-    @property
-    def is_worth_naming(self) -> bool:
-        return self.best is not None and self.ratio >= TYPE_MISMATCH_SHARE
-
-    def sentence(self) -> str:
-        if self.best is None:
-            return ""
-        if self.is_total:
-            return (
-                f"every one of its {self.considered:,} values parses as "
-                f"{self.best}"
-            )
-        failed = self.considered - round(self.ratio * self.considered)
-        shown = ", ".join(repr(e) for e in self.examples)
-        tail = f"; {shown} did not" if shown else ""
-        return (
-            f"{self.ratio * 100:.1f}% of its {self.considered:,} values parse "
-            f"as {self.best}, {failed:,} did not{tail}"
-        )
-
-
-@dataclass(frozen=True)
-class OutlierSummary:
-    """Values outside Tukey's fences, or the reason there is no count."""
-
-    lower_fence: float | None = None
-    upper_fence: float | None = None
-    below: int = 0
-    above: int = 0
-    suppressed: str | None = None
-
-    method = f"Tukey IQR fences, k={OUTLIER_K}"
-
-    @property
-    def total(self) -> int:
-        return self.below + self.above
-
-    def sentence(self) -> str:
-        if self.suppressed:
-            return f"no outlier count: {self.suppressed}"
-        if not self.total:
-            return f"no values outside the fences ({self.method})"
-        return (
-            f"{self.total:,} value(s) outside "
-            f"[{self.lower_fence:,.4g}, {self.upper_fence:,.4g}] "
-            f"({self.below:,} below, {self.above:,} above; {self.method})"
-        )
 
 
 @dataclass(frozen=True)
@@ -257,8 +144,6 @@ class ColumnProfile:
     blank_count: int = 0
     missing_token_count: int = 0
     missing_token_breakdown: dict[str, int] = field(default_factory=dict)
-    type_reading: TypeReading | None = None
-    outliers: OutlierSummary | None = None
 
     @property
     def name(self) -> str:
@@ -291,15 +176,8 @@ class ColumnProfile:
         one column two ways.
         """
         out = self.evidence.sentence()
-        extra = []
-        if self.type_reading is not None and self.type_reading.is_worth_naming:
-            extra.append(f"It is stored as {self.dtype} but "
-                         f"{self.type_reading.sentence()}.")
-        if self.outliers is not None and self.outliers.total:
-            extra.append(f"It has {self.outliers.sentence()}.")
-        tail = (" " + " ".join(extra)) if extra else ""
         if not self.hidden_missing:
-            return out + tail
+            return out
         parts = []
         if self.blank_count:
             parts.append(f"{self.blank_count:,} blank or whitespace-only")
@@ -311,7 +189,7 @@ class ColumnProfile:
             parts.append(named or f"{self.missing_token_count:,} standard tokens")
         return (
             f"{out} A further {self.hidden_missing:,} value(s) read as missing "
-            f"without being null: {'; '.join(parts)}.{tail}"
+            f"without being null: {'; '.join(parts)}."
         )
 
 
@@ -334,8 +212,6 @@ class TableProfile:
         "reads_missing", "missing_pct", "distinct", "distinct_pct",
         "min", "max",
         "mean", "median", "stddev", "q1", "q3",
-        "reads_as", "reads_as_pct", "parse_failures",
-        "outliers_below", "outliers_above", "fence_low", "fence_high",
     ]
 
     @property
@@ -351,7 +227,7 @@ class TableProfile:
     def to_rows(self) -> list[list[object]]:
         rows: list[list[object]] = []
         for c in self.columns:
-            e, n, t, o = c.evidence, c.numeric, c.type_reading, c.outliers
+            e, n = c.evidence, c.numeric
             rows.append([
                 c.name, c.dtype, c.role,
                 e.null_count, round(e.null_ratio * 100, 1),
@@ -364,14 +240,6 @@ class TableProfile:
                 None if n is None else n.stddev,
                 None if n is None else n.q1,
                 None if n is None else n.q3,
-                None if t is None else t.best,
-                None if t is None or t.best is None else round(t.ratio * 100, 1),
-                None if t is None or t.best is None
-                else t.considered - round(t.ratio * t.considered),
-                None if o is None or o.suppressed else o.below,
-                None if o is None or o.suppressed else o.above,
-                None if o is None or o.suppressed else o.lower_fence,
-                None if o is None or o.suppressed else o.upper_fence,
             ])
         return rows
 
@@ -412,59 +280,6 @@ class TableProfile:
                 f"{int(MOSTLY_MISSING * 100)}% missing: "
                 + ", ".join(
                     f"{c.name} ({c.missing_ratio * 100:.0f}%)" for c in mostly
-                )
-                + "."
-            )
-
-        misread = [
-            c for c in self.columns
-            if c.type_reading is not None and c.type_reading.is_worth_naming
-        ]
-        if misread:
-            total = [c for c in misread if c.type_reading.is_total]
-            partial = [c for c in misread if not c.type_reading.is_total]
-            if total:
-                out.append(
-                    f"{len(total)} text column(s) hold nothing but values of "
-                    f"another type: "
-                    + ", ".join(f"{c.name} -> {c.type_reading.best}" for c in total)
-                    + ". Nothing was converted."
-                )
-            if partial:
-                out.append(
-                    f"{len(partial)} text column(s) are mostly another type "
-                    f"with exceptions: "
-                    + ", ".join(
-                        f"{c.name} -> {c.type_reading.best} "
-                        f"({c.type_reading.ratio * 100:.1f}%)"
-                        for c in partial
-                    )
-                    + ". The exceptions are the interesting part."
-                )
-
-        flagged_outliers = [
-            c for c in self.columns
-            if c.outliers is not None and c.outliers.total and c.role == "measure"
-        ]
-        if flagged_outliers:
-            out.append(
-                f"{len(flagged_outliers)} measure(s) have values outside "
-                f"{OutlierSummary.method}: "
-                + ", ".join(
-                    f"{c.name} ({c.outliers.total:,})" for c in flagged_outliers
-                )
-                + ". Outside a fence is not the same as wrong."
-            )
-
-        suppressed = [
-            c for c in self.columns
-            if c.outliers is not None and c.outliers.suppressed
-        ]
-        if suppressed:
-            out.append(
-                f"{len(suppressed)} numeric column(s) got no outlier count: "
-                + ", ".join(
-                    f"{c.name} ({c.outliers.suppressed})" for c in suppressed
                 )
                 + "."
             )
@@ -515,137 +330,6 @@ def _text_exprs(name: str, listed: str) -> list[str]:
         # rather than meaning "use the default". The zero here is a real count.
         return [blank, "0"]
     return [blank, f"count(*) FILTER (WHERE upper(trim({col})) IN ({listed}))"]
-
-
-def _cast_ok(col: str, sql_type: str) -> str:
-    """
-    Whether one value parses as `sql_type` WITHOUT losing anything.
-
-    TRY_CAST converts rather than refusing where it can, which is the trap:
-    TRY_CAST('4.5' AS BIGINT) is 5, and TRY_CAST('2024-01-01 10:30:00' AS DATE)
-    is 2024-01-01. Both succeed and both drop information, so an unguarded test
-    reports a decimal column as integer and a timestamp column as date.
-
-    The guard for a narrower type is that the wider one round-trips it. `007`,
-    `' 7 '` and `1e3` still read as integers; `4.5` does not. A midnight
-    timestamp still reads as a date; 10:30 does not.
-    """
-    if sql_type == "BIGINT":
-        return (
-            f"TRY_CAST({col} AS BIGINT) IS NOT NULL AND "
-            f"TRY_CAST({col} AS DOUBLE) = CAST(TRY_CAST({col} AS BIGINT) AS DOUBLE)"
-        )
-    if sql_type == "DATE":
-        return (
-            f"TRY_CAST({col} AS DATE) IS NOT NULL AND "
-            f"TRY_CAST({col} AS TIMESTAMP) = "
-            f"CAST(TRY_CAST({col} AS DATE) AS TIMESTAMP)"
-        )
-    return f"TRY_CAST({col} AS {sql_type}) IS NOT NULL"
-
-
-def _considered(col: str, listed: str) -> str:
-    """Values a cast test should be judged on: present, and not already
-    reported as missing."""
-    clause = f"{col} IS NOT NULL AND trim({col}) <> ''"
-    if listed:
-        clause += f" AND upper(trim({col})) NOT IN ({listed})"
-    return clause
-
-
-def _cast_exprs(name: str, listed: str) -> list[str]:
-    col = _q(name)
-    keep = _considered(col, listed)
-    out = [f"count(*) FILTER (WHERE {keep})"]
-    for sql_type in CAST_CANDIDATES:
-        out.append(
-            f"count(*) FILTER (WHERE {keep} AND {_cast_ok(col, sql_type)})"
-        )
-    return out
-
-
-def _cast_examples(con, dataset_name: str, name: str, listed: str,
-                   sql_type: str) -> list[str]:
-    col = _q(name)
-    rows = con.execute(
-        f"SELECT DISTINCT {col} FROM {_q(dataset_name)} "
-        f"WHERE {_considered(col, listed)} AND NOT ({_cast_ok(col, sql_type)}) "
-        f"LIMIT {CAST_EXAMPLE_LIMIT}"
-    ).fetchall()
-    return [r[0] for r in rows]
-
-
-def _read_types(counts: list[int]) -> TypeReading:
-    """
-    Pick the narrowest type that fits best.
-
-    `CAST_CANDIDATES` is ordered narrowest first and ties go to the earlier
-    entry, which is why a column of 1s and 0s reads as BIGINT rather than
-    BOOLEAN: both parse every value, and the integer reading assumes less.
-    """
-    considered, hits = counts[0], counts[1:]
-    if not considered:
-        return TypeReading(considered=0)
-    ratios = {
-        t: hit / considered for t, hit in zip(CAST_CANDIDATES, hits) if hit
-    }
-    if not ratios:
-        return TypeReading(considered=considered)
-    best_ratio = max(ratios.values())
-    best = next(t for t in CAST_CANDIDATES if ratios.get(t) == best_ratio)
-    return TypeReading(
-        considered=considered, ratios=ratios, best=best, ratio=best_ratio
-    )
-
-
-def _outlier_counts(
-    con, dataset_name: str, numeric: list, summaries: dict
-) -> dict[str, OutlierSummary]:
-    """
-    Values outside Tukey's fences, in one pass for every numeric column.
-
-    The fences come from quantiles already computed, so this costs one scan
-    rather than one per column. A zero IQR is refused a count rather than
-    given a meaningless one: on a column that is 95% a single value the
-    quartiles coincide, the fences collapse to a point, and every other row is
-    technically outside them.
-    """
-    out: dict[str, OutlierSummary] = {}
-    live: list = []
-    for c in numeric:
-        n = summaries.get(c.name)
-        if n is None or n.q1 is None or n.q3 is None:
-            out[c.name] = OutlierSummary(
-                suppressed="no quantiles -- the column holds no values"
-            )
-        elif not n.iqr:
-            out[c.name] = OutlierSummary(
-                suppressed=(
-                    f"the quartiles are both {n.q1:,.4g}, so the fences "
-                    f"collapse to a point and every other value would be "
-                    f"flagged"
-                )
-            )
-        else:
-            live.append((c, n.q1 - OUTLIER_K * n.iqr, n.q3 + OUTLIER_K * n.iqr))
-
-    if live:
-        exprs = []
-        for c, lo, hi in live:
-            col = _q(c.name)
-            exprs += [
-                f"count(*) FILTER (WHERE {col} < {lo!r})",
-                f"count(*) FILTER (WHERE {col} > {hi!r})",
-            ]
-        row = con.execute(
-            f"SELECT {', '.join(exprs)} FROM {_q(dataset_name)}"
-        ).fetchone()
-        for i, (c, lo, hi) in enumerate(live):
-            out[c.name] = OutlierSummary(
-                lower_fence=lo, upper_fence=hi,
-                below=row[2 * i], above=row[2 * i + 1],
-            )
-    return out
 
 
 def _duplicate_rows(
@@ -718,7 +402,7 @@ def profile_table(
     for c in numeric:
         exprs += _numeric_exprs(c.name)
     for c in text:
-        exprs += _text_exprs(c.name, listed) + _cast_exprs(c.name, listed)
+        exprs += _text_exprs(c.name, listed)
 
     values: tuple = ()
     if exprs:
@@ -733,16 +417,11 @@ def profile_table(
             mean=mean, stddev=sd, q1=q1, median=med, q3=q3
         )
 
-    # Per text column: blank, token, considered, then one count per candidate.
-    stride = 2 + 1 + len(CAST_CANDIDATES)
     offset = 5 * len(numeric)
     blanks: dict[str, int] = {}
     tokens: dict[str, int] = {}
-    readings: dict[str, TypeReading] = {}
     for i, c in enumerate(text):
-        base = offset + stride * i
-        blanks[c.name], tokens[c.name] = values[base: base + 2]
-        readings[c.name] = _read_types(list(values[base + 2: base + stride]))
+        blanks[c.name], tokens[c.name] = values[offset + 2 * i: offset + 2 * i + 2]
 
     notes: list[str] = []
     flagged = [c.name for c in text if tokens.get(c.name)]
@@ -756,22 +435,6 @@ def profile_table(
             f"counts themselves are complete for all of them."
         )
 
-    named = [
-        c.name for c in text
-        if readings[c.name].is_worth_naming and not readings[c.name].is_total
-    ]
-    for name in named[:breakdown_cap]:
-        reading = readings[name]
-        readings[name] = TypeReading(
-            considered=reading.considered,
-            ratios=reading.ratios,
-            best=reading.best,
-            ratio=reading.ratio,
-            examples=_cast_examples(con, dataset_name, name, listed, reading.best),
-        )
-
-    outliers = _outlier_counts(con, dataset_name, numeric, summaries)
-
     columns: list[ColumnProfile] = []
     for c in stats:
         role, reason = suggest_role(c)
@@ -784,8 +447,6 @@ def profile_table(
                 blank_count=blanks.get(c.name, 0),
                 missing_token_count=tokens.get(c.name, 0),
                 missing_token_breakdown=breakdowns.get(c.name, {}),
-                type_reading=readings.get(c.name),
-                outliers=outliers.get(c.name),
             )
         )
 
@@ -801,25 +462,6 @@ def profile_table(
             "a person decides. Nothing was rewritten either way."
         )
 
-    if any(c.outliers is not None and c.outliers.total for c in columns):
-        notes.append(
-            f"An outlier here means outside {OutlierSummary.method} and "
-            f"nothing more. A price that is genuinely ten times the others is "
-            f"outside the fence and is not an error; a skewed distribution "
-            f"puts a tail outside it by construction. Phase 9 compares IQR "
-            f"against z-score and MAD, which disagree on purpose."
-        )
-    if any(
-        c.type_reading is not None and c.type_reading.is_worth_naming
-        for c in columns
-    ):
-        notes.append(
-            "A column that parses as another type was NOT converted. "
-            "TRY_CAST rounds and truncates where it can, so conversion is a "
-            "decision with consequences and it belongs to Phase 6, behind its "
-            "approval gate. What is reported here is only what parses."
-        )
-
     return TableProfile(
         dataset_name=dataset_name,
         row_count=row_count,
@@ -831,17 +473,11 @@ def profile_table(
 
 
 __all__ = [
-    "CAST_CANDIDATES",
-    "CAST_EXAMPLE_LIMIT",
     "MAX_BREAKDOWN_COLUMNS",
     "MISSING_VALUES",
     "MOSTLY_MISSING",
-    "OUTLIER_K",
-    "TYPE_MISMATCH_SHARE",
     "ColumnProfile",
     "NumericSummary",
-    "OutlierSummary",
     "TableProfile",
-    "TypeReading",
     "profile_table",
 ]

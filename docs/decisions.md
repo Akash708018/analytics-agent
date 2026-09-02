@@ -997,3 +997,43 @@ Machine-local and implementation choices that are easy to forget six months late
 - HEADERS puts the missing-data story in the first twelve columns because the
   envelope previews twelve inline. The numeric summary is in the file, behind
   it. That ordering is a decision, not an accident of how it was typed.
+
+## Phase 5, Step 3 — type readings and outliers
+
+- TRY_CAST CONVERTS rather than refusing where it can. TRY_CAST('4.5' AS
+  BIGINT) is 5; TRY_CAST('2024-01-01 10:30:00' AS DATE) is 2024-01-01. Both
+  succeed and both lose information, so an unguarded test reports a decimal
+  column as integer and a timestamp column as date -- and Phase 6 would then
+  propose a lossy conversion off a finding that looked solid.
+- The guard is one shape for both: a narrower type is claimed only when the
+  wider one round-trips it. BIGINT must equal its DOUBLE; DATE must equal its
+  TIMESTAMP. '007', ' 7 ' and '1e3' still read as integers, '4.5' does not; a
+  midnight timestamp still reads as a date, 10:30 does not.
+- CAST_CANDIDATES is ordered narrowest first and ties go to the earlier entry.
+  A column of 1s and 0s parses as both BIGINT and BOOLEAN; BIGINT wins because
+  it assumes less about intent.
+- The cast denominator excludes nulls, blanks and the Step 2 missing tokens.
+  'N/A' is already reported as missing; counting it again as a parse failure
+  describes one problem twice and understates the ratio.
+- pandas, DuckDB's sniffer and Frictionless infer types ALL-OR-NOTHING because
+  they must choose a storage type. They are answering a different question. A
+  profile reports, and the interesting case is the one they stay silent about
+  -- 95% numeric with one piece of junk. So their rule does not transfer.
+- TYPE_MISMATCH_SHARE = 0.9 is a DISPLAY threshold governing the summary only.
+  Every text column's ratio is computed and lands in the table regardless. Same
+  status as MOSTLY_MISSING. "Every value parses" is worded differently from
+  "most values parse" because only the first is a claim anyone should act on.
+- OUTLIER_K = 1.5 is Tukey's constant and matplotlib 3.10.8's
+  boxplot.whiskers default, verified by reading rcParams rather than recalled.
+- A ZERO IQR SUPPRESSES THE COUNT. On a column that is 95% one value the
+  quartiles coincide, the fences collapse to a point, and every other row is
+  outside them: measured, 5 of 100 flagged, and the five were the values 1, 2
+  and 3. Tukey says that and nobody should act on it. The reason is reported so
+  a silence cannot read as a clean bill.
+- A suppressed count writes None into the table, never 0. A zero reads as
+  "checked, none found"; nothing was checked.
+- The summary names outliers only for columns whose role is measure. A rating
+  of 1-5 with one 5 is not an outlier story, and evidence already classifies
+  low-cardinality numerics as dimensions.
+- The fences reuse q1 and q3 from Step 2, so the whole outlier analysis costs
+  one extra scan for the table rather than one per column.
