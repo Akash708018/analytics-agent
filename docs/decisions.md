@@ -1,18 +1,5 @@
 # Decisions
 
-The entire repository is available.
-
-Do NOT read the entire repository.
-
-For each task:
-1. Search for relevant symbols/files first.
-2. Read only the files directly required.
-3. For large files, read only relevant sections.
-4. Inspect related tests only.
-5. Do not inspect unrelated modules.
-6. Work only on the current phase/step.
-
-
 Machine-local and implementation choices that are easy to forget six months later. Product locks stay in the build guide (Section 13). This file is the “why did we do *that*?” log.
 
 ---
@@ -1244,3 +1231,21 @@ Machine-local and implementation choices that are easy to forget six months late
   instead. Counts taken against 200 rows are not what anyone wants when 230 are
   loaded, and leaving the read call there invites the agent to fetch them
   anyway.
+
+## Phase 5, Step 9 — acceptance
+
+- The acceptance test asserts FIVE clauses, not three. Clause 4: the
+  read_result_file call printed in the envelope is parsed back out and executed,
+  because a writer and a reader in the same package drift the moment either
+  builds a path by hand, and the result is a well-formed envelope pointing at
+  nothing. Clause 5: the workflow state reports profiled, then stale, then the
+  re-run -- and never the word "wrong".
+- Clause 2 is asserted against a table built in the script with known counts,
+  not against a fixture. "Correctly reports" needs ground truth, and a fixture
+  is only ground truth if somebody counted it.
+- SKIPS ARE NOT PASSES, and the script says so in its own summary. An Olist
+  table and big_synthetic each cover something a bare run does not.
+- Step 8 (excluded_columns, P5-D7) was SKIPPED deliberately. Not in the
+  Done-When, touches a closed phase, and the place a column exclusion is acted
+  on is Phase 6, where cleaning already has an approval gate. It belongs at the
+  front of Phase 6.
