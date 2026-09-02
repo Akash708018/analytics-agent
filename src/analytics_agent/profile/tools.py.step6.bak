@@ -36,8 +36,7 @@ from analytics_agent.profile.column_profile import (
     profile_column as _profile_column,
     render_column,
 )
-from analytics_agent.profile import runs
-from analytics_agent.profile.render import render_written_profile, write_profile
+from analytics_agent.profile.render import render_profile
 from analytics_agent.profile.table_profile import (
     MISSING_VALUES,
     profile_table,
@@ -71,21 +70,7 @@ def profile_dataset(
         )
     except ContractRefused as exc:
         return str(exc)
-
-    result = write_profile(workspace_id, profile)
-    # Recorded AFTER the write, with the path that was actually produced. A
-    # record naming a file that does not exist is worse than no record: the
-    # workflow state would offer a read_result_file call that refuses.
-    runs.record(
-        con,
-        dataset_name=profile.dataset_name,
-        row_count=profile.row_count,
-        column_count=profile.column_count,
-        result_path=str(result.path),
-        duplicate_rows=profile.duplicate_rows,
-        columns_missing=sum(1 for c in profile.columns if c.missing_count),
-    )
-    return render_written_profile(profile, result)
+    return render_profile(workspace_id, profile)
 
 
 def profile_column(

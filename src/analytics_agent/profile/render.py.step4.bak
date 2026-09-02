@@ -52,16 +52,21 @@ def _label(dataset_name: str) -> str:
     return f"profile_{dataset_name}"
 
 
-def write_profile(workspace_id: str, profile: TableProfile) -> results.Result:
+def render_profile(
+    workspace_id: str,
+    profile: TableProfile,
+    *,
+    inline_column_limit: int = INLINE_COLUMN_LIMIT,
+) -> str:
     """
-    Put the profile's table on disk and hand back the envelope's raw parts.
+    Write the profile and return what the agent should read.
 
-    Split out of `render_profile` so a caller can hold the `Result` -- Step 7
-    records the path and the row count it was taken at, and reconstructing
-    either from the rendered text would mean parsing prose that exists to be
-    read rather than parsed.
+    The file is always written. What comes back always carries the shape, the
+    findings, the path and the call that reads the rest of it -- see the module
+    docstring for why that is asserted as a property of the output rather than
+    trusted to whoever edits this next.
     """
-    return results.write_result(
+    result = results.write_result(
         workspace_id,
         label=_label(profile.dataset_name),
         headers=TableProfile.HEADERS,
@@ -70,21 +75,6 @@ def write_profile(workspace_id: str, profile: TableProfile) -> results.Result:
         dataset_name=profile.dataset_name,
     )
 
-
-def render_written_profile(
-    profile: TableProfile,
-    result: results.Result,
-    *,
-    inline_column_limit: int = INLINE_COLUMN_LIMIT,
-) -> str:
-    """
-    What the agent should read, for a profile whose table is already written.
-
-    What comes back always carries the shape, the findings, the path and the
-    call that reads the rest of it -- see the module docstring for why that is
-    asserted as a property of the output rather than trusted to whoever edits
-    this next.
-    """
     head = (
         f"Profile of {profile.dataset_name}: {profile.row_count:,} rows, "
         f"{profile.column_count} columns."
@@ -120,22 +110,4 @@ def render_written_profile(
     return "\n".join(out)
 
 
-def render_profile(
-    workspace_id: str,
-    profile: TableProfile,
-    *,
-    inline_column_limit: int = INLINE_COLUMN_LIMIT,
-) -> str:
-    """Write the profile and return what the agent should read."""
-    result = write_profile(workspace_id, profile)
-    return render_written_profile(
-        profile, result, inline_column_limit=inline_column_limit
-    )
-
-
-__all__ = [
-    "INLINE_COLUMN_LIMIT",
-    "render_profile",
-    "render_written_profile",
-    "write_profile",
-]
+__all__ = ["INLINE_COLUMN_LIMIT", "render_profile"]

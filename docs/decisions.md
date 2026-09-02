@@ -1,5 +1,18 @@
 # Decisions
 
+The entire repository is available.
+
+Do NOT read the entire repository.
+
+For each task:
+1. Search for relevant symbols/files first.
+2. Read only the files directly required.
+3. For large files, read only relevant sections.
+4. Inspect related tests only.
+5. Do not inspect unrelated modules.
+6. Work only on the current phase/step.
+
+
 Machine-local and implementation choices that are easy to forget six months later. Product locks stay in the build guide (Section 13). This file is the “why did we do *that*?” log.
 
 ---
@@ -1163,3 +1176,42 @@ Machine-local and implementation choices that are easy to forget six months late
 - All three profiling tools are READ_ONLY. Writing a result file is not a
   change to the workspace: the file IS the answer. None of them should ever
   prompt the user for confirmation.
+
+- Registering a tool is TWO edits: server.py and EXPECTED_TOOLS in
+  tests/test_tool_docs.py. The closed-set guard fired on all three profiling
+  tools, which is the guard working -- it fired the same way when Phase 4 added
+  four. Step 6c did one edit and the suite caught the other.
+- The reference was available and unread: test_contract_tool_docs.py names
+  tests/test_tool_docs.py in its opening paragraph. Reading a file that points
+  at another guard is not the same as reading the guard. Before adding a tool,
+  grep the tests for the tool's own name AND for any closed set it has to join.
+
+## Phase 5, Step 7a — the profile run record
+
+- P5-D8 answered with a ROW, not a directory listing. Result filenames carry
+  timestamps, so the profiled stage could have been inferred by globbing --
+  and that answers a worse question. Inferring gives "a profile exists"; a
+  record gives "profiled 40 minutes ago at 500 rows, and the table now has
+  530", which is F13 arriving through a door Phase 4 did not cover. A filename
+  does not know what the table looked like when it was written.
+- APPEND-ONLY, no versioning, deliberately unlike contract/store.py. A contract
+  supersedes its predecessor so SCD2 spans are needed; a profile supersedes
+  nothing. Three runs in an hour are three facts, not three drafts, and the
+  newest is interesting only because it is newest.
+- drift_phrase says OLD, never WRONG. Every number in a 500-row profile was
+  true when taken; beside a 530-row table it is out of date. An agent told
+  "stale" re-profiles, an agent told "wrong" apologises.
+- The record is written AFTER the file and carries the path that was actually
+  produced. A record naming a file that does not exist is worse than no record:
+  the workflow state would offer a read_result_file call that refuses, and the
+  agent would have been told to make it. A test asserts the round trip.
+- runs.is_bookkeeping() tests the _agent_ PREFIX rather than listing names.
+  _agent_contracts was once listed as a dataset because state.py's filter
+  predated it; a prefix test keeps working when a fifth table arrives, a list
+  of three does not.
+- render.py was split: write_profile returns the Result, render_written_profile
+  formats it, render_profile does both and keeps its old signature. Step 7
+  needs the path and the row count it was taken at, and reconstructing either
+  by parsing the rendered text would mean parsing prose that exists to be read.
+  All 24 Step 4 tests passed unchanged, which is the check that the split was
+  behaviour-preserving.
