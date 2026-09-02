@@ -22,16 +22,6 @@ Phase 4 adds four more, and the same shape a second time:
   run_analysis              the gate. Locked decision 12 lives here: no
                             analysis without a confirmed contract.
 
-Phase 5 adds three, and they are ungated: profiling is how a person
-finds out what a contract should say, so requiring one first inverts
-the workflow.
-
-  profile_dataset       count everything about a loaded table and write
-                        the counts where they can be read back.
-  profile_column        one column in detail: values, distribution,
-                        lengths, calendar coverage.
-  read_result_file      read a page of a result a tool wrote earlier.
-
 Those two are the conversation. The primitive load_csv / load_excel stay, so a
 caller who already knows the shape of a file can skip the exchange entirely.
 
@@ -76,7 +66,6 @@ from .util.formatting import format_kv
 from .ingest import csv_loader, draft, excel, postgres, sizegate, merges
 from .ingest.csv_loader import LoadRefused
 from .contract import tools as contract_tools
-from .profile import tools as profile_tools
 
 mcp = FastMCP(SERVER_NAME)
 
@@ -709,89 +698,6 @@ def run_analysis(
         return contract_tools.analyse(con, dataset_name, question)
     finally:
         con.close()
-
-
-@mcp.tool(annotations=READ_ONLY)
-def profile_dataset(
-    dataset_name: str,
-    missing_values: list[str] | None = None,
-    workspace_id: str | None = None,
-) -> str:
-    """Count everything about a loaded table: nulls, duplicates, distributions.
-
-    Reports what is there and changes nothing. No column is cleaned, converted
-    or rewritten, and a column reported as parsing to another type has NOT been
-    converted -- that is a decision with consequences and it belongs to Phase 6,
-    behind its own approval step.
-
-    Values that read as missing without being null are counted separately from
-    nulls, using the published pandas/pyarrow vocabulary. Pass
-    missing_values=["NR"] to widen it for a source that writes something else,
-    or missing_values=[] to switch the check off.
-
-    The full table of counts is written to a file and the first rows come back
-    inline. Read the rest with read_result_file before describing it.
-    """
-    # One workspace id, used twice: db.connect opens the data and the results
-    # directory hangs off the same workspace. Resolving it once is what keeps a
-    # profile and its result file in the same place.
-    wid = workspace_id or DEFAULT_WORKSPACE_ID
-    con = db.connect(wid)
-    try:
-        return profile_tools.profile_dataset(
-            con, wid, dataset_name, missing_values=missing_values
-        )
-    finally:
-        con.close()
-
-
-@mcp.tool(annotations=READ_ONLY)
-def profile_column(
-    dataset_name: str,
-    column: str,
-    top_n: int = 10,
-    workspace_id: str | None = None,
-) -> str:
-    """Look at one column closely: its values, distribution, lengths and dates.
-
-    The drill-down after profile_dataset says something about a column worth
-    following up. Writes nothing.
-
-    Shows the most frequent values with their shares, so read that list for
-    anything that means missing without being null -- 'unknown', 'none' and '-'
-    are judgement calls this tool deliberately does not make for you. Pass a
-    larger top_n to see further down the list.
-    """
-    wid = workspace_id or DEFAULT_WORKSPACE_ID
-    con = db.connect(wid)
-    try:
-        return profile_tools.profile_column(
-            con, wid, dataset_name, column, top_n=top_n
-        )
-    finally:
-        con.close()
-
-
-@mcp.tool(annotations=READ_ONLY)
-def read_result_file(
-    path: str,
-    start: int = 1,
-    limit: int = 50,
-    workspace_id: str | None = None,
-) -> str:
-    """Read a page of a result file written by an earlier profile_dataset call.
-
-    Use the path exactly as it was returned by that earlier call; a path from
-    anywhere else is refused. Rows are numbered from 1 and the header line is
-    not counted, so start=21 gives you the twenty-first row of data.
-
-    This is how a large result is actually seen. A profile that reports sixty
-    columns shows the first twenty inline and leaves the rest here.
-    """
-    # No connection: a result file is on disk, not in DuckDB.
-    return profile_tools.read_result(
-        workspace_id or DEFAULT_WORKSPACE_ID, path, start, limit
-    )
 
 
 def main() -> None:

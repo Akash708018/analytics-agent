@@ -58,26 +58,28 @@ def docs():
 # --------------------------------------------------------------------------
 
 EXPECTED_TOOLS = {
-    "ping",
-    "reset_workspace",
     "check_file",
-    "preview_file",
-    "propose_ingest_spec",
+    "confirm_dataset_contract",
     "confirm_ingest_spec",
+    "describe_dataset",
+    "describe_source",
+    "get_workflow_state",
+    "list_datasets",
+    "list_sources",
     "load_csv",
     "load_excel",
-    "list_sources",
-    "describe_source",
     "load_postgres_table",
-    "query_source",
-    "list_datasets",
-    "describe_dataset",
-    "show_limits",
-    # Phase 4, Step 7.
+    "ping",
+    "preview_file",
+    "profile_column",
+    "profile_dataset",
     "propose_dataset_contract",
-    "confirm_dataset_contract",
-    "get_workflow_state",
+    "propose_ingest_spec",
+    "query_source",
+    "read_result_file",
+    "reset_workspace",
     "run_analysis",
+    "show_limits",
 }
 
 
