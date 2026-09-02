@@ -1037,3 +1037,36 @@ Machine-local and implementation choices that are easy to forget six months late
   low-cardinality numerics as dimensions.
 - The fences reuse q1 and q3 from Step 2, so the whole outlier analysis costs
   one extra scan for the table rather than one per column.
+
+## Phase 5, Step 4 — rendering and the wide-table rule
+
+- EVERY PROFILE WRITES A FILE, including a four-column one that would read
+  fine inline. Skipping the file for small tables was tempting and is wrong:
+  it makes the agent reason about which case it is in, and an agent that has
+  learned "a profile comes with a path" produces a path when one is missing
+  rather than concluding the table was small. That is F7 through the front
+  door. The uniform contract costs disk; reset_workspace answers the disk.
+- What changes with width is the BODY, not the envelope. At or below 20
+  columns the render prints the per-column sentences; above it, the profile
+  table's own 20x12 preview. Sixty prose sentences is not a readable answer
+  and neither is a 24-column table in a chat window.
+- INLINE_COLUMN_LIMIT is results.PREVIEW_ROWS rather than a separate constant.
+  A higher threshold would promise a sentence per column while the preview had
+  already truncated the rows those sentences describe. A test asserts the two
+  stay equal so a later change to one fails loudly.
+- The invariant is asserted against the OUTPUT, not against which function
+  produced it: wherever the path appears, the shape, the findings and the
+  literal next call appear with it. The narrow form composes from Result's
+  parts rather than calling to_text() wholesale, and this is what stops that
+  being a hole. Both forms go through the same assertion helper.
+- The narrow form does NOT print the table as well as the sentences. Two
+  renderings of the same four columns in one result is the Phase 3 Step 8
+  shape: a reader cannot tell whether they differ, so they read both and trust
+  neither.
+- Notes come last in both forms. Whatever sits at the bottom is read last and
+  remembered, and caveats belong below the numbers they qualify.
+- No wide_table.csv fixture was added, against my own step map. Adding one
+  means editing tests/fixtures/make_fixtures.py, which I have not read, and
+  guessing at a file's structure produced two corrections in this phase
+  already. The tests build wide tables in DuckDB. Step 9 can add the CSV if
+  the acceptance test wants one on disk.
