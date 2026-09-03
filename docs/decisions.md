@@ -1387,3 +1387,69 @@ Machine-local and implementation choices that are easy to forget six months late
 - gaps_and_dupes.csv is the only CSV carrying a literal null sentinel; every
   other one writes an empty field. Phase 5's missing-value vocabulary has met
   exactly one fixture that exercises it. Carried to P6-D5.
+
+## Phase 6, Step 2 — the fixture, counted
+
+- make_fixtures.py STATES mixed_types.xlsx's ground truth beside the generator:
+  refusal at row 5101, {'units': 7, 'unit_price': 3} under on_error='null',
+  all VARCHAR under all_text=True. That is a claim, not a count. Phase 5
+  shipped a claim of the same shape -- "the DISTINCT * scan is the slow half"
+  -- wrong by a factor of ten. tests/test_mixed_types_ground_truth.py counts
+  the rows AND asserts the POSITIONS, because a count can be right for the
+  wrong reason and a position cannot.
+- THE PHASE 6 DONE-WHEN IS REACHABLE ONLY UNDER all_text=True, and nothing in
+  the build guide says so. Default on_error='stop' refuses the fixture at row
+  5101, so it never loads. on_error='null' converts units and unit_price at
+  INGEST and nulls the bad values, so there is no text left for cleaning to
+  find. Only all_text leaves six VARCHAR columns, and "a text->decimal
+  conversion succeeds" needs one. This is the real story rather than a defect:
+  a person meets the refusal, reaches for the documented escape hatch, and now
+  holds text columns that need cleaning. Phase 6 is what happens next, and
+  Step 4 detects against THAT state of the world.
+- P6-D4 ANSWERED, and not with a threshold. The fixture holds two conversions
+  identical in shape -- text in a numeric column, 7 of 6,000 and 3 of 6,000,
+  TRY_CAST NULL for both -- and different in kind. 'n/a' in units is a DECLARED
+  MISSING TOKEN (DEFAULT_NA_VALUES, case-insensitive, and region uses 'N/A' for
+  exactly that purpose in this same fixture), so converting it to NULL makes an
+  absence that was always there explicit and loses nothing. 'not priced' in
+  unit_price is NOT declared: it says a price was withheld rather than merely
+  absent, and converting it destroys the only record of the difference.
+  THE RULE: a conversion may convert an unconvertible value that is already a
+  declared missing token. An undeclared one is information -- the proposal
+  names it, shows a sample, and states what will be lost. A percentage would
+  have passed both at 0.12% and 0.05% and been silent about the difference
+  that matters. Asserted in SQL against the config the loaders read, not
+  against a list recalled from pandas.
+- The recon's section 2 failed -- `zsh: no matches found: --include=*.py`
+  needs quoting. Section 1's tree covered enough that it was not re-run.
+- load_excel's na_values DEFAULTS TO NO TOKENS, not to DEFAULT_NA_VALUES. So
+  region's ~300 'N/A' strings survive the load as literal text and the
+  missing-token action on region is still Phase 6's to propose. It also
+  narrows the P6-D4 wording: DEFAULT_NA_VALUES is the vocabulary the project
+  PUBLISHES and the profiler defaults to, not one every loader applies. The
+  point stands -- the proposal reads the published list rather than deriving a
+  second one -- but "the loaders read it today" was too strong.
+- load_excel's replace DEFAULTS TO TRUE: a second load of the same dataset
+  name overwrites in silence. Same hole Phase 5's live run found in the
+  profile run record, one layer further out, and Phase 6 writes tables for a
+  living. Step 5 decides whether apply_cleaning_plan may overwrite an existing
+  target name or must refuse.
+- unit_price lands as DOUBLE, not DECIMAL, under on_error='null'. Pinned, so a
+  Step 5 conversion that claims to produce a decimal has something to fail
+  against.
+- mixed_types.xlsx SUPPORTS FIVE CANDIDATE ACTIONS, NOT SIX. Counted: 0 exact
+  duplicate rows, 0 whitespace-padded values, 0 case variants, across all six
+  columns. It is a type-coercion fixture and nothing else -- the generator
+  writes clean values through random.choice on fixed lists, so there was never
+  a mechanism for any of them to appear. The Done-When asks to approve 3 of 6.
+  Step 4 decides between: a rule fires that this inventory does not predict;
+  the 6 was a round number written before the phase existed (Phase 5's
+  Done-When named three clauses and the test asserted five, same cause); or a
+  fixture gains a defect. IF THE THIRD, ADD A SECOND FIXTURE RATHER THAN
+  EDITING THIS ONE -- mixed_types.xlsx now has ten tests pinning its counts and
+  row positions, and mutating it to hit a number invalidates all of them.
+- COVERAGE GAP: whitespace trimming, case normalisation and duplicate removal
+  are three of the build guide's ten detection rules and none has a fixture
+  proven against it here. gaps_and_dupes.csv is named for duplicates and
+  probably covers one, uncounted and not asserted. Step 4's probe counts all
+  three across every fixture in one pass.
