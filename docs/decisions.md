@@ -1492,3 +1492,40 @@ Machine-local and implementation choices that are easy to forget six months late
 - STEP ORDER CORRECTED: sql.py before detect.py. The build guide requires every
   proposal to show the exact SQL that will run, so an action carries SQL from
   birth and detection cannot produce one until the renderer exists.
+
+## Phase 6, Step 4 — clean/sql.py
+
+- ONE EXPRESSION PER ACTION, and the statement, the affected count, the loss
+  count and the sample are all built from it. The build guide says a proposal
+  shows the exact SQL that will run; a proposal also shows NUMBERS, and a count
+  built from a different expression than the statement is a guess about a
+  statement it has never met. Phase 5's clause 4 with a write at the end.
+  Asserted: the expression appears verbatim in the statement it builds.
+- P6-D9: ONE STATEMENT PER ACTION, not one composed rebuild. Three approved
+  actions rebuild the table three times. Composing them would be cheaper and
+  would make the ledger dishonest -- a row count attributed to C002 is only
+  verifiable if C002 ran alone. If the cost ever bites, the answer is to SAY
+  the rebuild was batched, not to attribute a composed count to an action.
+- LITERAL SQL, NOT BOUND PARAMETERS. The strings are shown to a person who then
+  approves them, so what is shown has to be what runs. Values escaped, with
+  tests for a quote inside a token and a space inside a column name -- Phase 3's
+  header assembly produces `order date` and it is not hypothetical.
+- P6-D10 OPEN, and it is a bug in Step 3 found by writing Step 4.
+  CleaningAction.line() says "N value(s) will become NULL", which is true for
+  CONVERT_TYPE and false for the other lossy kinds. NORMALISE_CASE nulls
+  nothing and still destroys something: 'North' and 'north' merge and the
+  record that the source wrote them differently is gone, so its loss is counted
+  in DISTINCT VALUES. DROP_DUPLICATE_ROWS destroys multiplicity -- two identical
+  rows may be two real events, which is exactly the judgement the profiler
+  declines. Fix is one field, loss_unit, on the action. BELONGS AT STEP 5 where
+  actions are constructed, same reason P6-D1 moved to Step 6.
+- NORMALISE_MISSING IS NEVER LOSSY BY CONSTRUCTION -- the only values it touches
+  are already declared to mean absent. Which is why its tokens are rendered
+  into the statement in plain sight rather than looked up from config at apply
+  time: widen the list to something that is not a missing token and it becomes
+  a different action, and the approver can see that it has.
+- The fingerprint is a PROPERTY ON THE BINDING (dataset_contract.py:198), sha256
+  over "name:TYPE" joined by "|", first 12 hex; DatasetContract delegates to it.
+  The proposal path builds a binding and reads the property rather than hashing
+  a column list a second way. Binding.from_pairs' full signature is still
+  unread -- Step 5 opens with inspect.signature on it.
