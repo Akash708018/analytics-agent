@@ -4,15 +4,18 @@ None of these is a test of our code. Each one is a claim about DuckDB that the
 cleaning design depends on, measured on 1.5.5 rather than assumed, and left
 here so that the day 1.6 changes one of them the suite says which one.
 
-The three claims:
+The four claims:
 
   1. A genuinely read-only handle on the workspace file is reachable ONLY by
      ATTACH ... (READ_ONLY) from a separate connection, and only when nothing
      else holds the file. connect(read_only=True) and cursor() do not give one.
-  2. `* REPLACE (expr AS col)` preserves column position. `* EXCLUDE (col),
+  2. That handle refuses CREATE by STATEMENT TYPE, so `CREATE TABLE IF NOT
+     EXISTS` is refused even where it would be a no-op -- which is what
+     util/db.connect runs on every open.
+  3. `* REPLACE (expr AS col)` preserves column position. `* EXCLUDE (col),
      expr AS col` moves the column to the end -- and column ORDER is identity
      to Phase 4's Binding.fingerprint.
-  3. A hard CAST inside a CTAS aborts the whole rebuild on one bad value.
+  4. A hard CAST inside a CTAS aborts the whole rebuild on one bad value.
      TRY_CAST nulls it instead, which is a silent drop. Neither is acceptable
      unaudited, so the count comes first.
 """
@@ -137,6 +140,34 @@ def test_the_read_only_attach_still_needs_the_file_to_itself(wsfile):
         con.close()
     finally:
         writer.close()
+
+
+def test_read_only_refuses_create_even_when_the_table_already_exists(wsfile):
+    """The statement TYPE is refused, not its effect.
+
+    This is the one that decides Step 3's shape. util/db.connect runs
+    `CREATE TABLE IF NOT EXISTS _agent_datasets` on every open, which is a
+    no-op against an existing table and is still refused here. So the proposal
+    path cannot go through db.connect at all -- it needs its own opener.
+    """
+    setup = duckdb.connect(wsfile)
+    setup.execute(
+        "CREATE TABLE IF NOT EXISTS _agent_datasets (dataset_name VARCHAR PRIMARY KEY)"
+    )
+    setup.close()
+
+    con = duckdb.connect(":memory:")
+    try:
+        con.execute(f"ATTACH '{wsfile}' AS ws (READ_ONLY)")
+        with pytest.raises(duckdb.InvalidInputException) as exc:
+            con.execute(
+                "CREATE TABLE IF NOT EXISTS ws._agent_datasets "
+                "(dataset_name VARCHAR PRIMARY KEY)"
+            )
+        assert 'type "CREATE"' in str(exc.value)
+        assert con.execute("SELECT count(*) FROM ws.t").fetchone()[0] == 5
+    finally:
+        con.close()
 
 
 def test_a_read_only_attach_can_still_write_to_its_own_scratch():

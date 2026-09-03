@@ -1453,3 +1453,42 @@ Machine-local and implementation choices that are easy to forget six months late
   proven against it here. gaps_and_dupes.csv is named for duplicates and
   probably covers one, uncounted and not asserted. Step 4's probe counts all
   three across every fixture in one pass.
+
+## Phase 6, Step 3 — clean/plan.py
+
+- P6-D1 DOES NOT BLOCK THIS STEP AND I SAID THREE TIMES THAT IT DID. An
+  action's target is the DATASET, not a physical table: locked decision 13
+  already partitions state by dataset_name, _agent_datasets is keyed on it,
+  runs.py stores it. A plan that stores dataset_name and leaves physical
+  naming to the layer that writes tables is correct under either answer.
+  P6-D1 moves to STEP 6, where the tables are actually written -- the same
+  argument Phase 5 used to push excluded_columns out of its Step 8.
+- P6-D4 IS ENFORCED BY THE CONSTRUCTOR, not by a docstring. CleaningAction
+  refuses to exist with values_lost > 0 and no sample: "an action that cannot
+  show what it destroys is not a proposal". values_lost counts UNDECLARED
+  values only -- Step 2's finding that units' 'n/a' (declared) and
+  unit_price's 'not priced' (undeclared) are the same shape and different
+  kinds. Six lines, and it is the one place the rule can be made impossible
+  to forget.
+- STALENESS CHECKS THE FINGERPRINT BEFORE THE ROW COUNT, and says so. They are
+  different events: rows changing means less or more of the same table; the
+  fingerprint changing means a DIFFERENT table wearing the same name, which is
+  what load_excel(replace=True) produces by default and what drift_phrase in
+  runs.py cannot catch when the replacement is the same size. F13, third
+  appearance, answered at the start rather than found later.
+- PER-PLAN ACTION IDS. C001 is read off a screen and typed back, which rules
+  out a uuid, which makes ids ambiguous across plans, so resolution always
+  goes through latest() and refuses on staleness rather than picking one.
+- resolve() RETURNS THE UNKNOWN IDS TOO. A caller that only gets the hits
+  cannot tell the person which approved id it ignored, and silently skipping
+  an approved action is the worst failure this tool has available.
+- ONE FLAT TABLE, denormalised on purpose: plan-level columns repeat on every
+  action row. A plan is read whole and never updated, so a join buys
+  normalisation nobody spends. Same call runs.py made.
+- NOT IN THIS FILE: computing the fingerprint (contract/binding.py owns it and
+  it has not been read, so record() takes one as a parameter), and any SQL
+  (clean/sql.py renders it; a model that can BUILD SQL can build different SQL
+  from the one it showed).
+- STEP ORDER CORRECTED: sql.py before detect.py. The build guide requires every
+  proposal to show the exact SQL that will run, so an action carries SQL from
+  birth and detection cannot produce one until the renderer exists.
