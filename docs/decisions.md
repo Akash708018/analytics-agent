@@ -1249,3 +1249,141 @@ Machine-local and implementation choices that are easy to forget six months late
   Done-When, touches a closed phase, and the place a column exclusion is acted
   on is Phase 6, where cleaning already has an approval gate. It belongs at the
   front of Phase 6.
+
+## Phase 6, Step 1 — the ground facts
+
+- THE BUILD GUIDE'S THREE DUCKDB CLAIMS WERE MEASURED, not carried forward.
+  Two are wrong as written. Pinned in tests/test_duckdb_cleaning_facts.py, 14
+  tests, none of which tests our code -- each is a library claim the design
+  leans on, left in the suite so a version bump says which one moved.
+- P6-D3 ANSWERED: `* REPLACE (expr AS col)` rather than the guide's
+  `* EXCLUDE (col), expr AS col`. EXCLUDE moves the rebuilt column to the END
+  of the table. Column ORDER is identity to Binding.fingerprint, so under
+  EXCLUDE every value-level conversion reads downstream as structural drift.
+  EXCLUDE stays for the one action that really drops a column (P6-D8).
+- P6-D2 HALF ANSWERED. A genuinely read-only handle exists, but only via
+  ATTACH ... (READ_ONLY) from a separate connection, and only when nothing
+  else holds the file -- one handle per file per process. connect(read_only=
+  True) is a configuration conflict, not a downgrade; cursor() shares the
+  database and writes freely; access_mode cannot be lowered on a running
+  database. So the hard requirement is achievable IF util/db.connect opens per
+  call. If it caches, the choice is to change the lifecycle or to weaken the
+  requirement to a code-level guard -- and weakening it must be recorded as a
+  weakening, not substituted quietly.
+- P6-D4 OPEN, and it is the sharp one. The guide's example CAST aborts the
+  whole CTAS on one accounting-style negative, '(45.00)'. TRY_CAST converts it
+  to NULL: a value that existed before the clean is absent after it and
+  nothing says so, which is a silent drop. The way out is that the SAME
+  expression counts the unconvertible rows read-only at PROPOSAL time. A
+  conversion action that cannot say how many values it will not convert is not
+  a proposal. The threshold above which the action is withheld entirely is
+  decided with the fixture in hand, not now.
+- P6-D1 OPEN, and it is a collision between two LOCKED decisions: 17 says
+  versioned tables, 13 says state is partitioned by dataset_name. sales_v2 is
+  a table the contract, the profile run and the workflow state all know
+  nothing about. Verified that a self-referencing CREATE OR REPLACE TABLE
+  works on 1.5.5, so versioning is a CHOICE made for auditability rather than
+  a necessity -- which means the auditability has to be delivered somewhere,
+  and if not in the table name then in the ledger.
+- P6-D7 OPEN. apply_cleaning_plan takes approved_action_ids AND NOTHING ELSE,
+  so C003 has to resolve against a stored plan, and a stored plan can go stale
+  between proposal and approval exactly as a profile does. F13, third
+  appearance.
+- P6-D2 ANSWERED, and the hard requirement stands exactly as the build guide
+  writes it. ATTACH ... (READ_ONLY) from a separate connection is the only
+  route, and it is available: db.connect() does not cache, and its docstring
+  already forbids caching -- "a long-lived handle holds the lock and defeats
+  the isolation", written in Phase 2 for F2, which is the same reason Phase 6
+  needs it. Thirteen connects, thirteen closes in server.py.
+- A CRUDE COUNT NEARLY BECAME A DEFECT REPORT. `grep -c "db.connect"` returned
+  14 against 13 closes, and the fourteenth is a COMMENT at server.py:735. I
+  had already written the leak up as a finding before checking which lines the
+  count contained. Count the calls, not the lines that mention them.
+- db.connect() CANNOT BE THE PROPOSAL PATH'S OPENER. It runs
+  `con.execute(_SCHEMA)` -- CREATE TABLE IF NOT EXISTS _agent_datasets -- on
+  every open, and a read-only attach refuses CREATE by STATEMENT TYPE, not by
+  effect: IF NOT EXISTS does not save it even when the table exists. Measured
+  and pinned. Step 3 adds connect_read_only() beside connect() in util/db.py.
+- P6-D1 PROPOSED, and the codebase chose it rather than an argument.
+  state.py's _loadable_tables filters on the LEADING UNDERSCORE, not a name
+  list, so sales_v2 is not bookkeeping and shows in get_workflow_state as a
+  dataset of its own. And dataset_states labels an unregistered table
+  "No load record." / "unknown - not created by a loader" -- honest and wrong,
+  since the cleaner created it deliberately. So both obvious readings of locked
+  decision 17 damage the orientation tool: unregistered versions lie about
+  their origin, registered ones put three rows in a table whose primary key is
+  dataset_name while the contract and profile stay keyed to the base name.
+  THE THIRD SHAPE: clean forward under the same name, and push the superseded
+  copy behind the underscore as _history_<name>_v<N>. One dataset in the
+  registry and the listing, contract and profile still attached, both tables on
+  disk so the ledger's source/target version pair names something real, and the
+  history invisible to the tool whose job is telling someone where they are.
+  Self-referencing CREATE OR REPLACE was verified in Part 1; this splits it in
+  two so the prior state survives.
+  I HAD LEANED THE OTHER WAY -- visible _vN names -- and the underscore filter
+  plus the "not created by a loader" label is what changed it. The decision was
+  available to be read out of Phase 4's code the whole time.
+- Side effect worth knowing: state.py:103 builds "loaded: {available}" into
+  every DATASET_NOT_LOADED refusal from _loadable_tables. Visible _vN names
+  would grow that line by one entry per cleaning action, in a message whose
+  purpose is to be scannable.
+- db.user_tables filters `table_name NOT LIKE '\_%' ESCAPE '\'` -- the
+  underscore convention, in SQL, in db.py itself. So a _history_ table is
+  filtered at BOTH layers and the shape above holds. Its docstring also says
+  describe_dataset COMPARES user_tables against list_datasets to surface tables
+  with no metadata row, which is a second reason not to leave visible versions
+  unregistered: they would be reported as discrepancies by a tool built to find
+  exactly that.
+- THE COST OF THE _history_ SHAPE, recorded against my own proposal: those
+  tables are invisible to every tool that goes through user_tables. "Here is
+  the table before" is only evidence if somebody can reach the before. There is
+  no escape hatch: util/sql_guard.py DOES NOT EXIST -- run_sql is Group F,
+  Phase 8, and the build guide's repository layout describes the finished tree
+  rather than the disk. Second time in this step I read a document as a
+  description of what is there. So a clean/ reader for the history tables is a
+  NECESSITY, not a convenience, and Step 6 builds it or the version tables have
+  no reader at all.
+- FOR PHASE 8 TO INHERIT: when run_sql gets a table guard, the obvious
+  implementation is db.user_tables -- it exists and it already excludes
+  bookkeeping. If it does that, cleaning history stays unreachable through
+  run_sql permanently, and by accident. Written down now while the reason is
+  visible.
+- P6-D6's APPEND-ONLY HALF WAS DECIDED IN PHASE 2. register_dataset's docstring:
+  "This is distinct from the cleaning ledger (Phase 6), which is append-only
+  because it records history rather than current state." Only the envelope
+  question -- whether get_cleaning_ledger returns through util/results.py --
+  is open.
+- NOTHING IN THE CODEBASE CALLS .cursor(). Not one site. So the cursor test in
+  test_duckdb_cleaning_facts.py is prophylactic, not a bug report: it pins the
+  behaviour so nobody reaches for cursor() in Step 5 believing it isolates.
+- server.py opens a FRESH CONNECTION PER TOOL CALL at all thirteen sites, and
+  db.py has exactly one duckdb.connect(). No shared long-lived connection
+  object, which is the shape P6-D2 needs.
+- THE BOOKKEEPING TABLES ARE CREATED LAZILY ON A WRITABLE CONNECTION.
+  contract/store.py:138 and profile/runs.py:113 both say so. A read-only ATTACH
+  cannot create a table, so Phase 6's plan store and ledger CANNOT follow that
+  pattern: either they are created eagerly on a writable connection before the
+  proposal path runs, or the proposal path tolerates their absence and says so
+  instructionally rather than raising. Constrains Steps 3 and 7. Found by grep,
+  not by design.
+- src/analytics_agent/server.py.step6.bak was an importable stale module inside
+  the package -- it is why every db.connect line appeared twice in this step's
+  grep. Already gone by the time the removal ran. Recorded because the grep
+  output kept in this step describes a state that no longer holds.
+- mixed_types.xlsx EXISTS, and the draft of this step said it probably did not,
+  on the grounds that Phase 5's acceptance run reported "4 csv(s)". That run
+  globs *.csv. Reading a statement about a FILTER as a statement about a
+  directory -- absence from a filtered list is not absence. Cost: one wrong
+  paragraph, caught by an ls that should have come first.
+- THE FIXTURE WAS BUILT FOR F9, NOT FOR CLEANING. make_fixtures.py's docstring:
+  bad values sit below row 5000 so inference_rows=5000 never sees them, the
+  sniffer types the column BIGINT, and on_error='null' counts the failures. So
+  the open question for Step 2 is whether anything text-shaped SURVIVES ingest
+  -- if the junk is nulled at load, the Done-When's "a text->decimal conversion
+  succeeds" has no VARCHAR column to run against. Unsettled both ways: that
+  docstring describes the CSV path, and in xlsx every cell carries its own
+  type. Step 2 loads it through the real ingest path and COUNTS, rather than
+  reasoning from the generator's intent.
+- gaps_and_dupes.csv is the only CSV carrying a literal null sentinel; every
+  other one writes an empty field. Phase 5's missing-value vocabulary has met
+  exactly one fixture that exercises it. Carried to P6-D5.
