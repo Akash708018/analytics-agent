@@ -151,6 +151,27 @@ def conflicts(actions: list[CleaningAction]) -> list[str]:
     return out
 
 
+def first_step(actions: list[CleaningAction]) -> str:
+    """The id the conflict message tells you to approve first.
+
+    `conflicts()` says "approve C004 on its own first, then propose again". A
+    refusal whose NEXT STEP then names C003 contradicts its own WHY two lines
+    above, which is how the first version behaved: it used the first approved
+    id in list order and that happened to be the conversion.
+
+    So the recommended id is computed the same way the message is: the action
+    that is NOT the type change on the contested column.
+    """
+    converted = {
+        a.column for a in actions
+        if a.kind is ActionKind.CONVERT_TYPE and a.column
+    }
+    for a in actions:
+        if a.kind is not ActionKind.CONVERT_TYPE and a.column in converted:
+            return a.action_id
+    return actions[0].action_id
+
+
 @dataclass(frozen=True)
 class AppliedAction:
     action_id: str

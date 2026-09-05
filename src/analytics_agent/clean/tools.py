@@ -28,6 +28,14 @@ live run found an agent unable to tell which it was, so it forced the order with
 two calls rather than assume -- reasonable, and it should not have had to. The
 docstrings say so now.
 
+**The contract is read on a WRITABLE connection, before the read-only one is
+opened.** `contract.store.current` calls `_ensure_table`, which is
+`CREATE TABLE IF NOT EXISTS` -- refused by statement type on a read-only attach,
+Step 1 measured that. So a proposal that honours a contract opens three
+connections in sequence: writable to read the contract, read-only to detect,
+writable to store the plan. Never two at once; one handle per file per process.
+That is P6-D2 costing something concrete rather than in principle.
+
 **The suggested call is one the tool would accept.** `NEXT STEP` used to slice
 the first three ids, and Step 7's run watched that slice land on the one action
 carrying a discard warning, one apply later, after the ids renumbered. It now
@@ -42,6 +50,7 @@ import duckdb
 from ..config import DEFAULT_NA_VALUES
 from ..contract.dataset_contract import Binding
 from ..contract.refusals import Reason, Refusal
+from ..contract import store as contract_store
 from .. import workspace
 from ..util import db
 from . import apply as apply_module
@@ -146,21 +155,76 @@ def _safe_suggestion(actions, limit: int = 3):
     return picked
 
 
+def _contract_settings(workspace_id: str, dataset_name: str):
+    """The dataset's declared vocabulary and its excluded columns, or defaults.
+
+    P6-D8, owed since Phase 5 Step 8. Three levels, and the order matters:
+
+    1. an explicit `missing_values=` argument wins, because somebody typed it
+       for this call;
+    2. otherwise the contract's, because somebody confirmed it for this
+       dataset;
+    3. otherwise DEFAULT_NA_VALUES, the project vocabulary.
+
+    `missing_values=None` on the contract means level 3, not "no tokens". `[]`
+    means no tokens, the same switch Phase 5 gave `missing_values` one layer
+    down. A field left unset is a default, NOT an unresolved gap -- if it went
+    into `unresolved`, every contract in the workspace would be unconfirmable
+    the day the field was added.
+    """
+    con = db.connect(workspace_id)
+    try:
+        stored = contract_store.current(con, dataset_name)
+    except Exception:  # noqa: BLE001 - no contract table yet is not an error
+        stored = None
+    finally:
+        con.close()
+    if stored is None:
+        return None, ()
+    contract = stored.contract
+    return (
+        getattr(contract, "missing_values", None),
+        tuple(getattr(contract, "excluded_columns", ()) or ()),
+    )
+
+
+def _next_call_id(actions) -> str:
+    """An id safe to put in a NEXT STEP.
+
+    Every `next_call` in this module is a call the reader is invited to make,
+    so none of them may name an action the same message warns about. The
+    nothing-approved refusal used `actions[0]`, which on a plan whose first
+    action is lossy would recommend the discard.
+    """
+    safe = _safe_suggestion(actions, limit=1)
+    return safe[0].action_id if safe else actions[0].action_id
+
+
 def propose_cleaning_plan(
     workspace_id: str,
     dataset_name: str,
     missing_values: list[str] | None = None,
 ) -> str:
     """Detect on a read-only handle, then store the plan on a writable one."""
-    tokens = DEFAULT_NA_VALUES if missing_values is None else missing_values
+    declared, excluded = _contract_settings(workspace_id, dataset_name)
+    if missing_values is not None:
+        tokens = missing_values
+    elif declared is not None:
+        tokens = declared
+    else:
+        tokens = DEFAULT_NA_VALUES
 
     ro = connect_read_only(workspace_id)
     try:
         if not _table_exists(ro, dataset_name):
             return _not_loaded(ro, dataset_name)
-        actions = detect.detect(
-            ro, source=dataset_name, target=dataset_name, missing_tokens=tokens
-        )
+        actions = [
+            a for a in detect.detect(
+                ro, source=dataset_name, target=dataset_name,
+                missing_tokens=tokens,
+            )
+            if a.column not in excluded
+        ]
         rows = ro.execute(
             f'SELECT count(*) FROM "{dataset_name}"'
         ).fetchone()[0]
@@ -169,8 +233,14 @@ def propose_cleaning_plan(
         ro.close()
 
     if not actions:
+        held = (
+            f" {len(excluded)} column(s) are excluded by the contract and were "
+            f"not looked at: {', '.join(excluded)}."
+            if excluded
+            else ""
+        )
         return (
-            f"Nothing to clean in {dataset_name}. {rows:,} row(s), no exact "
+            f"Nothing to clean in {dataset_name}.{held} {rows:,} row(s), no exact "
             f"duplicates, no declared missing tokens, no padding, no case "
             f"variants, and every column already reads as the type it holds.\n\n"
             f"NEXT STEP: call profile_dataset(dataset_name=\"{dataset_name}\") "
@@ -228,9 +298,15 @@ def propose_cleaning_plan(
             f"approved_action_ids=[...]) with the ids you want. Nothing here "
             f"is free of loss, so there is no set worth suggesting."
         )
+    excluded_note = (
+        f"\n{len(excluded)} column(s) are excluded by the contract and were not "
+        f"looked at: {', '.join(excluded)}.\n"
+        if excluded
+        else ""
+    )
     return (
         f"{len(stored.actions)} change(s) proposed for {dataset_name} "
-        f"({rows:,} row(s)). Nothing has been changed.\n\n"
+        f"({rows:,} row(s)). Nothing has been changed.{excluded_note}\n\n"
         f"{lines}\n{warning}\n"
         f"Approve by id, in the order you want them run. Anything you do not "
         f"name is not run.\n\n"
@@ -275,7 +351,8 @@ def apply_cleaning_plan(
                 state=", ".join(a.action_id for a in stored.actions),
                 next_call=(
                     f'apply_cleaning_plan(dataset_name="{dataset_name}", '
-                    f'approved_action_ids=["{stored.actions[0].action_id}"])'
+                    f'approved_action_ids='
+                    f'["{_next_call_id(stored.actions)}"])'
                 ),
             ).to_text()
 
@@ -300,7 +377,8 @@ def apply_cleaning_plan(
                 state="approved: " + ", ".join(a.action_id for a in found),
                 next_call=(
                     f'apply_cleaning_plan(dataset_name="{dataset_name}", '
-                    f'approved_action_ids=["{found[0].action_id}"])'
+                    f'approved_action_ids='
+                    f'["{apply_module.first_step(found)}"])'
                 ),
             ).to_text()
 

@@ -241,6 +241,20 @@ class DatasetContract(BaseModel):
     known_exclusions: list[Exclusion] = Field(default_factory=list)
     caveats: list[str] = Field(default_factory=list)
 
+    missing_values: list[str] | None = Field(
+        default=None,
+        description="Strings that mean ABSENT in this dataset. None means use "
+        "the project vocabulary; [] means this dataset has none and every "
+        "such string is a real value. Unset is a DEFAULT, not a gap: it does "
+        "not belong in `unresolved`.",
+    )
+    excluded_columns: list[str] = Field(
+        default_factory=list,
+        description="Columns never to read. Distinct from known_exclusions, "
+        "which is about ROWS. Cleaning does not propose changes to these and "
+        "says it skipped them.",
+    )
+
     bound_to: Binding | None = None
 
     questions: list[str] = Field(

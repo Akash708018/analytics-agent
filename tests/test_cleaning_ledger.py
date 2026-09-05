@@ -417,3 +417,153 @@ def test_the_suggestion_says_why_it_held_one_back(ws):
     text = tools.propose_cleaning_plan(ws, "mixed", missing_values=TOKENS)
     suggestion = text.split("NEXT STEP:")[1]
     assert "records which one disposed of them" in suggestion
+
+
+# --------------------------------------------------------------------------
+# P6-D8: the contract's vocabulary and its excluded columns
+# --------------------------------------------------------------------------
+
+
+class _Stored:
+    """Stands in for StoredContract, which only needs its .contract here."""
+
+    def __init__(self, contract):
+        self.contract = contract
+
+
+class _Declaration:
+    """The two fields clean/tools.py reads off a contract, and nothing else.
+
+    NOT a real DatasetContract, on purpose. The first version of these tests
+    built one, and every one of them failed on a validator this phase had not
+    read: a contract with a blank `grain` must list "grain" in `unresolved`,
+    because "a contract either states what one row is, or says out loud that
+    nobody has yet". Satisfying that would mean inventing a grain for a fixture
+    these tests do not care about, and guessing which OTHER validators fire
+    next.
+
+    So the behaviour tests use this, and one separate test below asserts the
+    real model actually has the two fields with the right defaults -- by
+    reading `model_fields`, which needs no instance and runs no validator.
+    """
+
+    def __init__(self, missing_values=None, excluded_columns=None):
+        self.missing_values = missing_values
+        self.excluded_columns = excluded_columns or []
+
+
+def _confirm(monkeypatch, contract):
+    """Patch the boundary rather than write a contract through the store.
+
+    These tests are about how clean/tools.py USES a contract, not about how one
+    is stored, so they do not depend on confirm()'s signature either.
+    """
+    monkeypatch.setattr(
+        tools.contract_store, "current",
+        lambda con, name: _Stored(contract) if name == "mixed" else None,
+    )
+
+
+def test_the_contract_really_has_the_two_fields(ws):
+    """P6-D8 on the real model, without instantiating it.
+
+    model_fields is class-level: no validators run, so this says what the
+    contract declares rather than what one particular contract passes.
+    """
+    from analytics_agent.contract.dataset_contract import DatasetContract
+    fields = DatasetContract.model_fields
+    assert "missing_values" in fields
+    assert "excluded_columns" in fields
+    assert fields["missing_values"].default is None, (
+        "unset must mean 'use the project vocabulary', not 'no tokens'"
+    )
+    assert fields["excluded_columns"].default_factory() == []
+
+
+def test_with_no_contract_the_project_vocabulary_is_used(ws):
+    text = tools.propose_cleaning_plan(ws, "mixed")
+    assert "NORMALISE_MISSING on region" in text
+
+
+def test_the_contract_vocabulary_is_used_when_no_argument_is_given(ws, monkeypatch):
+    """Level 2 of three. Somebody confirmed it for this dataset."""
+    _confirm(monkeypatch, _Declaration(missing_values=[]))
+    text = tools.propose_cleaning_plan(ws, "mixed")
+    assert "NORMALISE_MISSING" not in text
+
+
+def test_an_explicit_argument_beats_the_contract(ws, monkeypatch):
+    """Level 1. Somebody typed it for this call."""
+    _confirm(monkeypatch, _Declaration(missing_values=[]))
+    text = tools.propose_cleaning_plan(ws, "mixed", missing_values=TOKENS)
+    assert "NORMALISE_MISSING on region" in text
+
+
+def test_an_unset_contract_field_is_a_default_not_a_gap(ws, monkeypatch):
+    """missing_values=None on the contract means "use the project vocabulary",
+    not "no tokens". If it meant a gap the field would belong in `unresolved`,
+    and every contract in the workspace would be unconfirmable the day it was
+    added."""
+    _confirm(monkeypatch, _Declaration(missing_values=None))
+    text = tools.propose_cleaning_plan(ws, "mixed")
+    assert "NORMALISE_MISSING on region" in text
+
+
+def test_an_excluded_column_is_not_proposed_and_the_exclusion_is_stated(ws, monkeypatch):
+    _confirm(monkeypatch, _Declaration(excluded_columns=["region"]))
+    text = tools.propose_cleaning_plan(ws, "mixed")
+    assert "on region" not in text
+    assert "excluded by the contract and were not looked at: region" in text
+
+
+def test_excluding_every_dirty_column_leaves_nothing_to_clean(ws, monkeypatch):
+    _confirm(monkeypatch,
+             _Declaration(excluded_columns=["region", "units", "unit_price"]))
+    text = tools.propose_cleaning_plan(ws, "mixed")
+    assert "Nothing to clean in mixed" in text
+    assert "excluded by the contract" in text
+
+
+def test_the_conflict_refusal_recommends_the_action_its_own_message_names(ws):
+    """The NEXT STEP used to contradict the WHY two lines above it.
+
+    The message says "approve C004 on its own first"; the first version's
+    NEXT STEP then named C003, the conversion, because it used the first
+    approved id in list order. A next_call that disagrees with the refusal it
+    sits under is worse than no next_call.
+    """
+    tools.propose_cleaning_plan(ws, "mixed", missing_values=TOKENS)
+    con = db.connect(ws)
+    try:
+        from analytics_agent.clean.plan import latest
+        actions = latest(con, "mixed").actions
+        units = [a for a in actions if a.column == "units"]
+    finally:
+        con.close()
+    normalise = next(a for a in units
+                     if a.kind is ActionKind.NORMALISE_MISSING)
+    convert = next(a for a in units if a.kind is ActionKind.CONVERT_TYPE)
+
+    text = tools.apply_cleaning_plan(ws, "mixed", [a.action_id for a in units])
+    assert reason_of(text) is Reason.ACTIONS_CONFLICT
+    next_step = text.split("NEXT STEP:")[1]
+    assert f'["{normalise.action_id}"]' in next_step
+    assert f'["{convert.action_id}"]' not in next_step
+    assert f"Approve {normalise.action_id} on its own first" in text
+
+
+def test_the_nothing_approved_refusal_does_not_recommend_a_lossy_action(ws):
+    """Same rule, different refusal. It used actions[0]."""
+    tools.propose_cleaning_plan(ws, "mixed", missing_values=[])
+    con = db.connect(ws)
+    try:
+        from analytics_agent.clean.plan import latest
+        lossy = {a.action_id for a in latest(con, "mixed").actions if a.is_lossy}
+    finally:
+        con.close()
+    assert lossy, "the fixture no longer has a lossy action"
+    text = tools.apply_cleaning_plan(ws, "mixed", [])
+    assert reason_of(text) is Reason.NOTHING_APPROVED
+    next_step = text.split("NEXT STEP:")[1]
+    for action_id in lossy:
+        assert f'["{action_id}"]' not in next_step

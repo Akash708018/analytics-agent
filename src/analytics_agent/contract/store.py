@@ -99,8 +99,16 @@ class StoredContract:
 # `confirmed_at` are written by the store, so they always differ and would
 # swamp the answer.
 _TRACKED = (
-    "grain", "primary_key", "date_column", "analysis_window", "dimensions",
-    "known_exclusions", "caveats", "bound_to",
+    "grain",
+    "primary_key",
+    "date_column",
+    "analysis_window",
+    "dimensions",
+    "known_exclusions",
+    "caveats",
+    "bound_to",
+    "missing_values",
+    "excluded_columns",
 )
 
 

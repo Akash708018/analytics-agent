@@ -1886,3 +1886,26 @@ Machine-local and implementation choices that are easy to forget six months late
   explaining the deferral names it. It now checks the approved_action_ids
   bracket specifically and separately asserts the id IS in the prose. Getting
   that wrong first time is the same confusion the sentence exists to prevent.
+
+## Phase 6, Step 9b — every NEXT STEP must agree with its own message
+
+- THE CONFLICT REFUSAL'S WORDING WAS RIGHT AND ITS NEXT STEP CONTRADICTED IT.
+  The WHY says "approve C004 on its own first"; the NEXT STEP named C003, the
+  conversion, because it used found[0] -- the first approved id in list order.
+  An agent that reads the refusal and follows its call does the OPPOSITE of
+  what the refusal asked, and has no reason to doubt it. Worse than no
+  next_call.
+- P6-D12 ONE LEVEL DOWN, found twice in two steps, which is the useful part.
+  Refusal.__post_init__ already checks a next_call is A CALL (it looks for
+  parentheses) and nothing checks it is the RIGHT call. So this step swept all
+  five refusals in the module rather than fixing the one that showed.
+- TWO OF FIVE WERE WRONG. ACTIONS_CONFLICT named the conversion.
+  NOTHING_APPROVED used actions[0], which on a plan whose first action is lossy
+  would recommend the discard -- it had not misbehaved yet only because this
+  fixture's first action is lossless.
+- first_step() COMPUTES THE RECOMMENDATION THE SAME WAY THE MESSAGE IS BUILT,
+  not by position: the action that is not the type change on the contested
+  column. A message and its call derived from one rule cannot disagree -- the
+  same argument clean/sql.py makes about a count and a statement built from one
+  expression. _next_call_id() reuses _safe_suggestion so there is one
+  definition of "safe to recommend" rather than two.
