@@ -1588,3 +1588,44 @@ Machine-local and implementation choices that are easy to forget six months late
   column is not the wrong type, it is a MIXED column, and merging two meanings
   is a decision no threshold should make. The fixture sits far above it
   (5,993/6,000 and 5,997/6,000), so the number is not tuned to pass it.
+
+## Phase 6, Step 6 — clean/apply.py
+
+- P6-D1 DECIDED: clean forward under the same name, previous contents kept as
+  _agent_history_<name>_v<N>. Asked four times and not answered, so decided on
+  the evidence and built so overruling costs one function (history_table and
+  next_version; the apply loop never sees a name it did not get from them).
+  The evidence: db.user_tables filters `NOT LIKE '\_%'` IN SQL and
+  state._loadable_tables filters the underscore again, so the snapshot is
+  already hidden without a new filter; _agent_datasets has dataset_name as its
+  PRIMARY KEY with no version column, so sales_v2 would be a second row for one
+  dataset or a table reported as "unknown - not created by a loader"; the
+  contract and the profile stay bound to the name they were written against;
+  and both tables sit on disk, so before/after is evidence rather than a ledger
+  line describing one.
+- THE COST OF THAT, PAID HERE RATHER THAN PROMISED AGAIN: those snapshots are
+  invisible to every tool going through user_tables, and run_sql is Phase 8. A
+  before-table nobody can open is not evidence, so history_tables() and
+  read_history() are part of this module.
+- P6-D11 DECIDED: a CONVERT_TYPE claims its column. conflicts() refuses the
+  combination and NAMES which to drop, rather than detection silently never
+  offering it. The rule is about TYPE CHANGES, not columns -- trim then
+  case-fold on one column is two text functions on a VARCHAR in order, both
+  survive, and there is a test asserting they are allowed.
+- DUCKDB'S DDL IS TRANSACTIONAL, measured: CREATE OR REPLACE inside a
+  transaction rolls back, and a table created inside one disappears. So a
+  failing action leaves the dataset EXACTLY as it was and the rollback takes
+  the snapshot with it -- no half-cleaned table, no orphan snapshot describing
+  a clean that never happened. conflicts() is still the better guard, because
+  being told which id to drop beats a rollback that says nothing; the
+  transaction is what makes the failure survivable when the guard misses, which
+  it will, because it knows about one interaction and there will be others.
+- EVERY STATEMENT MUST WRITE TO THE DATASET IT WAS PROPOSED FOR. A stored plan
+  is data, and data naming its own write target is checked against the target
+  the caller asked for rather than trusted. apply refuses anything not
+  beginning CREATE OR REPLACE TABLE "<dataset>" AS.
+- _agent_datasets IS DELIBERATELY NOT REWRITTEN. register_dataset REPLACES the
+  row and resets loaded_at, which would make a cleaned dataset look freshly
+  loaded and erase where it came from. Row counts there go stale for a cleaned
+  dataset; state.dataset_states reads shape from db.table_shape live, so the
+  listing stays correct. A choice, not an oversight.
