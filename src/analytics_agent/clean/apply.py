@@ -38,6 +38,14 @@ it was rather than half-cleaned. `conflicts()` is still the better guard --
 being told which id to drop beats a rollback that says nothing -- but the
 rollback is what makes the failure survivable when the guard misses.
 
+**The ledger is written inside the same transaction.** A ledger written after
+the commit can still fail after it, leaving a clean nobody recorded; written
+before a rollback it records a clean that never happened. A row in the same
+transaction cannot disagree with the tables it describes. That is why
+`clean/ledger.py` is a table and not the JSONL file the build guide asks for,
+and why `apply` takes a `plan_id` -- a ledger entry that cannot name the plan
+its action came from is a change with no provenance.
+
 **`_agent_datasets` is deliberately not rewritten.** `register_dataset` REPLACES
 the row and resets `loaded_at`, which would make a cleaned dataset look freshly
 loaded and erase where it came from. Row counts in that table go stale for a
@@ -49,7 +57,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from datetime import datetime
+
 from ..profile.runs import BOOKKEEPING_PREFIX
+from . import ledger
 from .plan import ActionKind, CleaningAction
 from .sql import ident
 
@@ -166,7 +177,12 @@ def _rows(con, table: str) -> int:
 
 
 def apply(
-    con, *, dataset_name: str, actions: list[CleaningAction]
+    con,
+    *,
+    dataset_name: str,
+    actions: list[CleaningAction],
+    plan_id: str = "(none)",
+    now: datetime | None = None,
 ) -> ApplyResult:
     """Snapshot, then run every approved action in order, in one transaction.
 
@@ -195,6 +211,12 @@ def apply(
     version = next_version(con, dataset_name)
     snapshot = history_table(dataset_name, version)
     before = _rows(con, dataset_name)
+    applied_at = now or datetime.now()
+
+    # Outside the transaction on purpose: CREATE TABLE IF NOT EXISTS inside one
+    # would roll back with everything else, and the ledger's own existence is
+    # not part of what an apply is allowed to undo.
+    ledger.ensure_table(con)
 
     con.execute("BEGIN TRANSACTION")
     try:
@@ -205,13 +227,27 @@ def apply(
         for a in actions:
             rows_before = _rows(con, dataset_name)
             con.execute(a.sql)
+            rows_after = _rows(con, dataset_name)
+            ledger.record_action(
+                con,
+                applied_at=applied_at,
+                dataset_name=dataset_name,
+                plan_id=plan_id,
+                action_id=a.action_id,
+                kind=a.kind.value,
+                column=a.column,
+                rows_before=rows_before,
+                rows_after=rows_after,
+                history_table=snapshot,
+                statement=a.sql,
+            )
             applied.append(
                 AppliedAction(
                     action_id=a.action_id,
                     kind=a.kind,
                     column=a.column,
                     rows_before=rows_before,
-                    rows_after=_rows(con, dataset_name),
+                    rows_after=rows_after,
                     statement=a.sql,
                 )
             )

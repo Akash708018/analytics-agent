@@ -77,6 +77,7 @@ from .ingest import csv_loader, draft, excel, postgres, sizegate, merges
 from .ingest.csv_loader import LoadRefused
 from .contract import tools as contract_tools
 from .profile import tools as profile_tools
+from .clean import tools as clean_tools
 
 mcp = FastMCP(SERVER_NAME)
 
@@ -796,6 +797,70 @@ def read_result_file(
 
 def main() -> None:
     mcp.run()
+
+
+@mcp.tool(annotations=READ_ONLY)
+def propose_cleaning_plan(
+    dataset_name: str,
+    missing_values: list[str] | None = None,
+    workspace_id: str | None = None,
+) -> str:
+    """Propose changes to a loaded table. Changes nothing.
+
+    Reads the table on a connection that cannot write, lists every change it
+    could make with the exact SQL and the exact counts, and stores the list so
+    the ids mean something. Nothing here is applied.
+
+    Every proposal that would discard a value says so, with a sample. A value
+    that already means missing costs nothing to convert; anything else is
+    information, and losing it is a decision you make by approving it.
+
+    Approve with apply_cleaning_plan(approved_action_ids=[...]). Anything you
+    do not name is not run.
+    """
+    wid = workspace_id or DEFAULT_WORKSPACE_ID
+    return clean_tools.propose_cleaning_plan(
+        wid, dataset_name, missing_values=missing_values
+    )
+
+
+@mcp.tool
+def apply_cleaning_plan(
+    dataset_name: str,
+    approved_action_ids: list[str],
+    workspace_id: str | None = None,
+) -> str:
+    """Run exactly the approved changes on a loaded table, or none of them.
+
+    Takes ids from the most recent propose_cleaning_plan. An id that is not in
+    that plan refuses the whole call rather than running the rest. If the table
+    has changed since the plan was made, this refuses and asks for a new
+    proposal -- the plan is old, not wrong.
+
+    The table keeps its name and its previous contents are kept alongside it,
+    so what was there before an approved change is still readable afterwards.
+
+    All of the approved changes are applied or none of them are.
+    """
+    wid = workspace_id or DEFAULT_WORKSPACE_ID
+    return clean_tools.apply_cleaning_plan(
+        wid, dataset_name, approved_action_ids
+    )
+
+
+@mcp.tool(annotations=READ_ONLY)
+def get_cleaning_ledger(
+    dataset_name: str | None = None,
+    workspace_id: str | None = None,
+) -> str:
+    """List every cleaning change that has actually run, newest first.
+
+    One line per applied action, each naming the table that holds the data as
+    it was before that action. Nothing appears here that was not approved by
+    id. Omit dataset_name for every dataset in this workspace.
+    """
+    wid = workspace_id or DEFAULT_WORKSPACE_ID
+    return clean_tools.get_cleaning_ledger(wid, dataset_name)
 
 
 if __name__ == "__main__":

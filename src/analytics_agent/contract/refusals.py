@@ -55,6 +55,17 @@ class Reason(str, Enum):
     # a column was named and the loaded table does not have it.
     COLUMN_NOT_FOUND = "COLUMN_NOT_FOUND"
 
+    # cleaning: an id was approved and there is no plan it could have come from.
+    NO_CLEANING_PLAN = "NO_CLEANING_PLAN"
+    # cleaning: the table moved since the plan was made. Old, not wrong.
+    CLEANING_PLAN_STALE = "CLEANING_PLAN_STALE"
+    # cleaning: apply was called with an empty approval list.
+    NOTHING_APPROVED = "NOTHING_APPROVED"
+    # cleaning: an approved id is not in the plan. Refuses the whole call.
+    ACTION_NOT_IN_PLAN = "ACTION_NOT_IN_PLAN"
+    # cleaning: two approved actions cannot both run, in the order given.
+    ACTIONS_CONFLICT = "ACTIONS_CONFLICT"
+
 
 _REASON_LINE = re.compile(r"^reason:\s*([A-Z_]+)\s*$", re.M)
 
