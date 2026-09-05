@@ -78,10 +78,18 @@ class CleaningAction:
     is not declared -- it says a price was withheld rather than merely absent,
     and converting it destroys the only record of the difference.
 
-    So `values_lost` counts UNDECLARED values that will become NULL, and it is
-    not allowed to be non-zero without a sample. That is checked here rather
-    than remembered, because a rule enforced by a docstring is a rule until
-    somebody is in a hurry.
+    So `values_lost` counts what an action destroys that was not already
+    declared absent, and it is not allowed to be non-zero without a sample.
+    Checked here rather than remembered, because a rule enforced by a docstring
+    is a rule until somebody is in a hurry.
+
+    `loss_unit` names WHAT is destroyed, because "becomes NULL" is only true
+    for a type conversion. Case folding nulls nothing and still loses
+    something: 'North' and 'north' merge and the record that the source wrote
+    them differently is gone, so its unit is "distinct value". Dropping exact
+    duplicates destroys multiplicity, so its unit is "row". P6-D10, found by
+    writing clean/sql.py and fixed here rather than left as wording that is
+    right a quarter of the time.
     """
 
     action_id: str
@@ -91,6 +99,7 @@ class CleaningAction:
     column: str | None = None
     rows_affected: int = 0
     values_lost: int = 0
+    loss_unit: str = "value"
     sample: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
@@ -115,12 +124,12 @@ class CleaningAction:
         head = f"{self.action_id}  {self.kind.value}{where}: {self.intent}"
         if not self.is_lossy:
             return f"{head} ({self.rows_affected:,} row(s))"
-        shown = ", ".join(repr(s) for s in self.sample[:3])
+        shown = ", ".join(repr(s) for s in self.sample[:3]) or "no sample"
         return (
             f"{head} ({self.rows_affected:,} row(s)). "
-            f"{self.values_lost:,} value(s) will become NULL and are not "
-            f"declared missing anywhere: {shown}. That is information, not "
-            f"absence -- approve this only if you mean to discard it."
+            f"{self.values_lost:,} {self.loss_unit}(s) will be discarded and "
+            f"are not declared missing anywhere: {shown}. That is information, "
+            f"not absence -- approve this only if you mean to lose it."
         )
 
 
@@ -225,6 +234,7 @@ def ensure_table(con) -> None:
             kind           VARCHAR NOT NULL,
             column_name    VARCHAR,
             intent         VARCHAR NOT NULL,
+            loss_unit      VARCHAR NOT NULL,
             sql_text       VARCHAR NOT NULL,
             rows_affected  BIGINT NOT NULL,
             values_lost    BIGINT NOT NULL,
@@ -263,11 +273,12 @@ def record(
     )
     for a in plan.actions:
         con.execute(
-            f"INSERT INTO {PLAN_TABLE} VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            f"INSERT INTO {PLAN_TABLE} VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             [
                 plan.plan_id, plan.dataset_name, plan.proposed_at,
                 plan.row_count, plan.fingerprint, a.action_id, a.kind.value,
-                a.column, a.intent, a.sql, a.rows_affected, a.values_lost,
+                a.column, a.intent, a.loss_unit, a.sql, a.rows_affected,
+                a.values_lost,
                 _SAMPLE_SEP.join(a.sample) if a.sample else None,
             ],
         )
@@ -288,10 +299,11 @@ def _rows_to_plan(rows) -> CleaningPlan:
                 kind=ActionKind(r[6]),
                 column=r[7],
                 intent=r[8],
-                sql=r[9],
-                rows_affected=r[10],
-                values_lost=r[11],
-                sample=tuple(r[12].split(_SAMPLE_SEP)) if r[12] else (),
+                loss_unit=r[9],
+                sql=r[10],
+                rows_affected=r[11],
+                values_lost=r[12],
+                sample=tuple(r[13].split(_SAMPLE_SEP)) if r[13] else (),
             )
             for r in rows
         ),

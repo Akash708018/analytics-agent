@@ -230,6 +230,11 @@ def drop_duplicate_rows(*, source: str, target: str) -> Rendering:
     this table carries. Nothing in the row distinguishes them, which is exactly
     the judgement the profiler declines to make and this action must therefore
     state rather than assume.
+
+    The sample shows the duplicated rows as JSON WITH their multiplicity, since
+    the count is the thing being destroyed. A first draft returned no sample at
+    all and CleaningAction refused to be constructed from it -- the rule from
+    Step 3 catching a gap in Step 4 without anybody looking for it.
     """
     src = ident(source)
     expression = "DISTINCT *"
@@ -244,7 +249,11 @@ def drop_duplicate_rows(*, source: str, target: str) -> Rendering:
             f"SELECT count(*) - (SELECT count(*) FROM "
             f"(SELECT {expression} FROM {src})) FROM {src}"
         ),
-        sample_sql=None,
+        sample_sql=(
+            f"SELECT to_json(d)::VARCHAR FROM (SELECT *, count(*) AS "
+            f"duplicate_count FROM {src} GROUP BY ALL HAVING count(*) > 1) d "
+            f"LIMIT {SAMPLE_LIMIT}"
+        ),
     )
 
 

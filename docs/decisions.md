@@ -1529,3 +1529,62 @@ Machine-local and implementation choices that are easy to forget six months late
   The proposal path builds a binding and reads the property rather than hashing
   a column list a second way. Binding.from_pairs' full signature is still
   unread -- Step 5 opens with inspect.signature on it.
+
+## Phase 6, Step 5 — clean/detect.py
+
+- P6-D5 RESOLVED BY P6-D2, not by preference. Detection cannot read a
+  TableProfile: profile_dataset records a run in _agent_profiles, and the
+  proposal path holds the workspace through ATTACH (READ_ONLY), which refuses
+  INSERT and CREATE by statement type. A read-only path cannot invoke a tool
+  that writes. Detection reads for itself and everything it reads is a SELECT
+  -- which is better anyway, because a profile from forty minutes ago describes
+  the table as it WAS and a proposal must describe it as it IS.
+- THREE GUARDS, EACH AGAINST MEASURED DUCKDB BEHAVIOUR. Each has a test that
+  asserts the behaviour first and the guard second, so the guard cannot be
+  tidied away by someone who does not know why it is there.
+    * TRY_CAST('9.50' AS BIGINT) is 10. A price column parses 100% as BIGINT
+      and rounds every value. BIGINT is only proposed when
+      count(*) WHERE TRY_CAST(c AS DOUBLE) <> TRY_CAST(c AS BIGINT) is 0.
+      Phase 5 had already WRITTEN DOWN that TRY_CAST rounds 4.5 to 5, and it
+      still nearly went into a detector. A note without a test is worth this.
+    * TRY_CAST('1' AS BOOLEAN) is TRUE. An integer column of 1s and 0s parses
+      perfectly as boolean, and proposing it would turn counts into flags.
+      BOOLEAN requires the literal words TRUE/FALSE.
+    * TRY_CAST makes a DATE from a timestamp string and drops the time.
+      TIMESTAMP by default; DATE only when every value is already midnight.
+    * Fourth, smaller: DECIMAL(18,2) over DOUBLE wherever every value survives
+      exactly. Money in a DOUBLE is how a total ends in .9999999999998.
+- P6-D10 FIXED: CleaningAction carries loss_unit. "1 distinct value(s) will be
+  discarded" for a case fold, "2 row(s)" for a de-duplication, "value" for a
+  conversion.
+- STEP 3'S RULE CAUGHT A GAP IN STEP 4 DURING STEP 5, unlooked for.
+  drop_duplicate_rows returned sample_sql=None; detection built an action with
+  values_lost=2 and __post_init__ refused it -- "an action that cannot show
+  what it destroys is not a proposal". The fix is a real sample: the duplicated
+  rows as JSON WITH their multiplicity, since the count is what is destroyed.
+- EXCLUDE_COLUMN IS NEVER DETECTED. A column that is entirely null may be the
+  one that matters with a broken feed. Nothing in a table's contents can
+  suggest dropping it; it comes from the contract (P6-D8) or a person.
+- IDS ARE STABLE: table-level first, then columns in ordinal order, asserted
+  across two runs. An id that moves between proposals is an id nobody can
+  approve.
+- P6-D11 OPEN, found by running detection on the real fixture. Detection
+  produced SIX actions, not the five Step 2 predicted, and the sixth is the
+  problem: C003 converts units to BIGINT and C004 normalises the same seven
+  'n/a' values in units. One decision, two actions, because each rule fires on
+  its own terms. Approving both is redundant at best; under P6-D9 each action
+  is a separate statement against the previous table, so C004 meets a BIGINT
+  column and MEASURED: "BinderException: No function matches the given name and
+  argument types 'trim(BIGINT)'" -- after C003 has already rebuilt the table.
+  The failure lands MID-APPLY. Step 6 picks between: detection not offering
+  NORMALISE_MISSING on a column it also offers CONVERT_TYPE for; the plan
+  recording the subsumption and the tool refusing the combination by name; or
+  apply re-rendering against the table as it stands, which is OUT because the
+  SQL shown would stop being the SQL run.
+- Detection found NO whitespace and NO case actions on mixed_types, agreeing
+  with Step 2's independent count of zero padded values and zero case variants.
+  Two measurements of one fixture agreeing is worth more than either alone.
+- CONVERT_MIN_SHARE = 0.90, and it is a judgement stated as one. Below that a
+  column is not the wrong type, it is a MIXED column, and merging two meanings
+  is a decision no threshold should make. The fixture sits far above it
+  (5,993/6,000 and 5,997/6,000), so the number is not tuned to pass it.

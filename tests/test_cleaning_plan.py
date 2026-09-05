@@ -99,9 +99,29 @@ def test_a_lossless_action_needs_no_sample():
 def test_the_line_states_the_loss_and_names_it_as_information():
     a = convert(values_lost=3, sample=("not priced", "not priced"))
     line = a.line()
-    assert "3 value(s) will become NULL" in line
+    assert "3 value(s) will be discarded" in line
     assert "not declared missing" in line
     assert "information, not" in line
+
+
+def test_the_loss_unit_is_named_rather_than_assumed_to_be_null():
+    """P6-D10. Case folding nulls nothing and still destroys something, so the
+    sentence cannot say "becomes NULL" for every kind."""
+    merged = CleaningAction(
+        action_id="C004", kind=ActionKind.NORMALISE_CASE, column="region",
+        intent="fold region to upper case",
+        sql="SELECT * REPLACE (upper(region) AS region) FROM t",
+        rows_affected=2, values_lost=1, loss_unit="distinct value",
+        sample=("North", "north"),
+    )
+    assert "1 distinct value(s) will be discarded" in merged.line()
+    assert "NULL" not in merged.line()
+
+
+def test_the_loss_unit_survives_storage(con):
+    record(con, dataset_name="mixed", row_count=6, fingerprint=FP,
+           actions=[convert(values_lost=1, loss_unit="row", sample=("x",))])
+    assert latest(con, "mixed").actions[0].loss_unit == "row"
 
 
 def test_a_lossless_line_does_not_threaten():
