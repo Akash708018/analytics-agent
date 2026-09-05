@@ -60,6 +60,15 @@ class LedgerEntry:
         return self.rows_before - self.rows_after
 
     def line(self) -> str:
+        """One entry, with the plan its id belongs to.
+
+        Action ids are per-plan by design -- C001 is meant to be read off a
+        screen and typed back, which rules out a uuid -- and that is right for
+        approval and wrong for a permanent record. Step 7's live run found C002
+        and C004 each appearing twice in one ledger meaning different actions,
+        disambiguated only by the history table name. The plan id was already
+        stored; it just was not printed.
+        """
         where = f" on {self.column}" if self.column else ""
         stamp = self.applied_at.strftime("%Y-%m-%d %H:%M")
         change = (
@@ -68,7 +77,7 @@ class LedgerEntry:
             else f"{self.rows_after:,} row(s), unchanged in count"
         )
         return (
-            f"{stamp}  {self.dataset_name}  {self.action_id} "
+            f"{stamp}  {self.dataset_name}  {self.action_id}/{self.plan_id[:6]} "
             f"{self.kind}{where}: {change}. Before: {self.history_table}"
         )
 

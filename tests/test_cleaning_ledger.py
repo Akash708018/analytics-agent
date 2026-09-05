@@ -313,3 +313,107 @@ def test_a_clean_table_proposes_nothing_and_says_so(ws):
     text = tools.propose_cleaning_plan(ws, "tidy", missing_values=TOKENS)
     assert "Nothing to clean in tidy" in text
     assert reason_of(text) is None
+
+
+# --------------------------------------------------------------------------
+# Step 8: the four things the live run found
+# --------------------------------------------------------------------------
+
+
+def test_the_suggested_call_excludes_the_lossy_action(ws):
+    """Step 7's run watched the first-three slice land on the one action
+    carrying a discard warning, one apply later, after the ids renumbered."""
+    text = tools.propose_cleaning_plan(ws, "mixed", missing_values=TOKENS)
+    con = db.connect(ws)
+    try:
+        from analytics_agent.clean.plan import latest
+        lossy = [a.action_id for a in latest(con, "mixed").actions if a.is_lossy]
+    finally:
+        con.close()
+    assert lossy, "the fixture no longer has a lossy action to exclude"
+    suggestion = text.split("NEXT STEP:")[1]
+    for action_id in lossy:
+        assert action_id not in suggestion
+
+
+def test_the_suggested_call_is_one_the_tool_would_accept(ws):
+    """A suggestion the tool refuses is worse than no suggestion."""
+    text = tools.propose_cleaning_plan(ws, "mixed", missing_values=TOKENS)
+    suggestion = text.split("NEXT STEP:")[1]
+    ids = [p.strip(' "') for p in
+           suggestion.split("approved_action_ids=[")[1].split("]")[0].split(",")]
+    applied = tools.apply_cleaning_plan(ws, "mixed", ids)
+    assert reason_of(applied) is None, applied[:200]
+
+
+def test_the_ledger_line_names_the_plan_an_id_belongs_to(ws):
+    """Per-plan ids are right for approval and wrong for a permanent record."""
+    tools.propose_cleaning_plan(ws, "mixed", missing_values=TOKENS)
+    con = db.connect(ws)
+    try:
+        from analytics_agent.clean.plan import latest
+        stored = latest(con, "mixed")
+        first = stored.actions[0].action_id
+    finally:
+        con.close()
+    tools.apply_cleaning_plan(ws, "mixed", [first])
+    con = db.connect(ws)
+    try:
+        entry = ledger.entries(con, "mixed")[0]
+        assert f"{first}/{entry.plan_id[:6]}" in entry.line()
+    finally:
+        con.close()
+
+
+def test_approved_ids_are_applied_in_the_order_given(con):
+    """Not plan order. An agent could not tell which it was and forced it with
+    two calls rather than assume."""
+    actions = proposals(con)
+    a = pick(actions, ActionKind.TRIM_WHITESPACE, "region")
+    b = pick(actions, ActionKind.NORMALISE_CASE, "region")
+    result = ap.apply(con, dataset_name="mixed", actions=[b, a], plan_id="p1")
+    assert [x.action_id for x in result.applied] == [b.action_id, a.action_id]
+
+
+def test_the_suggestion_does_not_pre_empt_a_normalisation_with_a_conversion(ws):
+    """The filter the first attempt at P6-D12 missed.
+
+    conflicts() only fires when a conversion and a normalisation on one column
+    are in the SAME call. Suggesting the conversion alone passes every check
+    and still disposes of the declared tokens by cast rather than by a step
+    somebody named -- which is exactly what this module's own refusal tells you
+    to avoid. A suggestion that contradicts the refusal is not a smaller bug
+    than one that gets refused.
+    """
+    text = tools.propose_cleaning_plan(ws, "mixed", missing_values=TOKENS)
+    con = db.connect(ws)
+    try:
+        from analytics_agent.clean.plan import latest
+        actions = latest(con, "mixed").actions
+    finally:
+        con.close()
+
+    normalised = {a.column for a in actions
+                  if a.kind is ActionKind.NORMALISE_MISSING}
+    pre_empting = [a.action_id for a in actions
+                   if a.kind is ActionKind.CONVERT_TYPE
+                   and a.column in normalised]
+    assert pre_empting, "the fixture no longer has a column with both"
+
+    suggestion = text.split("NEXT STEP:")[1]
+    approved = suggestion.split("approved_action_ids=[")[1].split("]")[0]
+    for action_id in pre_empting:
+        assert action_id not in approved
+        # named in the prose, though: deferred is not the same as excluded, and
+        # a list of ids cannot tell you which one it was.
+        assert action_id in suggestion
+    assert "left for the next round on purpose" in suggestion
+
+
+def test_the_suggestion_says_why_it_held_one_back(ws):
+    """Excluded and deferred look identical in a list of ids. They are not the
+    same thing, and the difference is the whole argument for the two-call
+    order."""
+    text = tools.propose_cleaning_plan(ws, "mixed", missing_values=TOKENS)
+    suggestion = text.split("NEXT STEP:")[1]
+    assert "records which one disposed of them" in suggestion

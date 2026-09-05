@@ -22,6 +22,17 @@ touches only `_agent_cleaning_plans`.
 `approved_action_ids`, resolves them against the latest stored plan, refuses on
 staleness before refusing on anything else, and refuses again if the approved
 set conflicts. An id that was not approved leaves no trace.
+
+**Approved ids are applied in the order given**, not in plan order. Step 7's
+live run found an agent unable to tell which it was, so it forced the order with
+two calls rather than assume -- reasonable, and it should not have had to. The
+docstrings say so now.
+
+**The suggested call is one the tool would accept.** `NEXT STEP` used to slice
+the first three ids, and Step 7's run watched that slice land on the one action
+carrying a discard warning, one apply later, after the ids renumbered. It now
+offers only actions that are neither lossy nor in conflict with each other, and
+says that is what it is offering.
 """
 
 from __future__ import annotations
@@ -35,6 +46,7 @@ from .. import workspace
 from ..util import db
 from . import apply as apply_module
 from . import detect, ledger, plan
+from .plan import ActionKind
 
 
 def connect_read_only(workspace_id: str):
@@ -94,6 +106,46 @@ def _not_loaded(con, dataset_name: str) -> str:
     ).to_text()
 
 
+def _safe_suggestion(actions, limit: int = 3):
+    """Actions worth suggesting: lossless, compatible, and in the right order.
+
+    Three filters, and the third was missed on the first attempt.
+
+    1. Nothing lossy. A suggestion that includes the action the same message
+       just warned about is worse than no suggestion.
+    2. Nothing that conflicts with what is already picked, checked with the
+       same `conflicts()` that would refuse it. A suggestion the tool would
+       refuse is worse than no suggestion.
+    3. **No conversion on a column that also has a normalisation waiting.**
+       This is the one that slipped through, because `conflicts()` only fires
+       when both are in the SAME call. Suggesting the conversion alone passes
+       every check and still produces the worse outcome: the declared tokens
+       are disposed of by the cast rather than by a step somebody named, which
+       is precisely what this module's own refusal tells you to avoid. A
+       suggestion that contradicts the refusal is not a smaller bug than a
+       suggestion that gets refused.
+
+    So the normalisation is offered first and the conversion comes round on the
+    next proposal, which is the order the refusal recommends.
+    """
+    deferred = {
+        a.column for a in actions
+        if a.kind is ActionKind.NORMALISE_MISSING and a.column
+    }
+    picked = []
+    for a in actions:
+        if a.is_lossy:
+            continue
+        if a.kind is ActionKind.CONVERT_TYPE and a.column in deferred:
+            continue
+        if apply_module.conflicts(picked + [a]):
+            continue
+        picked.append(a)
+        if len(picked) == limit:
+            break
+    return picked
+
+
 def propose_cleaning_plan(
     workspace_id: str,
     dataset_name: str,
@@ -146,21 +198,50 @@ def propose_cleaning_plan(
         if lossy
         else ""
     )
-    ids = ", ".join(f'"{a.action_id}"' for a in stored.actions[:3])
+    suggested = _safe_suggestion(stored.actions)
+    if suggested:
+        ids = ", ".join(f'"{a.action_id}"' for a in suggested)
+        held = [
+            a.action_id for a in stored.actions
+            if a.kind is ActionKind.CONVERT_TYPE and a.column in {
+                x.column for x in stored.actions
+                if x.kind is ActionKind.NORMALISE_MISSING
+            }
+        ]
+        because = (
+            f" {', '.join(held)} is left for the next round on purpose: "
+            f"converting that column would dispose of its declared missing "
+            f"tokens as part of the cast, and doing it in two steps records "
+            f"which one disposed of them."
+            if held
+            else ""
+        )
+        nudge = (
+            f"NEXT STEP: call apply_cleaning_plan(dataset_name=\"{dataset_name}\", "
+            f"approved_action_ids=[{ids}]) — these discard nothing and can run "
+            f"together.{because} Any of the others are yours to add by id."
+        )
+    else:
+        nudge = (
+            f"NEXT STEP: read the lines above and call "
+            f"apply_cleaning_plan(dataset_name=\"{dataset_name}\", "
+            f"approved_action_ids=[...]) with the ids you want. Nothing here "
+            f"is free of loss, so there is no set worth suggesting."
+        )
     return (
         f"{len(stored.actions)} change(s) proposed for {dataset_name} "
         f"({rows:,} row(s)). Nothing has been changed.\n\n"
         f"{lines}\n{warning}\n"
-        f"Approve by id. Anything you do not name is not run.\n\n"
-        f"NEXT STEP: call apply_cleaning_plan(dataset_name=\"{dataset_name}\", "
-        f"approved_action_ids=[{ids}]) with the ids you want."
+        f"Approve by id, in the order you want them run. Anything you do not "
+        f"name is not run.\n\n"
+        f"{nudge}"
     )
 
 
 def apply_cleaning_plan(
     workspace_id: str, dataset_name: str, approved_action_ids: list[str]
 ) -> str:
-    """Run exactly the approved ids, or refuse and change nothing."""
+    """Run exactly the approved ids, in the order given, or change nothing."""
     con = db.connect(workspace_id)
     try:
         if not _table_exists(con, dataset_name):

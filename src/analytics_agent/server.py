@@ -833,9 +833,10 @@ def apply_cleaning_plan(
     """Run exactly the approved changes on a loaded table, or none of them.
 
     Takes ids from the most recent propose_cleaning_plan. An id that is not in
-    that plan refuses the whole call rather than running the rest. If the table
-    has changed since the plan was made, this refuses and asks for a new
-    proposal -- the plan is old, not wrong.
+    that plan refuses the whole call rather than running the rest. The ids are
+    applied in the order you give them, not in the order they were proposed. If
+    the table has changed since the plan was made, this refuses and asks for a
+    new proposal -- the plan is old, not wrong.
 
     The table keeps its name and its previous contents are kept alongside it,
     so what was there before an approved change is still readable afterwards.

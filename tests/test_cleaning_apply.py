@@ -150,15 +150,22 @@ def test_a_conversion_and_a_missing_normalisation_on_one_column_are_refused(con)
         ap.apply(con, dataset_name="mixed", actions=pair)
 
 
-def test_the_refusal_names_which_one_to_drop(con):
+def test_the_refusal_offers_an_order_rather_than_telling_you_to_drop_one(con):
+    """Step 7's live run is why this changed.
+
+    "Approve one" still disposes of the declared tokens, and the ledger then
+    records them as casualties of a cast rather than as a normalisation
+    somebody named. Two calls end with the same table and a better record, and
+    an agent worked that out unprompted before the refusal said it.
+    """
     actions = proposals(con)
-    pair = [
-        pick(actions, ActionKind.CONVERT_TYPE, "units"),
-        pick(actions, ActionKind.NORMALISE_MISSING, "units"),
-    ]
+    normalise = pick(actions, ActionKind.NORMALISE_MISSING, "units")
+    pair = [pick(actions, ActionKind.CONVERT_TYPE, "units"), normalise]
     message = ap.conflicts(pair)[0]
-    assert "Approve one" in message
-    assert "already turns declared missing tokens into" in message
+    assert f"Approve {normalise.action_id} on its own first" in message
+    assert "propose again" in message
+    assert "same table" in message
+    assert "Approve one" not in message
 
 
 def test_two_text_actions_on_one_column_are_fine(con):

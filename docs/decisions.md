@@ -1861,3 +1861,28 @@ Machine-local and implementation choices that are easy to forget six months late
   it, and DatasetContract's own field list has not been read. Writing a field
   into a validated model nobody has seen is the mistake this phase has logged
   four times. Step 8, after one read.
+
+## Phase 6, Step 8b — P6-D12, properly
+
+- STEP 8'S FIX DID NOT CHANGE THE SUGGESTION. Filtering lossy and mutually
+  conflicting actions still returned ['C001','C002','C003'] on the real
+  fixture -- byte for byte what the broken version produced. It removed the
+  reported symptom (the lossy action) and kept C003, the units conversion,
+  which is the thing this module's OWN REFUSAL tells you not to do first.
+- WHY IT SLIPPED: conflicts() only fires when the conversion and the
+  normalisation are in the SAME call. Suggesting the conversion alone passes
+  every check and still disposes of the seven declared tokens by cast rather
+  than by a step somebody named. A SUGGESTION THAT CONTRADICTS THE REFUSAL IS
+  NOT A SMALLER BUG THAN ONE THAT GETS REFUSED -- it is a quieter one.
+- THIRD FILTER ADDED: no CONVERT_TYPE on a column that also has a
+  NORMALISE_MISSING waiting. Suggestion becomes ['C001','C002','C004'] and the
+  conversion comes round next proposal, which is the order the refusal
+  recommends.
+- DEFERRED IS NOT EXCLUDED, and a list of ids cannot tell you which. C005 is
+  left out because it discards something; C003 because it should run second.
+  The line now names the deferred id and says why.
+- AND A TEST WRITTEN BADLY: the first version asserted the deferred id appeared
+  nowhere before "Any of the others", which failed because the sentence
+  explaining the deferral names it. It now checks the approved_action_ids
+  bracket specifically and separately asserts the id IS in the prose. Getting
+  that wrong first time is the same confusion the sentence exists to prevent.

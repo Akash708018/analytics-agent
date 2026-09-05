@@ -25,11 +25,18 @@ and `read_history()` below are part of this module rather than an afterthought.
 `CONVERT_TYPE on units` and `NORMALISE_MISSING on units` because each rule fires
 on its own terms, and approving both fails: the second meets a BIGINT column and
 DuckDB says `No function matches the given name and argument types
-'trim(BIGINT)'`. So `conflicts()` refuses the combination and names the action
-to drop. Refusing with a reason teaches more than an option that silently never
-appears, and the alternative -- re-rendering each action against the table as it
-stands -- would break the rule the phase is built on: the SQL shown would stop
-being the SQL run.
+'trim(BIGINT)'`. So `conflicts()` refuses the combination.
+
+**It refuses by offering an order, not by telling you to drop one.** The first
+version said "approve one", and Step 7's live run showed why that is worse
+advice than it looks: approving only the conversion still disposes of the seven
+declared tokens, but the ledger records them as casualties of a cast rather than
+as a normalisation somebody named. Two calls -- normalise, re-propose, convert
+-- end with the same table and a record of which step did what. An agent worked
+that out unprompted and the refusal now says it.
+
+The alternative to refusing at all -- re-rendering each action against the table
+as it stands -- stays out, because the SQL shown would stop being the SQL run.
 
 **All or nothing.** DuckDB's DDL is transactional, measured: a
 `CREATE OR REPLACE TABLE` inside a transaction rolls back cleanly, and a table
@@ -135,9 +142,11 @@ def conflicts(actions: list[CleaningAction]) -> list[str]:
                 f"{a.action_id} and {owner.action_id} both change "
                 f"{a.column}. {owner.action_id} reads it as a different type, "
                 f"and {a.action_id} was written against text, so it would fail "
-                f"once {owner.action_id} has run. Approve one: "
-                f"{owner.action_id} already turns declared missing tokens into "
-                f"nulls as part of the conversion."
+                f"once {owner.action_id} has run. Approve {a.action_id} on its "
+                f"own first, then propose again and approve the conversion. "
+                f"Both orders end with the same table; only that one records "
+                f"which step disposed of the values, instead of leaving them "
+                f"as casualties of a cast."
             )
     return out
 
