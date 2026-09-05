@@ -1745,3 +1745,119 @@ Machine-local and implementation choices that are easy to forget six months late
   it, and DatasetContract's own field list has not been read. Writing a field
   into a validated model nobody has seen is the mistake this phase has logged
   four times. Step 8, after one read.
+
+## Phase 6, Step 7 — the ledger and the tools
+
+- P6-D6 DECIDED, BOTH HALVES, and the first half OVERRULES THE BUILD GUIDE.
+  The ledger is a TABLE, not the JSONL the guide asks for, because there is
+  exactly one thing a file cannot do: be written inside the same transaction as
+  the apply. Step 6 measured that DuckDB rolls DDL back. A ledger written after
+  the commit can fail after it, leaving a clean nobody recorded; written before
+  a rollback it records a clean that never happened. A row in the same
+  transaction cannot disagree with the tables it describes, and a test rolls an
+  apply back and asserts the ledger is empty. Durability across workspace.reset
+  is not a counter-argument -- reset is meant to clear the workspace, and a
+  ledger that outlived it would describe tables that are gone.
+- NO ENVELOPE. util/results.py is for results too big to say. A ledger is
+  bounded by the number of approvals, not by the size of the data. describe()
+  returns inline, newest first, capped at 20 with the remainder COUNTED --
+  P5-D3's principle on a different problem.
+- ONE ROW PER ACTION, not per apply. The Done-When is "the ledger shows exactly
+  those 3 with correct counts", which is a statement about actions. An
+  apply-level row would have to summarise, and summarising is where a count
+  stops being checkable.
+- ACTION_NOT_IN_PLAN REFUSES THE WHOLE CALL. Approving ["C001","C099"] runs
+  nothing. Running the ids it recognised and silently skipping the one it did
+  not is the worst failure this tool has available; a test asserts the ledger
+  stays empty.
+- connect_read_only LIVES IN clean/tools.py, not util/db.py, because db.connect
+  runs CREATE TABLE IF NOT EXISTS on every open and a read-only attach refuses
+  CREATE by statement type. A test asserts the proposal path actually uses it
+  rather than trusting the code above it.
+- FIVE REASON MEMBERS ADDED BY TARGETED EDIT rather than a full re-delivery of
+  refusals.py: the enum was read verbatim, the rest of the file was not, and
+  delivering a whole file seen only in part is worse than an edit whose anchor
+  can be quoted.
+- THE FINGERPRINT IS COMPUTED BY PHASE 4'S CODE. clean/tools._fingerprint reads
+  the column list and calls Binding.from_pairs(pairs, row_count).fingerprint.
+  The alternative was hashing the list here, and two fingerprints of one table
+  that disagree would be worse than a signature mismatch that fails loudly.
+  The signature was PROBED before the file was pasted and from_pairs turned out
+  to require row_count, which a memory-written call would have got wrong --
+  loudly, on the first proposal, after five files had been pasted. The
+  fingerprint is still taken over the columns alone: structure is identity,
+  volume is not, and the binding records both.
+- THE FINGERPRINT CAUGHT A STALE PLAN WITH THE ROW COUNT UNCHANGED, live, in
+  the round trip: 6,000 rows before and after, 819059ecc8eb -> 6070c50fbe3a
+  after three columns changed type. drift_phrase in profile/runs.py returns None
+  whenever current_rows == run.row_count, which is the hole Phase 5's live run
+  found; Step 3 checked the fingerprint FIRST on the argument that structure and
+  volume are different events, and this is that argument being right about
+  something rather than reasoned about.
+- P6-D12 OPEN, found in the round trip's own output. propose_cleaning_plan's
+  NEXT STEP suggests stored.actions[:3] -- the first three ids, whatever they
+  are. On this fixture C001/C002/C003 happen to be compatible; on a table where
+  one column yields both a conversion and a missing-token normalisation early,
+  the first three would contain a conflicting pair and THE TOOL WOULD REFUSE ITS
+  OWN SUGGESTED CALL. Refusal.__post_init__ already enforces that a next_call is
+  a call the agent can make (it checks for parentheses); this is the same
+  principle one level up and unenforced. Second problem in the same line: the
+  slice takes no view on loss, so on another fixture it would nudge toward the
+  action it had just warned about. Fix at Step 8: suggest the first three that
+  are neither lossy nor in conflict, and say so.
+- THE LIVE RUN COVERED IT ON THE SECOND ATTEMPT. The first found no cleaning
+  tool: Desktop's server process predated the registration, and closing a
+  window is not ending a process. The agent declined to substitute a re-load
+  with dtypes -- "that is not cleaning, it is a different ingest, with no
+  version history and no record of what changed" -- which is P6-D1's argument
+  reached by something that has not read it.
+- THE GATE WORKED. Five actions applied, unit_price WITHHELD and left VARCHAR,
+  unprompted. The one action carrying a discard warning is the one that did not
+  run.
+- THE AGENT OUT-DESIGNED THE P6-D11 REFUSAL, and it is right. It split
+  normalisation from conversion into two calls so the seven 'n/a' values would
+  be attributed to a normalisation somebody named rather than to a silent cast:
+  "same end state, different ledger story". conflicts() currently says "approve
+  one", which loses that record. THE REFUSAL SHOULD OFFER THE TWO-CALL ORDER
+  instead. Step 8.
+- AN AMBIGUITY I LEFT IN THE API. The agent could not tell whether
+  approved_action_ids applies in list order or plan order, so it forced the
+  order with two calls rather than assume. It IS list order --
+  CleaningPlan.resolve iterates the ids as given -- and nothing says so.
+  apply_cleaning_plan's docstring should. Step 8.
+- A PERCENTAGE ROUNDS UP THROUGH A FAILURE. The profile printed "100.0% of its
+  6,000 values parse as DOUBLE" on a column where 3 do not: 5,997/6,000 is
+  99.95%, rounded. A reader skimming that concludes the column is clean. Floor
+  rather than round, or clamp to 99.9% when the failure count is non-zero.
+  Phase 5's renderer, and the third display finding against it in two runs.
+- P6-D12 CONFIRMED AND WORSE THAN RECORDED. I wrote that the canned NEXT STEP's
+  first-three slice would put the lossy action inside it on ANOTHER fixture. It
+  happened on THIS one, one apply later: ids renumber between proposals,
+  unit_price moved C005 -> C003, and the suggestion then named it. An agent
+  following the tool's own advice discards 'not priced' believing it took the
+  safe option.
+- P6-D13 OPEN. Ledger ids collide across proposals -- C002 and C004 each appear
+  twice meaning different actions, disambiguated only by the history table
+  name. Per-plan ids are right for approval (C001 is read off a screen and
+  typed back, which rules out a uuid) and wrong for a permanent record. The data
+  is already stored: LedgerEntry.plan_id exists and line() does not print it.
+  Cheap fix, Step 8.
+- TWO PHASE 5 DISPLAY FINDINGS, from that run, neither put there by this phase.
+  (a) The dataset-level missing-token summary prints the matched VOCABULARY
+  ENTRY rather than the stored token: region holds 'N/A' and units holds 'n/a'
+  and both are reported as 'N/A'. Nothing is miscounted -- Step 2 measured the
+  match is case-insensitive -- but the line names a token the data does not
+  contain, and someone writing na_values=["N/A"] off it would miss all seven.
+  (b) units' range line reads "1 to n/a", a min/max over text that includes a
+  token. Same renderer, probably the same fix. Logged, not fixed here.
+- AND ONE PIECE OF CAUTION THAT VALIDATED STEP 5. The agent declined to infer
+  from 365 distinct order_date values that every value is midnight -- "a day
+  carrying two distinct timestamps and another carrying zero produces the same
+  count". Correct, and detect.proposed_type does not use distinct counts for
+  that: it asks TRY_CAST(c AS TIMESTAMP) <> date_trunc('day', ...) directly.
+  The caution was right and the guard already answered it.
+- P6-D8 IS NOT IN THIS STEP. The contract is a PYDANTIC model (Measure and
+  Exclusion are both BaseModel) with an SCD2 store and a propose path behind
+  it, and DatasetContract's own field list has not been read. Writing a field
+  into a validated model nobody has seen is the mistake this phase has logged
+  four times. Step 8, after one read.
