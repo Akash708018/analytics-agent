@@ -2009,3 +2009,58 @@ Machine-local and implementation choices that are easy to forget six months late
   optional contract fields, defaults, NOT in unresolved -- the missing_values
   argument, that unset is a default rather than a gap. Ranges and not-null
   deferred.
+
+## Phase 7, Step 1 — the ground facts
+
+- P7-D1. KEY UNIQUENESS IS ASKED WITH GROUP BY, NEVER count(DISTINCT).
+  count(DISTINCT (x)) is not a row constructor -- it is count(DISTINCT x) and
+  drops NULLs -- while count(DISTINCT (x,y)) IS one and treats NULLs as equal.
+  So the generic form is right for every composite key it gets tested against
+  and wrong for a one-column key: two rows 'a' and NULL, no duplicate, reads
+  as one duplicate. GROUP BY ... HAVING count(*) > 1 is null-safe for both
+  shapes AND returns the offending values rather than a count of them.
+  SCOPE: this is a rule for validate/, NOT a correction to contract/.
+  verify_key already documents the difference between the two forms at
+  compatibility.py:419 and gathers per-column null counts because of it --
+  Phase 4 got there first, and a predicted oversight turned out to be a
+  recorded decision. verify_key returns raw counts only -- row_count, distinct,
+  per-column null_counts, and a missing list whose early return carries zeroes
+  -- so validate/ reads those for the VERDICT and adds one GROUP BY query
+  beside it for the OFFENDERS, because a count cannot name the rows and the
+  reader's next question is always the values. Two implementations of "is this
+  key unique" would eventually disagree with the gate; one implementation and
+  one evidence query cannot.
+- AND THE ARITHMETIC DIFFERS BY KEY ARITY. One table, 'a' and NULL: as key [x]
+  distinct is 1 against 2 rows; as key [x, y] the row constructor counts the
+  NULL tuple and distinct is 2 against 2 rows. The same single NULL reads as a
+  duplicate in one branch and as unique in the other. So a duplicate-key
+  finding and a null-key finding are reported separately rather than both
+  derived from one comparison -- which is what compatibility.py:421 means by
+  "unique and usable are different questions".
+- P7-D2. AN INCLUSIVE WINDOW'S UPPER BOUND IS < end + INTERVAL 1 DAY.
+  AnalysisWindow is inclusive at both ends and date_column may be TIMESTAMP.
+  dt <= DATE '2024-12-31' casts the bound to midnight and drops
+  2024-12-31 23:59:59. Written the obvious way, every window on a timestamp
+  column loses its last day silently.
+- P7-D3. NOT IN IS BANNED IN validate/. One NULL in the parent column makes
+  NOT IN return zero rows, so an orphan check reports a clean pass on a table
+  full of orphans. NOT EXISTS is the form. An orphan and a NULL key are
+  counted apart -- both are unmatched, only one is a broken reference.
+- P7-D4. EVERY CHECK REPORTS FOUR NUMBERS THAT SUM TO THE ROW COUNT: checked,
+  passed, failed, not checked. Measured on a window and on a range: a
+  predicate does not see NULLs, so inside + outside != rows. P5-D3's principle
+  on a new problem -- a cap with the remainder reported, never a sample with
+  the shortfall unstated.
+- ROW COUNT VS EXPECTATION NEEDS NO NEW FIELD. Binding.row_count is what the
+  table held when the contract was confirmed, already stored beside the
+  fingerprint. classify_drift computes the same difference as a caveat;
+  validation renders it as a pass/fail row.
+- CALENDAR COVERAGE IS NOT THIS PHASE. It is Tier 3 (Phase 9) and F10 makes it
+  a precondition of TREND analysis, not of validation. A missing month is a
+  caveat on a line chart, not a broken dataset.
+- P7-D5 IS OPEN. Four of the guide's eight checks (null rules, ranges,
+  referential integrity, category domains) have nothing in the contract to
+  check against. Recommendation recorded: add foreign_keys and domains as
+  optional contract fields, defaults, NOT in unresolved -- the missing_values
+  argument, that unset is a default rather than a gap. Ranges and not-null
+  deferred.
