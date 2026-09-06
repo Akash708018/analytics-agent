@@ -1909,3 +1909,57 @@ Machine-local and implementation choices that are easy to forget six months late
   same argument clean/sql.py makes about a count and a statement built from one
   expression. _next_call_id() reuses _safe_suggestion so there is one
   definition of "safe to recommend" rather than two.
+
+## Phase 6, Step 10b — the cap nobody chose
+
+- THE LIVE RUN ANSWERED ITS QUESTION: the agent still reasons about
+  'not priced' explicitly rather than following a suggestion that now excludes
+  it -- "a statement about the order, not an absent number". The judgement is
+  being made, not delegated. It also read the C003 deferral correctly without
+  being told.
+- AND IT FOUND ONE MORE. The NEXT STEP omitted C006, a boolean conversion that
+  discards nothing and conflicts with nothing; the agent added it by hand and
+  said the suggested set "will under-report on every clean table". Right, and
+  neither of its two hypotheses was the cause: _safe_suggestion carried
+  limit=3.
+- WHERE THE 3 CAME FROM. The original line was stored.actions[:3], capped
+  because the set was arbitrary and the line had to stay short. P6-D12 replaced
+  the slice with filters and THE 3 CAME ALONG WITH IT -- a number that meant
+  something when the set was "the first few" and means nothing once the set is
+  defined by a property. Worse, the line says "these discard nothing and can run
+  together" without saying it is a subset. A PARAMETER THAT OUTLIVED ITS REASON.
+- WHY THE ACCEPTANCE TEST MISSED IT. Clause 5 asserts the suggestion EXCLUDES
+  what it should and that the tool accepts it. Nothing asserted it INCLUDES what
+  it should -- an easy asymmetry to write and a hard one to notice, because
+  every assertion passed. The new test compares the suggested ids against
+  _safe_suggestion's own output rather than a hand-written list, so the two
+  cannot drift.
+- THIRD DEFECT IN THIS PHASE FOUND BY AN AGENT READING THE OUTPUT rather than
+  by a test reading the code, and like the other two it was a sentence
+  disagreeing with a behaviour rather than a mechanism failing.
+
+## Phase 6, Step 10c — the cleaned stage
+
+- IT ARRIVES THE WAY PROFILING DID. describe_workflow_state already splices a
+  list of lines from runs.state_notes, empty when there is nothing to say, so
+  clean/ledger gained a state_notes of the same shape rather than a special
+  case being carved for it.
+- NOT IN DatasetState.stage. That column is about whether ANALYSIS CAN RUN
+  ("contract v2, ready"); cleaning is a different axis -- a dataset can be
+  cleaned with no contract, or carry a contract and never have been cleaned.
+  Phase 5 put profiling in the per-dataset section for the same reason rather
+  than inventing "loaded, profiled, no contract".
+- THE MIDDLE LINE EXISTS BECAUSE OF P6-D1. It names the snapshot AND says no
+  listing shows it, because db.user_tables filters the underscore in SQL and a
+  reader who goes looking for _agent_history_mixed_v1 in list_datasets will not
+  find it. Naming a table without that clause is a dead end dressed as a
+  pointer.
+- EMPTY, NOT "not cleaned". The renderer already writes its own line when
+  profile notes come back empty; a second module inventing an absence message
+  would put two voices in one section. Whether an uncleaned dataset should say
+  anything stays the renderer's decision.
+- THE IMPORT IS LOCAL, and the honest reason is that state.py's import block
+  has not been read -- an anchored edit against imports nobody has seen is how
+  this phase already burned two round trips. The secondary reason is real too:
+  state.py is imported by the server at startup and clean/ledger imports
+  profile/runs.

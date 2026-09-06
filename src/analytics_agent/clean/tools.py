@@ -115,8 +115,19 @@ def _not_loaded(con, dataset_name: str) -> str:
     ).to_text()
 
 
-def _safe_suggestion(actions, limit: int = 3):
+def _safe_suggestion(actions, limit: int | None = None):
     """Actions worth suggesting: lossless, compatible, and in the right order.
+
+    **No cap by default.** The first version sliced `actions[:3]`, and when the
+    slice was replaced by these filters the `3` came along with it -- a number
+    that meant "keep the line short" back when the set was arbitrary, and means
+    nothing now that the set is defined by a property. On the real fixture it
+    silently dropped `C006`, a boolean conversion that discards nothing and
+    conflicts with nothing, while the line above it said "these discard nothing
+    and can run together" without mentioning it was a subset. A live agent
+    noticed the omission and added it back by hand.
+
+    `limit` stays for `_next_call_id`, which wants exactly one.
 
     Three filters, and the third was missed on the first attempt.
 
@@ -150,7 +161,7 @@ def _safe_suggestion(actions, limit: int = 3):
         if apply_module.conflicts(picked + [a]):
             continue
         picked.append(a)
-        if len(picked) == limit:
+        if limit is not None and len(picked) == limit:
             break
     return picked
 

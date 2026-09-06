@@ -191,6 +191,36 @@ def describe(con, dataset_name: str | None = None) -> str:
     )
 
 
+def state_notes(con, dataset_name: str) -> list[str]:
+    """Lines for get_workflow_state, or [] if this dataset has not been cleaned.
+
+    Deliberately the same shape as `profile/runs.state_notes`: a list the caller
+    splices in, empty when there is nothing to say. `describe_workflow_state`
+    already knows how to handle that, so the cleaning stage arrives the same way
+    the profiling stage did rather than as a special case.
+
+    NOT added to `DatasetState.stage`. That column reads
+    "contract v2, ready" -- it is about whether analysis can run, and cleaning
+    is a different axis. A dataset can be cleaned and have no contract, or have
+    a contract and never have been cleaned, and collapsing the two into one
+    string would make both harder to read. Profiling went in the per-dataset
+    section for the same reason.
+    """
+    total = count(con, dataset_name)
+    if not total:
+        return []
+    newest = entries(con, dataset_name, limit=1)[0]
+    where = f" on {newest.column}" if newest.column else ""
+    return [
+        f"Cleaned: {total} action(s) applied, most recently "
+        f"{newest.action_id} ({newest.kind}{where}) at "
+        f"{newest.applied_at:%Y-%m-%d %H:%M}.",
+        f"The data as it stood before that is kept in {newest.history_table}, "
+        f"which no listing shows because it is bookkeeping.",
+        f'Full history: get_cleaning_ledger(dataset_name="{dataset_name}")',
+    ]
+
+
 __all__ = [
     "INLINE_ENTRIES",
     "LEDGER_TABLE",
@@ -200,4 +230,5 @@ __all__ = [
     "ensure_table",
     "entries",
     "record_action",
+    "state_notes",
 ]

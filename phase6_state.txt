@@ -1,0 +1,160 @@
+=== 1. the workflow state, for the cleaned stage ===
+185:class DatasetState:
+186-    """One dataset, as get_workflow_state reports it."""
+187-
+188-    dataset_name: str
+189-    row_count: int
+190-    column_count: int
+191-    age_phrase: str
+192-    source: str
+193-    contract: StoredContract | None = None
+194-    blocked_by: str = ""
+195-    next_call: str = ""
+196-    notes: list[str] = field(default_factory=list)
+197-
+198-    @property
+199-    def stage(self) -> str:
+200-        if self.contract is None:
+201-            return "loaded, no contract"
+202-        if self.blocked_by:
+203-            return f"contract v{self.contract.version}, BLOCKED"
+204-        return f"contract v{self.contract.version}, ready"
+205-
+206-
+207-def dataset_states(con) -> list[DatasetState]:
+208-    """
+209-    Every loaded dataset, with where it is and what to call next.
+210-
+211-    The load timestamps are the point (F13). This server is launched once when
+212-    Claude Desktop starts and kept alive across every conversation, so a
+213-    dataset from two hours ago and another chat is still here. Showing when
+214-    each arrived turns a leftover from a surprise into a fact.
+215-    """
+    column_count: int
+    age_phrase: str
+    source: str
+    contract: StoredContract | None = None
+    blocked_by: str = ""
+    next_call: str = ""
+    notes: list[str] = field(default_factory=list)
+
+    @property
+    def stage(self) -> str:
+        if self.contract is None:
+            return "loaded, no contract"
+        if self.blocked_by:
+            return f"contract v{self.contract.version}, BLOCKED"
+        return f"contract v{self.contract.version}, ready"
+
+
+def dataset_states(con) -> list[DatasetState]:
+    """
+    Every loaded dataset, with where it is and what to call next.
+
+    The load timestamps are the point (F13). This server is launched once when
+    Claude Desktop starts and kept alive across every conversation, so a
+    dataset from two hours ago and another chat is still here. Showing when
+    each arrived turns a leftover from a surprise into a fact.
+    """
+    out: list[DatasetState] = []
+    for name in _loadable_tables(con):
+        rows, cols = db.table_shape(con, name)
+        record = db.get_dataset(con, name)
+        state = DatasetState(
+            dataset_name=name,
+            row_count=rows,
+            column_count=cols,
+            age_phrase=record.age_phrase() if record else "No load record.",
+            source=(
+                f"{record.source_type} - {record.source_detail}"
+                if record
+                else "unknown - not created by a loader"
+            ),
+        )
+        if record is None:
+            state.notes.append(
+                "This table was not created by a loader, so nothing is known "
+                "about where it came from."
+            )
+
+        live = current(con, name)
+        state.contract = live
+        if live is None:
+            state.next_call = f'propose_dataset_contract(dataset_name="{name}")'
+            out.append(state)
+            continue
+
+        try:
+            drift = classify_drift(live.contract, binding_for(con, name))
+        except ContractRefused as exc:
+            state.blocked_by = str(exc)
+            state.next_call = f'propose_dataset_contract(dataset_name="{name}")'
+            out.append(state)
+            continue
+
+        if drift.blocks:
+            state.blocked_by = f"stale: {', '.join(drift.breaking)} no longer exist"
+            state.next_call = f'propose_dataset_contract(dataset_name="{name}")'
+        else:
+            caveat = drift.caveat()
+            if caveat:
+                state.notes.append(caveat)
+            state.next_call = f'run_analysis(dataset_name="{name}", ...)'
+        out.append(state)
+    return out
+
+
+def describe_workflow_state(con) -> str:
+    """What get_workflow_state returns."""
+    states = dataset_states(con)
+    if not states:
+        return (
+            "Nothing is loaded in this workspace.\n\n"
+            "NEXT STEP: call propose_ingest_spec(path=\"...\") to read a file, "
+            "then confirm_ingest_spec to load it."
+        )
+
+    lines = [
+        f"{len(states)} dataset(s) in this workspace.",
+        "",
+        "| dataset | rows | columns | stage | next call |",
+        "| --- | --- | --- | --- | --- |",
+    ]
+    for s in states:
+        lines.append(
+            f"| {s.dataset_name} | {s.row_count:,} | {s.column_count} | "
+            f"{s.stage} | {s.next_call} |"
+        )
+
+    for s in states:
+        lines += ["", f"### {s.dataset_name}", s.age_phrase, f"Source: {s.source}"]
+        profile_lines = runs.state_notes(con, s.dataset_name, s.row_count)
+        if profile_lines:
+            lines += profile_lines
+        else:
+            lines.append(
+                f'Not profiled. profile_dataset(dataset_name="{s.dataset_name}") '
+                f"counts the nulls, duplicates and distributions before anyone "
+                f"has to agree what the columns mean."
+            )
+        if s.contract:
+            lines.append(
+                f"Contract v{s.contract.version}, confirmed "
+                f"{s.contract.confirmed_at:%Y-%m-%d %H:%M}, fingerprint "
+
+=== 2. the ledger row, to confirm the acceptance test reads it right ===
+46:class LedgerEntry:
+47-    applied_at: datetime
+48-    dataset_name: str
+49-    plan_id: str
+50-    action_id: str
+51-    kind: str
+52-    column: str | None
+53-    rows_before: int
+54-    rows_after: int
+55-    history_table: str
+56-    statement: str
+57-
+58-    @property
+59-    def rows_removed(self) -> int:
+60-        return self.rows_before - self.rows_after

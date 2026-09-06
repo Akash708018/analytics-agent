@@ -567,3 +567,78 @@ def test_the_nothing_approved_refusal_does_not_recommend_a_lossy_action(ws):
     next_step = text.split("NEXT STEP:")[1]
     for action_id in lossy:
         assert f'["{action_id}"]' not in next_step
+
+
+def test_the_suggestion_offers_every_safe_action_not_the_first_three(ws):
+    """The cap was inherited from a slice that no longer exists.
+
+    `actions[:3]` capped at three because the set was arbitrary and the line
+    had to stay short. Once the set became "lossless and compatible", the cap
+    started dropping actions that met the stated test while the line claimed
+    otherwise. A live agent spotted the omission and added the action back by
+    hand, which is the correct outcome and not one to rely on.
+    """
+    text = tools.propose_cleaning_plan(ws, "mixed", missing_values=TOKENS)
+    con = db.connect(ws)
+    try:
+        from analytics_agent.clean.plan import latest
+        actions = latest(con, "mixed").actions
+    finally:
+        con.close()
+
+    safe = {a.action_id for a in tools._safe_suggestion(actions)}
+    suggested = set(
+        p.strip(' "') for p in
+        text.split("approved_action_ids=[")[1].split("]")[0].split(",")
+    )
+    assert suggested == safe
+    assert len(safe) > 3 or len(safe) == len(
+        [a for a in actions if not a.is_lossy]
+    ), "the fixture no longer distinguishes a cap from no cap"
+
+
+# --------------------------------------------------------------------------
+# the cleaned stage
+# --------------------------------------------------------------------------
+
+
+def test_an_uncleaned_dataset_produces_no_lines(con):
+    """Empty, not a "not cleaned" sentence.
+
+    describe_workflow_state already writes its own line when profile notes come
+    back empty; a second module inventing its own absence message would put two
+    different voices in one section.
+    """
+    assert ledger.state_notes(con, "mixed") == []
+
+
+def test_a_cleaned_dataset_names_the_count_the_action_and_the_snapshot(con):
+    actions = proposals(con)
+    ap.apply(con, dataset_name="mixed", plan_id="p1",
+             actions=[pick(actions, ActionKind.CONVERT_TYPE, "units")])
+    notes = ledger.state_notes(con, "mixed")
+    assert len(notes) == 3
+    assert "1 action(s) applied" in notes[0]
+    assert "CONVERT_TYPE on units" in notes[0]
+    assert "_agent_history_mixed_v1" in notes[1]
+    assert 'get_cleaning_ledger(dataset_name="mixed")' in notes[2]
+
+
+def test_it_reports_the_newest_action_not_the_first(con):
+    actions = proposals(con)
+    ap.apply(con, dataset_name="mixed", plan_id="p1",
+             actions=[pick(actions, ActionKind.TRIM_WHITESPACE, "region")])
+    ap.apply(con, dataset_name="mixed", plan_id="p2",
+             actions=[pick(proposals(con), ActionKind.CONVERT_TYPE, "units")])
+    notes = ledger.state_notes(con, "mixed")
+    assert "2 action(s) applied" in notes[0]
+    assert "CONVERT_TYPE on units" in notes[0]
+    assert "_agent_history_mixed_v2" in notes[1]
+
+
+def test_the_snapshot_line_says_why_nothing_lists_it(con):
+    """A reader who goes looking for that table in list_datasets will not find
+    it, and should be told so rather than left to wonder."""
+    ap.apply(con, dataset_name="mixed", plan_id="p1",
+             actions=[pick(proposals(con), ActionKind.CONVERT_TYPE, "units")])
+    assert "bookkeeping" in ledger.state_notes(con, "mixed")[1]

@@ -294,6 +294,14 @@ def describe_workflow_state(con) -> str:
                 f"counts the nulls, duplicates and distributions before anyone "
                 f"has to agree what the columns mean."
             )
+
+        # Imported here rather than at the top: clean/ledger.py arrived two
+        # phases after this file, and state.py is imported by the server at
+        # startup while clean/ledger.py imports profile/runs.py. A local import
+        # keeps that graph flat whatever else moves.
+        from .clean import ledger as clean_ledger
+
+        lines += clean_ledger.state_notes(con, s.dataset_name)
         if s.contract:
             lines.append(
                 f"Contract v{s.contract.version}, confirmed "
