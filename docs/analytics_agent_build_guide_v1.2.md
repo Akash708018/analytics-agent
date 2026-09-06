@@ -1006,7 +1006,7 @@ Forecasting, multi-dataset joins, scheduled runs. Out of scope until 0–14 are 
 | 3 | Ingest Spec \+ merges |  ☑ Dones | 30/08/2026 | Steps 1-8. 197 unit assertions, 31 acceptance assertions (35 with big_synthetic), Phase 2's 20 still passing. Live run recorded in phase3_step7.md. |
 | 4 | Contract \+ workflow state | ☑ Dones |  |  |
 | 5 | Profiling |☑ Dones| 01/09/2026| Steps 1-7, 9. 747 unit assertions, 42 acceptance assertions. Phase 2's 20, Phase 3's 35 and Phase 4's 50 still passing.|
-| 6 | Cleaning gate |◐ In progress. | 03/09/2026  | Step 1. 15 library-fact tests pinned; 762 unit assertions. Phase 2's 20, Phase 3's 35, Phase 4's 50 and Phase 5's 50 still passing. |
+| 6 | Cleaning gate | ☑ Dones | 06/09/2026  | Step 1. 15 library-fact tests pinned; 762 unit assertions. Phase 2's 20, Phase 3's 35, Phase 4's 50 and Phase 5's 50 still passing. |
 | 7 | Validation | ☐ Not started |  |  |
 | 8 | Analysis T1–2 | ☐ Not started |  |  |
 | 9 | Analysis T3–5 | ☐ Not started |  |  |
