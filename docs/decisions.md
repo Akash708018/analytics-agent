@@ -2106,3 +2106,47 @@ Machine-local and implementation choices that are easy to forget six months late
   COLUMN NAMES, and it is a Phase 3 header fixture. Nothing in tests/fixtures
   is broken in validation's terms, so Step 3 builds one and counts it by hand
   before any rule reads it.
+
+## Phase 7, Step 3 — a fixture that breaks on purpose
+
+- NOTHING IN tests/fixtures WAS BROKEN IN VALIDATION'S TERMS. gaps_and_dupes
+  writes 200 unique ORD- ids and has no date column (its name refers to
+  duplicate and blank COLUMN NAMES); clean_sales is clean by construction;
+  mixed_types breaks on coercion, which is Phase 6's subject. A rule written
+  against any of them passes, and a passing rule proves nothing about a check
+  whose job is to fail.
+- ONE FAULT PER ROW, ENFORCED BY CONSTRUCTION. _broken_row fills every field
+  with something valid and each caller overrides exactly one, so the families
+  are disjoint and the totals add. A row that was both null-keyed and out of
+  window would let a checker be right by accident while getting both numbers
+  wrong. Asserted, not intended: test_no_row_carries_two_faults.
+- A DIFFERENT COUNT PER FAMILY (3, 2, 4, 5, 6, 7, 8, 9, 10, 11). A rule that
+  reads the wrong column reports a number belonging to something else and is
+  caught by looking at it.
+- THE COUNTS ARE DECLARED, NOT DISCOVERED. BROKEN_BREAKS is the specification;
+  the ground-truth test writes the same numbers out again as literals rather
+  than importing them, because a test that reads its expectations from the
+  generator only asserts that the generator agrees with itself. Phase 6 Step 2
+  counted mixed_types.xlsx by hand for the same reason.
+- TIMESTAMPS, NOT DATES, AND A ROW IN THE LAST SECOND. P7-D2 cannot be tested
+  on a DATE column. The window holds 171 rows written correctly and 170
+  written `<= end`; that one row is the regression detector.
+- THE LOOKUP CARRIES A BLANK ROW ON PURPOSE. One NULL in the parent column is
+  what makes NOT IN return UNKNOWN for every comparison: NOT EXISTS finds 7
+  orphans, NOT IN finds 0. Without it the two forms agree and P7-D3 is
+  untested. It is also realistic -- the trailing empty line every spreadsheet
+  export contributes to a dimension table.
+- AN ORPHAN AND A NULL REFERENCE ARE COUNTED APART (7 and 8). Both are
+  unmatched; only one is a broken reference.
+- PHASE 5'S ACCEPTANCE COUNT IS NOT A CONSTANT. Its clause 1 is written as
+  "it runs on every fixture" and loops over tests/fixtures rather than over a
+  named list, so adding broken_sales.csv and region_lookup.csv moved it from
+  50 to 56 with nothing edited and nothing wrong. That is the right way to
+  write the clause -- a fixture nobody profiles is a fixture nobody has
+  checked -- but 50 was never a number to carry forward. Current value 56, and
+  it moves again the next time a fixture is added.
+- DO NOT RUN make_fixtures.py WHOLE. main() rewrites every fixture. Measured:
+  the CSVs come back byte-identical, every .xlsx comes back a few bytes
+  different because openpyxl is not byte-stable across versions, and
+  mixed_types.xlsx carries Phase 6's Done-When counts. Call the two new
+  generators directly.

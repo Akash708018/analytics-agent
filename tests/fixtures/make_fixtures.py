@@ -336,6 +336,159 @@ def make_big_synthetic_csv(path: Path, target_gb: float = 1.5) -> int:
     return rows
 
 
+# ---------------------------------------------------------------------------
+# Phase 7, Step 3: a fixture that is broken on purpose
+# ---------------------------------------------------------------------------
+# The Phase 7 Done-When is "a correct failure on a deliberately broken
+# fixture", and nothing in this directory was broken in validation's terms:
+# gaps_and_dupes.csv writes 200 unique ORD- ids and has no date column at all,
+# its name meaning duplicate and blank COLUMN NAMES.
+#
+# Four rules this fixture is built to:
+#
+#   ONE FAULT PER ROW. Every family below is disjoint, so the totals add and a
+#   checker that reports a different total is wrong rather than differently
+#   right. A row that was both null-keyed and out of window would let a rule
+#   be right by accident.
+#
+#   A DIFFERENT COUNT PER FAMILY. No two families share a number, so a rule
+#   that reads the wrong column reports a number that belongs to something
+#   else and is caught by inspection.
+#
+#   THE COUNTS ARE DECLARED, NOT DISCOVERED. BROKEN_BREAKS is the whole
+#   specification; tests/test_broken_sales_ground_truth.py writes the same
+#   numbers out again as literals rather than importing them, because a test
+#   that reads its expectations from the generator only ever asserts that the
+#   generator agrees with itself.
+#
+#   TIMESTAMPS, NOT DATES. P7-D2's trap -- `<= DATE 'end'` casting to midnight
+#   and dropping the rest of that day -- cannot exist on a DATE column. The
+#   date_last_second row is inside the window if the bound is written
+#   `< end + INTERVAL 1 DAY` and outside it if it is not, which is the only
+#   thing that turns that decision into something a test can fail on.
+
+BROKEN_BASE_ROWS = 120
+BROKEN_WINDOW = (date(2024, 1, 1), date(2024, 12, 31))
+
+BROKEN_BREAKS = {
+    "duplicate_key": 3,      # same order_id, everything else different
+    "null_key": 2,           # no order_id at all
+    "date_before": 4,        # 2023
+    "date_after": 5,         # 2025
+    "date_null": 6,          # no timestamp
+    "date_last_second": 1,   # 2024-12-31 23:59:59 -- INSIDE, and the P7-D2 canary
+    "region_orphan": 7,      # a region the lookup does not have
+    "region_null": 8,        # no region
+    "channel_unknown": 9,    # outside the declared vocabulary
+    "units_negative": 10,    # a count that cannot be negative
+    "price_null": 11,        # no price, and therefore no revenue
+}
+
+# Three misspellings across seven rows, so "7 rows" and "3 values" are
+# separately checkable -- a report that prints one as the other is the P7-D6
+# failure in a new place.
+UNKNOWN_REGIONS = ["Nord", "Souh", "Nrth-West"]
+UNKNOWN_CHANNELS = ["Partner", "Reseller"]
+
+# Central is real and unused; the blank row is the trailing empty line every
+# spreadsheet export eventually contributes to a dimension table. It is there
+# on purpose: one NULL in the parent column is what makes `NOT IN` return
+# UNKNOWN for every comparison and report a clean pass over seven orphans.
+LOOKUP_REGIONS = REGIONS + ["Central"]
+
+BROKEN_HEADER = ["order_id", "order_ts", "region", "product", "channel",
+                 "units", "unit_price", "revenue"]
+
+
+def _broken_ts(rng, start=date(2024, 1, 1), days=365) -> str:
+    """A timestamp inside a span, written with a time so the column is not a
+    DATE."""
+    d = start + timedelta(days=rng.randrange(days))
+    return (f"{d.isoformat()} {rng.randrange(8, 20):02d}:"
+            f"{rng.randrange(60):02d}:{rng.randrange(60):02d}")
+
+
+def _broken_row(rng, order_id, ts, region=None, channel=None, units=None,
+                price=None) -> list:
+    """One row, with every field defaulting to something valid.
+
+    Each caller overrides exactly one thing, which is how the one-fault-per-row
+    rule is enforced by construction rather than by review.
+    """
+    region = rng.choice(REGIONS) if region is None else region
+    channel = rng.choice(CHANNELS) if channel is None else channel
+    units = rng.randint(1, 40) if units is None else units
+    price = round(rng.uniform(5.0, 250.0), 2) if price is None else price
+    revenue = "" if price == "" else round(units * float(price), 2)
+    return [order_id, ts, region, rng.choice(PRODUCTS), channel,
+            units, price, revenue]
+
+
+def make_region_lookup_csv(path: Path) -> None:
+    """The parent side of the referential-integrity check.
+
+    Referential integrity needs two datasets; a column and a hope is what the
+    check would otherwise be run against.
+    """
+    with path.open("w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        w.writerow(["region", "region_name"])
+        for r in LOOKUP_REGIONS:
+            w.writerow([r, f"{r} sales territory"])
+        w.writerow(["", "(unassigned)"])
+
+
+def make_broken_sales_csv(path: Path) -> None:
+    """120 clean rows and 66 injected faults. See BROKEN_BREAKS."""
+    rng = _rng()
+    rows = [
+        _broken_row(rng, f"ORD-{i + 1:05d}", _broken_ts(rng))
+        for i in range(BROKEN_BASE_ROWS)
+    ]
+
+    next_id = BROKEN_BASE_ROWS + 1
+
+    def fresh() -> str:
+        nonlocal next_id
+        order_id = f"ORD-{next_id:05d}"
+        next_id += 1
+        return order_id
+
+    # A repeated key, not a repeated row: everything except order_id differs,
+    # so `DISTINCT *` cannot find these and only a grain check can.
+    for i in range(BROKEN_BREAKS["duplicate_key"]):
+        rows.append(_broken_row(rng, f"ORD-{i + 11:05d}", _broken_ts(rng)))
+    for _ in range(BROKEN_BREAKS["null_key"]):
+        rows.append(_broken_row(rng, "", _broken_ts(rng)))
+    for _ in range(BROKEN_BREAKS["date_before"]):
+        rows.append(_broken_row(rng, fresh(),
+                                _broken_ts(rng, date(2023, 1, 1), 365)))
+    for _ in range(BROKEN_BREAKS["date_after"]):
+        rows.append(_broken_row(rng, fresh(),
+                                _broken_ts(rng, date(2025, 1, 1), 200)))
+    for _ in range(BROKEN_BREAKS["date_null"]):
+        rows.append(_broken_row(rng, fresh(), ""))
+    for _ in range(BROKEN_BREAKS["date_last_second"]):
+        rows.append(_broken_row(rng, fresh(), "2024-12-31 23:59:59"))
+    for i in range(BROKEN_BREAKS["region_orphan"]):
+        rows.append(_broken_row(rng, fresh(), _broken_ts(rng),
+                                region=UNKNOWN_REGIONS[i % len(UNKNOWN_REGIONS)]))
+    for _ in range(BROKEN_BREAKS["region_null"]):
+        rows.append(_broken_row(rng, fresh(), _broken_ts(rng), region=""))
+    for i in range(BROKEN_BREAKS["channel_unknown"]):
+        rows.append(_broken_row(rng, fresh(), _broken_ts(rng),
+                                channel=UNKNOWN_CHANNELS[i % len(UNKNOWN_CHANNELS)]))
+    for i in range(BROKEN_BREAKS["units_negative"]):
+        rows.append(_broken_row(rng, fresh(), _broken_ts(rng), units=-(i + 1)))
+    for _ in range(BROKEN_BREAKS["price_null"]):
+        rows.append(_broken_row(rng, fresh(), _broken_ts(rng), price=""))
+
+    with path.open("w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        w.writerow(BROKEN_HEADER)
+        w.writerows(rows)
+
+
 SMALL_FIXTURES = [
     ("clean_sales.csv", make_clean_sales_csv),
     ("multiheader.csv", make_multiheader_csv),
@@ -344,6 +497,8 @@ SMALL_FIXTURES = [
     ("merged_multiheader.xlsx", make_merged_multiheader_xlsx),
     ("mixed_types.xlsx", make_mixed_types_xlsx),
     ("gaps_and_dupes.csv", make_gaps_and_dupes_csv),
+    ("broken_sales.csv", make_broken_sales_csv),
+    ("region_lookup.csv", make_region_lookup_csv),
 ]
 
 
