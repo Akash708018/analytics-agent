@@ -2064,3 +2064,45 @@ Machine-local and implementation choices that are easy to forget six months late
   optional contract fields, defaults, NOT in unresolved -- the missing_values
   argument, that unset is a default rather than a gap. Ranges and not-null
   deferred.
+
+## Phase 7, Step 2 — the sentence the gate has been printing
+
+- P7-D6. THE DENOMINATOR IS THE ROWS THE KEY COULD HAVE COUNTED.
+  KeyVerdict.distinct comes from count(DISTINCT x) for a one-column key and
+  count(DISTINCT (a,b)) for a composite. The first drops nulls, the second
+  counts a null-bearing tuple, so subtracting distinct from row_count reported
+  every null key as a duplicate as well as a null. Measured on the real class:
+  rows ('a'),('b'),(NULL) produced "1 row(s) repeat a key that is meant to be
+  unique" in the DETAIL line of a KEY_NOT_UNIQUE refusal, on a table where no
+  key repeats. keyed_rows names the population; is_unique and duplicate_rows
+  use it.
+- NO VERDICT MOVES, AND THAT IS WHY IT COULD LAND MID-PHASE. holds requires no
+  null in any key column, and with no nulls keyed_rows IS row_count. Every
+  refusal the gate raised yesterday it raises today; only the explanation
+  changed. Asserted across five key shapes rather than argued.
+- A CLAUSE WITH NOTHING TO REPORT IS NOT PRINTED. The duplicate clause now
+  fires on duplicate_rows rather than on `not is_unique`, so an all-null key
+  stops announcing zero repeats, and an empty table gets its own sentence
+  instead of "0 distinct combinations across 0 rows".
+- SUPERSEDES P7-D1's SCOPE LINE. Step 1 recorded "this is a rule for validate/,
+  NOT a correction to contract/", on the strength of a grep that reached
+  verify_key's docstring and not KeyVerdict's arithmetic. verify_key was
+  indeed already careful; the class consuming its counts was not. The correct
+  scope is both: validate/ adds the GROUP BY evidence query, AND contract/
+  gets this fix.
+- THE KNOWLEDGE WAS ALREADY IN THE CODEBASE. evidence.py records both null
+  rules as numbered findings (Phase 4) and table_profile.py cites them by
+  number (Phase 5). KeyVerdict is in the same package as evidence.py and did
+  not honour them. A rule documented in one module does not protect arithmetic
+  in another, which is the reusable half of this step: the fix was not new
+  knowledge, it was knowledge written down twice and not applied at the third
+  site. A sweep of src/ for the same shape came back clean: the only other
+  row_count - distinct is table_profile._duplicate_rows, which counts
+  DISTINCT * -- null-bearing rows included, same population both sides -- and
+  the two remaining subtractions take one single-column distinct from another,
+  where nulls drop from both sides equally.
+- THE DONE-WHEN HAS NO FIXTURE YET. gaps_and_dupes.csv writes 200 unique
+  ORD-ids and has no date column; its name refers to duplicate and blank
+  COLUMN NAMES, and it is a Phase 3 header fixture. Nothing in tests/fixtures
+  is broken in validation's terms, so Step 3 builds one and counts it by hand
+  before any rule reads it.

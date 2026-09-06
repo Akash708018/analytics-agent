@@ -336,8 +336,26 @@ class KeyVerdict:
         return " + ".join(self.columns)
 
     @property
+    def keyed_rows(self) -> int:
+        """Rows the distinct count could possibly have counted.
+
+        P7-D6. `count(DISTINCT (a, b))` counts a tuple containing NULL;
+        `count(DISTINCT x)` drops it. So `distinct` and `row_count` describe
+        the same population for a composite key and different populations for
+        a single-column one, and subtracting the second from the first
+        reported every null key as a duplicate as well as a null. The verdict
+        was unaffected -- `holds` refuses a null-bearing key either way -- but
+        the DETAIL line of a KEY_NOT_UNIQUE refusal named a repeat that did
+        not exist, and that line is what an agent reads before deciding what
+        to do next.
+        """
+        if len(self.columns) == 1:
+            return self.row_count - self.null_counts.get(self.columns[0], 0)
+        return self.row_count
+
+    @property
     def is_unique(self) -> bool:
-        return bool(self.columns) and self.row_count > 0 and self.distinct == self.row_count
+        return bool(self.columns) and self.keyed_rows > 0 and self.distinct == self.keyed_rows
 
     @property
     def null_bearing(self) -> list[str]:
@@ -349,7 +367,7 @@ class KeyVerdict:
 
     @property
     def duplicate_rows(self) -> int:
-        return max(0, self.row_count - self.distinct)
+        return max(0, self.keyed_rows - self.distinct)
 
     def sentence(self) -> str:
         if self.missing:
@@ -362,12 +380,17 @@ class KeyVerdict:
                 f"{self.label} is unique across {self.distinct:,} of "
                 f"{self.row_count:,} rows, with no nulls."
             )
+        if not self.row_count:
+            return (
+                f"{self.dataset_name} has no rows, so {self.label} identifies "
+                f"nothing."
+            )
         parts = []
-        if not self.is_unique:
+        if self.duplicate_rows:
             parts.append(
-                f"{self.distinct:,} distinct combinations across "
-                f"{self.row_count:,} rows, so {self.duplicate_rows:,} row(s) "
-                f"repeat a key that is meant to be unique"
+                f"{self.distinct:,} distinct value(s) across "
+                f"{self.keyed_rows:,} keyed row(s), so {self.duplicate_rows:,} "
+                f"row(s) repeat a key that is meant to be unique"
             )
         for c in self.null_bearing:
             parts.append(f"{c} is null in {self.null_counts[c]:,} row(s)")

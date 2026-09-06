@@ -395,3 +395,143 @@ def test_a_reloaded_table_with_a_dropped_column_is_caught(items):
     assert v.drift is Drift.DESTRUCTIVE
     assert v.breaking == ["price"]
     assert reason_of(v.refusal().to_text()) is Reason.CONTRACT_STALE
+
+
+# --------------------------------------------------------------------------
+# P7-D6: a null key is not a duplicate key
+#
+# Phase 7, Step 2. Appended rather than spliced. `distinct` comes from
+# count(DISTINCT x) for a one-column key and count(DISTINCT (a, b)) for a
+# composite; the first drops nulls and the second does not, so the two forms
+# need different denominators. None of these changes a verdict -- `holds` is
+# asserted unchanged in the last test -- they change what the refusal SAYS.
+# --------------------------------------------------------------------------
+
+
+def _p7_key_table(name: str, values: str, columns: str = "order_id"):
+    """A throwaway in-memory table. Returns an open connection to close."""
+    import duckdb
+
+    con = duckdb.connect(":memory:")
+    con.execute(
+        f"CREATE TABLE {name} AS SELECT * FROM (VALUES {values}) v({columns})"
+    )
+    return con
+
+
+def test_p7_a_null_key_is_not_reported_as_a_duplicate():
+    """The defect, in the shape it shipped in. Three rows, no repeat."""
+    from analytics_agent.contract.compatibility import verify_key
+
+    con = _p7_key_table("t", "('a'),('b'),(NULL)")
+    try:
+        v = verify_key(con, "t", ["order_id"])
+        assert (v.row_count, v.distinct, v.keyed_rows) == (3, 2, 2)
+        assert v.duplicate_rows == 0
+        assert "repeat" not in v.sentence()
+        assert "null in 1 row(s)" in v.sentence()
+    finally:
+        con.close()
+
+
+def test_p7_a_real_duplicate_is_still_reported():
+    from analytics_agent.contract.compatibility import verify_key
+
+    con = _p7_key_table("t", "('a'),('a'),('b')")
+    try:
+        v = verify_key(con, "t", ["order_id"])
+        assert v.duplicate_rows == 1
+        assert not v.is_unique
+        assert "1 row(s) repeat" in v.sentence()
+    finally:
+        con.close()
+
+
+def test_p7_a_key_with_both_faults_counts_each_once():
+    """One null and one repeat, reported as one of each rather than two
+    repeats and a null."""
+    from analytics_agent.contract.compatibility import verify_key
+
+    con = _p7_key_table("t", "('a'),('a'),(NULL)")
+    try:
+        v = verify_key(con, "t", ["order_id"])
+        assert (v.keyed_rows, v.distinct, v.duplicate_rows) == (2, 1, 1)
+        sentence = v.sentence()
+        assert "1 row(s) repeat" in sentence
+        assert "null in 1 row(s)" in sentence
+    finally:
+        con.close()
+
+
+def test_p7_an_all_null_key_announces_no_repeats():
+    """Nothing is comparable, so nothing is claimed. It still does not hold."""
+    from analytics_agent.contract.compatibility import verify_key
+
+    con = _p7_key_table("t", "(NULL),(NULL)")
+    try:
+        v = verify_key(con, "t", ["order_id"])
+        assert v.keyed_rows == 0
+        assert not v.is_unique and not v.holds
+        assert v.duplicate_rows == 0
+        assert "repeat" not in v.sentence()
+    finally:
+        con.close()
+
+
+def test_p7_a_composite_key_is_untouched():
+    """The row constructor already counted null-bearing tuples, so the
+    denominator for a composite key is the row count and nothing moves."""
+    from analytics_agent.contract.compatibility import verify_key
+
+    con = _p7_key_table(
+        "c", "('a',1),('b',NULL),('c',NULL)", "order_id, line_no"
+    )
+    try:
+        v = verify_key(con, "c", ["order_id", "line_no"])
+        assert v.keyed_rows == v.row_count == 3
+        assert v.is_unique and not v.holds     # unique, not usable
+        assert "repeat" not in v.sentence()
+        assert "line_no is null in 2 row(s)" in v.sentence()
+    finally:
+        con.close()
+
+
+def test_p7_an_empty_table_gets_a_sentence_of_its_own():
+    """It used to read "0 distinct combinations across 0 rows"."""
+    from analytics_agent.contract.compatibility import verify_key
+
+    import duckdb
+
+    con = duckdb.connect(":memory:")
+    try:
+        con.execute("CREATE TABLE e (order_id VARCHAR)")
+        v = verify_key(con, "e", ["order_id"])
+        assert not v.holds
+        assert "no rows" in v.sentence()
+        assert "distinct" not in v.sentence()
+    finally:
+        con.close()
+
+
+def test_p7_no_verdict_moves():
+    """The claim that makes this safe to land mid-phase.
+
+    holds requires no null in any key column, and with no nulls keyed_rows IS
+    row_count -- so every gate decision is what it was. Asserted across the
+    five shapes rather than reasoned about in a comment.
+    """
+    from analytics_agent.contract.compatibility import verify_key
+
+    shapes = {
+        "clean": ("('a'),('b')", True),
+        "dupes": ("('a'),('a')", False),
+        "nulls": ("('a'),(NULL)", False),
+        "both_of_them": ("('a'),('a'),(NULL)", False),
+        "all_null": ("(NULL),(NULL)", False),
+    }
+    for name, (values, expected) in shapes.items():
+        con = _p7_key_table(name, values)
+        try:
+            assert verify_key(con, name, ["order_id"]).holds is expected, name
+        finally:
+            con.close()
