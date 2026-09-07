@@ -9,9 +9,11 @@ read-only handle on the workspace is reachable only through
 holds the file. `util/db.connect` cannot be that opener: it runs
 `CREATE TABLE IF NOT EXISTS _agent_datasets` on every open, and a read-only
 attach refuses `CREATE` by statement type, `IF NOT EXISTS` included. So
-`connect_read_only` lives here for now rather than in `util/db.py`, where it
-would sit beside a function it deliberately does not call. Moving it is a
-one-line change if that reads better later.
+`connect_read_only` is a separate function rather than a flag on `connect`, and
+it now lives in `util/db.py` -- moved there in Phase 7, Step 7, which is the
+moment this paragraph used to describe as "later": `validate/tools.py` needed
+the same handle, and a second package importing it from `clean` would have been
+the wrong shape.
 
 **The proposal reads read-only and the plan is stored writable.** Two
 connections, in that order, never open at once -- one handle per file per
@@ -53,23 +55,10 @@ from ..contract.refusals import Reason, Refusal
 from ..contract import store as contract_store
 from .. import workspace
 from ..util import db
+from ..util.db import connect_read_only
 from . import apply as apply_module
 from . import detect, ledger, plan
 from .plan import ActionKind
-
-
-def connect_read_only(workspace_id: str):
-    """A handle that cannot write, whatever the code above it does.
-
-    Measured in Step 1: CREATE, INSERT, UPDATE and DROP are all refused by the
-    engine on a read-only attached database. Nothing here relies on the caller
-    being careful.
-    """
-    con = duckdb.connect(":memory:")
-    path = workspace.duckdb_path(workspace_id)
-    con.execute(f"ATTACH '{path}' AS ws (READ_ONLY)")
-    con.execute("USE ws")
-    return con
 
 
 def _table_exists(con, dataset_name: str) -> bool:

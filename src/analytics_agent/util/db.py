@@ -95,6 +95,31 @@ def connect(workspace_id: str = DEFAULT_WORKSPACE_ID) -> duckdb.DuckDBPyConnecti
     return con
 
 
+def connect_read_only(workspace_id: str = DEFAULT_WORKSPACE_ID) -> duckdb.DuckDBPyConnection:
+    """A handle on this workspace that the engine will not let write.
+
+    Moved here from `clean/tools.py` in Phase 7, Step 7, which is the moment
+    that file's own docstring named: "connect_read_only lives here for now
+    rather than in util/db.py, where it would sit beside a function it
+    deliberately does not call. Moving it is a one-line change if that reads
+    better later." A second package needed it, so later arrived.
+
+    It cannot be `connect()` with a flag, and that is the reason it is a
+    separate function rather than a parameter: `connect()` runs
+    `CREATE TABLE IF NOT EXISTS _agent_datasets` on every open, and a
+    read-only ATTACH refuses CREATE by statement type, IF NOT EXISTS included.
+    Phase 6, Step 1 measured that.
+
+    One handle per file per process still holds. Open this OR `connect()`,
+    never both at once.
+    """
+    validate_workspace_id(workspace_id)
+    con = duckdb.connect(":memory:")
+    con.execute(f"ATTACH '{workspace.duckdb_path(workspace_id)}' AS ws (READ_ONLY)")
+    con.execute("USE ws")
+    return con
+
+
 def register_dataset(
     con: duckdb.DuckDBPyConnection,
     dataset_name: str,

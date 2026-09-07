@@ -2222,3 +2222,41 @@ Machine-local and implementation choices that are easy to forget six months late
   reason. And it is the wrong guess to make -- duplicate keys can mean "drop
   the duplicates" or "the declared grain is wrong", which are opposite actions.
   render() takes the line it should end with.
+
+## Phase 7, Step 7 — validate_dataset
+
+- P7-D11. VALIDATION DOES NOT GO THROUGH require_contract. The gate refuses a
+  dataset whose key does not hold, with KEY_NOT_UNIQUE -- which is exactly
+  broken_sales.csv, so routed through it the tool that exists to explain why
+  the data is broken would be blocked by the data being broken. It reads
+  contract.store.current directly. Not a hole in locked decision 12: nothing
+  here computes a number, the handle cannot write, and no caller can turn a
+  report into an analysis. The gate names the first thing that stopped it; the
+  report names everything it found.
+- TWO REFUSALS, AND ONLY TWO: no dataset, no contract. A STALE contract does
+  NOT refuse -- a check whose column has gone reports NOT RUN and names it,
+  and the rest of the report still runs, which is more information for the
+  same reading. No contract DOES refuse, because that report would be a page
+  of NOT RUN and P7-D10 already says a page of NOT RUN must not read as
+  success.
+- P7-D12. A VALIDATION FAILURE IS SETTLED IN THE CONTRACT, NOT IN THE DATA --
+  with the tools this project has. Duplicate KEYS whose rows differ are not
+  duplicate ROWS; a missing id cannot be invented; a date outside the window
+  cannot be moved into it; rows lost since confirmation cannot be restored by
+  rewriting the table. So propose_cleaning_plan is the wrong call in every
+  case, and naming it would be the defect Phase 6 Step 8 corrected twice: a
+  NEXT STEP contradicting the message above it. The report ends with
+  propose_dataset_contract, and says looking at the rows first is the other
+  option. Everything passing ends with run_analysis instead.
+- connect_read_only MOVED TO util/db.py. clean/tools.py named this moment
+  itself ("moving it is a one-line change if that reads better later"); a
+  second package needing the handle is what "later" meant. clean/tools.py
+  imports it and keeps it in __all__, so Phase 6's
+  test_the_proposal_connection_cannot_write is untouched. The paragraph that
+  described where it lived was rewritten in the same edit -- a docstring
+  describing a function's home after it moves is the kind of sentence this
+  phase keeps finding.
+- NOT TAKEN, ON PURPOSE: the gate's KEY_NOT_UNIQUE refusal could name
+  validate_dataset(...) as its next call, which is what a reader of that
+  refusal wants next. One line in a Phase 4 file, and it belongs in a step
+  that has a reason to open that file.

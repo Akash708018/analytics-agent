@@ -89,6 +89,7 @@ EXPECTED_TOOLS = {
     "reset_workspace",
     "run_analysis",
     "show_limits",
+    "validate_dataset",
 }
 
 

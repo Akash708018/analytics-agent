@@ -99,6 +99,7 @@ def render(
     results: list[CheckResult],
     *,
     contract_version: int | None = None,
+    note: str = "",
     next_call: str = "",
 ) -> str:
     """The report. Table, then the sentence behind every row of it."""
@@ -152,6 +153,8 @@ def render(
             "and a total would be a number nothing measured.",
         ]
 
+    if note:
+        lines += ["", note]
     if next_call:
         lines += ["", f"NEXT STEP: call {next_call}"]
     return "\n".join(lines)

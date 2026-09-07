@@ -78,6 +78,7 @@ from .ingest.csv_loader import LoadRefused
 from .contract import tools as contract_tools
 from .profile import tools as profile_tools
 from .clean import tools as clean_tools
+from .validate import tools as validate_tools
 
 mcp = FastMCP(SERVER_NAME)
 
@@ -862,6 +863,32 @@ def get_cleaning_ledger(
     """
     wid = workspace_id or DEFAULT_WORKSPACE_ID
     return clean_tools.get_cleaning_ledger(wid, dataset_name)
+
+
+@mcp.tool(annotations=READ_ONLY)
+def validate_dataset(
+    dataset_name: str,
+    workspace_id: str | None = None,
+) -> str:
+    """Check a loaded table against the contract in force for it.
+
+    Returns a pass/fail table: the key that identifies a row, whether every
+    row is dated and falls inside the analysis window, and whether the table
+    still holds the row count the contract was agreed at. Every check reports
+    how many rows passed, how many failed, and how many it could not examine.
+
+    A check with nothing to test against says NOT RUN rather than passing. A
+    contract that names no primary key produces a report where nothing could
+    be checked, and that is not a clean bill of health.
+
+    Reads on a connection that cannot write. Nothing here changes the table.
+
+    Call this when run_analysis refuses, when a number looks wrong, or before
+    trusting a dataset somebody else loaded. It reports every disagreement it
+    finds rather than stopping at the first.
+    """
+    wid = workspace_id or DEFAULT_WORKSPACE_ID
+    return validate_tools.validate_dataset(wid, dataset_name)
 
 
 if __name__ == "__main__":
