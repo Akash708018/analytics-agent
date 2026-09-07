@@ -2467,3 +2467,34 @@ Machine-local and implementation choices that are easy to forget six months late
   the checker to guess. And the key is COMPOSITE-CAPABLE because primary_key
   is: a foreign key that could not reference a composite key could not
   reference half the tables here, order_items among them.
+
+## Phase 7, Step 11 — foreign_keys and domains
+
+- P7-D5, DECIDED, AND THE INDUSTRY DECIDED IT. dbt ships four generic tests:
+  unique, not_null, accepted_values, relationships. This project already had
+  the first two (key.unique, and key.complete as not_null on the key). The
+  other two are exactly what Phase 7 deferred, and "table stakes in every
+  comparable tool" is a better reason to build them than "the guide lists
+  eight" was. Great Expectations and Soda name the same set.
+- AND dbt SETTLED THE SHAPE. Those tests are declared in schema.yml beside the
+  model, not passed to the command that runs them. So foreign_keys and domains
+  go on the CONTRACT, where every other definition lives: an agreement in a
+  call argument is not versioned, not exported to docs/contracts/, and not in
+  the report.
+- RANGES STAY DEFERRED. accepted_range is dbt_utils, not dbt core -- the same
+  signal that put the other two above the line, read the other way.
+- EMPTY IS A DEFAULT, NOT A GAP, for the third time. Neither field is in
+  unresolved. Most datasets reference nothing and constrain nothing, and a
+  field that counted as a gap would make every contract in the workspace
+  unconfirmable the day it was added.
+- A DECLARED COLUMN THE TABLE LACKS IS REFUSED; A REFERENCED DATASET THAT IS
+  NOT LOADED IS NOT. bound_to makes the first checkable -- the same condition
+  date_column's type check runs under. The second cannot be checked at
+  declaration time and should not be: a contract must be readable on a machine
+  that never loaded the table, and a foreign key pointing at an absent dataset
+  is a check that reports NOT RUN, which is P7-D7 working.
+- referenced_columns DEFAULTS TO THE SAME NAMES, filled in at construction so
+  the stored contract says what will actually be joined rather than leaving
+  the checker to guess. And the key is COMPOSITE-CAPABLE because primary_key
+  is: a foreign key that could not reference a composite key could not
+  reference half the tables here, order_items among them.
