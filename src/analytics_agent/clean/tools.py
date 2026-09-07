@@ -47,13 +47,11 @@ says that is what it is offering.
 
 from __future__ import annotations
 
-import duckdb
 
 from ..config import DEFAULT_NA_VALUES
 from ..contract.dataset_contract import Binding
 from ..contract.refusals import Reason, Refusal
 from ..contract import store as contract_store
-from .. import workspace
 from ..util import db
 from ..util.db import connect_read_only
 from . import apply as apply_module

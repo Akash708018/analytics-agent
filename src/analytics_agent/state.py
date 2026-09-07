@@ -242,7 +242,8 @@ def dataset_states(con) -> list[DatasetState]:
             continue
 
         try:
-            drift = classify_drift(live.contract, binding_for(con, name))
+            observed = binding_for(con, name)
+            drift = classify_drift(live.contract, observed)
         except ContractRefused as exc:
             state.blocked_by = str(exc)
             state.next_call = f'propose_dataset_contract(dataset_name="{name}")'
@@ -256,7 +257,29 @@ def dataset_states(con) -> list[DatasetState]:
             caveat = drift.caveat()
             if caveat:
                 state.notes.append(caveat)
-            state.next_call = f'run_analysis(dataset_name="{name}", ...)'
+
+            # The gate's own check, run here for the reason dbt will not tell
+            # you to build a model whose upstream test failed: a status view
+            # that recommends a call the gate refuses is worse than one that
+            # recommends nothing. This mirrors require_contract exactly --
+            # same function, same cache shortcut -- so the two cannot disagree
+            # about a dataset. Found by a live agent reading get_workflow_state
+            # and validate_dataset side by side; no acceptance fixture had a
+            # key that fails.
+            key = None
+            if live.contract.primary_key:
+                unchanged = (
+                    drift.drift is Drift.IDENTICAL
+                    and live.contract.bound_to.fingerprint == observed.fingerprint
+                )
+                if not unchanged:
+                    key = verify_key(con, name, live.contract.primary_key)
+
+            if key is not None and not key.holds:
+                state.blocked_by = f"the key does not hold -- {key.sentence()}"
+                state.next_call = f'validate_dataset(dataset_name="{name}")'
+            else:
+                state.next_call = f'run_analysis(dataset_name="{name}", ...)'
         out.append(state)
     return out
 

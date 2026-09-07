@@ -101,6 +101,31 @@ def _closing(dataset_name: str, results: list) -> tuple[str, str]:
             "Every check passed. The contract and the table agree.",
             f'run_analysis(dataset_name="{dataset_name}")',
         )
+
+    # A row-count LOSS is the one failure where re-confirming is the wrong
+    # first move, and two live readers reached that unprompted: re-confirming
+    # at the count the table holds signs a number nobody can account for, and
+    # every later drift check then measures against it as if it meant
+    # something. Incident practice everywhere says find the cause before
+    # resetting the baseline. get_cleaning_ledger is the only call in this
+    # workspace that can say whether an approved action removed the rows --
+    # and reading the ledger is not cleaning, which is what P7-D12 rules out.
+    lost = next(
+        (r for r in results
+         if r.check_id == "table.row_count" and "lost" in r.detail),
+        None,
+    )
+    if lost is not None:
+        return (
+            "Rows the contract was agreed against are gone, and nothing here "
+            "can say where. Re-confirming at the count the table holds would "
+            "sign a number nobody can account for, and every later drift check "
+            "would measure against it. Rule out the cleaning layer first: if "
+            "no approved action removed them, they left by a route nobody "
+            "recorded, and that is worth knowing before the agreement moves.",
+            f'get_cleaning_ledger(dataset_name="{dataset_name}")',
+        )
+
     note = (
         "A finding here is a disagreement between the table and the contract, "
         "and either side can move. Nothing in the cleaning layer can settle "

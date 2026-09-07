@@ -304,9 +304,10 @@ def clause_two() -> str:
           "6 row(s) could not be checked and are not counted as passing" in text)
     check("uncheckable rows are not added up", "never added up" in text)
 
-    check("it points at the contract, not at cleaning",
-          'NEXT STEP: call propose_dataset_contract(dataset_name="broken_sales")'
-          in text)
+    check("a row-count loss points at the ledger before the contract",
+          'NEXT STEP: call get_cleaning_ledger(dataset_name="broken_sales")'
+          in text,
+          "re-confirming would sign a count nobody can account for")
     check("it does not recommend cleaning", "propose_cleaning_plan" not in text)
     return text
 
@@ -440,6 +441,12 @@ def clause_five() -> None:
         con.close()
     check("the workflow state reports the validated stage",
           "validated just now" in state)
+    check("it does not call a dataset the gate refuses ready",
+          "BLOCKED" in state
+          and 'run_analysis(dataset_name="broken_sales"' not in state,
+          "Step 10b: the state asks the gate")
+    check("and it points at the report instead",
+          'validate_dataset(dataset_name="broken_sales")' in state)
     check("it names the contract the validation ran against",
           "against contract v1" in state)
     check("it offers the full report",

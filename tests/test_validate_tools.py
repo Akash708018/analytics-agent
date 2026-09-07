@@ -242,3 +242,39 @@ def test_validating_changes_nothing(ws, monkeypatch):
         assert after.execute("SELECT count(*) FROM sales").fetchone()[0] == rows_before
     finally:
         after.close()
+
+
+# --------------------------------------------------------------------------
+# Step 10b: a call named that the reader should not make
+# --------------------------------------------------------------------------
+
+
+def test_a_row_count_loss_names_the_ledger_rather_than_the_contract(ws, monkeypatch):
+    """Found by two live readers, independently, disagreeing with the tool.
+
+    Re-confirming at the count the table holds signs a number nobody can
+    account for, and every later drift check then measures against it. The
+    cleaning ledger is the only call in the workspace that can say whether an
+    approved action removed the rows.
+    """
+    confirm(monkeypatch, _Stored(FULL, row_count=200))
+    text = tools.validate_dataset(ws, "sales")
+    assert 'NEXT STEP: call get_cleaning_ledger(dataset_name="sales")' in text
+    assert "propose_dataset_contract" not in text.split("NEXT STEP:")[1]
+    assert "sign a number nobody can account for" in text
+
+
+def test_reading_the_ledger_is_not_cleaning(ws, monkeypatch):
+    """get_cleaning_ledger reports; propose_cleaning_plan changes things.
+    P7-D12 rules out the second, not the first."""
+    confirm(monkeypatch, _Stored(FULL, row_count=200))
+    text = tools.validate_dataset(ws, "sales")
+    assert "propose_cleaning_plan" not in text
+
+
+def test_a_grown_table_still_points_at_the_contract(ws, monkeypatch):
+    """Only a LOSS is unexplained. Rows arriving is a reload, which
+    classify_drift calls NEUTRAL and P7-D9 passes."""
+    confirm(monkeypatch, _Stored(FULL, row_count=150))
+    text = tools.validate_dataset(ws, "sales")
+    assert 'NEXT STEP: call propose_dataset_contract(dataset_name="sales")' in text

@@ -413,7 +413,12 @@ class KeyVerdict:
                 "repeats, a join or a sum over it double-counts, and nothing "
                 "downstream can tell that it did."
             ),
-            detail=self.sentence(),
+            detail=(
+                f"{self.sentence()} "
+                f'validate_dataset(dataset_name="{self.dataset_name}") reports '
+                f"this and everything else that disagrees with the contract, "
+                f"rather than stopping at the key."
+            ),
             next_call=(
                 f'propose_dataset_contract(dataset_name="{self.dataset_name}", '
                 f"primary_key=[...]) with a key that holds, or state the grain "

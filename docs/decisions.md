@@ -2369,3 +2369,39 @@ Machine-local and implementation choices that are easy to forget six months late
   passed, which is why 33 rule tests asserting on counts and on failure
   wording never saw it. Now "no row is missing order_id". Phase 6's closing
   note again: every defect that reaches a live agent is a sentence.
+
+## Phase 7, Step 10b — no tool names a call the reader should not make
+
+- THE STATE ASKS THE GATE. dataset_states computed next_call from contract
+  presence and drift alone, so a dataset require_contract refuses with
+  KEY_NOT_UNIQUE read as "contract v1, ready" with NEXT STEP run_analysis. dbt
+  does not tell you to build a model whose upstream test failed; a status view
+  that recommends a call the gate refuses is worse than one that recommends
+  nothing. Fixed with verify_key and the SAME cache shortcut require_contract
+  uses, so the two cannot disagree -- a second implementation would be the
+  P7-D6 shape. Found by a live agent reading two tools' output side by side;
+  Phase 4's clause 2 fixture is clean_sales, whose key holds, so no script
+  could have caught it.
+- AND A HOLE PINNED RATHER THAN CLOSED. The shortcut is a cache keyed on
+  "nothing moved", and nothing establishes that the key HELD when the contract
+  was confirmed -- store.confirm does not look at the data, deliberately. So a
+  contract confirmed against an already-broken key is never re-checked, by the
+  gate or the report. dbt has the same separation and also has a test run at
+  build time, which this does not. validate_dataset uses no shortcut and
+  catches it every time. Closing it properly means running the key check at
+  confirm, or keying the cache on a recorded validation rather than a
+  fingerprint. Phase 8 or later.
+- A ROW-COUNT LOSS NAMES THE LEDGER, NOT THE CONTRACT. The note said "look at
+  the rows first" and the NEXT STEP named propose_dataset_contract -- Phase 6
+  Step 8's defect class, back in a different tool, and two live readers stopped
+  at the same line. P7-D12 is right in direction and premature for this one
+  failure: re-confirming at the count the table holds signs a number nobody can
+  account for. get_cleaning_ledger is the only call that can rule out an
+  approved action, and READING the ledger is not cleaning. A GROWN table keeps
+  propose_dataset_contract: rows arriving is a reload, which classify_drift
+  calls NEUTRAL.
+- THE TIDY, WITH A REASON TO OPEN THE FILES AT LAST. Two imports orphaned when
+  connect_read_only moved in Step 7, checked rather than assumed before
+  removal; and EXPECTED_TOOLS deduped from 31 entries to 25. A set literal made
+  the repeats harmless, which is why they waited; a list a reader checks
+  against server.py is worse for holding three names three times each.
