@@ -2187,3 +2187,38 @@ Machine-local and implementation choices that are easy to forget six months late
   validation.
 - P7-D5 STILL OPEN, STILL NOT BLOCKING. Four checks built, none of them
   reading a field that does not exist.
+
+## Phase 7, Step 6 — the pass/fail table
+
+- P7-D10. THE HEADLINE COUNTS THE THREE OUTCOMES AND NEVER COLLAPSES THEM INTO
+  ONE WORD. Five failed and one passed is not "FAIL"; five passed and four
+  could not run is not "PASS". Both single words are available and shorter,
+  and both throw away what P7-D7 exists to preserve -- the difference between
+  a question answered and one never asked. A reader who skims one line is the
+  reader this is for, so that line has to be true alone.
+- FAILURES FIRST, AND THE DENOMINATOR ONCE. "5 of 6 failed, 1 of 6 passed,
+  0 of 6 could not run" says the same thing three times, which is how a
+  headline becomes something people skip. The total attaches to whichever
+  count is named first.
+- A THIN CONTRACT MUST NOT READ AS SUCCESS. "no check could run. All 5 say why
+  below, and none of them is a pass." A contract naming no key and no date
+  column is confirmable -- those fields are optional and `unresolved` is about
+  blanks nobody declared -- so this report is reachable, and PASS there would
+  be the most expensive sentence in the phase.
+- A DASH, NEVER A ZERO, WHERE COUNTING ROWS IS NOT THE POINT. Scope.TABLE and
+  NOT RUN both print "-". A zero in a "failed" column reads as "nothing
+  failed", which for a check that never ran is a claim nobody made. P7-D8
+  reaching the page: a table that prints 0 for those checks has quietly made
+  them about rows again. The explanation line appears only when there is a
+  dash to explain.
+- ROWS A CHECK COULD NOT EXAMINE ARE NEVER ADDED UP. The same six undated rows
+  are not_checked for date.in_window and again for date.not_future; a roll-up
+  would report twelve uncheckable rows where there are six. The per-check
+  column is the honest place, and the report says so rather than leaving the
+  arithmetic as a trap for whoever sums the column.
+- THE NEXT STEP IS SUPPLIED, NOT GUESSED. report.py does not know its
+  workspace, whether a result file was written, or which tools are registered;
+  Refusal refuses to construct with a next_call that is not a call for the same
+  reason. And it is the wrong guess to make -- duplicate keys can mean "drop
+  the duplicates" or "the declared grain is wrong", which are opposite actions.
+  render() takes the line it should end with.
