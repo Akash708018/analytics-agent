@@ -41,7 +41,7 @@ from datetime import date
 from ..contract import store as contract_store
 from ..contract.refusals import Reason, Refusal
 from ..util import db
-from . import report, rules
+from . import report, rules, runs
 from .rules import Outcome
 
 
@@ -150,6 +150,28 @@ def validate_dataset(
         )
     finally:
         ro.close()
+
+    # Third connection, writable, after the read-only one is closed. Same
+    # sequence clean/tools.py established: writable to read the contract,
+    # read-only to run the checks, writable to record that they ran. Never two
+    # at once -- one handle per file per process.
+    con = db.connect(workspace_id)
+    try:
+        runs.record(
+            con,
+            dataset_name=dataset_name,
+            contract_version=stored.version,
+            row_count=next(
+                (r.rows for r in results if r.scope is rules.Scope.ROWS), 0
+            ),
+            checks_total=len(results),
+            checks_failed=sum(1 for r in results if r.outcome is Outcome.FAIL),
+            checks_not_run=sum(
+                1 for r in results if r.outcome is Outcome.NOT_RUN
+            ),
+        )
+    finally:
+        con.close()
 
     note, next_call = _closing(dataset_name, results)
     return report.render(

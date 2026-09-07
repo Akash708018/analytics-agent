@@ -302,6 +302,13 @@ def describe_workflow_state(con) -> str:
         from .clean import ledger as clean_ledger
 
         lines += clean_ledger.state_notes(con, s.dataset_name)
+
+        # Local for the same reason, and one more: validate/runs.py imports
+        # profile/runs.py, which this file already imports at the top. A local
+        # import keeps the graph flat whatever else moves.
+        from .validate import runs as validate_runs
+
+        lines += validate_runs.state_notes(con, s.dataset_name, s.row_count)
         if s.contract:
             lines.append(
                 f"Contract v{s.contract.version}, confirmed "

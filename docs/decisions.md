@@ -2260,3 +2260,69 @@ Machine-local and implementation choices that are easy to forget six months late
   validate_dataset(...) as its next call, which is what a reader of that
   refusal wants next. One line in a Phase 4 file, and it belongs in a step
   that has a reason to open that file.
+
+## Phase 7, Step 8 — the validated stage
+
+- A TABLE BEFORE IT IS A SPLICE. get_workflow_state could say loaded, profiled
+  and cleaned, and could not say whether anybody had checked a dataset against
+  its contract. Validation writes no file, so there was not even a directory
+  listing to infer from -- _agent_validations is the only thing that can
+  answer it.
+- P7-D13. THE RECORD STORES THE COUNTS, NOT A PATH. profile/runs.py stores
+  result_path because a profile is expensive and its output is a CSV somebody
+  pages through. A validation report is prose regenerated in one call, and
+  writing it to disk would create the F7 shape ON PURPOSE: a path in a
+  transcript nobody opens. "Full report: validate_dataset(...)" is a call, not
+  a path.
+- checks_passed IS DERIVED, NOT STORED. Three numbers that must add to the
+  total; storing the fourth is a chance for them to disagree.
+- THE ROW COUNT IS STORED, AND IT IS THE F13 DOOR. "validated 40 minutes ago
+  at 186 rows, and the table now holds 190." A validation is a statement about
+  a table at a moment, and the moment has to sit beside it or the statement
+  becomes a claim about data nobody checked. Wording follows Phase 5: OLD, NOT
+  WRONG -- an agent told "stale" re-runs, an agent told "wrong" apologises.
+- P7-D10 REACHES THE STATE LINE. "2 of 6 passed, 4 could not run", never one
+  word. The state line is read faster than the report, so it is the more
+  important place for that rule rather than a place it can be relaxed.
+- NOT IN DatasetState.stage. Third module, same argument, and it holds a third
+  time: that column is about whether ANALYSIS CAN RUN and validation is a
+  different axis again. Profiling (Phase 5), cleaning (Phase 6 Step 10c) and
+  validation all splice into the per-dataset section, which is why
+  describe_workflow_state has needed no new branch since Phase 5.
+- THREE CONNECTIONS IN SEQUENCE: writable to read the contract, read-only to
+  run the checks, writable to record that they ran. Never two at once. Only a
+  report records a run -- the two refusals record nothing, because nothing was
+  checked.
+
+## Phase 7, Step 8 — the validated stage
+
+- A TABLE BEFORE IT IS A SPLICE. get_workflow_state could say loaded, profiled
+  and cleaned, and could not say whether anybody had checked a dataset against
+  its contract. Validation writes no file, so there was not even a directory
+  listing to infer from -- _agent_validations is the only thing that can
+  answer it.
+- P7-D13. THE RECORD STORES THE COUNTS, NOT A PATH. profile/runs.py stores
+  result_path because a profile is expensive and its output is a CSV somebody
+  pages through. A validation report is prose regenerated in one call, and
+  writing it to disk would create the F7 shape ON PURPOSE: a path in a
+  transcript nobody opens. "Full report: validate_dataset(...)" is a call, not
+  a path.
+- checks_passed IS DERIVED, NOT STORED. Three numbers that must add to the
+  total; storing the fourth is a chance for them to disagree.
+- THE ROW COUNT IS STORED, AND IT IS THE F13 DOOR. "validated 40 minutes ago
+  at 186 rows, and the table now holds 190." A validation is a statement about
+  a table at a moment, and the moment has to sit beside it or the statement
+  becomes a claim about data nobody checked. Wording follows Phase 5: OLD, NOT
+  WRONG -- an agent told "stale" re-runs, an agent told "wrong" apologises.
+- P7-D10 REACHES THE STATE LINE. "2 of 6 passed, 4 could not run", never one
+  word. The state line is read faster than the report, so it is the more
+  important place for that rule rather than a place it can be relaxed.
+- NOT IN DatasetState.stage. Third module, same argument, and it holds a third
+  time: that column is about whether ANALYSIS CAN RUN and validation is a
+  different axis again. Profiling (Phase 5), cleaning (Phase 6 Step 10c) and
+  validation all splice into the per-dataset section, which is why
+  describe_workflow_state has needed no new branch since Phase 5.
+- THREE CONNECTIONS IN SEQUENCE: writable to read the contract, read-only to
+  run the checks, writable to record that they ran. Never two at once. Only a
+  report records a run -- the two refusals record nothing, because nothing was
+  checked.
