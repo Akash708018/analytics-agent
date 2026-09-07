@@ -109,6 +109,8 @@ _TRACKED = (
     "bound_to",
     "missing_values",
     "excluded_columns",
+    "foreign_keys",
+    "domains",
 )
 
 

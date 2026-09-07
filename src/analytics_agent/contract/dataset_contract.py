@@ -141,6 +141,52 @@ class Exclusion(BaseModel):
         return v
 
 
+class ForeignKey(BaseModel):
+    """A column that must point at a row of another dataset.
+
+    dbt's `relationships` test, declared where dbt declares it: in the schema
+    file beside the model, not in the call that runs the check. The referenced
+    dataset is NAMED, not resolved -- it may not be loaded when the contract is
+    written, and a check with nothing to run against reports NOT RUN rather
+    than failing (P7-D7).
+
+    Composite rather than single-column, because `primary_key` already is and a
+    foreign key that cannot reference a composite key cannot reference half the
+    tables this project loads.
+    """
+
+    columns: list[str]
+    references: str
+    referenced_columns: list[str] = Field(default_factory=list)
+    reason: str = ""
+
+    @model_validator(mode="after")
+    def _the_two_sides_line_up(self) -> ForeignKey:
+        if not self.columns:
+            raise ValueError("a foreign key needs at least one column.")
+        if not self.references.strip():
+            raise ValueError(
+                "a foreign key needs the dataset it references, by name."
+            )
+        if not self.referenced_columns:
+            # The common case, and the one dbt writes: the same column names on
+            # both sides. Filled in rather than left for the checker to guess.
+            object.__setattr__(self, "referenced_columns", list(self.columns))
+        if len(self.columns) != len(self.referenced_columns):
+            raise ValueError(
+                f"{len(self.columns)} column(s) on this side and "
+                f"{len(self.referenced_columns)} on {self.references}: a "
+                f"foreign key joins them in pairs, so the two lists must be "
+                f"the same length."
+            )
+        return self
+
+    def label(self) -> str:
+        left = " + ".join(self.columns)
+        right = " + ".join(self.referenced_columns)
+        return f"{left} -> {self.references}.{right}"
+
+
 class AnalysisWindow(BaseModel):
     """The period the analysis covers. Both ends inclusive."""
 
@@ -253,6 +299,19 @@ class DatasetContract(BaseModel):
         description="Columns never to read. Distinct from known_exclusions, "
         "which is about ROWS. Cleaning does not propose changes to these and "
         "says it skipped them.",
+    )
+    foreign_keys: list[ForeignKey] = Field(
+        default_factory=list,
+        description="Columns that must point at a row of another dataset. "
+        "Empty is a DEFAULT, not a gap: most datasets reference nothing, and "
+        "a field that counted as a gap would make every contract in the "
+        "workspace unconfirmable the day it was added.",
+    )
+    domains: dict[str, list[str]] = Field(
+        default_factory=dict,
+        description="Column -> the complete set of values it may hold. dbt's "
+        "accepted_values. Empty is a DEFAULT, not a gap, for the same reason "
+        "as foreign_keys.",
     )
 
     bound_to: Binding | None = None
@@ -491,6 +550,33 @@ class DatasetContract(BaseModel):
             lines += ["", "Caveats:"] + [f"  - {c}" for c in self.caveats]
         return "\n".join(lines)
 
+    @model_validator(mode="after")
+    def _declared_columns_exist(self) -> DatasetContract:
+        """A declaration naming a column the table does not have is a typo.
+
+        Only checkable once `bound_to` is set, which is the same condition
+        `date_column`'s type check runs under. Unbound contracts are legal --
+        a contract has to be readable on a machine that never loaded the table
+        -- so this says nothing about them.
+        """
+        if self.bound_to is None:
+            return self
+        known = {c.name for c in self.bound_to.columns}
+        for fk in self.foreign_keys:
+            missing = [c for c in fk.columns if c not in known]
+            if missing:
+                raise ValueError(
+                    f"foreign key {fk.label()} names {', '.join(missing)}, "
+                    f"which {self.dataset_name} does not have."
+                )
+        for column in self.domains:
+            if column not in known:
+                raise ValueError(
+                    f"a domain is declared for {column}, which "
+                    f"{self.dataset_name} does not have."
+                )
+        return self
+
     def to_yaml_dict(self) -> dict[str, Any]:
         """
         The export written to docs/contracts/<dataset>.yaml on confirm.
@@ -534,6 +620,16 @@ class DatasetContract(BaseModel):
                 for e in self.known_exclusions
             ],
             "caveats": list(self.caveats),
+            "foreign_keys": [
+                {
+                    "columns": list(fk.columns),
+                    "references": fk.references,
+                    "referenced_columns": list(fk.referenced_columns),
+                    "reason": fk.reason,
+                }
+                for fk in self.foreign_keys
+            ],
+            "domains": {k: list(v) for k, v in self.domains.items()},
         }
 
 
@@ -576,6 +672,7 @@ __all__ = [
     "ColumnBinding",
     "DatasetContract",
     "Exclusion",
+    "ForeignKey",
     "Measure",
     "contract_from_json",
 ]
