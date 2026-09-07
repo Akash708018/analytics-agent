@@ -2344,3 +2344,28 @@ Machine-local and implementation choices that are easy to forget six months late
   there are none. state.py passes the version off the StoredContract the
   per-dataset loop already read, so it costs no query, and None where no
   contract is in force.
+
+## Phase 7, Step 9 — the acceptance script
+
+- BOTH CLAUSES BUILD A REAL CONFIRMED CONTRACT. Proposed values, a binding,
+  store.confirm -- not the patched contract_store.current the unit tests use.
+  A table rendered from a stand-in proves the renderer works and says nothing
+  about the path a person takes. It exercises Phase 4 for free: if the model's
+  validators or the store move, this fails at the confirm and names which.
+- CLAUSE 3 IS P7-D11, ASSERTED. require_contract refuses broken_sales with
+  KEY_NOT_UNIQUE and validate_dataset reports five findings on the same table,
+  and both are correct at once. If validation is ever routed through the gate,
+  this is the clause that notices.
+- A SKIP IS NOT A PASS. The first clause 4 read `"list_datasets" in known or
+  not known`, which passes when server.py cannot be found and printed
+  PASS (server.py not found). A script whose green includes checks that could
+  not run is what P7-D7 argues against at the row level, one layer up.
+- CONFIRMING A CONTRACT DOES NOT LOOK AT THE DATA. Asserted rather than
+  assumed: a contract confirms against broken_sales, whose key does not hold.
+  Validation is where the data is checked, which is why P7-D12 sends a failure
+  back to the contract rather than to the cleaner.
+- "every row carries a order_id" -- FIXED. The article was hard-coded in front
+  of a column name in two places, both in the ELSE branch of a check that
+  passed, which is why 33 rule tests asserting on counts and on failure
+  wording never saw it. Now "no row is missing order_id". Phase 6's closing
+  note again: every defect that reaches a live agent is a sentence.

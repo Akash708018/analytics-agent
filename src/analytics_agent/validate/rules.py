@@ -277,7 +277,7 @@ def key_checks(con, dataset_name: str, primary_key: list[str]) -> list[CheckResu
             f"{missing_key_rows:,} row(s) have no {label} and are not "
             f"identified by it"
             if missing_key_rows
-            else f"every row carries a {label}"
+            else f"no row is missing {label}"
         ),
     )
     return [unique, complete]
@@ -351,7 +351,7 @@ def date_checks(
             f"{undated:,} row(s) have no {date_column} and cannot be placed in "
             f"time"
             if undated
-            else f"every row carries a {date_column}"
+            else f"no row is missing {date_column}"
         ),
     )
 
