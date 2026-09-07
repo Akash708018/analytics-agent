@@ -138,3 +138,48 @@ def test_the_age_phrase_carries_both_the_interval_and_the_stamp(con):
         phrase = run.age_phrase(NOW + delta)
         assert phrase.startswith(expected)
         assert "2026-09-07 11:48" in phrase
+
+
+# --------------------------------------------------------------------------
+# Step 8b: the other way a validation goes out of date
+# --------------------------------------------------------------------------
+
+
+def test_a_contract_that_moved_since_makes_the_validation_stale(con):
+    """Step 8 shipped one kind of staleness and this is the other.
+
+    Validate at v2, confirm v3, and without this the section reads "validated
+    against contract v2" directly above "Contract v3", with nothing saying the
+    check predates the agreement it is quoted against. The row count cannot
+    catch it: a table that gained no rows reads as freshly validated.
+    """
+    a_run(con, contract_version=2)
+    lines = runs.state_notes(con, "sales", 186, 3, now=NOW)
+    assert "out of date" in lines[1]
+    assert "the contract has moved to v3 since (v2 then)" in lines[1]
+    assert "nobody is working to now" in lines[1]
+    assert "Re-run validate_dataset" in lines[1]
+
+
+def test_both_kinds_of_staleness_share_one_instruction(con):
+    """Two reasons, one sentence, one re-run. Two "re-run this" lines for one
+    stale run is noise, and the reader acts on the first either way."""
+    a_run(con, contract_version=2)
+    line = runs.state_notes(con, "sales", 190, 3, now=NOW)[1]
+    assert "the contract has moved to v3" in line
+    assert "gained 4 row(s)" in line
+    assert line.count("Re-run validate_dataset") == 1
+
+
+def test_an_unchanged_contract_is_not_reported_as_moved(con):
+    a_run(con, contract_version=2)
+    lines = runs.state_notes(con, "sales", 186, 2, now=NOW)
+    assert "out of date" not in lines[1]
+    assert "Full report" in lines[1]
+
+
+def test_an_unknown_version_skips_the_comparison(con):
+    """None means the caller does not know, not "it matches"."""
+    a_run(con, contract_version=2)
+    lines = runs.state_notes(con, "sales", 186, None, now=NOW)
+    assert "Full report" in lines[1]

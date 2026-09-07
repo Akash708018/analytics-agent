@@ -308,7 +308,12 @@ def describe_workflow_state(con) -> str:
         # import keeps the graph flat whatever else moves.
         from .validate import runs as validate_runs
 
-        lines += validate_runs.state_notes(con, s.dataset_name, s.row_count)
+        lines += validate_runs.state_notes(
+            con,
+            s.dataset_name,
+            s.row_count,
+            s.contract.version if s.contract else None,
+        )
         if s.contract:
             lines.append(
                 f"Contract v{s.contract.version}, confirmed "

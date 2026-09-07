@@ -202,9 +202,16 @@ def history(con, dataset_name: str) -> list[ValidationRun]:
 
 
 def state_notes(
-    con, dataset_name: str, current_rows: int, now: datetime | None = None
+    con,
+    dataset_name: str,
+    current_rows: int,
+    current_version: int | None = None,
+    now: datetime | None = None,
 ) -> list[str]:
     """Lines for get_workflow_state, or [] if this dataset was never validated.
+
+    `current_version` is the version in force NOW, or None when the caller does
+    not know. None skips the comparison rather than assuming a match.
 
     Deliberately the same shape as `profile/runs.state_notes` and
     `clean/ledger.state_notes`: a list the caller splices in, empty when there
@@ -224,10 +231,27 @@ def state_notes(
         f"{run.age_phrase(now)} against contract v{run.contract_version}: "
         f"{run.verdict_phrase()}."
     ]
+
+    # Two ways a validation goes out of date, and Step 8 shipped one of them.
+    # The rows can move under it, and the AGREEMENT can move over it: validate
+    # at v2, confirm v3, and without this the section reads "validated against
+    # contract v2" above "Contract v3" with nothing saying the check predates
+    # the agreement it is quoted against. Collected into one sentence with one
+    # instruction, because two "re-run this" lines for one stale run is noise.
+    reasons = []
+    if current_version is not None and current_version != run.contract_version:
+        reasons.append(
+            f"the contract has moved to v{current_version} since "
+            f"(v{run.contract_version} then), so this describes an agreement "
+            f"nobody is working to now"
+        )
     drift = run.drift_phrase(current_rows)
     if drift:
+        reasons.append(drift)
+
+    if reasons:
         lines.append(
-            f"That validation is out of date: {drift}. "
+            f"That validation is out of date: {'; '.join(reasons)}. "
             f'Re-run validate_dataset(dataset_name="{dataset_name}").'
         )
     else:
@@ -235,7 +259,6 @@ def state_notes(
             f'Full report: validate_dataset(dataset_name="{dataset_name}")'
         )
     return lines
-
 
 __all__ = [
     "VALIDATION_TABLE",

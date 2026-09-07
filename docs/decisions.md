@@ -2326,3 +2326,21 @@ Machine-local and implementation choices that are easy to forget six months late
   run the checks, writable to record that they ran. Never two at once. Only a
   report records a run -- the two refusals record nothing, because nothing was
   checked.
+
+## Phase 7, Step 8b — a validation goes out of date two ways
+
+- THE ROWS MOVE UNDER IT, AND THE AGREEMENT MOVES OVER IT. Step 8 shipped only
+  the first. Validate at v2, confirm v3, and the section read "validated
+  against contract v2" directly above "Contract v3" with nothing saying the
+  check predates the agreement it was quoted against -- and drift_phrase could
+  never catch it, because a table that gained no rows reads as freshly
+  validated. Found by reading Step 8's own Part 5 output rather than by a test.
+- ONE SENTENCE, ONE INSTRUCTION. When both are true the reasons join into a
+  single "out of date" line with a single Re-run. Two re-run instructions for
+  one stale run is noise and the reader acts on the first either way.
+- current_version=None MEANS UNKNOWN, NOT "MATCHES". A caller that does not
+  know should not assert a match by omission -- the rule missing_values=None
+  already follows on a contract, where unset means use the default rather than
+  there are none. state.py passes the version off the StoredContract the
+  per-dataset loop already read, so it costs no query, and None where no
+  contract is in force.
