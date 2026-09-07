@@ -1,0 +1,483 @@
+"""One check, one row of the report, and four numbers that add up.
+
+Phase 7, Step 4. The first code in `validate/`.
+
+**P7-D4 is structural here rather than documented.** Every check reports
+`passed`, `failed` and `not_checked`, and `CheckResult` refuses to construct
+unless the three sum to `rows`. A predicate does not see NULLs -- Step 1
+measured that on a window, a range and a domain -- so a check that reports only
+what its predicate saw describes some of its rows and calls the rest a pass.
+Making the sum a constructor invariant is the same move `Refusal` makes with
+parentheses in `next_call` and `DatasetContract` makes with blanks not listed in
+`unresolved`: the guarantee is not a line in a docstring that a later check can
+forget.
+
+**P7-D7: a check that could not run is not a check that passed.** A dataset with
+no primary key declared has nothing to verify a key against, and reporting PASS
+would be a lie told in the safest-looking direction. `not_run_because` carries
+the sentence, the outcome renders as NOT RUN, and the counts are all zero --
+because zero rows were examined, and pretending otherwise is how a validation
+report becomes a thing people stop reading.
+
+**Evidence is capped with the remainder counted**, P5-D3's rule again. Ten
+offending values is enough to recognise the problem and short enough that
+nobody mistakes it for the answer; the count of what is not shown is printed
+beside it rather than left to be inferred from a truncated list.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from datetime import date
+from enum import Enum
+
+from ..contract.compatibility import verify_key
+
+# What a check shows before it starts counting instead of listing.
+EVIDENCE_LIMIT = 10
+
+
+class Outcome(str, Enum):
+    PASS = "PASS"
+    FAIL = "FAIL"
+    NOT_RUN = "NOT RUN"
+
+
+class Scope(str, Enum):
+    """What a check counts.
+
+    P7-D8: not every check is about rows. "The contract was agreed at 51,290
+    rows and the table holds 51,530" is true of the table and of no row in
+    particular, and inventing a per-row breakdown for it -- calling every row
+    failed, or every row passed -- would put a number in the report that
+    nothing measured. A TABLE-scoped check leaves the four counts at zero and
+    the renderer prints a dash, which is what "this question is not about
+    rows" looks like when it is said out loud.
+    """
+
+    ROWS = "rows"
+    TABLE = "table"
+
+
+@dataclass(frozen=True)
+class CheckResult:
+    """One check against one dataset."""
+
+    check_id: str
+    title: str
+    subject: str
+    rows: int = 0
+    passed: int = 0
+    failed: int = 0
+    not_checked: int = 0
+    detail: str = ""
+    evidence: tuple[str, ...] = ()
+    evidence_total: int = 0
+    not_run_because: str = ""
+    scope: Scope = Scope.ROWS
+    table_ok: bool | None = None
+
+    def __post_init__(self) -> None:
+        if self.not_run_because:
+            if self.rows or self.passed or self.failed or self.not_checked:
+                raise ValueError(
+                    f"{self.check_id}: a check that did not run counts nothing. "
+                    f"Zero rows were examined, and any other number here would "
+                    f"be describing rows nobody looked at."
+                )
+            return
+        if self.scope is Scope.TABLE:
+            if self.rows or self.passed or self.failed or self.not_checked:
+                raise ValueError(
+                    f"{self.check_id}: a TABLE-scoped check counts no rows. "
+                    f"P7-D8: the finding is true of the table and of no row in "
+                    f"particular, and a per-row breakdown here would be a "
+                    f"number nothing measured."
+                )
+            if self.table_ok is None:
+                raise ValueError(
+                    f"{self.check_id}: a TABLE-scoped check needs table_ok, "
+                    f"because it has no failure count to derive an outcome from."
+                )
+            return
+        total = self.passed + self.failed + self.not_checked
+        if total != self.rows:
+            raise ValueError(
+                f"{self.check_id}: passed + failed + not_checked = {total:,}, "
+                f"but the table has {self.rows:,} row(s). P7-D4: a predicate "
+                f"does not see NULLs, so every row a check did not examine is "
+                f"counted rather than left out of the arithmetic."
+            )
+        if len(self.evidence) > EVIDENCE_LIMIT:
+            raise ValueError(
+                f"{self.check_id}: {len(self.evidence)} evidence lines, cap is "
+                f"{EVIDENCE_LIMIT}. Cap it and count the remainder."
+            )
+        if self.evidence_total < len(self.evidence):
+            raise ValueError(
+                f"{self.check_id}: evidence_total {self.evidence_total} is "
+                f"below the {len(self.evidence)} line(s) shown."
+            )
+
+    @property
+    def outcome(self) -> Outcome:
+        if self.not_run_because:
+            return Outcome.NOT_RUN
+        if self.scope is Scope.TABLE:
+            return Outcome.PASS if self.table_ok else Outcome.FAIL
+        return Outcome.FAIL if self.failed else Outcome.PASS
+
+    @property
+    def evidence_withheld(self) -> int:
+        return max(0, self.evidence_total - len(self.evidence))
+
+    def sentence(self) -> str:
+        """What this check found, in one line, counts included."""
+        if self.not_run_because:
+            return f"Not run: {self.not_run_because}"
+        parts = [self.detail] if self.detail else []
+        if self.not_checked:
+            parts.append(
+                f"{self.not_checked:,} row(s) could not be checked and are not "
+                f"counted as passing"
+            )
+        return ". ".join(parts) + ("." if parts else "")
+
+    @classmethod
+    def about_the_table(cls, check_id: str, title: str, subject: str, *,
+                        ok: bool, detail: str):
+        return cls(check_id=check_id, title=title, subject=subject,
+                   scope=Scope.TABLE, table_ok=ok, detail=detail)
+
+    @classmethod
+    def not_run(cls, check_id: str, title: str, subject: str, why: str):
+        return cls(check_id=check_id, title=title, subject=subject,
+                   not_run_because=why)
+
+
+def _q(name: str) -> str:
+    return '"' + name.replace('"', '""') + '"'
+
+
+def _duplicates(con, dataset_name: str, columns: list[str]):
+    """The keys that repeat, how many rows they cover, and up to ten of them.
+
+    P7-D1: asked with GROUP BY rather than with a count. The grouping form is
+    null-safe for a one-column key as well as a composite one and -- the reason
+    it wins outright -- it returns the offending values. A check that reports
+    "3 keys repeat" sends somebody to write this query.
+
+    The NULL guard is applied for a one-column key ONLY, which is P7-D6's
+    denominator arriving in a second place: `count(DISTINCT x)` drops nulls and
+    `count(DISTINCT (a, b))` does not, so a null-bearing tuple IS a comparable
+    value for a composite key and is not one for a single column. Guarding both
+    the same way would make this query disagree with the verdict it is
+    evidence for.
+    """
+    quoted = ", ".join(_q(c) for c in columns)
+    guard = (
+        f"WHERE {_q(columns[0])} IS NOT NULL" if len(columns) == 1 else ""
+    )
+    # The totals subquery projects ONLY the count, never the key columns.
+    # An earlier version aliased it `AS n` and selected the key columns
+    # alongside; a table whose own key column is called `n` then had two
+    # columns of that name in the subquery, `sum(n)` summed the grouping
+    # column instead of the count, and every duplicate row silently became
+    # zero. Nothing raised. Projecting one column makes the collision
+    # impossible rather than unlikely.
+    groups, rows = con.execute(
+        f"SELECT count(*), coalesce(sum(cnt), 0) FROM ("
+        f"  SELECT count(*) AS cnt FROM {_q(dataset_name)} {guard} "
+        f"  GROUP BY {quoted} HAVING count(*) > 1)"
+    ).fetchone()
+    shown = con.execute(
+        f"SELECT {quoted}, count(*) FROM {_q(dataset_name)} {guard} "
+        f"GROUP BY {quoted} HAVING count(*) > 1 "
+        f"ORDER BY count(*) DESC, {quoted} LIMIT {EVIDENCE_LIMIT}"
+    ).fetchall()
+    evidence = tuple(
+        f"{' + '.join('(null)' if v is None else str(v) for v in r[:-1])} "
+        f"appears {r[-1]:,} times"
+        for r in shown
+    )
+    return evidence, int(groups), int(rows)
+
+
+def key_checks(con, dataset_name: str, primary_key: list[str]) -> list[CheckResult]:
+    """Uniqueness and completeness, from one pass over the table.
+
+    Two checks and not one, because "the key repeats" and "the key is missing"
+    have different fixes and P7-D6 showed what happens when one number tries to
+    carry both. The verdict comes from `contract.compatibility.verify_key` --
+    the same function the gate calls, so a dataset the gate refuses cannot be
+    reported as valid here.
+    """
+    if not primary_key:
+        why = (
+            "the contract states no primary key, so there is nothing to verify "
+            "a row against"
+        )
+        return [
+            CheckResult.not_run("key.unique", "Primary key is unique", "-", why),
+            CheckResult.not_run("key.complete", "Primary key is present", "-", why),
+        ]
+
+    v = verify_key(con, dataset_name, primary_key)
+    label = " + ".join(primary_key)
+
+    if v.missing:
+        why = (
+            f"{', '.join(v.missing)} is not a column of {dataset_name}, so the "
+            f"contract names a key the table does not have"
+        )
+        return [
+            CheckResult.not_run("key.unique", "Primary key is unique", label, why),
+            CheckResult.not_run("key.complete", "Primary key is present", label, why),
+        ]
+
+    # P7-D6's denominator, reused: for a one-column key the null rows were
+    # never comparable and are NOT counted as passing; for a composite key the
+    # row constructor counts a null-bearing tuple, so every row was examined.
+    not_comparable = v.row_count - v.keyed_rows
+    evidence, groups, duplicate_rows = _duplicates(con, dataset_name, primary_key)
+
+    missing_key_rows = 0
+    if v.null_bearing:
+        any_null = " OR ".join(f"{_q(c)} IS NULL" for c in primary_key)
+        missing_key_rows = con.execute(
+            f"SELECT count(*) FROM {_q(dataset_name)} WHERE {any_null}"
+        ).fetchone()[0]
+
+    unique = CheckResult(
+        check_id="key.unique",
+        title="Primary key is unique",
+        subject=label,
+        rows=v.row_count,
+        passed=v.keyed_rows - duplicate_rows,
+        failed=duplicate_rows,
+        not_checked=not_comparable,
+        detail=(
+            f"{groups:,} key value(s) repeat, across {duplicate_rows:,} row(s)"
+            if duplicate_rows
+            else f"{v.distinct:,} distinct value(s), none repeated"
+        ),
+        evidence=evidence,
+        evidence_total=groups,
+    )
+
+    complete = CheckResult(
+        check_id="key.complete",
+        title="Primary key is present",
+        subject=label,
+        rows=v.row_count,
+        passed=v.row_count - missing_key_rows,
+        failed=missing_key_rows,
+        not_checked=0,
+        detail=(
+            f"{missing_key_rows:,} row(s) have no {label} and are not "
+            f"identified by it"
+            if missing_key_rows
+            else f"every row carries a {label}"
+        ),
+    )
+    return [unique, complete]
+
+
+def _column_type(con, dataset_name: str, column: str) -> str | None:
+    row = con.execute(
+        """SELECT data_type FROM information_schema.columns
+           WHERE table_schema = 'main' AND table_name = ? AND column_name = ?""",
+        [dataset_name, column],
+    ).fetchone()
+    return row[0] if row else None
+
+
+def date_checks(
+    con,
+    dataset_name: str,
+    date_column: str | None,
+    window: tuple[date, date] | None = None,
+    *,
+    today: date | None = None,
+) -> list[CheckResult]:
+    """Three questions about the column the contract dates a row by.
+
+    `today` is injectable for the reason `store.confirm`'s `now` is: a test
+    that asserts on "in the future" and reads the wall clock asserts something
+    different every day it runs.
+
+    The three run independently. A contract can name a date column and declare
+    no window -- that is a legitimate state, not a gap -- so `date.in_window`
+    reports NOT RUN while the other two still answer. Collapsing them into one
+    check would make a missing window silence a question about nulls that has
+    nothing to do with it.
+    """
+    if not date_column:
+        why = "the contract names no date column, so no row can be placed in time"
+        return [
+            CheckResult.not_run("date.present", "Every row is dated", "-", why),
+            CheckResult.not_run("date.in_window", "Dates fall in the analysis window", "-", why),
+            CheckResult.not_run("date.not_future", "No row is dated in the future", "-", why),
+        ]
+
+    column_type = _column_type(con, dataset_name, date_column)
+    if column_type is None:
+        why = (
+            f"{date_column} is not a column of {dataset_name}, so the contract "
+            f"names a date column the table does not have"
+        )
+        return [
+            CheckResult.not_run("date.present", "Every row is dated", date_column, why),
+            CheckResult.not_run("date.in_window", "Dates fall in the analysis window", date_column, why),
+            CheckResult.not_run("date.not_future", "No row is dated in the future", date_column, why),
+        ]
+
+    col = _q(date_column)
+    table = _q(dataset_name)
+    rows, dated = con.execute(
+        f"SELECT count(*), count({col}) FROM {table}"
+    ).fetchone()
+    undated = rows - dated
+
+    present = CheckResult(
+        check_id="date.present",
+        title="Every row is dated",
+        subject=date_column,
+        rows=rows,
+        passed=dated,
+        failed=undated,
+        not_checked=0,
+        detail=(
+            f"{undated:,} row(s) have no {date_column} and cannot be placed in "
+            f"time"
+            if undated
+            else f"every row carries a {date_column}"
+        ),
+    )
+
+    if window is None:
+        in_window = CheckResult.not_run(
+            "date.in_window", "Dates fall in the analysis window", date_column,
+            "the contract declares no analysis window, so there is no span to "
+            "test a date against",
+        )
+    else:
+        start, end = window
+        # P7-D2. The window is inclusive at both ends and date_column may be a
+        # TIMESTAMP, where `<= end` casts the bound to midnight and drops the
+        # rest of that day. Step 1 measured it; broken_sales.csv holds the one
+        # row at 23:59:59 that notices if this is ever written the other way.
+        inside = con.execute(
+            f"SELECT count(*) FROM {table} WHERE {col} >= ? "
+            f"AND {col} < CAST(? AS DATE) + INTERVAL 1 DAY",
+            [start, end],
+        ).fetchone()[0]
+        before = con.execute(
+            f"SELECT count(*) FROM {table} WHERE {col} < ?", [start]
+        ).fetchone()[0]
+        after = con.execute(
+            f"SELECT count(*) FROM {table} "
+            f"WHERE {col} >= CAST(? AS DATE) + INTERVAL 1 DAY", [end]
+        ).fetchone()[0]
+        evidence = []
+        if before:
+            earliest = con.execute(
+                f"SELECT min({col}) FROM {table} WHERE {col} < ?", [start]
+            ).fetchone()[0]
+            evidence.append(f"{before:,} row(s) before {start}, earliest {earliest}")
+        if after:
+            latest = con.execute(
+                f"SELECT max({col}) FROM {table} "
+                f"WHERE {col} >= CAST(? AS DATE) + INTERVAL 1 DAY", [end]
+            ).fetchone()[0]
+            evidence.append(f"{after:,} row(s) after {end}, latest {latest}")
+        in_window = CheckResult(
+            check_id="date.in_window",
+            title="Dates fall in the analysis window",
+            subject=f"{date_column} in {start} to {end}",
+            rows=rows,
+            passed=inside,
+            failed=before + after,
+            not_checked=undated,
+            detail=(
+                f"{before + after:,} row(s) fall outside {start} to {end}"
+                if before + after
+                else f"all {inside:,} dated row(s) fall inside {start} to {end}"
+            ),
+            evidence=tuple(evidence),
+            evidence_total=len(evidence),
+        )
+
+    cutoff = today or date.today()
+    ahead = con.execute(
+        f"SELECT count(*) FROM {table} "
+        f"WHERE {col} >= CAST(? AS DATE) + INTERVAL 1 DAY", [cutoff]
+    ).fetchone()[0]
+    not_future = CheckResult(
+        check_id="date.not_future",
+        title="No row is dated in the future",
+        subject=date_column,
+        rows=rows,
+        passed=dated - ahead,
+        failed=ahead,
+        not_checked=undated,
+        detail=(
+            f"{ahead:,} row(s) are dated after {cutoff}"
+            if ahead
+            else f"nothing is dated after {cutoff}"
+        ),
+    )
+    return [present, in_window, not_future]
+
+
+def row_count_check(
+    con, dataset_name: str, expected_rows: int, *, agreed_when: str = ""
+) -> CheckResult:
+    """The table against the row count the contract was confirmed at.
+
+    **No new contract field.** `Binding.row_count` is what the table held when
+    somebody agreed the definitions, stored beside the fingerprint precisely so
+    a change is detectable. `classify_drift` already computes this difference
+    as a caveat; this renders the same fact as a row of the report.
+
+    **Growth passes with the difference stated; loss fails.** Rows appearing is
+    a table being reloaded with more recent data, which `classify_drift` calls
+    NEUTRAL -- proceed, and say so. Rows disappearing means data that was there
+    when the agreement was made is gone, so every number computed under that
+    contract describes rows that are no longer there. `runs.drift_phrase` makes
+    exactly that distinction for a profile, in those words, and a validation
+    report that treated the two the same would be less careful than the
+    profiler.
+    """
+    rows = con.execute(f"SELECT count(*) FROM {_q(dataset_name)}").fetchone()[0]
+    when = f" on {agreed_when}" if agreed_when else ""
+    if rows == expected_rows:
+        detail = f"{rows:,} row(s), the same count the contract was agreed at{when}"
+    elif rows > expected_rows:
+        detail = (
+            f"the table has gained {rows - expected_rows:,} row(s) since the "
+            f"contract was agreed{when} ({expected_rows:,} then, {rows:,} now). "
+            f"Numbers computed here cover more data than the agreement was "
+            f"written against"
+        )
+    else:
+        detail = (
+            f"the table has lost {expected_rows - rows:,} row(s) since the "
+            f"contract was agreed{when} ({expected_rows:,} then, {rows:,} now), "
+            f"so the agreement describes rows that are no longer there"
+        )
+    return CheckResult.about_the_table(
+        "table.row_count", "Row count matches the contract",
+        dataset_name, ok=rows >= expected_rows, detail=detail,
+    )
+
+
+__all__ = [
+    "EVIDENCE_LIMIT",
+    "CheckResult",
+    "Outcome",
+    "Scope",
+    "date_checks",
+    "key_checks",
+    "row_count_check",
+]

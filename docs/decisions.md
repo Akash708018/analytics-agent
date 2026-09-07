@@ -2150,3 +2150,40 @@ Machine-local and implementation choices that are easy to forget six months late
   different because openpyxl is not byte-stable across versions, and
   mixed_types.xlsx carries Phase 6's Done-When counts. Call the two new
   generators directly.
+
+## Phase 7, Step 5 — the date checks and the row count
+
+- P7-D2 IS NOW A NUMBER. The window bound is `< end + INTERVAL 1 DAY`, and
+  test_the_window_bound_includes_the_last_second_of_the_last_day asserts 171.
+  Written `<= end` it is 170, because the bound casts to midnight and drops
+  the last day of a TIMESTAMP column. A decision in this file is one somebody
+  can undo without noticing; a decision with a test under it is one they find
+  out about.
+- THREE DATE CHECKS, NOT ONE. date.present, date.in_window, date.not_future.
+  A contract may name a date column and declare no window -- a legitimate
+  state -- so in_window reports NOT RUN while the other two still answer.
+  One aggregate "date sanity" check would let a missing window silence a
+  question about nulls, and would have to pick one outcome for three findings.
+- THE SAME SIX ROWS ARE COUNTED DIFFERENTLY BY TWO CHECKS. Undated rows are
+  FAILED for date.present and NOT CHECKED for date.in_window, because a row
+  that cannot be placed in time at all cannot answer where it falls. P7-D4's
+  fourth column is what makes that sayable; without it the window check would
+  have to call six undated rows a pass or a failure, and both are false.
+- `today` IS INJECTABLE, for the reason store.confirm's `now` is. And the
+  future cutoff is `>= today + INTERVAL 1 DAY` -- same shape as P7-D2, same
+  reason: a row stamped this afternoon is not tomorrow's data.
+- P7-D8. NOT EVERY CHECK IS ABOUT ROWS. "Agreed at 51,290 rows, holds 51,530"
+  is true of the table and of no row in particular. Scope.TABLE leaves the
+  four counts at zero and carries an explicit table_ok; inventing a per-row
+  breakdown would put a number in the report that nothing measured, which is
+  PASS-on-unrun wearing different clothes.
+- P7-D9. GROWTH PASSES WITH THE DIFFERENCE STATED, LOSS FAILS. No new contract
+  field: Binding.row_count is the count the contract was confirmed at and
+  classify_drift already computes this difference as a caveat. The asymmetry
+  is classify_drift's NEUTRAL and runs.drift_phrase's own distinction -- rows
+  appearing is a reload, rows disappearing means the agreement describes rows
+  that are no longer there. The alternative (fail on any difference) is
+  defensible and makes every table that gained a row overnight fail
+  validation.
+- P7-D5 STILL OPEN, STILL NOT BLOCKING. Four checks built, none of them
+  reading a field that does not exist.
