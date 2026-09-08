@@ -2793,3 +2793,42 @@ Machine-local and implementation choices that are easy to forget six months late
   always applied, never arguments, and every method_note carries the four
   numbers plus the window. A number computed outside the signed window is not
   the number the contract describes.
+
+## Phase 8, Step 2 — nothing the caller wrote reaches a connection
+
+- P8-D14. util/sql_guard.py PARSES, IT DOES NOT EXECUTE. Four checks in cost
+  order: extract_statements for a second statement, the wrapped form parsing,
+  no SUBQUERY in the parse tree, and typeof() = BOOLEAN against the table. Only
+  the last touches the caller's connection, and it asks the binder a question
+  with LIMIT 1 rather than running the rule over the data.
+- P8-D15. A SUBQUERY IS THE QUIET VERSION OF P8-D7. Measured while building:
+  "1=1) OR (SELECT count(*) FROM read_csv('/etc/passwd')) > 0 AND (1=1" is ONE
+  statement, parses, binds, and types as BOOLEAN -- it passes every other check
+  in the file and reads the password file. A rule says which rows of THIS table
+  are excluded and has no business opening a second relation, so subqueries are
+  refused. The test is structural, on the parse tree: status = 'SUBQUERY'
+  contains the word and is an ordinary rule, and a substring match on the
+  serialized JSON refuses it.
+- AND WHAT THE GUARD DOES NOT DO, RECORDED SO NOBODY ASSUMES IT. Any scalar
+  function is allowed -- lower(status) = 'cancelled' has to be. The shape of
+  the expression is bounded, not what a function does inside it. Nor does the
+  guard know whether a rule is the RIGHT rule: status = 'canceled' against a
+  table spelling it with two Ls passes everything and excludes nothing, which
+  is why the analysis reports rows actually removed rather than assuming.
+- P8-D16. THE WRAPPER PARENTHESISES ON PURPOSE. A rule is checked as
+  SELECT 1 WHERE (rule), so a rule ending in a line comment swallows the
+  closing paren and fails to parse instead of silently truncating whatever it
+  was appended to. status = 'x' -- is refused for that reason.
+- UnsafeSQL IS A ValueError, NOT A Refusal. util/ sits below state.py and
+  importing it would invert the dependency. The caller that has a Reason to
+  hand wraps the message in the instructional refusal 8.2 requires -- which
+  means every message here is written to be quoted inside one.
+- TWO SENTENCES FIXED BEFORE THEY SHIPPED, both found by reading Part 3's
+  output rather than by a test. "this rule is a INTEGER" was Phase 7 Step 9's
+  defect exactly ("every row carries a order_id"), an article hard-coded in
+  front of a value; it now reads "has type INTEGER, not BOOLEAN" and no article
+  is chosen. And a BinderException was being printed whole, so the refusal
+  ended with the internal typeof() query and a caret under it -- a line the
+  reader never wrote, offered to them as the thing to correct. _engine_message
+  keeps everything up to the LINE marker, which keeps "Candidate bindings:
+  status" and drops the query. Both have tests now.
