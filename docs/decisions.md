@@ -2893,3 +2893,47 @@ Machine-local and implementation choices that are easy to forget six months late
   columns, a row count classify_drift calls NEUTRAL -- is refused where it used
   to pass. The KEY_NOT_UNIQUE refusal already reads correctly, so no wording
   changed.
+
+## Phase 8, Step 4 — the rows every analysis is allowed to see
+
+- P8-D18. ONE MODULE DECIDES WHAT "THE DATA" MEANS. analysis_window,
+  known_exclusions and excluded_columns are the contract's, so analysis/base.py
+  reads them and the nine analyses read it. Nine WHERE clauses would disagree
+  eventually, which is P7-D6 with nine copies instead of two. scope_for takes a
+  Gate, never a dataset name: locked decision 12 says no analysis without a
+  confirmed contract, and a builder that accepts a string is a way around the
+  gate, so the type is the enforcement.
+- P8-D19. A NULL-SAFE PREDICATE AND A NULL-SAFE COUNT WANT OPPOSITE TREATMENTS
+  OF NULL, and the obvious way double-counts. Measured on a seven-row fixture
+  before the module existed: excluded 2 + outside_window 2 + no_date 1 +
+  analysed 3 = 8, against 7 rows. The undated row was counted twice, because
+  the window count was written NOT coalesce((window), false) -- the coalesce
+  turns "cannot tell" into "outside". NOT (window) leaves it NULL, FILTER does
+  not count a NULL predicate, and the row lands once, in the bucket named after
+  why it could not be judged. The predicate has to decide; the count has to
+  refuse to. P7-D4 one layer up, where the fix for the first problem causes the
+  second.
+- rule_unknown IS NOT A FIFTH BUCKET. A row an exclusion cannot judge is KEPT,
+  so it is already inside analysed or a window bucket; counting it again breaks
+  the sum. It is a qualifier in the method note.
+- Scope's CONSTRUCTOR REFUSES A SCOPE THAT LOSES ROWS. CheckResult will not let
+  a check under-report; this will not let a scope lose a row. An analysis that
+  quietly computed over 900 of 1,000 rows would arrive as arithmetic rather
+  than as an error, which is the failure this phase is arranged against.
+- P8-D20. THE WINDOW IS INTERPOLATED, THE RULES ARE GUARDED. validate/rules.py
+  passes its dates as ? and is right to -- it builds and runs one query. This
+  returns a fragment nine analyses paste into their own, and placeholders would
+  make each of them responsible for two parameters in the right order. A date
+  cannot carry SQL: these come off a validated AnalysisWindow and isoformat()
+  is three integers and two hyphens. Exclusion rules ARE caller text and go
+  through sql_guard. Interpolation is safe exactly where the value has a type
+  that cannot express an attack.
+- P8-O4 IS OPEN, AND RECORDED RATHER THAN DISCOVERED LATER. There are now two
+  quoting helpers (rules.py's _q, sql_guard.quote_identifier) and two window
+  clauses (rules.py's parameterised one, base.py's literal one). Both windows
+  implement P7-D2 identically today and could drift apart tomorrow.
+  Recommendation: do NOT merge them mid-phase -- rules.py carries 63 acceptance
+  assertions and the parameterised form is right for what it does -- but pin
+  their agreement with a test that runs both against one fixture and asserts
+  the same rows, so a divergence fails rather than ships. Step 10b's precedent
+  for waiting was "a reason to open the file"; the test does not need one.
