@@ -2668,3 +2668,128 @@ Machine-local and implementation choices that are easy to forget six months late
   always applied, never arguments, and every method_note carries the four
   numbers plus the window. A number computed outside the signed window is not
   the number the contract describes.
+
+## Phase 8, Step 1 — the ground facts
+
+- P8-D1. A SHARE HAS A DENOMINATOR THAT CAN BE inf. ieee_floating_point_ops is
+  on by default: 1/0 is inf, 0.0/0.0 is nan, both cast to VARCHAR as 'inf' and
+  'nan' -- a report cell, not an error. // and % return NULL instead, so the
+  rule differs by operator. Every share computes its denominator first and
+  refuses on a zero or NULL total with a sentence.
+- P8-D2. A SHARE OF A SIGNED TOTAL IS NOT A PROPORTION. Four rows summing to 0
+  with sum(abs) 260 produced share = inf, inf, -inf, -inf and a cum_share
+  ending at nan on the M1 and -nan on x86 -- the sign of a 0/0 NaN is
+  unspecified and the cell is text either way, which is a reason to refuse the
+  value rather than special-case it in formatting.py. pareto, concentration
+  and ranking_shift count negatives before they run and say how many.
+- P8-D3. THE DEFAULT WINDOW FRAME IS RANGE, AND RANGE LUMPS TIES. Four rows
+  tied at 10 all read cum_default = 40. ROWS UNBOUNDED PRECEDING with the
+  measure descending then the key gives 10/20/30/40.
+- P8-D4. LIMIT n OVER TIES ANSWERS A DIFFERENT QUESTION. 100,000 of 300,000
+  rows tied at the top; LIMIT 5 returned five of them, the same five on five
+  runs at threads=8 -- stable in this measurement, which is not guaranteed and
+  is not recorded as either. The defect is the word "top": a tiebreak on the
+  key changes the answer entirely (k245760... -> k0...) and both are correct.
+  top_n orders with an explicit tiebreak AND reports how many rows tie at the
+  cut. And NULLS_LAST is the default both directions, so a column that is 90%
+  NULL still returns a full top 5 with nothing saying so -- the null count goes
+  in the method note.
+- P8-D5. NULL IS A GROUP, AND PIVOT DROPS IT. GROUP BY keeps NULL as its own
+  group; PIVOT discarded it -- table total 26, pivot total 23, the missing 3
+  being the one NULL-channel row. cross_tab is built from sum(x) FILTER
+  (WHERE ...) with an explicit (null) column. It could not have used PIVOT
+  anyway: PIVOT ct ON ? is a parser error, so the dimension would have to be
+  interpolated as an identifier.
+- P8-D6. AN EXCLUSION RULE NEGATED THE OBVIOUS WAY DELETES THE NULLS. Four
+  rows, one cancelled, WHERE NOT (status = 'cancelled') kept two. NOT
+  coalesce(rule, false) and IS DISTINCT FROM keep three. known_exclusions is
+  applied null-safely and every analysis reports four numbers that sum to the
+  row count: rows, excluded by the rule, not excluded because the rule was
+  NULL, analysed. P7-D4 on a third field.
+- P8-D7. util/sql_guard.py IS PHASE 8's FIRST FILE, AND READ-ONLY IS NOT IT.
+  con.execute("SELECT ... ; DROP TABLE ex;") dropped the table, on a string of
+  exactly the shape known_exclusions[].rule carries. A read-only handle refuses
+  the DROP and then still runs the second statement in the same call, and still
+  reads any file the process can open -- /etc/hosts 2 rows, /etc/passwd 142
+  rows through read_csv on the M1. Read-only guards the catalog, not the
+  filesystem. Measured on both machines. duckdb.extract_statements returns 2 for
+  the injected string and 1 for a lone statement; json_serialize_sql returns an
+  error JSON, without raising, for anything that is not a single SELECT. There
+  is no quote_identifier in 1.5.5 (only json_quote) and format does not quote,
+  so identifiers are quoted by doubling " in Python.
+- P8-D8. sum CAN ABORT AN ANALYSIS. sum(INTEGER) widens to HUGEINT and
+  sum(DECIMAL(18,2)) to DECIMAL(38,2), and at the top of each promotion the
+  engine raises -- OutOfRangeException and ConversionException. run_analysis
+  catches it and names the measure and the type, because a traceback reaching
+  the agent is the F1 shape.
+- P8-D9. SPREAD ON A GROUP OF ONE IS NULL, NOT ZERO. stddev is stddev_samp; at
+  n=1 it is NULL while stddev_pop is 0.0. group_compare prints "not computed
+  (n=1)". P7-D10 inside a table cell.
+- P8-D10. THE MEDIAN OF A DATE IS A TIMESTAMP THAT IS NOT IN THE COLUMN.
+  median of 2024-01-01 and 2024-01-04 is 2024-01-02 12:00:00, typed TIMESTAMP.
+  summary_stats on a date column reports quantile_disc or names which it used.
+  And avg of INTEGER and of DECIMAL are both DOUBLE while median of DECIMAL
+  stays DECIMAL, so two summary rows of one column disagree about type.
+- P8-D11. QUANTILES ARE EXACT, BECAUSE ON THE M1 THEY ARE CHEAP. 5M rows:
+  exact quantile_cont 0.237s, approx_quantile 0.032s, full summary_stats shape
+  0.376s. About 7x, and a quarter of a second is not worth an approximation --
+  a report that says "median" should mean median. approx_quantile is not used
+  by default; if a table makes it necessary the swap is measured and the
+  method_note says which was used, because an approximation nobody was told
+  about is a number nobody can audit. Limits on the figure: four columns, in
+  memory, no NULLs, one measure, and P5-D3 already found the 28.5M-row cost was
+  dominated by TRY_CAST type readings rather than aggregates. It says quantiles
+  are not the thing to optimise first, not that wide tables are fast.
+- P8-D12. run_analysis ALREADY EXISTS, AND ITS SIGNATURE MAKES THE TRAP
+  OPTIONAL. server.py:692 takes (dataset_name, question=None,
+  workspace_id=None) and delegates to contract_tools.analyse. Three places
+  spell the call: validate/tools.py:102 with no ellipsis, state.py:282 with
+  one, tests/test_phase7.py:251 asserting the first exactly. A required
+  analysis_type would make validate_dataset name a call refused for a missing
+  argument -- Phase 6 Step 8 and Step 9's defect twice over, and Step 10b's
+  rule that no tool names a call the reader should not make. SO analysis_type
+  IS OPTIONAL and the no-type call keeps doing what it does today: the tool
+  already answers "the agreement in force, the caveats any result would have to
+  carry, and what can be called now", and adding the registry's valid types to
+  that answer is the same sentence with more in it -- which Phase 8's Done-When
+  requires anyway for an unknown type. No call site changes, no test string
+  changes. THE DOCSTRING IS WHAT MUST CHANGE: "The analysis library itself
+  arrives in Phase 8 ... Do not report a computed answer from it -- it does not
+  compute one" stops being true in the step that makes it compute one, which is
+  Phase 7's closing note exactly -- a docstring that stopped describing its own
+  signature. Rewritten in the same commit as the behaviour, against Phase 5
+  Step 6b's guard. AND question IS ALREADY THERE, UNSPENT: Step 9 decides
+  whether it selects an analysis, becomes a note in the method_note, or goes.
+  It is not a second name for analysis_type.
+- P8-D13. NOTHING BETWEEN AN inf AND THE REPORT. formatting.py matched none of
+  inf, nan, round(, :, or float -- it does not special-case numbers at all, so
+  P8-D1's inf and P8-D2's nan reach a table cell as the engine produced them.
+  The refusal belongs in the analysis, before the value is built; teaching
+  formatting.py two spellings of NaN would be repairing the wrong layer.
+  results.py already carries Rule 3's 50x50 cap, PAGE_ROWS = 50 and class
+  Result, which is the envelope every analysis returns through.
+- P8-O1 IS CLOSED, AND THE CODE CLOSED IT. grep "role" in
+  contract/dataset_contract.py returns no matches anywhere in the file, and
+  evidence.suggest_role's docstring says "Nothing here is authoritative ... The
+  suggestion exists so the reader has something to correct." So the guide's
+  Phase 8 trap names a field that does not exist on the object analysis reads,
+  and the function that does produce a role disclaims the authority the trap
+  assumes. THE CONTRACT IS THE AUTHORITY: a primary_key column is never
+  summarised as a measure, a numeric column absent from measures is not
+  aggregated for being numeric, and excluded_columns ("Columns never to read.
+  Distinct from known_exclusions, which is about ROWS") is honoured the way
+  cleaning already honours it -- skipped, and said so, which is the field's own
+  description rather than a behaviour analysis invents.
+  suggest_role may explain a choice in a method note; it decides nothing.
+  Step 14's argument on a fourth field.
+- P8-O2 IS OPEN. THE HOLE STEP 10b PINNED. The gate's shortcut is a cache keyed
+  on "nothing moved" and store.confirm does not look at the data, so a contract
+  confirmed against an already-broken key is never re-checked -- and Phase 8 is
+  where something behind that gate produces figures a report carries. Close it
+  by checking the key at confirm, or by keying the shortcut on a recorded
+  validation, which _agent_validations can answer since Step 8. Recommendation:
+  the second. Decide in Step 2, before the registry exists.
+- P8-O3 IS OPEN. Recommendation: analysis_window and known_exclusions are
+  always applied, never arguments, and every method_note carries the four
+  numbers plus the window. A number computed outside the signed window is not
+  the number the contract describes.
