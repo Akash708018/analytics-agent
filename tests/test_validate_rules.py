@@ -360,3 +360,116 @@ def test_a_table_scoped_check_may_not_count_rows():
 def test_a_table_scoped_check_needs_a_verdict():
     with pytest.raises(ValueError, match="needs table_ok"):
         CheckResult(check_id="x", title="t", subject="s", scope=rules.Scope.TABLE)
+
+
+# --------------------------------------------------------------------------
+# Step 12: the two declarations, checked
+# --------------------------------------------------------------------------
+
+LOOKUP = Path(__file__).resolve().parent / "fixtures" / "region_lookup.csv"
+CHANNELS = ["Online", "Retail", "Wholesale"]
+
+
+@pytest.fixture()
+def joined(sales):
+    if not LOOKUP.exists():
+        pytest.skip(f"{LOOKUP.name} not generated; see make_fixtures.py")
+    sales.execute(
+        f"CREATE TABLE region_lookup AS SELECT * FROM read_csv_auto('{LOOKUP}')"
+    )
+    return sales
+
+
+def fk(columns=("region",), references="region_lookup", referenced=None):
+    from analytics_agent.contract.dataset_contract import ForeignKey
+    return ForeignKey(columns=list(columns), references=references,
+                      referenced_columns=list(referenced or []))
+
+
+def test_orphans_and_null_references_are_counted_apart(joined):
+    """7 and 8. Both are unmatched and only one is a broken reference: a NULL
+    foreign key points at nothing on purpose."""
+    r = rules.reference_checks(joined, "sales", [fk()])[0]
+    assert (r.rows, r.passed, r.failed, r.not_checked) == (186, 171, 7, 8)
+    assert r.outcome is Outcome.FAIL
+
+
+def test_the_orphans_are_named_with_their_row_counts(joined):
+    """Three misspellings across seven rows -- two different numbers, and the
+    report says both."""
+    r = rules.reference_checks(joined, "sales", [fk()])[0]
+    assert r.evidence_total == 3
+    assert "7 row(s) point at 3 value(s)" in r.detail
+    assert any("Nord (3 row(s)) is not in region_lookup" in e for e in r.evidence)
+
+
+def test_not_in_would_have_reported_a_clean_pass(joined):
+    """P7-D3's regression detector, asserted against the rule rather than
+    against DuckDB.
+
+    region_lookup carries a blank row, so `NOT IN` returns UNKNOWN for every
+    comparison. The rule finds 7; the query nobody should write finds 0.
+    """
+    r = rules.reference_checks(joined, "sales", [fk()])[0]
+    naive = joined.execute(
+        "SELECT count(*) FROM sales "
+        "WHERE region NOT IN (SELECT region FROM region_lookup)"
+    ).fetchone()[0]
+    assert (r.failed, naive) == (7, 0)
+
+
+def test_a_parent_that_is_not_loaded_is_not_run(sales):
+    """The contract is not wrong; the workspace is thin. P7-D7."""
+    r = rules.reference_checks(sales, "sales", [fk(references="nowhere")])[0]
+    assert r.outcome is Outcome.NOT_RUN
+    assert "nowhere is not loaded" in r.not_run_because
+    assert "the workspace is thin" in r.not_run_because
+
+
+def test_a_join_that_cannot_be_made_is_not_run(joined):
+    r = rules.reference_checks(
+        joined, "sales", [fk(referenced=["nope"])])[0]
+    assert r.outcome is Outcome.NOT_RUN
+    assert "no column called nope" in r.not_run_because
+
+
+def test_every_reference_matching_passes(joined):
+    joined.execute("CREATE TABLE tidy AS SELECT 'North' AS region")
+    r = rules.reference_checks(joined, "tidy", [fk()])[0]
+    assert r.outcome is Outcome.PASS
+    assert r.evidence == ()
+
+
+def test_values_outside_the_declared_set_are_counted(sales):
+    r = rules.domain_checks(sales, "sales", {"channel": CHANNELS})[0]
+    assert (r.rows, r.passed, r.failed, r.not_checked) == (186, 177, 9, 0)
+    assert r.evidence_total == 2
+    assert any("Partner (5 row(s))" in e for e in r.evidence)
+
+
+def test_a_null_is_absence_rather_than_a_violation(sales):
+    """The same rule the reference check follows, and the same reason: a
+    predicate does not see a NULL, so a check that failed them would be
+    reporting something it never measured."""
+    r = rules.domain_checks(sales, "sales", {"region": ["North", "South"]})[0]
+    assert r.not_checked == 8
+    assert r.passed + r.failed + r.not_checked == 186
+
+
+def test_a_domain_on_a_column_the_table_lacks_is_not_run(sales):
+    r = rules.domain_checks(sales, "sales", {"nope": ["a"]})[0]
+    assert r.outcome is Outcome.NOT_RUN
+    assert "not a column of sales" in r.not_run_because
+
+
+def test_an_empty_declared_set_is_not_run_rather_than_failing_everything(sales):
+    """Declaring no allowed values is a mistake, not a constraint. Failing
+    every row would be a report full of findings about a typo."""
+    r = rules.domain_checks(sales, "sales", {"channel": []})[0]
+    assert r.outcome is Outcome.NOT_RUN
+    assert "would fail every row" in r.not_run_because
+
+
+def test_a_dataset_declaring_neither_gets_neither_check(sales):
+    assert rules.reference_checks(sales, "sales", []) == []
+    assert rules.domain_checks(sales, "sales", {}) == []

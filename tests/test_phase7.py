@@ -51,6 +51,7 @@ from analytics_agent.contract.dataset_contract import (  # noqa: E402
     AnalysisWindow,
     Binding,
     DatasetContract,
+    ForeignKey,
     Measure,
 )
 from analytics_agent.contract.refusals import Reason, reason_of  # noqa: E402
@@ -146,6 +147,8 @@ def confirm_contract(
     primary_key: list[str],
     date_column: str,
     row_count: int | None = None,
+    foreign_keys: list | None = None,
+    domains: dict | None = None,
 ):
     """A real contract, confirmed through the real store.
 
@@ -180,6 +183,8 @@ def confirm_contract(
             ],
             dimensions=["region", "channel"],
             bound_to=Binding.from_pairs(pairs, row_count or rows),
+            foreign_keys=list(foreign_keys or []),
+            domains=dict(domains or {}),
         )
         return store.confirm(con, contract)
     finally:
@@ -216,7 +221,8 @@ def clause_one() -> str:
 
     check("it does not refuse", reason_of(text) is None)
     check("the headline says every check passed",
-          "clean_sales: all 6 check(s) passed." in text)
+          "clean_sales: all 6 check(s) passed." in text,
+          "six, not eight: this contract declares no reference and no domain")
     check("it names the contract it checked against",
           "Checked against contract v1." in text)
     check("the table has a header row",
@@ -261,11 +267,15 @@ def clause_two() -> str:
         return ""
 
     load(BROKEN, "broken_sales")
+    load(Path("tests/fixtures/region_lookup.csv"), "region_lookup")
     # Agreed at 200 rows against a table holding 186, so the row-count check
     # has something to find. Every other count comes from the fixture.
     stored = confirm_contract(
         "broken_sales", primary_key=["order_id"], date_column="order_ts",
         row_count=200,
+        foreign_keys=[ForeignKey(columns=["region"],
+                                 references="region_lookup")],
+        domains={"channel": ["Online", "Retail", "Wholesale"]},
     )
     check("a contract confirms against a broken table", stored.version == 1,
           "confirming does not look at the data")
@@ -274,7 +284,7 @@ def clause_two() -> str:
 
     check("it does not refuse", reason_of(text) is None)
     check("the headline counts rather than collapsing",
-          "broken_sales: 5 of 6 check(s) failed, 1 passed." in text)
+          "broken_sales: 7 of 8 check(s) failed, 1 passed." in text)
     check("it does not say FAIL as a verdict",
           not text.startswith("FAIL"))
 
@@ -293,6 +303,18 @@ def clause_two() -> str:
     check("the last second of the last day is inside the window",
           "| 186 | 171 |" in table_row(text, "Dates fall in the analysis window"),
           "170 would mean the bound was written <= end")
+
+    check("orphan references: 171 passed, 7 failed, 8 not checked",
+          "| 186 | 171 | 7 | 8 |" in table_row(
+              text, "Every reference points at a row"))
+    check("values outside the declared set: 177 passed, 9 failed",
+          "| 186 | 177 | 9 | 0 |" in table_row(
+              text, "Values are inside the declared set"))
+
+    check("it names the regions the lookup does not have",
+          "Nord (3 row(s)) is not in region_lookup" in text)
+    check("it names the channels the contract does not list",
+          "Partner (5 row(s))" in text)
 
     check("it names the keys that repeat", "ORD-00011 appears 2 times" in text)
     check("it names the earliest date outside the window",
@@ -345,7 +367,7 @@ def clause_three() -> None:
     check("the report does not refuse the same dataset",
           reason_of(text) is None, "P7-D11")
     check("and it reports more than one finding",
-          text.count("FAIL") >= 5,
+          text.count("FAIL") >= 7,
           "the gate names the first thing that stopped it")
 
 
@@ -430,7 +452,7 @@ def clause_five() -> None:
               f"{run.row_count} rows")
         check("it recorded the verdict as counts",
               (run.checks_total, run.checks_failed, run.checks_not_run)
-              == (6, 5, 0),
+              == (8, 7, 0),
               run.verdict_phrase())
 
     con = db.connect(WORKSPACE)

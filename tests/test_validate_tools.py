@@ -43,10 +43,13 @@ class _Window:
 class _Contract:
     """The four fields validate/tools.py reads off a contract, and no more."""
 
-    def __init__(self, primary_key=None, date_column=None, window=None):
+    def __init__(self, primary_key=None, date_column=None, window=None,
+                 foreign_keys=None, domains=None):
         self.primary_key = primary_key or []
         self.date_column = date_column
         self.analysis_window = _Window(*window) if window else None
+        self.foreign_keys = foreign_keys or []
+        self.domains = domains or {}
 
 
 class _Stored:

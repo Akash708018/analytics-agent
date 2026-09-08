@@ -167,6 +167,14 @@ def validate_dataset(
         results += rules.date_checks(
             ro, dataset_name, contract.date_column, window, today=today
         )
+        # The two declared checks, after the four derived ones and before the
+        # table-level one, so the report reads down the same order the contract
+        # does: the key, the dates, what this table points at, what its columns
+        # may hold, and finally the table against the count it was agreed at.
+        results += rules.reference_checks(
+            ro, dataset_name, contract.foreign_keys
+        )
+        results += rules.domain_checks(ro, dataset_name, contract.domains)
         results.append(
             rules.row_count_check(
                 ro, dataset_name, stored.row_count,

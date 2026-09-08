@@ -472,12 +472,384 @@ def row_count_check(
     )
 
 
+def reference_checks(con, dataset_name: str, foreign_keys) -> list[CheckResult]:
+    """dbt's `relationships`, one check per declared key.
+
+    **P7-D3, and this is the check it was measured for.** One NULL anywhere in
+    the parent column makes `NOT IN` return no rows at all, so an orphan check
+    written that way reports a clean pass over a table full of orphans. Step 1
+    measured it; `region_lookup.csv` carries a blank row so a regression is
+    visible rather than theoretical -- `NOT EXISTS` finds 7, `NOT IN` finds 0.
+
+    **An orphan and a null reference are counted apart.** Both are unmatched
+    and only one is a broken reference: a NULL foreign key is a row that points
+    at nothing on purpose, optional by design in most schemas. Counting them
+    together produces a number nobody can act on, so nulls land in
+    `not_checked` -- they were never comparable -- and orphans in `failed`.
+    """
+    out: list[CheckResult] = []
+    for fk in foreign_keys or []:
+        check_id = f"reference.{'+'.join(fk.columns)}"
+        title = "Every reference points at a row"
+        label = fk.label()
+
+        if not _table_columns(con, fk.references):
+            out.append(CheckResult.not_run(
+                check_id, title, label,
+                f"{fk.references} is not loaded in this workspace, so there is "
+                f"nothing to check the reference against. Load it and run this "
+                f"again -- the contract is not wrong, the workspace is thin",
+            ))
+            continue
+
+        there = _table_columns(con, fk.references)
+        missing = [c for c in fk.referenced_columns if c not in there]
+        if missing:
+            out.append(CheckResult.not_run(
+                check_id, title, label,
+                f"{fk.references} has no column called {', '.join(missing)}, "
+                f"so the contract names a join that cannot be made",
+            ))
+            continue
+
+        table, parent = _q(dataset_name), _q(fk.references)
+        on = " AND ".join(
+            f"p.{_q(b)} = c.{_q(a)}"
+            for a, b in zip(fk.columns, fk.referenced_columns)
+        )
+        stated = " AND ".join(f"c.{_q(c)} IS NOT NULL" for c in fk.columns)
+
+        rows = con.execute(f"SELECT count(*) FROM {table}").fetchone()[0]
+        unstated = con.execute(
+            f"SELECT count(*) FROM {table} c WHERE NOT ({stated})"
+        ).fetchone()[0]
+        orphans = con.execute(
+            f"SELECT count(*) FROM {table} c WHERE {stated} "
+            f"AND NOT EXISTS (SELECT 1 FROM {parent} p WHERE {on})"
+        ).fetchone()[0]
+
+        evidence, distinct = (), 0
+        if orphans:
+            quoted = ", ".join(f"c.{_q(c)}" for c in fk.columns)
+            distinct = con.execute(
+                f"SELECT count(*) FROM (SELECT DISTINCT {quoted} FROM {table} c "
+                f"WHERE {stated} AND NOT EXISTS "
+                f"(SELECT 1 FROM {parent} p WHERE {on}))"
+            ).fetchone()[0]
+            shown = con.execute(
+                f"SELECT {quoted}, count(*) FROM {table} c WHERE {stated} "
+                f"AND NOT EXISTS (SELECT 1 FROM {parent} p WHERE {on}) "
+                f"GROUP BY {quoted} ORDER BY count(*) DESC, {quoted} "
+                f"LIMIT {EVIDENCE_LIMIT}"
+            ).fetchall()
+            evidence = tuple(
+                f"{' + '.join(str(v) for v in r[:-1])} "
+                f"({r[-1]:,} row(s)) is not in {fk.references}"
+                for r in shown
+            )
+
+        out.append(CheckResult(
+            check_id=check_id,
+            title=title,
+            subject=label,
+            rows=rows,
+            passed=rows - orphans - unstated,
+            failed=orphans,
+            not_checked=unstated,
+            detail=(
+                f"{orphans:,} row(s) point at {distinct:,} value(s) "
+                f"{fk.references} does not have"
+                if orphans
+                else f"every stated reference matches a row of {fk.references}"
+            ),
+            evidence=evidence,
+            evidence_total=distinct,
+        ))
+    return out
+
+
+def domain_checks(con, dataset_name: str, domains) -> list[CheckResult]:
+    """dbt's `accepted_values`, one check per declared column.
+
+    Nulls are `not_checked` rather than failed, for the reason the reference
+    check counts them apart: absence and a value outside the set are different
+    findings with different fixes, and a predicate does not see a NULL anyway
+    (Step 1 measured that on this exact shape).
+    """
+    out: list[CheckResult] = []
+    known = _table_columns(con, dataset_name)
+    for column, allowed in (domains or {}).items():
+        check_id = f"value.{column}"
+        title = "Values are inside the declared set"
+        if column not in known:
+            out.append(CheckResult.not_run(
+                check_id, title, column,
+                f"{column} is not a column of {dataset_name}, so the contract "
+                f"constrains something the table does not have",
+            ))
+            continue
+        if not allowed:
+            out.append(CheckResult.not_run(
+                check_id, title, column,
+                f"the declared set for {column} is empty, which would fail "
+                f"every row rather than testing anything",
+            ))
+            continue
+
+        table, col = _q(dataset_name), _q(column)
+        placeholders = ", ".join("?" for _ in allowed)
+        rows = con.execute(f"SELECT count(*) FROM {table}").fetchone()[0]
+        absent = con.execute(
+            f"SELECT count(*) - count({col}) FROM {table}"
+        ).fetchone()[0]
+        outside = con.execute(
+            f"SELECT count(*) FROM {table} WHERE {col} IS NOT NULL "
+            f"AND {col} NOT IN ({placeholders})", list(allowed)
+        ).fetchone()[0]
+
+        evidence, distinct = (), 0
+        if outside:
+            distinct = con.execute(
+                f"SELECT count(DISTINCT {col}) FROM {table} WHERE {col} IS NOT "
+                f"NULL AND {col} NOT IN ({placeholders})", list(allowed)
+            ).fetchone()[0]
+            shown = con.execute(
+                f"SELECT {col}, count(*) FROM {table} WHERE {col} IS NOT NULL "
+                f"AND {col} NOT IN ({placeholders}) GROUP BY {col} "
+                f"ORDER BY count(*) DESC, {col} LIMIT {EVIDENCE_LIMIT}",
+                list(allowed)
+            ).fetchall()
+            evidence = tuple(f"{r[0]} ({r[1]:,} row(s))" for r in shown)
+
+        out.append(CheckResult(
+            check_id=check_id,
+            title=title,
+            subject=f"{column} in {', '.join(allowed)}",
+            rows=rows,
+            passed=rows - outside - absent,
+            failed=outside,
+            not_checked=absent,
+            detail=(
+                f"{outside:,} row(s) hold {distinct:,} value(s) the contract "
+                f"does not list"
+                if outside
+                else f"every stated {column} is one of the {len(allowed)} "
+                f"declared value(s)"
+            ),
+            evidence=evidence,
+            evidence_total=distinct,
+        ))
+    return out
+
+
+def reference_checks(
+    con, dataset_name: str, foreign_keys, loaded: set[str] | None = None
+) -> list[CheckResult]:
+    """dbt's `relationships`, one check per declared key.
+
+    **P7-D3, and this is the rule's whole reason for existing.** The join is
+    written with NOT EXISTS. `NOT IN` returns zero rows the moment the parent
+    column holds a single NULL -- Step 1 measured it, and `region_lookup.csv`
+    carries a blank row so a regression here shows up as 7 orphans becoming 0
+    rather than as nothing at all.
+
+    **An orphan and a null reference are counted apart.** Both are unmatched
+    and only one is a broken reference: a NULL foreign key is a row that points
+    at nothing on purpose, optional by design in most schemas. So a null is
+    `not_checked` -- it was never comparable -- and an orphan is `failed`.
+
+    **A referenced dataset that is not loaded reports NOT RUN.** The contract
+    names it rather than resolving it, because a contract has to be readable on
+    a machine that never loaded anything. P7-D7: a check that could not run is
+    not a check that passed.
+    """
+    if not foreign_keys:
+        return []
+    if loaded is None:
+        loaded = {
+            r[0] for r in con.execute(
+                "SELECT table_name FROM information_schema.tables "
+                "WHERE table_schema = 'main'"
+            ).fetchall()
+        }
+
+    table = _q(dataset_name)
+    rows = con.execute(f"SELECT count(*) FROM {table}").fetchone()[0]
+    out: list[CheckResult] = []
+
+    for i, fk in enumerate(foreign_keys, start=1):
+        check_id = f"reference.integrity[{i}]"
+        title = "Every reference points at a row"
+        label = fk.label()
+
+        if fk.references not in loaded:
+            out.append(CheckResult.not_run(
+                check_id, title, label,
+                f"{fk.references} is not loaded in this workspace, so there "
+                f"is nothing to resolve {' + '.join(fk.columns)} against. The "
+                f"contract is not wrong; the workspace is thin",
+            ))
+            continue
+
+        missing = [c for c in fk.columns if _column_type(con, dataset_name, c) is None]
+        if missing:
+            out.append(CheckResult.not_run(
+                check_id, title, label,
+                f"{', '.join(missing)} is not a column of {dataset_name}, so "
+                f"the contract names a key the table does not have",
+            ))
+            continue
+
+        # The far side too. Left to the engine this is a BinderException from
+        # inside a check, which is a traceback where a sentence belongs.
+        absent = [
+            c for c in fk.referenced_columns
+            if _column_type(con, fk.references, c) is None
+        ]
+        if absent:
+            out.append(CheckResult.not_run(
+                check_id, title, label,
+                f"{fk.references} has no column called {', '.join(absent)}, so "
+                f"the join the contract describes cannot be made",
+            ))
+            continue
+
+        parent = _q(fk.references)
+        on = " AND ".join(
+            f"p.{_q(r)} = c.{_q(l)}"
+            for l, r in zip(fk.columns, fk.referenced_columns)
+        )
+        any_null = " OR ".join(f"c.{_q(c)} IS NULL" for c in fk.columns)
+
+        unset = con.execute(
+            f"SELECT count(*) FROM {table} c WHERE {any_null}"
+        ).fetchone()[0]
+        orphans = con.execute(
+            f"SELECT count(*) FROM {table} c WHERE NOT ({any_null}) "
+            f"AND NOT EXISTS (SELECT 1 FROM {parent} p WHERE {on})"
+        ).fetchone()[0]
+
+        quoted = ", ".join(f"c.{_q(c)}" for c in fk.columns)
+        shown = con.execute(
+            f"SELECT {quoted}, count(*) FROM {table} c WHERE NOT ({any_null}) "
+            f"AND NOT EXISTS (SELECT 1 FROM {parent} p WHERE {on}) "
+            f"GROUP BY {quoted} ORDER BY count(*) DESC, {quoted} "
+            f"LIMIT {EVIDENCE_LIMIT}"
+        ).fetchall() if orphans else []
+        distinct = con.execute(
+            f"SELECT count(*) FROM (SELECT {quoted} FROM {table} c "
+            f"WHERE NOT ({any_null}) AND NOT EXISTS "
+            f"(SELECT 1 FROM {parent} p WHERE {on}) GROUP BY {quoted})"
+        ).fetchone()[0] if orphans else 0
+
+        out.append(CheckResult(
+            check_id=check_id,
+            title=title,
+            subject=label,
+            rows=rows,
+            passed=rows - orphans - unset,
+            failed=orphans,
+            not_checked=unset,
+            detail=(
+                f"{orphans:,} row(s) point at {distinct:,} value(s) "
+                f"{fk.references} does not have"
+                if orphans
+                else f"every set reference resolves in {fk.references}"
+            ),
+            evidence=tuple(
+                f"{' + '.join(str(v) for v in r[:-1])} ({r[-1]:,} row(s)) "
+                f"is not in {fk.references}"
+                for r in shown
+            ),
+            evidence_total=distinct,
+        ))
+    return out
+
+
+def domain_checks(con, dataset_name: str, domains) -> list[CheckResult]:
+    """dbt's `accepted_values`, one check per declared column.
+
+    A value outside the declared set and a value that is absent are different
+    findings, and Step 1 measured that a `NOT IN` predicate reports only the
+    first: a NULL comparison is UNKNOWN, so nulls are invisible to it. They are
+    counted separately here, as `not_checked` -- a row with no value did not
+    break the vocabulary, it simply has nothing to check against it.
+
+    The declared set is never derived from the data. A domain read off the
+    column it constrains validates the column against itself and passes by
+    construction; `propose_dataset_contract` reports what it sees and leaves
+    the declaring to somebody who knows whether a fourth value is legal and
+    merely absent.
+    """
+    out: list[CheckResult] = []
+    for column in sorted(domains):
+        allowed = list(domains[column])
+        check_id = f"value.domain[{column}]"
+        title = "Values are inside the declared set"
+
+        if _column_type(con, dataset_name, column) is None:
+            out.append(CheckResult.not_run(
+                check_id, title, column,
+                f"{column} is not a column of {dataset_name}, so the contract "
+                f"constrains a column the table does not have",
+            ))
+            continue
+        if not allowed:
+            out.append(CheckResult.not_run(
+                check_id, title, column,
+                f"the declared set for {column} is empty, which would fail "
+                f"every row rather than constrain any",
+            ))
+            continue
+
+        table, col = _q(dataset_name), _q(column)
+        placeholders = ", ".join("?" for _ in allowed)
+        rows, present = con.execute(
+            f"SELECT count(*), count({col}) FROM {table}"
+        ).fetchone()
+        outside = con.execute(
+            f"SELECT count(*) FROM {table} WHERE {col} IS NOT NULL "
+            f"AND {col} NOT IN ({placeholders})", allowed
+        ).fetchone()[0]
+        shown = con.execute(
+            f"SELECT {col}, count(*) FROM {table} WHERE {col} IS NOT NULL "
+            f"AND {col} NOT IN ({placeholders}) GROUP BY {col} "
+            f"ORDER BY count(*) DESC, {col} LIMIT {EVIDENCE_LIMIT}", allowed
+        ).fetchall() if outside else []
+        distinct = con.execute(
+            f"SELECT count(DISTINCT {col}) FROM {table} WHERE {col} IS NOT NULL "
+            f"AND {col} NOT IN ({placeholders})", allowed
+        ).fetchone()[0] if outside else 0
+
+        out.append(CheckResult(
+            check_id=check_id,
+            title=title,
+            subject=f"{column} in {{{', '.join(allowed)}}}",
+            rows=rows,
+            passed=present - outside,
+            failed=outside,
+            not_checked=rows - present,
+            detail=(
+                f"{outside:,} row(s) hold {distinct:,} value(s) outside the "
+                f"declared set"
+                if outside
+                else f"every value is one of the {len(allowed)} declared"
+            ),
+            evidence=tuple(
+                f"{r[0]} ({r[1]:,} row(s))" for r in shown
+            ),
+            evidence_total=distinct,
+        ))
+    return out
+
 __all__ = [
     "EVIDENCE_LIMIT",
     "CheckResult",
     "Outcome",
     "Scope",
     "date_checks",
+    "domain_checks",
     "key_checks",
+    "reference_checks",
     "row_count_check",
 ]

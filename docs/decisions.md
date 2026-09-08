@@ -2498,3 +2498,36 @@ Machine-local and implementation choices that are easy to forget six months late
   the checker to guess. And the key is COMPOSITE-CAPABLE because primary_key
   is: a foreign key that could not reference a composite key could not
   reference half the tables here, order_items among them.
+
+## Phase 7, Step 12 — reference integrity and category domains
+
+- dbt's relationships AND accepted_values, on the fields Step 11 added. On
+  broken_sales.csv: 7 orphan references over 3 distinct values with 8 nulls
+  beside them, and 9 rows holding 2 values outside the channel vocabulary.
+  Every number was pinned against the file in Step 3, before a rule existed to
+  read it.
+- P7-D3 EARNED ITS FIXTURE. The join is NOT EXISTS. region_lookup.csv carries a
+  blank row so a regression is visible rather than silent: NOT EXISTS finds 7,
+  NOT IN finds 0. Step 1 measured it and this is the step where the wrong form
+  would have shipped.
+- AN ORPHAN AND A NULL REFERENCE ARE COUNTED APART, 7 and 8. Both unmatched,
+  one a broken reference. A NULL foreign key points at nothing ON PURPOSE and
+  is optional by design in most schemas, so it is not_checked -- never
+  comparable -- and the domain check follows the same rule for the same
+  reason.
+- THREE WAYS A DECLARED CHECK DOES NOT RUN, each naming what is absent: the
+  referenced dataset is not loaded ("the contract is not wrong; the workspace
+  is thin"), the far side has no such column (checked here rather than left to
+  the engine, because a BinderException from inside a check is a traceback
+  where a sentence belongs), and the declared set is empty (which would fail
+  every row rather than constrain any).
+- THE DOMAIN IS NEVER DERIVED FROM THE DATA. A set read off the column it
+  constrains validates the column against itself and passes by construction.
+  Step 13 REPORTS the distinct values and leaves the declaring to somebody who
+  knows whether a fourth is legal and merely absent -- the shape propose.py
+  already uses for analysis_window: reported, never proposed.
+- THE EVIDENCE WORDING AND TWO CHECK TITLES WERE SETTLED BY THE TESTS. Drafted
+  before the implementation and rediscovered by running them, which is the
+  right way round: "Nord (3 row(s)) is not in region_lookup" says what is
+  wrong, where "Nord appears 3 times" is the phrasing a DUPLICATE check needs
+  and says nothing here.
