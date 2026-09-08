@@ -2937,3 +2937,56 @@ Machine-local and implementation choices that are easy to forget six months late
   their agreement with a test that runs both against one fixture and asserts
   the same rows, so a divergence fails rather than ships. Step 10b's precedent
   for waiting was "a reason to open the file"; the test does not need one.
+
+## Phase 8, Step 5 — the registry, and the first thing in it
+
+- P8-D21. summary_stats COVERS THE CONTRACT'S MEASURES, NOT EVERY COLUMN.
+  profile_dataset already answers "what is in this table" for every column with
+  no contract needed. A second walker would be a second profiler, gated and
+  formatted differently, and one day the two would disagree about a number
+  somebody had quoted. This answers the narrower question -- what the DECLARED
+  measures come to under the contract's window and exclusions -- and names
+  everything it did not summarise: key columns, excluded_columns, and numeric
+  columns nobody declared. Naming them is what makes the omission a decision
+  rather than a mystery. It is also why the cost question evaporated: measured
+  at 1M rows x 30 columns, thirty exact quantiles took a query from 1.03s to
+  3.97s, and a contract does not declare thirty measures. P8-O1 turned out to
+  be a performance decision as well as a correctness one.
+- P8-D22. THE DECLARED AGGREGATE IS USED, AND ITS ABSENCE IS NOT A DEFAULT.
+  Measure.agg has no default because the guess that gets guessed is sum.
+  agg unset -> nothing is totalled and the note names the call that fixes it.
+  agg='none' -> a total is WRONG, not undeclared, and does not appear even as a
+  convenience; min, max and the counts are still true and are still reported.
+  An aggregate the SQL map does not know is refused by name rather than
+  computed.
+- P8-D23. VALUES KEEP THEIR COLUMN'S TYPE; STATISTICS ARE COMPUTED IN FLOATING
+  POINT. Found by rendering the table rather than by a test: mean 15.375 beside
+  median 15.37 on the same money column. DuckDB computes median of a DECIMAL at
+  the column's own scale -- the median of 10.50 and 20.25 comes back as
+  Decimal('15.37') -- so the median is taken as quantile_cont(CAST(col AS
+  DOUBLE), 0.5) and the two agree. min and max stay Decimal, because 10.50 has
+  two places since somebody declared two; a float's seventeen digits are an
+  artifact and are rounded to four.
+- A DEFECT THE TESTS CAUGHT: DuckDB returns a DECIMAL column as
+  decimal.Decimal, which the first _number() did not handle at all, so money
+  would have reached a report cell as Decimal('30.75'). format_table renders
+  every cell with str() and rounds nothing, so whatever a function hands it is
+  what a reader sees.
+- P8-D24. AN ANALYSIS RETURNS Output; THE TOOL LAYER WRITES THE Result. This
+  reverses what was said one turn earlier, when Result looked like the natural
+  return type. write_result takes a workspace_id, and putting that inside nine
+  analysis functions gives all nine the filesystem and makes none testable
+  without a workspace. Result stays the ONLY envelope a caller sees -- locked
+  decision 20 is untouched -- built in one place from what nine functions
+  computed.
+- P8-D25. THE REGISTRY DOES NOT CATCH THE ENGINE'S ERRORS. P8-D8's sum
+  overflow has to become a refusal naming the measure and the type, but
+  building a Refusal in analysis/ would put it above state.py in the import
+  graph for the sake of one message. It raises; server.py translates. Same
+  reason sql_guard raises UnsafeSQL.
+- P8-O5 IS OPEN. table_profile.py passes n.mean straight into format_table,
+  which renders with str(), so profile_dataset prints a seventeen-digit mean
+  today. summary_stats rounds; the profiler does not; the same number can
+  appear both ways in one session. Not fixed here because it is Phase 5 code
+  with its own tests, but it is a real inconsistency and it is now written
+  down.
