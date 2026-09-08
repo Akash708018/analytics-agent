@@ -60,7 +60,6 @@ class Gate:
     version: int
     drift: DriftVerdict
     key: KeyVerdict | None = None
-    revalidated: bool = True
 
     @property
     def caveats(self) -> list[str]:
@@ -88,6 +87,33 @@ class Gate:
             f"Under contract v{self.version} for "
             f"{self.contract.dataset_name}: {self.contract.grain}."
         )
+
+
+def _key_verdict(con, dataset_name: str, contract) -> "KeyVerdict | None":
+    """Does the stated key identify a row -- asked every time, or not at all.
+
+    There was a shortcut here: skip the check when the fingerprint and the row
+    count are what they were at confirmation, on the ground that nothing can
+    have moved. The claim was true and the inference was not. `store.confirm`
+    does not look at the data, deliberately (P7-D12), so "nothing moved" meant
+    nothing moved since a state nobody had checked -- and a contract confirmed
+    against an already-broken key passed the gate forever, because the table
+    had indeed sat still. Phase 7 Step 10b pinned that hole rather than closing
+    it; this closes it.
+
+    What it costs, measured on 5M rows before it was removed: 0.077-0.179s
+    depending on the key shape, against 0.376s for the aggregate shape of
+    summary_stats on the same table. The check costs about half the analysis it
+    gates, and 7ms on a table the size of Olist. A shortcut worth a verdict
+    nobody computed is not worth that.
+
+    One function, called from two places, because two copies of this decision
+    would eventually disagree about a dataset -- which is what Step 10b had
+    already fixed once, and what P7-D6 is about.
+    """
+    if not contract.primary_key:
+        return None
+    return verify_key(con, dataset_name, contract.primary_key)
 
 
 def require_contract(con, dataset_name: str) -> Gate:
@@ -144,25 +170,15 @@ def require_contract(con, dataset_name: str) -> Gate:
     if drift.blocks:
         raise ContractRefused(drift.refusal().to_text())
 
-    # The fingerprint earns its keep here and nowhere else: identical
-    # structure AND identical row count means nothing can have moved, so the
-    # key re-check is skipped. Any difference at all and it is run.
-    unchanged = (
-        drift.drift is Drift.IDENTICAL
-        and live.contract.bound_to.fingerprint == observed.fingerprint
-    )
-    key_verdict = None
-    if live.contract.primary_key and not unchanged:
-        key_verdict = verify_key(con, dataset_name, live.contract.primary_key)
-        if not key_verdict.holds:
-            raise ContractRefused(key_verdict.refusal().to_text())
+    key_verdict = _key_verdict(con, dataset_name, live.contract)
+    if key_verdict is not None and not key_verdict.holds:
+        raise ContractRefused(key_verdict.refusal().to_text())
 
     return Gate(
         contract=live.contract,
         version=live.version,
         drift=drift,
         key=key_verdict,
-        revalidated=not unchanged,
     )
 
 
@@ -262,18 +278,11 @@ def dataset_states(con) -> list[DatasetState]:
             # you to build a model whose upstream test failed: a status view
             # that recommends a call the gate refuses is worse than one that
             # recommends nothing. This mirrors require_contract exactly --
-            # same function, same cache shortcut -- so the two cannot disagree
+            # the same helper, run on every call -- so the two cannot disagree
             # about a dataset. Found by a live agent reading get_workflow_state
             # and validate_dataset side by side; no acceptance fixture had a
             # key that fails.
-            key = None
-            if live.contract.primary_key:
-                unchanged = (
-                    drift.drift is Drift.IDENTICAL
-                    and live.contract.bound_to.fingerprint == observed.fingerprint
-                )
-                if not unchanged:
-                    key = verify_key(con, name, live.contract.primary_key)
+            key = _key_verdict(con, name, live.contract)
 
             if key is not None and not key.holds:
                 state.blocked_by = f"the key does not hold -- {key.sentence()}"

@@ -169,19 +169,23 @@ def test_an_unchanged_dataset_passes_cleanly(con):
     assert "one row = one item on one order" in gate.header()
 
 
-def test_an_unchanged_dataset_skips_the_key_recheck(con):
+def test_an_unchanged_dataset_has_its_key_checked_anyway(con):
     """
-    The fingerprint's only job. Identical structure AND identical row count
-    means nothing can have moved, so the count is not run again.
+    This used to read: "The fingerprint's only job. Identical structure AND
+    identical row count means nothing can have moved, so the count is not run
+    again." Both sentences were true and the conclusion did not follow --
+    nothing had moved since a state nobody checked, because store.confirm does
+    not look at the data. Phase 8 Step 3 removed the skip, so an unchanged
+    dataset now carries a verdict rather than a None.
     """
     _load_items(con)
     _confirmed(con)
     gate = require_contract(con, "order_items")
-    assert not gate.revalidated
-    assert gate.key is None
+    assert gate.key is not None
+    assert gate.key.holds
 
 
-def test_more_rows_revalidate_and_pass_with_a_caveat(con):
+def test_more_rows_pass_with_a_caveat(con):
     _load_items(con)
     _confirmed(con)
     con.execute(
@@ -191,7 +195,6 @@ def test_more_rows_revalidate_and_pass_with_a_caveat(con):
            FROM range(30) t(i)"""
     )
     gate = require_contract(con, "order_items")
-    assert gate.revalidated
     assert gate.key is not None and gate.key.holds
     assert any("gained 30 rows" in c for c in gate.caveats)
 

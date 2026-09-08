@@ -2832,3 +2832,64 @@ Machine-local and implementation choices that are easy to forget six months late
   reader never wrote, offered to them as the thing to correct. _engine_message
   keeps everything up to the LINE marker, which keeps "Candidate bindings:
   status" and drops the query. Both have tests now.
+
+## Phase 8, Step 3 — the gate checks the key every time
+
+- P8-D17. THE SHORTCUT IS GONE. require_contract skipped verify_key when the
+  fingerprint and row count matched the binding, on the ground that nothing
+  could have moved. The claim was true; the inference was not. store.confirm
+  does not look at the data, deliberately, so "nothing moved" meant nothing
+  moved since a state nobody established -- and a contract confirmed against an
+  already-broken key passed the gate forever, precisely because the table had
+  sat still. Phase 7 Step 10b pinned this and said Phase 8 or later.
+- MEASURED BEFORE REMOVED, and the absolute number is not what decided it. A
+  key check on the M1: 0.006-0.008s at 100,000 rows, 0.077-0.179s at 5,000,000
+  depending on key shape. Step 1 measured summary_stats' own aggregate shape on
+  the same 5M rows at 0.376s. THE GATE'S CHECK COSTS ABOUT HALF THE ANALYSIS IT
+  GATES, and 7ms on a table the size of Olist. A shortcut worth a verdict
+  nobody computed is not worth that.
+- TWO OPTIONS REFUSED. Checking the key at confirm would close it at the source
+  and break the separation Phase 7 asserted on purpose -- confirming a contract
+  does not look at the data, tested against broken_sales.csv -- and would make
+  validate_dataset partly redundant. Keying the skip on a recorded validation
+  in _agent_validations is correct but couples the gate to a second module's
+  records, and a dataset nobody validated gets the slow path forever. An
+  in-process memo was the third, and a mutable module global in a server F13
+  says outlives the chat is a worse thing to own than a scan.
+- A CORRECTION LOGGED WHILE DECIDING: the third option was written as "make the
+  cache a memo of a check that ran", against a cache that does not exist.
+  state.py has no store -- the shortcut is a boolean recomputed on every call --
+  so there was nothing to un-seed and a memo would have had to be introduced.
+  Reading the code changed the option, not just its wording.
+- Gate.revalidated IS REMOVED. It was set from `not unchanged`, read by nothing
+  but two assertions in test_state.py, and always True once the shortcut goes.
+  A field that can hold one value is a question a caller will eventually think
+  they asked.
+- THREE TESTS WERE NAMED AFTER THE HOLE, and all three were correct about what
+  the code did. test_state_gate.py's
+  test_a_key_that_never_held_is_not_re_checked_and_both_agree_about_it pinned it
+  deliberately -- its docstring is this decision written out a phase early,
+  ending "validate_dataset uses no shortcut and catches it every time, which is
+  the answer available today", and the shortcut is what stopped being true. A
+  test written to pin a limitation is supposed to fail on the day it closes, and
+  this one is how the step was known to have landed; it is now
+  test_a_key_that_never_held_is_caught_the_first_time_the_gate_runs with its
+  three assertions inverted. In test_state.py,
+  test_an_unchanged_dataset_skips_the_key_recheck asserted `not
+  gate.revalidated` and `gate.key is None` under a docstring of two true
+  sentences and a conclusion that did not follow; it is now
+  test_an_unchanged_dataset_has_its_key_checked_anyway.
+  test_more_rows_revalidate_and_pass_with_a_caveat lost one line and the word
+  "revalidate" from its name, since every call revalidates now. The defect was
+  never code disagreeing with its tests -- it was all four agreeing on the wrong
+  thing.
+- ONE FUNCTION, TWO CALLERS. state.py:156 and state.py:276 both ran the
+  condition; Step 10b had already fixed them once by making the status view ask
+  the gate. _key_verdict is what they both call now, and dataset_states' comment
+  no longer says "same cache shortcut", because there is not one.
+- THE BEHAVIOUR CHANGE, STATED RATHER THAN DISCOVERED. A key that breaks AFTER
+  confirmation now refuses at the next gated call rather than at the next
+  structural change. A table someone appended duplicate rows to -- same
+  columns, a row count classify_drift calls NEUTRAL -- is refused where it used
+  to pass. The KEY_NOT_UNIQUE refusal already reads correctly, so no wording
+  changed.

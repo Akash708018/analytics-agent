@@ -119,8 +119,8 @@ def test_a_repeated_key_is_reported_as_blocked_not_as_ready():
 
 
 def test_the_state_and_the_gate_cannot_disagree():
-    """Both call verify_key with the same shortcut, so a dataset the gate
-    refuses can never read as ready."""
+    """Both call verify_key through the same helper, on every call, so a
+    dataset the gate refuses can never read as ready."""
     for name, sql, key in (("ok", GOOD, ["k"]), ("dupes", DUPES, ["k"]),
                            ("nulls", NULLS, ["k"])):
         build(name, sql, key)
@@ -151,24 +151,27 @@ def test_a_contract_with_no_key_declared_is_not_blocked_by_one():
     assert state.next_call.startswith("run_analysis")
 
 
-def test_a_key_that_never_held_is_not_re_checked_and_both_agree_about_it():
-    """A known limitation, pinned so it is a decision rather than a surprise.
+def test_a_key_that_never_held_is_caught_the_first_time_the_gate_runs():
+    """The limitation this file used to pin, closed in Phase 8 Step 3.
 
-    require_contract skips verify_key when the structure and row count are
-    identical to what the contract was bound to -- a cache keyed on "nothing
-    moved". Nothing establishes that the key held when the contract was
-    confirmed: store.confirm does not look at the data, deliberately, because
-    a contract is an agreement about intent and testing it is a separate act.
-    So a contract confirmed against a table whose key ALREADY failed is never
-    re-checked, and neither the gate nor this report notices.
+    It read: require_contract skips verify_key when the structure and row count
+    are identical to what the contract was bound to, nothing establishes that
+    the key held when the contract was confirmed, so a contract confirmed
+    against an already-broken key is never re-checked -- and it ended
+    "validate_dataset uses no shortcut and catches it every time, which is the
+    answer available today". The shortcut is gone and the gate is the answer
+    now.
 
-    dataset_states mirrors the shortcut rather than fixing it here, because a
-    state view that blocked what the gate allows is the same disagreement in
-    the other direction. validate_dataset uses no shortcut and catches it every
-    time, which is the answer available today.
+    store.confirm still does not look at the data. That separation was never
+    the problem; the problem was a gate inferring "nothing moved" from a
+    binding recorded before anybody checked anything.
+
+    A test written to pin a limitation is supposed to fail on the day the
+    limitation is closed. This one did, which is how the step was known to have
+    landed.
     """
     build("sales", DUPES, ["k"])
-    assert not gate_refuses("sales"), "the shortcut is what this pins"
+    assert gate_refuses("sales"), "nothing moved, and the key never held"
     state = state_of("sales")
-    assert "BLOCKED" not in state.stage
-    assert state.next_call.startswith("run_analysis")
+    assert "BLOCKED" in state.stage
+    assert state.next_call.startswith("validate_dataset")
