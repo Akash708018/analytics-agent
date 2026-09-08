@@ -2531,3 +2531,29 @@ Machine-local and implementation choices that are easy to forget six months late
   right way round: "Nord (3 row(s)) is not in region_lookup" says what is
   wrong, where "Nord appears 3 times" is the phrasing a DUPLICATE check needs
   and says nothing here.
+
+## Phase 7, Step 14 — reported, never proposed
+
+- THE PROPOSAL STATES WHAT A VOCABULARY COLUMN HOLDS AND DECLARES NOTHING.
+  analysis_window's rule on a second field, and propose.py already carries the
+  comment. A domain read off the column it constrains validates the column
+  against itself and passes by construction, which is worse than no check
+  because it looks like one.
+- THE FIXTURE MAKES THE ARGUMENT. On broken_sales.csv the region note reads
+  "East, Nord, North, Nrth-West, Souh, South, West" -- the three injected
+  misspellings sitting beside the four real regions. Anybody who pasted that
+  set back would declare the errors legal and the check would pass over all
+  seven.
+- A VOCABULARY IS TEXT, REPEATING, AND AT MOST TWELVE DISTINCT VALUES -- not
+  `suggest_role == "dimension"`. The first version used the role and a
+  five-row fixture found it immediately: five rows with five regions makes
+  region unique, so suggest_role reads it as an identifier, correctly, because
+  counting cannot tell a vocabulary nobody has repeated yet from a name for a
+  row. The role heuristic answers a different question; asking for the shape
+  directly avoids inheriting its edges.
+- NUMBERS ARE LEFT OUT rather than guessed at. evidence.suggest_role already
+  says an integer of 1-5 could be a rating to average or a bucket to group by
+  and only a person knows which.
+- A COLUMN THAT NEVER REPEATS GETS NOTHING. Five rows and five regions could
+  be a vocabulary or an id, and saying so would guess in the direction of the
+  more useful answer, which is the direction that gets believed.

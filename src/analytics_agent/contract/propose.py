@@ -64,6 +64,7 @@ from analytics_agent.contract.dataset_contract import (
     AnalysisWindow,
     DatasetContract,
     Exclusion,
+    ForeignKey,
     Measure,
 )
 from analytics_agent.contract.evidence import DatasetEvidence, gather, suggest_role
@@ -257,6 +258,62 @@ def _resolve_date_column(
     return dates[0].name, True, notes
 
 
+# The point past which a column stops looking like a controlled vocabulary.
+# The same twelve the dimension heuristic uses, for the same reason: a set a
+# person can read in one line is a set they can confirm or correct.
+VOCABULARY_LIMIT = 12
+
+
+# What a controlled vocabulary is stored as, in this project and in every
+# warehouse it will read from. A numeric column of 1-5 could be a rating to
+# average or a bucket to group by, and evidence.suggest_role already says only
+# a person knows which -- so numbers are left out rather than guessed at.
+_VOCABULARY_TYPES = ("VARCHAR", "CHAR", "TEXT", "STRING")
+
+
+def _domain_notes(con, dataset_name, ev, declared) -> list[str]:
+    """What a low-cardinality column holds -- reported, never proposed.
+
+    `analysis_window`'s rule, applied to a second field. The distinct values in
+    a column are what IS there; a domain is what is ALLOWED, and the difference
+    is whether another value would be a mistake or a Tuesday. Reading the
+    set off the data would produce a check that validates the column against
+    itself and passes by construction, which is worse than no check because it
+    looks like one.
+
+    So this states the values and stops. Nothing is written into `domains`,
+    nothing goes in `unresolved`, and no question is asked -- a dataset with no
+    controlled vocabulary is complete, not unfinished.
+    """
+    notes = []
+    for col in ev.columns:
+        if col.name in declared:
+            continue
+        # Not `role == "dimension"`: on a small table every repeated-in-life
+        # column can look unique, and suggest_role reads a five-row fixture's
+        # region as an identifier. The shape of a vocabulary is simpler than
+        # the role heuristic -- text, repeating, and few enough to read.
+        if not col.dtype.upper().startswith(_VOCABULARY_TYPES):
+            continue
+        if col.is_unique or col.is_constant or not col.non_null:
+            continue
+        if col.distinct > VOCABULARY_LIMIT:
+            continue
+        values = [
+            r[0] for r in con.execute(
+                f'SELECT DISTINCT "{col.name}" FROM "{dataset_name}" '
+                f'WHERE "{col.name}" IS NOT NULL ORDER BY 1'
+            ).fetchall()
+        ]
+        notes.append(
+            f"{col.name} holds {col.distinct:,} distinct value(s): "
+            f"{', '.join(str(v) for v in values)}. Declare "
+            f'domains={{"{col.name}": [...]}} if that is the complete set -- '
+            f"the data cannot tell you whether another value is legal and "
+            f"merely absent."
+        )
+    return notes
+
 def propose_contract(
     con,
     dataset_name: str,
@@ -271,6 +328,8 @@ def propose_contract(
     analysis_window: tuple[date, date] | None = None,
     known_exclusions: list[Exclusion] | None = None,
     caveats: list[str] | None = None,
+    foreign_keys: list[ForeignKey] | None = None,
+    domains: dict[str, list[str]] | None = None,
     loaded_at: datetime | None = None,
 ) -> Proposal:
     """
@@ -417,11 +476,18 @@ def propose_contract(
         dimensions=dimension_names,
         known_exclusions=list(known_exclusions or []),
         caveats=list(caveats or []),
+        # Neither is asked about and neither goes in `unresolved`. dbt does not
+        # nag you for a relationships test; empty is a default, not a gap, and
+        # a question about a field most datasets leave empty would be noise in
+        # the one place this project cannot afford it.
+        foreign_keys=list(foreign_keys or []),
+        domains=dict(domains or {}),
         bound_to=binding,
         questions=questions,
         unresolved=unresolved,
     )
 
+    notes += _domain_notes(con, dataset_name, ev, contract.domains)
     notes += ev.notes
     return Proposal(
         contract=contract,

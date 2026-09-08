@@ -23,6 +23,7 @@ from analytics_agent.contract import ContractRefused, store
 from analytics_agent.contract.dataset_contract import (
     DatasetContract,
     Exclusion,
+    ForeignKey,
     contract_from_json,
 )
 from analytics_agent.contract.propose import propose_contract
@@ -113,6 +114,57 @@ def _parse_exclusions(raw: list[dict] | None) -> list[Exclusion]:
     return out
 
 
+def _parse_foreign_keys(raw: list[dict] | None) -> list[ForeignKey]:
+    """Turn the tool's list-of-objects into ForeignKeys, refusing a bad shape.
+
+    Same shape as `_parse_exclusions`, and the same reason: an agent passing a
+    string where a list belongs should read a sentence naming the field, not a
+    pydantic traceback with a `loc` tuple in it.
+    """
+    out: list[ForeignKey] = []
+    for i, item in enumerate(raw or []):
+        if not isinstance(item, dict):
+            raise ContractRefused(
+                Refusal(
+                    reason=Reason.CONTRACT_INVALID,
+                    what=f"foreign key {i + 1} is not an object.",
+                    why=(
+                        "a foreign key needs the column(s) on this side and "
+                        "the dataset they point at."
+                    ),
+                    next_call=(
+                        'propose_dataset_contract(..., foreign_keys=[{"columns": '
+                        '["region"], "references": "region_lookup"}])'
+                    ),
+                ).to_text()
+            )
+        try:
+            out.append(
+                ForeignKey(
+                    columns=item.get("columns") or [],
+                    references=item.get("references", ""),
+                    referenced_columns=item.get("referenced_columns") or [],
+                    reason=item.get("reason", ""),
+                )
+            )
+        except Exception as exc:
+            raise ContractRefused(
+                Refusal(
+                    reason=Reason.CONTRACT_INVALID,
+                    what=f"foreign key {i + 1} is not usable.",
+                    why=(
+                        "a reference the checker cannot join is a check that "
+                        "can only report that it did not run."
+                    ),
+                    detail=str(exc),
+                    next_call=(
+                        'propose_dataset_contract(..., foreign_keys=[{"columns": '
+                        '["region"], "references": "region_lookup"}])'
+                    ),
+                ).to_text()
+            ) from exc
+    return out
+
 def propose(
     con,
     dataset_name: str,
@@ -128,11 +180,14 @@ def propose(
     analysis_window_end: str | None = None,
     known_exclusions: list[dict] | None = None,
     caveats: list[str] | None = None,
+    foreign_keys: list[dict] | None = None,
+    domains: dict[str, list[str]] | None = None,
 ) -> str:
     """Draft a contract and render it. Stores nothing."""
     try:
         window = _parse_window(analysis_window_start, analysis_window_end)
         exclusions = _parse_exclusions(known_exclusions)
+        keys = _parse_foreign_keys(foreign_keys)
         record = db.get_dataset(con, dataset_name)
         proposal = propose_contract(
             con,
@@ -147,6 +202,8 @@ def propose(
             analysis_window=window,
             known_exclusions=exclusions,
             caveats=caveats,
+            foreign_keys=keys,
+            domains=domains,
             loaded_at=getattr(record, "loaded_at", None) if record else None,
         )
         return proposal.to_text()

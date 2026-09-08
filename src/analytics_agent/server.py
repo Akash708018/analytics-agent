@@ -586,6 +586,8 @@ def propose_dataset_contract(
     analysis_window_end: str | None = None,
     known_exclusions: list[dict] | None = None,
     caveats: list[str] | None = None,
+    foreign_keys: list[dict] | None = None,
+    domains: dict[str, list[str]] | None = None,
     workspace_id: str | None = None,
 ) -> str:
     """Draft a Dataset Contract for a loaded dataset. Stores nothing.
@@ -630,6 +632,7 @@ def propose_dataset_contract(
             analysis_window_start=analysis_window_start,
             analysis_window_end=analysis_window_end,
             known_exclusions=known_exclusions, caveats=caveats,
+            foreign_keys=foreign_keys, domains=domains,
         )
     finally:
         con.close()
