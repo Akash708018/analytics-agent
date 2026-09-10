@@ -38,10 +38,10 @@ second way of saying so.
 
 from __future__ import annotations
 
-from decimal import Decimal
 from typing import Any
 
 from ..util.sql_guard import quote_identifier
+from .base import number
 from .registry import Output, register
 
 # What a declared aggregate becomes in SQL. `none` is deliberately absent: it
@@ -57,41 +57,6 @@ _AGG_SQL = {
     "count_distinct": "count(DISTINCT {col})",
     "median": "median({col})",
 }
-
-# Four decimal places, thousands separated, trailing zeros dropped. Measured in
-# Step 5: avg of a DECIMAL(18,2) money column cast straight to text gives
-# 23.583333333333332, and format_table renders cells with str(), so a number
-# arrives in a report exactly as wide as the float made it. `:,.4g` -- the
-# convention table_profile uses for outlier fences -- is wrong here: it turns
-# 1234567.89 into 1.235e+06, which is fine for a fence and unreadable for money.
-_PLACES = 4
-
-
-def _number(value: Any) -> Any:
-    """A number as a reader should see it. None stays None -- see P8-D9.
-
-    A `Decimal` keeps its own scale and is not rounded. DuckDB returns a
-    DECIMAL column as `decimal.Decimal`, and that scale is a fact about the
-    column -- 10.50 on a DECIMAL(18,2) money column is two decimal places
-    because somebody declared two. A float's seventeen digits are an artifact
-    of the type, which is why those are rounded and these are not.
-    """
-    if value is None or isinstance(value, bool):
-        return value
-    if isinstance(value, Decimal):
-        return f"{value:,}"
-    if isinstance(value, int):
-        return f"{value:,}"
-    if isinstance(value, float):
-        if value != value or value in (float("inf"), float("-inf")):
-            # P8-D1: inf and nan reach a cell as text unless somebody stops
-            # them. Nothing here divides, but a measure can already hold one.
-            return str(value)
-        rounded = round(value, _PLACES)
-        text = f"{rounded:,.{_PLACES}f}".rstrip("0").rstrip(".")
-        return text or "0"
-    return value
-
 
 def _agg_of(measure) -> str | None:
     """The declared aggregate as a lowercase string, whatever type it is.
@@ -167,7 +132,7 @@ def summary_stats(con, gate, scope, **params) -> Output:
                 f"SELECT count(*), count({col}) FROM {table} WHERE {scope.where}"
             ).fetchall()[0]
             rows.append([measure.name, "(not declared)", unit,
-                         _number(counts[1]), _number(counts[0] - counts[1]),
+                         number(counts[1]), number(counts[0] - counts[1]),
                          "", "", "", "", "", ""])
             undeclared_reason.append(
                 f"{measure.name} has no declared aggregate, so nothing was "
@@ -201,12 +166,12 @@ def summary_stats(con, gate, scope, **params) -> Output:
                 f"max({col}), NULL, NULL, NULL FROM {table} WHERE {scope.where}"
             ).fetchall()[0]
 
-        total = "not additive" if agg == "none" else _number(row[2])
+        total = "not additive" if agg == "none" else number(row[2])
         rows.append([
             measure.name, agg, unit,
-            _number(row[1]), _number(row[0] - row[1]), total,
-            _number(row[3]), _number(row[4]),
-            _number(row[5]), _number(row[6]), _number(row[7]),
+            number(row[1]), number(row[0] - row[1]), total,
+            number(row[3]), number(row[4]),
+            number(row[5]), number(row[6]), number(row[7]),
         ])
 
     summary = [scope.method_note()]

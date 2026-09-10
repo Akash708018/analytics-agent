@@ -2990,3 +2990,40 @@ Machine-local and implementation choices that are easy to forget six months late
   appear both ways in one session. Not fixed here because it is Phase 5 code
   with its own tests, but it is a real inconsistency and it is now written
   down.
+
+## Phase 8, Step 6 — counting into groups, and cutting the list
+
+- P8-D26. THE ORDER IS DETERMINISTIC AND THE TIE IS REPORTED, WHICH ARE TWO
+  DIFFERENT FIXES. Every ranking orders by the value then by the group name, so
+  the same data gives the same answer twice; and when something ties at the cut
+  the note says how many groups shared that value and that the tiebreak, not
+  the data, decided which appear. Determinism makes an answer repeatable.
+  Saying so makes it honest -- P8-D4 measured that a tiebreak changes the
+  answer entirely and that both orderings are correct.
+- P8-D27. NULL IS A GROUP CALLED (null). P8-D5, applied: GROUP BY keeps it,
+  PIVOT drops it, and '' and NULL are two values not one. A blank cell in a
+  frequency table reads as the empty string, so the group is named. The count
+  is also stated in the note even when the group falls below the cut -- a
+  reader who saw only a truncated table would otherwise conclude the column is
+  always populated.
+- P8-D28. A SHARE COLUMN IS DROPPED, WITH ITS REASON, RATHER THAN COMPUTED
+  WRONG. Three cases and they are not the same: a group total below zero (a
+  share of a signed total is not a proportion), an aggregate that does not add
+  across groups (avg of avgs has no total to be a share of), and a total of
+  zero (x/0 is inf in 1.5.5, not an error, and inf renders as a cell). The
+  denominator is computed first and the column is absent with a sentence naming
+  which case applied.
+- P8-D29. frequency AND top_n REPORT DECLARED DIMENSIONS ONLY. P8-O1 again, and
+  the same division as summary_stats: profile_dataset shows the top values of
+  every column with no contract; these answer the narrower question and refuse
+  an undeclared column with the list of declared ones. Ranking by a measure
+  with no agg, or by one declared non-additive, is refused rather than defaulted
+  -- P8-D22 is not weaker in a ranking than in a total.
+- number AND label MOVED TO base.py. Three analyses need the same formatting,
+  and the first one to want it is not where it belongs. Mechanical, tested
+  before and after.
+- A FIXTURE DEFECT WORTH THE LINE: the test table's amounts were written as
+  bare literals, so DuckDB typed the column DECIMAL(3,1) and the test that
+  needed to write -100.0 could not -- it failed on its own setup, not on the
+  code. Declared casts now. A fixture that cannot express the case it was
+  built for is a test that passes for the wrong reason.
