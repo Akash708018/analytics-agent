@@ -8,6 +8,7 @@ from __future__ import annotations
 
 __all__ = [
     "AGG_SQL", "agg_of", "column_types", "is_numeric", "is_integer",
+    "is_arbitrary_precision",
     "dimension_names", "require_dimension", "require_measure",
 ]
 
@@ -47,14 +48,6 @@ def column_types(con, dataset_name: str) -> dict[str, str]:
     return {r[0]: r[1] for r in rows}
 
 
-NUMERIC_TYPES = ("TINYINT", "SMALLINT", "INTEGER", "BIGINT", "HUGEINT", "UTINYINT",
-            "USMALLINT", "UINTEGER", "UBIGINT", "FLOAT", "DOUBLE", "DECIMAL", "REAL")
-
-
-def is_numeric(dtype: str) -> bool:
-    return dtype.upper().startswith(NUMERIC_TYPES)
-
-
 INTEGER_TYPES = (
     "TINYINT", "SMALLINT", "INTEGER", "BIGINT", "HUGEINT",
     "UTINYINT", "USMALLINT", "UINTEGER", "UBIGINT", "UHUGEINT",
@@ -64,6 +57,42 @@ INTEGER_TYPES = (
 def is_integer(dtype: str) -> bool:
     """Whether this is a scalar integer type, including unsigned HUGEINT."""
     return dtype.strip().upper() in INTEGER_TYPES
+
+
+NUMERIC_TYPES = INTEGER_TYPES + ("FLOAT", "DOUBLE", "DECIMAL")
+
+# DuckDB writes a declared VARINT back as BIGNUM: an integer with no fixed width.
+# It is named so a caller can say what it is; nothing computes over it (S7b-r1).
+ARBITRARY_PRECISION_TYPES = ("BIGNUM",)
+
+
+def _base_type(name: str) -> str:
+    """The type name without a trailing (...): DECIMAL(10,2) -> DECIMAL.
+
+    A list type ends in ] and is returned whole, so DECIMAL(18,2)[] stays
+    DECIMAL(18,2)[] and cannot be mistaken for DECIMAL.
+    """
+    if name.endswith(")") and "(" in name:
+        return name[: name.index("(")]
+    return name
+
+
+def is_numeric(dtype: str) -> bool:
+    """Whether DuckDB's name for a column type is a scalar number.
+
+    The whole base name is compared, not its first letters: a prefix match
+    read INTEGER[] and DECIMAL(18,2)[] as numbers and missed UHUGEINT
+    (P8-O8). A list of numbers is not a number. BIGNUM is not numeric here;
+    is_arbitrary_precision names it.
+    """
+    name = dtype.upper()
+    return "[" not in name and _base_type(name) in NUMERIC_TYPES
+
+
+def is_arbitrary_precision(dtype: str) -> bool:
+    """Whether this is DuckDB's arbitrary-precision integer (declared VARINT)."""
+    name = dtype.upper()
+    return "[" not in name and _base_type(name) in ARBITRARY_PRECISION_TYPES
 
 
 def dimension_names(contract) -> list[str]:
@@ -86,7 +115,7 @@ def require_dimension(contract, column: str) -> str:
     declared is refused with the list of the ones somebody did -- a caller who
     wanted it is one confirm_dataset_contract away.
     """
-    if column in set(getattr(contract, "excluded_columns", None) or []):
+    if column in set(contract.excluded_columns):
         raise ValueError(
             f"{column!r} is in excluded_columns: the contract says never to "
             f"read it."
@@ -105,7 +134,7 @@ def require_dimension(contract, column: str) -> str:
 
 def require_measure(contract, name: str):
     """Return the declared measure itself, refusing excluded columns first."""
-    if name in set(getattr(contract, "excluded_columns", None) or []):
+    if name in set(contract.excluded_columns):
         raise ValueError(
             f"{name!r} is in excluded_columns: the contract says never to "
             f"read it."

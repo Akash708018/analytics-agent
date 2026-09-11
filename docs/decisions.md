@@ -3109,3 +3109,89 @@ Machine-local and implementation choices that are easy to forget six months late
   real-Measure rejection test; requiring that regression while expecting an
   empty search is contradictory. No source map or accepting fixture retains
   the alias. The test stays visible to the audit.
+
+## Phase 8, Step 7b.0 — a type is read by its whole name
+- P8-D30. IS_NUMERIC COMPARES THE WHOLE BASE NAME. NUMERIC_TYPES is
+  INTEGER_TYPES + FLOAT, DOUBLE, DECIMAL. REAL is gone: DuckDB 1.5.5 writes REAL
+  and FLOAT4 back as FLOAT. _base_type drops a trailing (...) and returns a list
+  type whole, and a name containing [ is never numeric. .upper() is kept and no
+  .strip() is added (R7). Step 7b.0 Part 4 printed UHUGEINT numeric=True and
+  INTEGER[], DECIMAL(18,2)[], INTEGER[3] numeric=False (container; M1 reported
+  match, not pasted).
+- P8-O8 IS CLOSED by P8-D30.
+- P8-D31. BIGNUM IS NAMED, NOT COMPUTED OVER. DuckDB writes a declared VARINT as
+  BIGNUM. ARBITRARY_PRECISION_TYPES = ("BIGNUM",) and is_arbitrary_precision
+  name it; is_numeric and is_integer return False for it, so no analysis that
+  branches on them computes over it. The retired Codex spec called this ruling
+  S7b-r1; that was never logged, and this entry replaces it.
+- P8-D32. EXCLUDED_COLUMNS IS READ AS A PLAIN ATTRIBUTE. require_dimension and
+  require_measure read contract.excluded_columns with no getattr and no `or []`,
+  so a renamed field raises AttributeError. Refusal strings are byte-identical:
+  no diff line of declared.py touches them. A real contract cannot hold None:
+  dataset_contract.py:297 is list[str] with default_factory=list; src has no
+  model_construct, validate_assignment or `excluded_columns = None`; its one
+  model_copy (store.py:282) updates only version and confirmed_at.
+  summary_stats.py:66 and base.py:246 already read the field this way.
+- P8-D33. TWO 7a TESTS LOST THEIR TOLERANCE CASES.
+  test_require_dimension_refuses_an_undeclared_column_with_the_list and
+  test_require_measure_returns_the_measure_object asserted that None and a
+  missing attribute were accepted, which P8-D32 removes. Each keeps an
+  excluded_columns=[] case, and the new missing-attribute test asserts the
+  refusal. Approved by Akash, 11 Sep 2026.
+- P8-O11 IS OPEN. Two readers still default silently: declared.py
+  dimension_names reads `getattr(contract, "dimensions", []) or []`, and
+  clean/tools.py:185 reads `getattr(contract, "excluded_columns", ()) or ()`.
+  Both are outside 7b.0's fence.
+- P8-O12 IS OPEN. BIGNUM in the analyses. Measured on DuckDB 1.5.5 (container;
+  M1 reported match, not pasted): min, sum and median return BIGNUM, which
+  Python receives as str; avg, stddev_samp and quantile_cont return DOUBLE.
+  10::BIGNUM::HUGEINT raises "Positive bignum too large for type", as did every
+  non-zero BIGNUM cast to HUGEINT or UHUGEINT that was tried; ::BIGINT works.
+- P8-O13 IS OPEN. 128-bit integers against bound parameters, to be ruled on in
+  7b.1. Binding the Python int 5 against a UHUGEINT column plans CAST(u AS
+  BIGINT) > 5, which errors on values above 2^63-1; the literal u > 5 and u >
+  ?::UHUGEINT both work. UHUGEINT plus a bound int returns DOUBLE. sum() over
+  UHUGEINT returns DOUBLE on both summary_stats paths, before and after 7b.0
+  (container).
+- C14. CODEX LOOP RETIRED. The architect-plus-Codex loop put two layers between
+  Akash and the code, and each sub-step took three or four round trips where a
+  step guide takes one. Verification came from Akash's terminal either way, so
+  the loop added cost and gave nothing back. The step-guide method is restored
+  from 7b.0 on. AGENTS.md (c155646) stays committed and inactive.
+- C15. R6 AGAINST THE 7a TESTS. Predicted: R6 with R7 leaves every existing test
+  passing, for +6. Measured: 2 of the 7a tests failed under R6 (container).
+  Because: the 7b.0 scope was written from a description of the getattr read
+  without reading tests/test_declared.py.
+- C16. A LINE RANGE WHERE TWO LINES PRINTED. Predicted is_numeric uses at
+  test_declared.py:151-153; printed 151 and 153. Because: a range was written
+  for the block, and line 152 is its for line.
+- C17. A BYPASS SEARCH WRITTEN FROM MEMORY. Predicted: an empty search for
+  model_construct, validate_assignment and `excluded_columns = None` rules out
+  None. Measured: model_copy(update=...) and setattr also skip validation
+  (pydantic 2.13.4, container). Because: the bypass list was recalled, not
+  measured. A second search closed it.
+- C18. A RECURSIVE GREP WITHOUT --include. Predicted test file paths only;
+  printed two tests/__pycache__ .pyc files as well. Because: the flag was on the
+  neighbouring commands but not this one, and the mock repo had no matching file
+  to expose it.
+- C19. CITED ENTRIES THAT WERE NEVER LOGGED. The 7b.0 scope cited P8-O12, C15
+  and S7b-r1 as logged; a search of every .md file in the repo found none.
+  Because: numbers drafted in the retired Codex spec were treated as logged. The
+  P8-O12 and C15 in this entry are new numbers, assigned in order.
+- C20. THE C-NUMBER SEARCH READ ACTION IDS. Predicted: the next-free-C command
+  prints the highest correction. Printed C099, a zero-padded cleaning action id
+  (see PER-PLAN ACTION IDS); corrections are unpadded. Because: the pattern
+  accepted any C followed by digits, and it was verified on a sample with no
+  action ids. Replacement:
+  grep -oE '(^|[^A-Za-z0-9_])C[1-9][0-9]*' docs/decisions.md | tr -dc 'C0-9\n' | sort -t C -k2 -n | uniq | tail -1
+- C21. THE BUILD GUIDE'S NAME. Predicted analytics_agent_build_guide_v1_2.md;
+  the file is docs/analytics_agent_build_guide_v1.2.md. Because: the name was
+  copied from the working instructions without being measured.
+- C22. LEDGER LINES ASSUMED. Predicted the build guide names Step 7 sub-steps; a
+  search for Step 7, 7b and 7c printed nothing. Because: "progress ledger" was
+  read as step-level, and line 33 says a box is ticked when a phase passes its
+  Done-When test.
+- MEASURED VALIDATION. test_declared.py printed 15 passed before (Akash's
+  terminal). After, 21 passed and the full suite 1161 passed, reported by Akash
+  as matching, output not pasted; the baseline 1155 is from the 7a entry. The
+  step guide phase8_step7b0_type-predicates.md holds the container outputs.

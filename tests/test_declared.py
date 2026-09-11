@@ -15,9 +15,13 @@ from analytics_agent.analysis import frequency, summary_stats
 from analytics_agent.analysis.base import LostRows, ScopeError, scope_for
 from analytics_agent.analysis.declared import (
     AGG_SQL,
+    ARBITRARY_PRECISION_TYPES,
+    INTEGER_TYPES,
+    NUMERIC_TYPES,
     agg_of,
     column_types,
     dimension_names,
+    is_arbitrary_precision,
     is_integer,
     is_numeric,
     require_dimension,
@@ -114,19 +118,16 @@ def test_require_dimension_refuses_an_undeclared_column_with_the_list():
     with pytest.raises(ValueError) as exc:
         require_dimension(FakeContract(), "unknown")
     assert "Declared: region, channel" in str(exc.value)
-    for exclusions in [None, []]:
-        contract = SimpleNamespace(dimensions=["region"], excluded_columns=exclusions)
-        assert require_dimension(contract, "region") == "region"
-    assert require_dimension(SimpleNamespace(dimensions=["region"]), "region") == "region"
+    contract = SimpleNamespace(dimensions=["region"], excluded_columns=[])
+    assert require_dimension(contract, "region") == "region"
 
 
 def test_require_measure_returns_the_measure_object():
     measure = FakeMeasure("amount")
     contract = FakeContract(measures=[measure])
     assert require_measure(contract, "amount") is measure
-    assert require_measure(SimpleNamespace(measures=[measure]), "amount") is measure
-    contract.excluded_columns = None
-    assert require_measure(contract, "amount") is measure
+    duck = SimpleNamespace(measures=[measure], excluded_columns=[])
+    assert require_measure(duck, "amount") is measure
 
 
 def test_require_measure_refuses_an_undeclared_measure_with_the_list():
@@ -192,3 +193,54 @@ def test_every_registered_analysis_sits_in_its_build_guide_tier():
 def test_lost_rows_is_a_scope_error():
     assert issubclass(LostRows, ScopeError)
     assert issubclass(LostRows, ValueError)
+
+
+# Phase 8 Step 7b.0: type names as DuckDB writes them, and excluded_columns read directly.
+
+
+def test_a_list_of_numbers_is_not_a_number():
+    for dtype in ["INTEGER[]", "DECIMAL(18,2)[]", "DOUBLE[]", "INTEGER[3]", "BIGNUM[]"]:
+        assert not is_numeric(dtype)
+        assert not is_arbitrary_precision(dtype)
+    assert is_numeric("INTEGER") and is_numeric("DECIMAL(18,2)")
+
+
+def test_every_integer_type_is_numeric_and_real_is_gone():
+    for dtype in INTEGER_TYPES:
+        assert is_numeric(dtype)
+    assert "REAL" not in NUMERIC_TYPES
+    assert not set(NUMERIC_TYPES) & set(ARBITRARY_PRECISION_TYPES)
+
+
+def test_predicates_read_the_names_of_a_real_duckdb_table(con):
+    con.execute(
+        "CREATE TABLE kinds(u UHUGEINT, n NUMERIC(10,2), r REAL, "
+        "li INTEGER[], dt DATE, v VARINT)"
+    )
+    types = column_types(con, "kinds")
+    assert {c for c, t in types.items() if is_numeric(t)} == {"u", "n", "r"}
+    assert {c for c, t in types.items() if is_arbitrary_precision(t)} == {"v"}
+
+
+def test_a_contract_without_excluded_columns_is_refused_loudly():
+    with pytest.raises(AttributeError, match="excluded_columns"):
+        require_dimension(SimpleNamespace(dimensions=["region"]), "region")
+    with pytest.raises(AttributeError, match="excluded_columns"):
+        require_measure(SimpleNamespace(measures=[FakeMeasure("amount")]), "amount")
+
+
+def test_summary_stats_does_not_name_a_list_column_as_undeclared_numeric(con):
+    con.execute("ALTER TABLE sales ADD COLUMN tags INTEGER[]")
+    con.execute("ALTER TABLE sales ADD COLUMN extra DOUBLE")
+    gate = FakeGate(FakeContract(date_column=None, primary_key=[]))
+    text = " ".join(summary_stats.summary_stats(con, gate, scope_for(con, gate)).summary)
+    assert "extra" in text
+    assert "tags" not in text
+
+
+def test_bignum_is_named_and_not_computed_over(con):
+    con.execute("CREATE TABLE wide(v VARINT)")
+    dtype = column_types(con, "wide")["v"]
+    assert is_arbitrary_precision(dtype)
+    assert not is_numeric(dtype)
+    assert not is_integer(dtype)
