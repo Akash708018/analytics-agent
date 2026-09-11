@@ -27,7 +27,7 @@ from typing import Any
 
 from ..util.sql_guard import bind_predicate, negate, quote_identifier
 
-__all__ = ["Scope", "ScopeError", "number", "label", "window_clause", "scope_for"]
+__all__ = ["Scope", "ScopeError", "LostRows", "number", "label", "window_clause", "scope_for"]
 
 
 # Four decimal places, thousands separated, trailing zeros dropped. Measured in
@@ -77,6 +77,10 @@ def label(value: Any) -> str:
 
 class ScopeError(ValueError):
     """The contract describes rows that cannot be selected."""
+
+
+class LostRows(ScopeError):
+    """An analysis's output does not add back to the rows its scope allowed."""
 
 
 def window_clause(column: str, start, end) -> str:

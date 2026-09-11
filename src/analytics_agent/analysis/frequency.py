@@ -31,44 +31,13 @@ from typing import Any
 
 from ..util.sql_guard import quote_identifier
 from .base import label, number
+from .declared import AGG_SQL, agg_of, require_dimension, require_measure
 from .registry import Output, register
 
 # How many groups a frequency table shows before it stops being a table anyone
 # reads. results.py previews 20 rows and pages the rest, so this is not a data
 # limit -- the file has everything -- it is what the cut is set to by default.
 DEFAULT_LIMIT = 20
-
-
-def _dimension_names(contract) -> list[str]:
-    """The declared dimensions, whether they are strings or objects.
-
-    `dimensions` may hold names or small models; both are read the same way
-    rather than one being assumed, for the reason `_agg_of` reads `agg` twice.
-    """
-    out = []
-    for d in getattr(contract, "dimensions", []) or []:
-        out.append(str(getattr(d, "name", d)))
-    return out
-
-
-def _require_dimension(contract, column: str) -> str:
-    """P8-O1 again: the contract says which columns are dimensions.
-
-    profile_dataset already shows the top values of every column without a
-    contract. This one answers the narrower question, so a column nobody
-    declared is refused with the list of the ones somebody did -- a caller who
-    wanted it is one confirm_dataset_contract away.
-    """
-    declared = _dimension_names(contract)
-    if column in declared:
-        return column
-    raise ValueError(
-        f"{column!r} is not a declared dimension of "
-        f"{contract.dataset_name}. Declared: "
-        f"{', '.join(declared) if declared else '(none)'}. "
-        f"profile_dataset describes any column without a contract; this "
-        f"analysis reports the ones the contract names."
-    )
 
 
 def _tie_note(rows: list[list[Any]], value_index: int, shown: int, total_groups: int) -> str | None:
@@ -106,12 +75,7 @@ def frequency(con, gate, scope, column: str, limit: int = DEFAULT_LIMIT, **param
         raise ValueError(f"limit must be at least 1; got {limit}.")
 
     contract = gate.contract
-    if column in set(contract.excluded_columns):
-        raise ValueError(
-            f"{column!r} is in excluded_columns: the contract says never to "
-            f"read it."
-        )
-    _require_dimension(contract, column)
+    require_dimension(contract, column)
     col = quote_identifier(column)
     table = quote_identifier(scope.dataset_name)
 
@@ -156,7 +120,7 @@ def frequency(con, gate, scope, column: str, limit: int = DEFAULT_LIMIT, **param
 
 @register(
     "top_n",
-    tier=2,
+    tier=1,
     summary="The largest groups of a declared dimension by a declared measure, "
             "with the number tied at the cut stated.",
 )
@@ -172,16 +136,9 @@ def top_n(con, gate, scope, dimension: str, measure: str,
         raise ValueError(f"n must be at least 1; got {n}.")
 
     contract = gate.contract
-    _require_dimension(contract, dimension)
-    declared = {m.name: m for m in contract.measures}
-    if measure not in declared:
-        raise ValueError(
-            f"{measure!r} is not a declared measure of {contract.dataset_name}. "
-            f"Declared: {', '.join(sorted(declared)) or '(none)'}."
-        )
-    from .summary_stats import _AGG_SQL, _agg_of  # noqa: PLC0415 -- one map, one place
-
-    agg = _agg_of(declared[measure])
+    require_dimension(contract, dimension)
+    m = require_measure(contract, measure)
+    agg = agg_of(m)
     if agg is None:
         raise ValueError(
             f"measure {measure!r} has no declared aggregate, so there is no "
@@ -194,11 +151,11 @@ def top_n(con, gate, scope, dimension: str, measure: str,
             f"by its total would produce an order built from a number the "
             f"contract says is not meaningful."
         )
-    if agg not in _AGG_SQL:
+    if agg not in AGG_SQL:
         raise ValueError(f"cannot rank by agg={agg!r}.")
 
     dim = quote_identifier(dimension)
-    total_sql = _AGG_SQL[agg].format(col=quote_identifier(measure))
+    total_sql = AGG_SQL[agg].format(col=quote_identifier(measure))
     table = quote_identifier(scope.dataset_name)
 
     # P8-D4: the tiebreak is on the group name, so the same data gives the same

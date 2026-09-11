@@ -42,51 +42,8 @@ from typing import Any
 
 from ..util.sql_guard import quote_identifier
 from .base import number
+from .declared import AGG_SQL, agg_of, column_types, is_numeric
 from .registry import Output, register
-
-# What a declared aggregate becomes in SQL. `none` is deliberately absent: it
-# is not an aggregate that produces nothing, it is a statement that no total is
-# meaningful, and mapping it to anything at all would produce that total.
-_AGG_SQL = {
-    "sum": "sum({col})",
-    "avg": "avg({col})",
-    "mean": "avg({col})",
-    "min": "min({col})",
-    "max": "max({col})",
-    "count": "count({col})",
-    "count_distinct": "count(DISTINCT {col})",
-    "median": "median({col})",
-}
-
-def _agg_of(measure) -> str | None:
-    """The declared aggregate as a lowercase string, whatever type it is.
-
-    `Measure.agg` is an `Aggregation | None`; whether that enum stringifies to
-    its name or its value is not something to find out in production, so both
-    are handled and neither is assumed.
-    """
-    agg = getattr(measure, "agg", None)
-    if agg is None:
-        return None
-    return str(getattr(agg, "value", agg)).strip().lower()
-
-
-def _columns(con, dataset_name: str) -> dict[str, str]:
-    rows = con.execute(
-        "SELECT column_name, data_type FROM information_schema.columns "
-        "WHERE table_name = ? ORDER BY ordinal_position",
-        [dataset_name],
-    ).fetchall()
-    return {r[0]: r[1] for r in rows}
-
-
-_NUMERIC = ("TINYINT", "SMALLINT", "INTEGER", "BIGINT", "HUGEINT", "UTINYINT",
-            "USMALLINT", "UINTEGER", "UBIGINT", "FLOAT", "DOUBLE", "DECIMAL", "REAL")
-
-
-def _is_numeric(dtype: str) -> bool:
-    return dtype.upper().startswith(_NUMERIC)
-
 
 @register(
     "summary_stats",
@@ -105,7 +62,7 @@ def summary_stats(con, gate, scope, **params) -> Output:
 
     contract = gate.contract
     table = quote_identifier(scope.dataset_name)
-    types = _columns(con, scope.dataset_name)
+    types = column_types(con, scope.dataset_name)
     excluded = set(contract.excluded_columns)
 
     headers = ["measure", "agg", "unit", "n", "nulls", "total",
@@ -115,7 +72,7 @@ def summary_stats(con, gate, scope, **params) -> Output:
 
     for measure in contract.measures:
         col = quote_identifier(measure.name)
-        agg = _agg_of(measure)
+        agg = agg_of(measure)
         unit = getattr(measure, "unit", None) or ""
 
         if measure.name in excluded:
@@ -124,7 +81,7 @@ def summary_stats(con, gate, scope, **params) -> Output:
             )
             continue
 
-        numeric = _is_numeric(types.get(measure.name, ""))
+        numeric = is_numeric(types.get(measure.name, ""))
         stats = ["", "", "", "", ""] if not numeric else None
 
         if agg is None:
@@ -141,12 +98,12 @@ def summary_stats(con, gate, scope, **params) -> Output:
             )
             continue
 
-        total_sql = "NULL" if agg == "none" else _AGG_SQL.get(agg, "").format(col=col)
+        total_sql = "NULL" if agg == "none" else AGG_SQL.get(agg, "").format(col=col)
         if not total_sql:
             raise ValueError(
                 f"measure {measure.name!r} declares agg={agg!r}, which this "
                 f"analysis cannot compute. Known: "
-                f"{', '.join(sorted(_AGG_SQL))}, none."
+                f"{', '.join(sorted(AGG_SQL))}, none."
             )
 
         if numeric:
@@ -184,7 +141,7 @@ def summary_stats(con, gate, scope, **params) -> Output:
         skipped.append(f"key column(s) {', '.join(contract.primary_key)}")
     undeclared = [
         name for name, dtype in types.items()
-        if _is_numeric(dtype)
+        if is_numeric(dtype)
         and name not in {m.name for m in contract.measures}
         and name not in contract.primary_key
         and name not in excluded

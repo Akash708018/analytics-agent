@@ -3027,3 +3027,85 @@ Machine-local and implementation choices that are easy to forget six months late
   needed to write -100.0 could not -- it failed on its own setup, not on the
   code. Declared casts now. A fixture that cannot express the case it was
   built for is a test that passes for the wrong reason.
+
+## Phase 8, Step 7a — what the contract declares has one home
+
+- DECLARATIONS LIVE IN analysis/declared.py. The aggregate map, aggregate
+  spelling, column types, and declared dimension and measure checks moved
+  together before distribution and cross_tab become more callers of private
+  names. require_measure returns the object the contract holds, not a copy.
+  Excluded columns are refused before declaration lookup; absent or None
+  excluded_columns means an empty list. No name is stripped or case-folded.
+  The helpers raise ValueError and never translate an engine error.
+- C7. top_n IS TIER 1. Section 9 puts it beside frequency; Step 6 registered
+  it in Tier 2. A test now reads every registered entry against the guide's
+  tiers, including entries the next steps will add.
+- C8. top_n NOW REFUSES AN EXCLUDED DIMENSION OR MEASURE. frequency already
+  checked, but top_n in the same file did not. Both now ask the shared
+  declaration helpers, and the excluded-column sentence is unchanged. A real
+  contract can hold a column in excluded_columns and also in dimensions or
+  measures: the overlap validator checks only
+  `both = sorted(set(names) & set(self.dimensions))`. The other validators
+  check column existence, date types, foreign keys and domains, not overlap
+  with exclusions. P5 constructed a real DatasetContract with region both
+  declared as a dimension and excluded, and a defined sum measure.
+- C9. A MEDIAN TOTAL USES THE SAME DOUBLE QUANTILE AS ITS MEDIAN COLUMN.
+  Measured on DuckDB 1.5.5: median over DECIMAL(18,2) values 10.50 and 20.25
+  returns Decimal('15.37'); quantile_cont(CAST(col AS DOUBLE), 0.5) returns
+  15.375. The map now uses the latter. The rendered total and median both read
+  15.375. Every map value is one aggregate call accepting FILTER (WHERE ...).
+  P2 measured a NULL-only cell: sum returns None, count and count_distinct
+  return 0. A report must render what the aggregate actually returned.
+- INTEGER TYPES ARE EXACT NAMES, INCLUDING UHUGEINT. is_integer strips and
+  uppercases the type name and tests equality against the ten signed and
+  unsigned integer types. P3 measured isfinite(3::T) as True for all ten.
+  Integer array types are not scalar integers. The numeric-prefix helper
+  moved without changing its type set; UHUGEINT remains absent from that set.
+- LostRows IS A ScopeError. An analysis whose output does not add back to the
+  rows its scope allowed has a named ValueError subtype ready for 7b and 7c.
+  No analysis was added in this step.
+- C10. "avg" WAS A KEY NO CONTRACT CAN DECLARE. Aggregation is a Literal whose
+  mean is spelled "mean"; three summary_stats tests declared "avg" through a
+  FakeMeasure the real Measure rejects, and one assertion echoed it back. Four
+  lines changed and were run against the unchanged module first: the total
+  stayed 2.6667, so the substitution is neutral and only the label follows its
+  input. The real Measure now refuses "avg" in a test. Written in the Step 5
+  guide; caught by Step 7a's stop A.
+- C11. Aggregation IS A Literal, NOT AN ENUM. The spec's tests and the
+  aggregate helper's docstring described a shape nobody had read. Tests now
+  inspect the type with get_args; agg_of reads the declared string or None,
+  without an enum-value branch. Its callers do not acquire a default.
+- THE CONTRACT SPELLS ITS AGGREGATES TWICE. Aggregation and AGGREGATIONS are
+  two spellings of one list, now pinned equal in value and order by a test.
+  AGG_SQL's keys are exactly that list minus none, with no tolerated alias.
+- STOP B, ANSWERED. MAX_ROWS and MAX_COLS come from util/formatting.py.
+  analysis/ never imports util/results.py, because results.py imports
+  workspace. The tool layer remains responsible for writing the Result.
+- P8-O8 IS OPEN. is_numeric matches by prefix. P4 measured INTEGER[] and
+  DECIMAL(18,2)[] as numeric=True, integer=False; UHUGEINT as numeric=False,
+  integer=True; INTEGER as numeric=True, integer=True. This move leaves the
+  numeric predicate unchanged; the result is recorded rather than repaired.
+- C13. THE GATE STATED AN EDIT'S SIZE BEFORE THE READ THAT MEASURED IT. r1 said
+  three lines; the same dispatch's R12 covered line 145, which renders the
+  aggregate's name. Stop F caught it at a cost of one round trip. A dispatch
+  states an edit's extent only after the read that establishes it.
+- C12 NOT RAISED. R8's single-line grep could not match a sentence split across
+  two f-strings; R13 read it with context and the quoted sentence was right.
+- P8-O9 IS OPEN. Is agg=None reachable behind the gate? _cross_field_checks
+  allows it only while agg_path is in unresolved, and is_confirmable is `not
+  unresolved`. R15 and the confirm body at contract/store.py:249 show
+  `if not contract.is_confirmable: raise ContractRefused(...)`. P5 constructed
+  the unresolved None-aggregate contract and printed is_confirmable=False.
+  Through normal confirmation, that state cannot be stored; the missing-agg
+  branches are defensive on that path. They stay. No direct catalog tampering
+  or bypass path was probed, and the broader gate audit remains open.
+- P8-O10 IS OPEN. The stand-ins are looser than the models, which is how C10
+  survived two steps. Step 10's acceptance runs every analysis through a real
+  DatasetContract and a real gate.
+- MEASURED VALIDATION. Step A: 19 passed against unchanged source. The 49
+  existing analysis tests passed before and after the move. The 15 new tests
+  passed, and the full suite rose from 1140 to 1155 passed. The old private-name
+  search is empty. The quoted-avg search has one intentional match in the new
+  real-Measure rejection test; requiring that regression while expecting an
+  empty search is contradictory. No source map or accepting fixture retains
+  the alias. The test stays visible to the audit.

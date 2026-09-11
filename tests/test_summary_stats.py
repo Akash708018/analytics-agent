@@ -141,8 +141,8 @@ def test_a_null_inside_the_scope_is_counted_not_dropped(con):
 
 
 def test_the_declared_aggregate_is_used_rather_than_sum(con):
-    out = output_for(con, gate(measures=[FakeMeasure("unit_price", agg="avg")]))
-    assert cell(out, "unit_price", "agg") == "avg"
+    out = output_for(con, gate(measures=[FakeMeasure("unit_price", agg="mean")]))
+    assert cell(out, "unit_price", "agg") == "mean"
     assert cell(out, "unit_price", "total") == "2.6667"
 
 
@@ -172,7 +172,7 @@ def test_a_decimal_keeps_the_scale_its_column_declared(con):
 def test_the_mean_is_not_seventeen_digits_wide(con):
     """format_table renders cells with str(), so a float arrives exactly as
     wide as it is. avg of a money column is 2.6666666666666665 raw."""
-    out = output_for(con, gate(measures=[FakeMeasure("unit_price", agg="avg")]))
+    out = output_for(con, gate(measures=[FakeMeasure("unit_price", agg="mean")]))
     assert cell(out, "unit_price", "mean") == "2.6667"
 
 
@@ -209,7 +209,7 @@ def test_an_undeclared_numeric_column_is_named_not_summarised(con):
 
 def test_an_excluded_column_is_not_read(con):
     out = output_for(con, gate(
-        measures=[FakeMeasure("amount"), FakeMeasure("unit_price", agg="avg")],
+        measures=[FakeMeasure("amount"), FakeMeasure("unit_price", agg="mean")],
         excluded_columns=["unit_price"]))
     assert not any(r[0] == "unit_price" for r in out.rows)
     assert any("excluded_columns" in s for s in out.summary)
