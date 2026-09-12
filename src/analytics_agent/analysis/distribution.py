@@ -20,7 +20,7 @@ from typing import Any
 
 from ..util.formatting import MAX_ROWS
 from ..util.sql_guard import quote_identifier
-from .base import LostRows, number
+from .base import LostRows, ParamsInvalid, number
 from .declared import agg_of, column_types, is_integer, is_numeric, require_measure
 from .registry import Output, register
 
@@ -42,7 +42,7 @@ def distribution(con, gate, scope, measure: str, bins: int = DEFAULT_BINS, **par
             f"distribution takes measure and bins; got {', '.join(sorted(params))}."
         )
     if isinstance(bins, bool) or not isinstance(bins, int) or not 2 <= bins <= MAX_BINS:
-        raise ValueError(
+        raise ParamsInvalid(
             f"bins must be a whole number from 2 to {MAX_BINS}; got {bins!r}."
         )
 

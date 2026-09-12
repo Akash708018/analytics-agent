@@ -851,6 +851,8 @@ def read_result_file(
     path: str,
     start: int = 1,
     limit: int = 50,
+    start_col: int = 1,
+    col_limit: int = 12,
     workspace_id: str | None = None,
 ) -> str:
     """Read a page of a result file written by an earlier profile_dataset call.
@@ -859,12 +861,16 @@ def read_result_file(
     anywhere else is refused. Rows are numbered from 1 and the header line is
     not counted, so start=21 gives you the twenty-first row of data.
 
-    This is how a large result is actually seen. A profile that reports sixty
-    columns shows the first twenty inline and leaves the rest here.
+    This is how a large result is actually seen. Columns are paged as well as
+    rows: twelve come back at a time, and a wide result says how many are
+    left and gives the call that returns them. A cross_tab can be fifty
+    columns wide, and without start_col the ones past the twelfth are in the
+    file and reachable by nothing.
     """
     # No connection: a result file is on disk, not in DuckDB.
     return profile_tools.read_result(
-        workspace_id or DEFAULT_WORKSPACE_ID, path, start, limit
+        workspace_id or DEFAULT_WORKSPACE_ID, path, start, limit,
+        start_col=start_col, col_limit=col_limit,
     )
 
 

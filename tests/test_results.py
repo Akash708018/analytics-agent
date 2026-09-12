@@ -398,3 +398,79 @@ def test_the_inline_caps_have_one_home():
 
     assert [n for n in dir(config) if n.startswith("MAX_INLINE")] == []
     assert (formatting.MAX_ROWS, formatting.MAX_COLS) == (50, 50)
+# --------------------------------------------------------------------------
+# paging by column -- P8-O15
+# --------------------------------------------------------------------------
+
+def test_a_wide_page_says_which_columns_it_is(ws):
+    r = _written(ws, n=3, cols=50)
+    text = results.read_result_file(ws, str(r.path))
+    assert "columns 1 to 12 of 50" in text
+
+
+def test_the_columns_past_the_window_are_reachable(ws):
+    """P8-O15, measured before this existed: a 50-column result returned twelve
+    cells and the other thirty-eight columns were in the file and returnable by
+    no call at all. Row paging existed; column paging did not."""
+    r = _written(ws, n=3, cols=50)
+    first = results.read_result_file(ws, str(r.path))
+    assert "r0c20" not in first
+    later = results.read_result_file(ws, str(r.path), start_col=13)
+    assert "columns 13 to 24 of 50" in later
+    assert "r0c20" in later
+
+
+def test_a_wide_page_offers_the_next_columns(ws):
+    r = _written(ws, n=3, cols=50)
+    text = results.read_result_file(ws, str(r.path))
+    assert "38 more columns" in text
+    assert f'read_result_file(path="{r.path}", start=1, limit=50, start_col=13)' in text
+
+
+def test_the_last_column_page_offers_nothing_further(ws):
+    r = _written(ws, n=3, cols=50)
+    text = results.read_result_file(ws, str(r.path), start_col=49)
+    assert "columns 49 to 50 of 50" in text
+    assert "more columns" not in text
+
+
+def test_a_narrow_result_is_not_told_about_columns(ws):
+    r = _written(ws, n=3, cols=3)
+    text = results.read_result_file(ws, str(r.path))
+    assert "columns 1 to 3 of 3" in text
+    assert "more columns" not in text
+
+
+def test_a_column_past_the_end_is_not_a_refusal(ws):
+    """The same judgement as a row past the end: a wrong guess, not a broken
+    call, so it carries no reason code and names the page that exists."""
+    r = _written(ws, n=3, cols=50)
+    text = results.read_result_file(ws, str(r.path), start_col=99)
+    assert reason_of(text) is None
+    assert "past the end" in text
+    assert "start_col=39" in text
+
+
+def test_start_col_zero_is_refused_like_start_zero(ws):
+    r = _written(ws, n=3, cols=50)
+    text = results.read_result_file(ws, str(r.path), start_col=0)
+    assert reason_of(text) is Reason.RESULT_OUT_OF_SCOPE
+    assert "numbered from 1" in text
+
+
+def test_the_column_page_is_capped_like_the_row_page(ws):
+    """Asking for fifty columns at once would hand format_table its own cap to
+    enforce, and it does not say when it truncates -- the failure this module
+    exists to prevent."""
+    r = _written(ws, n=3, cols=50)
+    text = results.read_result_file(ws, str(r.path), col_limit=10_000)
+    assert f"columns 1 to {results.PREVIEW_COLS} of 50" in text
+
+
+def test_the_page_size_constant_has_one_home():
+    """P8-D48 again: config defined RESULT_PAGE_ROWS = 100 with no readers,
+    where results.PAGE_ROWS says 50."""
+    from analytics_agent import config
+
+    assert not hasattr(config, "RESULT_PAGE_ROWS")
+    assert results.PAGE_ROWS == 50

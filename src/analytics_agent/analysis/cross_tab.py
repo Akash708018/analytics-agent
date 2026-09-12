@@ -20,7 +20,7 @@ from typing import Any
 
 from ..util.formatting import MAX_COLS, MAX_ROWS
 from ..util.sql_guard import quote_identifier
-from .base import LostRows, label, number
+from .base import LostRows, ParamsInvalid, label, number
 from .declared import AGG_SQL, agg_of, require_dimension, require_measure
 from .registry import Output, register
 from .stats import MAX_GROUPS
@@ -45,7 +45,7 @@ def cross_tab(con, gate, scope, rows: str, columns: str,
             f"{', '.join(sorted(params))}."
         )
     if rows == columns:
-        raise ValueError(
+        raise ParamsInvalid(
             f"cross_tab of {rows} against itself is its frequency: "
             f'frequency(column="{rows}") answers that.'
         )

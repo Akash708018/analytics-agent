@@ -256,6 +256,8 @@ def read_result_file(
     path: str,
     start: int = 1,
     limit: int = PAGE_ROWS,
+    start_col: int = 1,
+    col_limit: int = PREVIEW_COLS,
 ) -> str:
     """
     Read one page of a result file. Rows are numbered from 1, header excluded.
@@ -284,6 +286,18 @@ def read_result_file(
             ),
             state=f"in {directory}: {_known(workspace_id)}",
             next_call=f'read_result_file(path="{directory}/<a name listed above>")',
+        ).to_text()
+
+    if start_col < 1:
+        return Refusal(
+            reason=Reason.RESULT_OUT_OF_SCOPE,
+            what=f"start_col={start_col} is not a column number.",
+            why=(
+                "columns are numbered from 1, like rows. Reading from 1 "
+                "instead would return a page that does not begin where it "
+                "was asked to."
+            ),
+            next_call=f'read_result_file(path="{target}", start_col=1)',
         ).to_text()
 
     if start < 1:
@@ -322,18 +336,39 @@ def read_result_file(
             f"start={max(1, total - limit + 1)}, limit={limit})"
         )
 
+    col_limit = max(1, min(col_limit, PREVIEW_COLS))
+    first_col = start_col - 1
+    shown_headers = headers[first_col:first_col + col_limit]
+    if not shown_headers:
+        return (
+            f"{target.name} has {len(headers)} columns and column "
+            f"{start_col:,} is past the end. Nothing was returned. The "
+            f"last column page starts at "
+            f"{max(1, len(headers) - col_limit + 1):,}:\n"
+            f'  read_result_file(path="{target}", '
+            f"start_col={max(1, len(headers) - col_limit + 1)})"
+        )
+    last_col = first_col + len(shown_headers)
+
     last = start + len(page) - 1
     out = [
         f"{target.name}: rows {start:,} to {last:,} of {total:,}, "
-        f"{len(headers)} columns.",
+        f"columns {start_col:,} to {last_col:,} of {len(headers):,}.",
         "",
-        format_table([r[:PREVIEW_COLS] for r in page], headers[:PREVIEW_COLS]),
+        format_table([r[first_col:last_col] for r in page], shown_headers),
     ]
-    if len(headers) > PREVIEW_COLS:
-        out.append(
-            f"Showing {PREVIEW_COLS} of {len(headers)} columns: "
-            f"{', '.join(headers)}."
-        )
+    if last_col < len(headers):
+        # P8-O15: the columns past the window were written to the file and
+        # were returnable by nothing before this. Measured on a 50-column
+        # result: twelve cells came back, the label column among them, and
+        # thirty-eight columns existed only on disk.
+        out += [
+            "",
+            f"{len(headers) - last_col:,} more columns are in the file and "
+            f"are NOT shown above:",
+            f'  read_result_file(path="{target}", start={start}, '
+            f"limit={limit}, start_col={last_col + 1})",
+        ]
     if last < total:
         out += [
             "",

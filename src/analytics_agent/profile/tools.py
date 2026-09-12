@@ -131,15 +131,22 @@ def read_result(
     path: str,
     start: int = 1,
     limit: int = results.PAGE_ROWS,
+    start_col: int = 1,
+    col_limit: int = results.PREVIEW_COLS,
 ) -> str:
     """
     Read one page of a result file written by an earlier tool call.
 
-    Rows are numbered from 1 and the header is not row 0. A path resolving
-    outside this workspace's results directory is refused whether or not it
-    exists.
+    Rows are numbered from 1 and the header is not row 0. Columns are
+    numbered from 1 too: a wide result shows twelve at a time and says how
+    many are left, which is the only way the rest are reachable. A path
+    resolving outside this workspace's results directory is refused whether
+    or not it exists.
     """
-    return results.read_result_file(workspace_id, path, start=start, limit=limit)
+    return results.read_result_file(
+        workspace_id, path, start=start, limit=limit,
+        start_col=start_col, col_limit=col_limit,
+    )
 
 
 __all__ = ["profile_column", "profile_dataset", "read_result"]

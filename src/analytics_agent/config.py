@@ -212,8 +212,10 @@ EXCEL_BATCH_ROWS: int = 50_000
 # objection, ruled in P8-D48. This module deliberately defines no inline caps.
 MAX_CELL_CHARS: int = 200         # truncate a long free-text cell
 
-# read_result_file paging (guide 8.1 Rule 4).
-RESULT_PAGE_ROWS: int = 100
+# read_result_file paging lives in util/results.py as PAGE_ROWS, which is
+# tied to formatting.MAX_ROWS so a page is exactly what the formatter was
+# built to render. RESULT_PAGE_ROWS was defined here, said 100 where that
+# says 50, and had no readers (P8-D48's shape).
 
 # Default null tokens. An Ingest Spec may override these per dataset (guide 6).
 DEFAULT_NA_VALUES: list[str] = [
