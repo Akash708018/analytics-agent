@@ -33,6 +33,7 @@ from ..util.sql_guard import quote_identifier
 from .base import label, number, share_basis
 from .declared import AGG_SQL, agg_of, require_dimension, require_measure
 from .registry import Output, register
+from .stats import ranked_totals
 
 # How many groups a frequency table shows before it stops being a table anyone
 # reads. results.py previews 20 rows and pages the rest, so this is not a data
@@ -161,10 +162,7 @@ def top_n(con, gate, scope, dimension: str, measure: str,
     # P8-D4: the tiebreak is on the group name, so the same data gives the same
     # answer twice. It does not make the answer the only correct one, which is
     # what the tie note is for.
-    grouped = con.execute(
-        f"SELECT {dim}, {total_sql}, count(*) FROM {table} WHERE {scope.where} "
-        f"GROUP BY 1 ORDER BY 2 DESC NULLS LAST, 1 ASC"
-    ).fetchall()
+    grouped = ranked_totals(con, scope, dimension, total_sql)
 
     summary = [scope.method_note()] + list(gate.caveats)
     headers = ["value", f"{measure} ({agg})", "rows", "share"]

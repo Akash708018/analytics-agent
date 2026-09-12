@@ -20,7 +20,8 @@ from typing import Any
 from ..util.formatting import MAX_ROWS
 from .base import number
 
-__all__ = ["STAT_HEADERS", "MAX_GROUPS", "stat_exprs", "stat_cells"]
+__all__ = ["STAT_HEADERS", "MAX_GROUPS", "stat_exprs", "stat_cells",
+           "ranked_totals"]
 
 # The cells these expressions produce, in order.
 STAT_HEADERS = ["n", "nulls", "min", "max", "mean", "median", "stddev"]
@@ -61,3 +62,24 @@ def stat_cells(raw) -> list[Any]:
         number(present), number(rows - present),
         number(lo), number(hi), number(mean), number(median), number(spread),
     ]
+
+
+def ranked_totals(con, scope, dimension: str, total_sql: str):
+    """(group, total, rows) per group, biggest first, deterministically.
+
+    P8-D4: the tiebreak is on the group name, so the same data gives the same
+    answer twice -- it does not make that answer the only correct one, which is
+    what top_n's tie note is for. NULLS LAST keeps a group whose total is NULL
+    below every group that has one.
+
+    top_n, pareto and concentration order groups identically. Spelled three
+    times they drift, which is P8-D50's argument one module over.
+    """
+    from ..util.sql_guard import quote_identifier
+
+    dim = quote_identifier(dimension)
+    table = quote_identifier(scope.dataset_name)
+    return con.execute(
+        f"SELECT {dim}, {total_sql}, count(*) FROM {table} WHERE {scope.where} "
+        f"GROUP BY 1 ORDER BY 2 DESC NULLS LAST, 1 ASC"
+    ).fetchall()
