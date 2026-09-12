@@ -3253,3 +3253,58 @@ Machine-local and implementation choices that are easy to forget six months late
 - MEASURED VALIDATION. tests/test_distribution.py: 23 passed. Full suite 1161 ->
   1184. Every expected value in the spec's 3.6 reproduced in the container
   against the real base.py and registry.py before the guide was written.
+
+## Phase 8, Step 7c — cross_tab
+- P8-D41. A CELL IS AN AGGREGATE FILTERED BY A BOUND VALUE. sum(x) FILTER (WHERE
+  col IS NOT DISTINCT FROM ?), the values bound. = ? found no NULL row; IS NOT
+  DISTINCT FROM found it, found '', and found B's without escaping, because a
+  data value never enters the SQL text. P8-D20's other half: parameters are
+  right where the query is built and run in one place.
+- P8-D42. A GROUP COUNT COUNTS NULL. count(DISTINCT channel) said 4 where there
+  were 5 groups, so a cap checked that way admits one column too many. Counted
+  as SELECT count(*) FROM (SELECT DISTINCT ...), before the table is built, and
+  the cap includes the (total) row and column so the whole table fits 50 x 50:
+  MAX_ROW_GROUPS is MAX_ROWS - 1 and MAX_COLUMN_GROUPS is MAX_COLS - 2, both
+  from util/formatting.py per P8-D40.
+- P8-D43. MARGINS ARE COMPUTED FROM ROWS, IN A SECOND QUERY. North's mean is
+  18.75; the mean of its cells is 15. And GROUPING SETS returned two rows both
+  called NULL -- the NULL group and the grand total -- so totals come from the
+  same expression strings with no GROUP BY.
+- P8-D44. A BLANK CELL AND A ZERO ARE DIFFERENT ANSWERS. count over no rows is 0
+  and is shown as 0; sum over no rows is NULL and is shown blank, with a
+  sentence. South x Retail is blank although a row exists: its amount is NULL.
+- P8-D45. THE CELLS MUST ADD BACK TO THE SCOPE. PIVOT on this step's fixture
+  summed to 112.00 of 117.00 and named the '' column after its own generated
+  SQL. cross_tab reconciles the body's row counts, the totals row and
+  scope.analysed, and raises LostRows rather than print a table that quietly
+  lost a group. Unlike distribution's guard (7b.1), this one is reachable and is
+  tested.
+- P8-O15 IS OPEN. results.py previews 12 columns; a cross_tab may have 50.
+  Whether read_result_file pages columns as well as rows decides whether the
+  model can see the rest -- Step 9, where the tool layer writes the Result.
+- P8-O16 IS OPEN. top_n gives a share only for agg='sum', but count adds across
+  groups too, so a count ranking loses its share with a sentence that is not
+  true of it. pareto and concentration need the same 'which aggregates add'
+  answer; Step 8 decides it once, in declared.py.
+- C24. A HEREDOC TERMINATOR WAS GLUED TO THE LAST LINE OF CODE. The 7b.1 guide
+  was assembled with shell command substitution, which strips trailing newlines,
+  so a file's last line read label="distribution")PY and the heredoc never
+  closed: the shell swallowed the rest of the script into the file. Caught by
+  extracting the commands back out of the finished guide and running them, which
+  is what rule 3 is for. Guides are assembled in Python from now on, and every
+  block is checked to end in a newline.
+- C26. A BANNED-CONSTRUCT GREP MATCHED THE DOCSTRING. The 7c guide's check for
+  banned imports and SQL searched for bare words -- PIVOT, contract, state --
+  and the module names all of them in its docstring, explaining what it does
+  instead. Printed nine lines of prose where the Check said nothing. Caught by
+  extracting the command back out of the guide and running it. The pattern
+  matches the SQL spellings and the import lines now, and the Check gives the
+  five imports literally.
+- C25. frequency.py WAS CALLED CUT SHORT. The 7b.1 guide said the upload cut
+  frequency.py off at line 50 and that 7c would need to read its tail. The
+  upload holds all 216 lines; only the excerpt displayed in chat stopped at 50.
+  No extra read was needed.
+- MEASURED VALIDATION. tests/test_cross_tab.py: 24 passed. Full suite 1184 ->
+  1208. The count, sum and mean tables, the group counts and the PIVOT shortfall
+  all reproduced in the container against the real base.py and registry.py
+  before the guide was written.
