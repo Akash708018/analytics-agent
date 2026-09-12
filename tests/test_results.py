@@ -389,3 +389,12 @@ def test_the_results_directory_is_created_on_demand(ws):
     workspace.reset(ws)
     assert results.list_results(ws) == []
     assert results.results_dir(ws).is_dir()
+
+
+def test_the_inline_caps_have_one_home():
+    """P8-O14: config's pair is deleted; formatting's is the source of truth."""
+    from analytics_agent import config
+    from analytics_agent.util import formatting
+
+    assert [n for n in dir(config) if n.startswith("MAX_INLINE")] == []
+    assert (formatting.MAX_ROWS, formatting.MAX_COLS) == (50, 50)

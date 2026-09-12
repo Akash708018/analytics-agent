@@ -210,3 +210,44 @@ def test_the_method_note_and_caveats_travel(con):
                   column="region")
     assert out.summary[0].startswith("8 of 8 row(s) analysed")
     assert "gained 30 rows since v1" in out.summary
+
+
+# Phase 8 Step 8a: which aggregates add across groups (P8-O16).
+
+
+def test_a_count_ranking_keeps_its_share(con):
+    g = gate(measures=[FakeMeasure("amount", agg="count")])
+    out = out_for(con, g, "top_n", dimension="region", measure="amount")
+    assert [r[3] for r in out.rows] == ["37.5%", "25.0%", "25.0%", "12.5%"]
+    assert not any("does not add up" in s for s in out.summary)
+    assert any("Share is of 8, the count of amount" in s for s in out.summary)
+
+
+def test_a_count_share_names_its_denominator_when_a_null_shrinks_it(con):
+    """AGG_SQL spells count as count(col), which skips a null measure."""
+    con.execute("UPDATE sales SET amount = NULL WHERE id = 3")
+    g = gate(measures=[FakeMeasure("amount", agg="count")])
+    out = out_for(con, g, "top_n", dimension="region", measure="amount")
+    assert out.rows[0] == ["North", "2", "3", "28.6%"]
+    assert any("denominator is 7 and not the 8 analysed row(s)" in s
+               for s in out.summary)
+
+
+def test_count_distinct_does_not_add_and_the_fixture_proves_it(con):
+    table_wide = con.execute("SELECT count(DISTINCT amount) FROM sales").fetchall()[0][0]
+    summed = con.execute(
+        "SELECT sum(d) FROM (SELECT count(DISTINCT amount) d FROM sales GROUP BY region)"
+    ).fetchall()[0][0]
+    assert (table_wide, summed) == (7, 8), "20.00 is in both North and South"
+    g = gate(measures=[FakeMeasure("amount", agg="count_distinct")])
+    out = out_for(con, g, "top_n", dimension="region", measure="amount")
+    assert all(r[3] == "" for r in out.rows)
+    assert any("count_distinct does not add up across groups" in s
+               for s in out.summary)
+
+
+def test_a_mean_ranking_still_has_no_share(con):
+    g = gate(measures=[FakeMeasure("amount", agg="mean")])
+    out = out_for(con, g, "top_n", dimension="region", measure="amount")
+    assert all(r[3] == "" for r in out.rows)
+    assert any("mean does not add up" in s for s in out.summary)

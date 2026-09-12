@@ -64,7 +64,6 @@ from fastmcp import FastMCP
 from .config import (
     DEFAULT_WORKSPACE_ID,
     MAX_EXCEL_MB,
-    MAX_INLINE_ROWS,
     SERVER_NAME,
     SERVER_VERSION,
     WARN_CSV_MB,
@@ -72,7 +71,7 @@ from .config import (
 )
 from . import workspace
 from .util import db
-from .util.formatting import format_kv
+from .util.formatting import MAX_ROWS, format_kv
 from .ingest import csv_loader, draft, excel, postgres, sizegate, merges
 from .ingest.csv_loader import LoadRefused
 from .contract import tools as contract_tools
@@ -456,15 +455,15 @@ def query_source(alias: str, sql: str, workspace_id: str | None = None) -> str:
     con = db.connect(workspace_id or DEFAULT_WORKSPACE_ID)
     try:
         postgres.attach(con, alias)
-        rows = con.execute(sql).fetchmany(MAX_INLINE_ROWS)
+        rows = con.execute(sql).fetchmany(MAX_ROWS)
         names = [d[0] for d in con.description]
         if not rows:
             return "Query returned no rows."
         lines = ["| " + " | ".join(names) + " |",
                  "| " + " | ".join("---" for _ in names) + " |"]
         lines += ["| " + " | ".join(str(v) for v in r) + " |" for r in rows]
-        if len(rows) == MAX_INLINE_ROWS:
-            lines.append(f"\n(first {MAX_INLINE_ROWS} rows)")
+        if len(rows) == MAX_ROWS:
+            lines.append(f"\n(first {MAX_ROWS} rows)")
         return "\n".join(lines)
     except LoadRefused as exc:
         return _refusal(exc)

@@ -26,8 +26,10 @@ from decimal import Decimal
 from typing import Any
 
 from ..util.sql_guard import bind_predicate, negate, quote_identifier
+from .declared import adds_across_groups
 
-__all__ = ["Scope", "ScopeError", "LostRows", "number", "label", "window_clause", "scope_for"]
+__all__ = ["Scope", "ScopeError", "LostRows", "number", "label", "window_clause",
+           "scope_for", "ShareBasis", "share_basis"]
 
 
 # Four decimal places, thousands separated, trailing zeros dropped. Measured in
@@ -73,6 +75,59 @@ def label(value: Any) -> str:
     value -- Step 1 measured that '' and NULL are two rows, not one.
     """
     return "(null)" if value is None else str(value)
+
+
+@dataclass(frozen=True)
+class ShareBasis:
+    """The denominator a share column divides by, or why there is not one."""
+
+    denominator: Any = None
+    reason: str | None = None
+
+    @property
+    def ok(self) -> bool:
+        return self.reason is None
+
+    def share(self, value: Any) -> str:
+        """The cell, or empty when there is no denominator or no value."""
+        if not self.ok or value is None:
+            return ""
+        return f"{value / self.denominator * 100:.1f}%"
+
+
+def share_basis(agg: str | None, group_totals) -> ShareBasis:
+    """P8-D28's three cases, asked once and answered in one place.
+
+    They are three different refusals and the sentence has to say which: an
+    aggregate that does not add across groups has no total to be a share of; a
+    group total below zero makes a share that can exceed 100% or change sign;
+    and a denominator of zero divides to inf rather than raising (P8-D1,
+    measured on 1.5.5). The order matters -- an aggregate that does not add is
+    refused before its values are inspected, because their signs are not the
+    reason.
+
+    top_n, pareto and concentration all need this, which is why it is here
+    beside number and label rather than inside the first caller.
+    """
+    if not adds_across_groups(agg):
+        return ShareBasis(reason=(
+            f"{agg} does not add up across groups, so there is no total for a "
+            f"group to be a share of."
+        ))
+    values = [v for v in group_totals if v is not None]
+    negatives = sum(1 for v in values if v < 0)
+    if negatives:
+        return ShareBasis(reason=(
+            f"{negatives} group(s) total below zero, and a share of a signed "
+            f"total is not a proportion -- it can exceed 100% or change sign."
+        ))
+    denominator = sum(values) if values else 0
+    if denominator <= 0:
+        return ShareBasis(reason=(
+            "the totals sum to zero or less, and dividing by that gives inf "
+            "rather than an error."
+        ))
+    return ShareBasis(denominator=denominator)
 
 
 class ScopeError(ValueError):

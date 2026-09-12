@@ -30,7 +30,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..util.sql_guard import quote_identifier
-from .base import label, number
+from .base import label, number, share_basis
 from .declared import AGG_SQL, agg_of, require_dimension, require_measure
 from .registry import Output, register
 
@@ -174,19 +174,13 @@ def top_n(con, gate, scope, dimension: str, measure: str,
             "No rows are in scope, so there is nothing to rank."
         ])
 
-    values = [g[1] for g in grouped if g[1] is not None]
-    denominator = sum(values) if agg == "sum" else None
-    negatives = sum(1 for v in values if v is not None and v < 0)
+    basis = share_basis(agg, [g[1] for g in grouped])
 
-    share_ok = denominator is not None and denominator > 0 and negatives == 0
     shown = min(n, len(grouped))
     rows = []
     for value, total, count in grouped[:shown]:
-        share = (
-            f"{total / denominator * 100:.1f}%"
-            if share_ok and total is not None else ""
-        )
-        rows.append([label(value), number(total), number(count), share])
+        rows.append([label(value), number(total), number(count),
+                     basis.share(total)])
 
     summary.append(
         f"{len(grouped):,} group(s) of {dimension}; the {shown} largest by "
@@ -196,21 +190,20 @@ def top_n(con, gate, scope, dimension: str, measure: str,
     if tie:
         summary.append(tie)
 
-    if not share_ok:
-        if negatives:
+    if not basis.ok:
+        summary.append(f"No share column: {basis.reason}")
+    else:
+        # The denominator is stated because it is not always the analysed rows:
+        # AGG_SQL spells count as count(col), which skips a null measure, so a
+        # count ranking divides by fewer rows than the method note reports.
+        summary.append(
+            f"Share is of {number(basis.denominator)}, the {agg} of {measure} "
+            f"across all {len(grouped):,} group(s)."
+        )
+        if agg == "count" and basis.denominator != scope.analysed:
             summary.append(
-                f"No share column: {negatives} group(s) total below zero, and a "
-                f"share of a signed total is not a proportion -- it can exceed "
-                f"100% or change sign."
-            )
-        elif denominator is None:
-            summary.append(
-                f"No share column: {agg} does not add up across groups, so "
-                f"there is no total for a group to be a share of."
-            )
-        else:
-            summary.append(
-                "No share column: the totals sum to zero or less, and dividing "
-                "by that gives inf rather than an error."
+                f"count({measure}) skips rows where {measure} is null, so that "
+                f"denominator is {number(basis.denominator)} and not the "
+                f"{scope.analysed:,} analysed row(s)."
             )
     return Output(headers=headers, rows=rows, summary=summary, label="top_n")

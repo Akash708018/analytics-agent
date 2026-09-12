@@ -206,10 +206,10 @@ EXCEL_PREVIEW_ROWS: int = 20      # openpyxl read_only iterator
 # Excel -> DuckDB streaming batch size (guide 4.2).
 EXCEL_BATCH_ROWS: int = 50_000
 
-# Inline return caps. util/formatting.py currently keeps its own MAX_ROWS and
-# MAX_COLS; point it at these instead so there is one source of truth.
-MAX_INLINE_ROWS: int = 50
-MAX_INLINE_COLS: int = 50
+# Inline return caps live in util/formatting.py as MAX_ROWS and MAX_COLS,
+# which has no module-level imports. config.py imports yaml and subprocess, so
+# pointing formatting here would hand every analysis module that graph: P8-D40's
+# objection, ruled in P8-D48. This module deliberately defines no inline caps.
 MAX_CELL_CHARS: int = 200         # truncate a long free-text cell
 
 # read_result_file paging (guide 8.1 Rule 4).

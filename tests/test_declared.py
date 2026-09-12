@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import date
+from decimal import Decimal
 from types import SimpleNamespace
 from typing import get_args
 
@@ -12,9 +13,16 @@ import pytest
 from pydantic import ValidationError
 
 from analytics_agent.analysis import frequency, summary_stats
-from analytics_agent.analysis.base import LostRows, ScopeError, scope_for
+from analytics_agent.analysis.base import (
+    LostRows,
+    ScopeError,
+    scope_for,
+    share_basis,
+)
 from analytics_agent.analysis.declared import (
+    ADDITIVE_AGGS,
     AGG_SQL,
+    adds_across_groups,
     ARBITRARY_PRECISION_TYPES,
     INTEGER_TYPES,
     NUMERIC_TYPES,
@@ -244,3 +252,26 @@ def test_bignum_is_named_and_not_computed_over(con):
     assert is_arbitrary_precision(dtype)
     assert not is_numeric(dtype)
     assert not is_integer(dtype)
+
+
+# Phase 8 Step 8a: additivity, and the share gate it feeds.
+
+
+def test_only_sum_and_count_add_across_groups():
+    assert ADDITIVE_AGGS == ("sum", "count")
+    for agg in ADDITIVE_AGGS:
+        assert adds_across_groups(agg)
+    for agg in set(get_args(Aggregation)) - set(ADDITIVE_AGGS):
+        assert not adds_across_groups(agg)
+    assert not adds_across_groups(None)
+    assert set(ADDITIVE_AGGS) <= set(AGG_SQL)
+
+
+def test_share_basis_names_which_of_the_three_refusals_applied():
+    assert share_basis("sum", [Decimal("10"), Decimal("5")]).denominator == Decimal("15")
+    assert share_basis("sum", [10, 30]).share(10) == "25.0%"
+    assert share_basis("mean", [1, 2]).reason.startswith("mean does not add up")
+    assert "not a proportion" in share_basis("sum", [5, -1]).reason
+    assert "inf rather than an error" in share_basis("sum", [0, 0]).reason
+    assert share_basis("sum", [None, None]).reason is not None
+    assert share_basis("sum", [10, None]).share(None) == ""

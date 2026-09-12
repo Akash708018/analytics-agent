@@ -10,6 +10,7 @@ __all__ = [
     "AGG_SQL", "agg_of", "column_types", "is_numeric", "is_integer",
     "is_arbitrary_precision",
     "dimension_names", "require_dimension", "require_measure",
+    "ADDITIVE_AGGS", "adds_across_groups",
 ]
 
 # What a declared aggregate becomes in SQL. `none` is deliberately absent: it
@@ -25,6 +26,28 @@ AGG_SQL: dict[str, str] = {
     "count_distinct": "count(DISTINCT {col})",
     "median": "quantile_cont(CAST({col} AS DOUBLE), 0.5)",
 }
+
+
+# Which aggregates add across disjoint groups, so that the group totals sum to
+# a total the whole table shares. sum and count do: every analysed row lands in
+# exactly one group and is counted once. count_distinct does not -- two groups
+# can each hold the same distinct value and each count it once, so the group
+# counts sum past the table's own distinct count unless the groups happen to
+# partition by that value, which no contract states. mean, median, min and max
+# do not: min and max recombine, but there is no total for a group to be part
+# of, and a share of one means nothing.
+ADDITIVE_AGGS = ("sum", "count")
+
+
+def adds_across_groups(agg: str | None) -> bool:
+    """Whether group totals of this aggregate sum to a table-wide total.
+
+    P8-O16: top_n gave a share only for agg='sum' and told a count ranking that
+    count "does not add up across groups", which is false of it -- the counts
+    add to the analysed rows. This is the one place that answers the question;
+    pareto and concentration ask it too (Step 8c).
+    """
+    return agg in ADDITIVE_AGGS
 
 
 def agg_of(measure) -> str | None:
