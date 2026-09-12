@@ -23,9 +23,10 @@ from ..util.sql_guard import quote_identifier
 from .base import LostRows, label, number
 from .declared import AGG_SQL, agg_of, require_dimension, require_measure
 from .registry import Output, register
+from .stats import MAX_GROUPS
 
 TOTAL = "(total)"
-MAX_ROW_GROUPS = MAX_ROWS - 1        # the (total) row
+MAX_ROW_GROUPS = MAX_GROUPS          # the (total) row; stats.py is its home
 MAX_COLUMN_GROUPS = MAX_COLS - 2     # the label column and the (total) column
 
 

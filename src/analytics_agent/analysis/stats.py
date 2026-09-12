@@ -1,0 +1,63 @@
+"""The statistics a summary reports, and the one place they are spelled.
+
+`summary_stats` computes seven numbers per measure over one undivided scope;
+`group_compare` computes the same seven per group. Written twice they drift,
+and C9 measured the exact way they would: `median` over a DECIMAL(18,2) column
+returns Decimal('15.37') where `quantile_cont(CAST(col AS DOUBLE), 0.5)`
+returns 15.375. A group median spelled the first way disagrees with the same
+column's median one table up, and both are correct -- which is the failure
+P8-D28 and P8-D46 are also shaped like.
+
+So the expressions live here, in the order their cells appear, and both callers
+interpolate them into their own GROUP BY (or absence of one). The declared
+aggregate is NOT here: that is the contract's, and `declared.AGG_SQL` holds it.
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+from ..util.formatting import MAX_ROWS
+from .base import number
+
+__all__ = ["STAT_HEADERS", "MAX_GROUPS", "stat_exprs", "stat_cells"]
+
+# The cells these expressions produce, in order.
+STAT_HEADERS = ["n", "nulls", "min", "max", "mean", "median", "stddev"]
+
+# A table of groups carries one more row than it has groups -- the (all) row in
+# group_compare, the (total) row in cross_tab -- so the cap is one below the
+# table limit. P8-D48: the limit itself lives in util/formatting.py.
+MAX_GROUPS = MAX_ROWS - 1
+
+
+def stat_exprs(col: str, numeric: bool) -> list[str]:
+    """The seven SQL expressions, for an already-quoted column.
+
+    Non-numeric measures get NULL for the derived three rather than being
+    refused: a date measure with agg=min is a legitimate declaration, its
+    counts and extremes are true, and its average is not. The blank cells say
+    which parts do not apply.
+    """
+    exprs = [f"count(*)", f"count({col})", f"min({col})", f"max({col})"]
+    if numeric:
+        return exprs + [
+            f"avg({col})",
+            f"quantile_cont(CAST({col} AS DOUBLE), 0.5)",
+            f"stddev({col})",
+        ]
+    return exprs + ["NULL", "NULL", "NULL"]
+
+
+def stat_cells(raw) -> list[Any]:
+    """The seven cells, from the seven values `stat_exprs` selected.
+
+    `nulls` is computed rather than selected: count(*) minus count(col) is the
+    number of analysed rows in this group with no value, and asking SQL for it
+    separately is a second chance to disagree.
+    """
+    rows, present, lo, hi, mean, median, spread = raw
+    return [
+        number(present), number(rows - present),
+        number(lo), number(hi), number(mean), number(median), number(spread),
+    ]
