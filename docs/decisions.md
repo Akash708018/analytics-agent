@@ -3195,3 +3195,61 @@ Machine-local and implementation choices that are easy to forget six months late
   terminal). After, 21 passed and the full suite 1161 passed, reported by Akash
   as matching, output not pasted; the baseline 1155 is from the 7a entry. The
   step guide phase8_step7b0_type-predicates.md holds the container outputs.
+
+## Phase 8, Step 7b.1 — distribution
+- P8-D34. BINS ARE BOUND EDGES, NOT FLOOR DIVISION. floor((x - min) / width)
+  over 0.0..1.0 in tenths filed 0.3, 0.6 and 0.7 one bin low -- 0.3/0.1 is
+  2.9999999999999996 -- and put the maximum in bin 10 of 0..9. Edges are min +
+  (max - min) * i / n in Python, first and last set to min and max themselves,
+  bound as parameters; a value belongs to [lo, hi), the last bin to [lo, hi].
+- P8-D35. A BOUND EDGE CARRIES THE COLUMN'S OWN TYPE. Closes P8-O13. A bare ?
+  against a UHUGEINT column makes DuckDB cast the COLUMN: the plan reads CAST(u
+  AS BIGINT) > 5, which raises ConversionException on any value above 2**63-1.
+  The integer path binds CAST(? AS dtype) instead, measured working on INTEGER,
+  BIGINT, HUGEINT, UHUGEINT and UTINYINT, and a UHUGEINT measure spanning
+  0..2**128-1 binned correctly. Before 7b.0 this column was not numeric and
+  never reached the query.
+- P8-D36. A MEASURE THAT NEVER VARIES IS ONE BIN, NOT AN ERROR. (x - min) / 0.0
+  is nan and floor(nan)::INT raised ConversionException, so a constant column
+  aborted the query. Edges are computed in Python and lo == hi falls out as one
+  bin with no division anywhere.
+- P8-D37. inf AND nan ARE COUNTED, NOT BINNED. One nan made max() nan and one
+  inf made p75 inf. isfinite() binds on integer, decimal and double alike; the
+  non-finite count is a sentence, and neither bins nor quantiles see them.
+- P8-D38. AN INTEGER MEASURE HAS WHOLE-NUMBER BINS. 1..5 in ten bins of 0.4 left
+  five bins empty by construction. Width is ceil(span / bins) and the note says
+  when that yields fewer bins than asked: the fixture's rating asks for 10 and
+  gets 5.
+- P8-D39. distribution NEEDS A DECLARED MEASURE, NOT A DECLARED AGGREGATE. It
+  totals nothing, and P8-D22's refusals exist to stop a wrong total. It says so
+  when agg is unset or 'none' rather than behaving differently from
+  summary_stats without a word.
+- P8-D40. MAX_BINS COMES FROM util/formatting.py. The Step 7 spec said
+  results.py, and that read stopped the step: results.py has PREVIEW_ROWS 20,
+  PREVIEW_COLS 12 and PAGE_ROWS 50 but no 50x50 constant, and it imports
+  analytics_agent.workspace and contract.refusals, so analysis/ importing it
+  would invert the import graph. formatting.py holds MAX_ROWS and MAX_COLS and
+  has no module-level imports.
+- P8-O14 IS OPEN. Two sources of truth for the inline caps. util/formatting.py
+  defines MAX_ROWS and MAX_COLS; config.py defines MAX_INLINE_ROWS and
+  MAX_INLINE_COLS with a comment at line 209 saying formatting.py should point
+  at them. distribution reads formatting's. Whichever survives, one has to go.
+- THE ENGINE'S BINS ARE NOT USED. equi_width_bins with nice rounding moved
+  3..977 to 100..1000; without it the edges carry 0.10000000000000014; and
+  histogram() with boundaries is upper-inclusive with an implicit inf bin. Each
+  is a convention nobody here chose.
+- THE MEDIAN AGREES WITH summary_stats, pinned by a test on one fixture:
+  quantile_cont on DOUBLE gives 9.375 where median(DECIMAL) gives 9.37.
+- LostRows IS A GUARD WITH NO TEST. distribution counts its bins and its finite
+  values from the same WHERE, so a scope that under-reports cannot make them
+  disagree, and the branch cannot be reached from outside. It stays as a guard
+  against a future change to either query. cross_tab's LostRows, which compares
+  cells against scope.analysed, is reachable and is tested in 7c.
+- C23. THE LEDGER WAS LEFT SAYING NOT STARTED. Step 7b.0 ruled that the build
+  guide needed no update because Phase 8 is not finished. Section 12 offers
+  three states and Phase 8's row still read Not started after seven committed
+  steps, so the ruling was made without reading the section. The row reads In
+  progress from this step on.
+- MEASURED VALIDATION. tests/test_distribution.py: 23 passed. Full suite 1161 ->
+  1184. Every expected value in the spec's 3.6 reproduced in the container
+  against the real base.py and registry.py before the guide was written.
