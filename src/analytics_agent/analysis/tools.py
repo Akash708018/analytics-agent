@@ -74,6 +74,16 @@ def compute_analysis(
     except ContractRefused as exc:
         return str(exc)
 
+    # The MCP wrapper declares every parameter any of the nine takes,
+    # because FastMCP builds the JSON schema from the signature and
+    # **params exposes nothing -- the agent would see a tool it cannot pass
+    # a column to. So it passes all of them and the ones nobody gave arrive
+    # as None. Dropping them here rather than there keeps server.py's rule
+    # that a tool calls one function and returns what it gets back, and
+    # lets each analysis apply its own default instead of a second copy of
+    # that default living upstream.
+    params = {k: v for k, v in params.items() if v is not None}
+
     try:
         analysis = get(analysis_type)
     except UnknownAnalysis as exc:

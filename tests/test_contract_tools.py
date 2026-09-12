@@ -247,11 +247,16 @@ def test_the_report_names_the_contract_it_would_compute_under(loaded, tmp_path):
     assert "| price | none | item price in BRL, excludes freight |" in text
 
 
-def test_the_report_says_what_can_be_called_today(loaded, tmp_path):
+def test_the_report_lists_the_analyses_and_names_one_to_call(loaded, tmp_path):
+    """Phase 8 arrived. The report named describe_dataset because there was
+    nothing to compute; now it names the nine and one call that runs one.
+    """
     tools.confirm(loaded, _json_of(_settled(loaded)), export_root=tmp_path)
     text = tools.analyse(loaded, "order_items")
-    assert "Phase 8" in text
-    assert 'describe_dataset(dataset_name="order_items")' in text
+    for name in ("summary_stats", "cross_tab", "pareto", "ranking_shift"):
+        assert name in text
+    assert 'compute_analysis(dataset_name="order_items"' in text
+    assert "Phase 8" not in text
 
 
 def test_the_question_is_echoed_when_one_is_asked(loaded, tmp_path):

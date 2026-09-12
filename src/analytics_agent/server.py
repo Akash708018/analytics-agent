@@ -26,6 +26,12 @@ Phase 5 adds three, and they are ungated: profiling is how a person
 finds out what a contract should say, so requiring one first inverts
 the workflow.
 
+Phase 8 adds one, and it is gated for the same reason run_analysis is:
+
+  compute_analysis      run one of the nine analyses over a dataset,
+                        under the contract in force, and write what it
+                        found where it can be read back.
+
   profile_dataset       count everything about a loaded table and write
                         the counts where they can be read back.
   profile_column        one column in detail: values, distribution,
@@ -75,6 +81,7 @@ from .util.formatting import MAX_ROWS, format_kv
 from .ingest import csv_loader, draft, excel, postgres, sizegate, merges
 from .ingest.csv_loader import LoadRefused
 from .contract import tools as contract_tools
+from .analysis import tools as analysis_tools
 from .profile import tools as profile_tools
 from .clean import tools as clean_tools
 from .validate import tools as validate_tools
@@ -703,14 +710,77 @@ def run_analysis(
     propose_dataset_contract. Make that call rather than trying a different
     tool; nothing else will produce the number.
 
-    The analysis library itself arrives in Phase 8. What this returns today is
-    the agreement in force, the caveats any result would have to carry, and
-    what can be called now. Do not report a computed answer from it -- it does
-    not compute one.
+    This computes nothing. What it returns is the agreement in force, the
+    caveats any result would have to carry, and the analyses that can be run
+    against it. compute_analysis runs one of them. Do not report a computed
+    answer from this tool -- it does not compute one.
     """
     con = db.connect(workspace_id or DEFAULT_WORKSPACE_ID)
     try:
         return contract_tools.analyse(con, dataset_name, question)
+    finally:
+        con.close()
+
+
+@mcp.tool(annotations=READ_ONLY)
+def compute_analysis(
+    dataset_name: str,
+    analysis_type: str,
+    column: str | None = None,
+    dimension: str | None = None,
+    measure: str | None = None,
+    rows: str | None = None,
+    columns: str | None = None,
+    limit: int | None = None,
+    n: int | None = None,
+    bins: int | None = None,
+    threshold: float | None = None,
+    before_start: str | None = None,
+    before_end: str | None = None,
+    after_start: str | None = None,
+    after_end: str | None = None,
+    workspace_id: str | None = None,
+) -> str:
+    """Run one named analysis over a dataset, under the contract in force.
+
+    run_analysis lists what can be computed for a dataset and computes nothing.
+    This computes one of them. An analysis_type nobody registered comes back
+    with the full list of valid names, so a wrong guess costs one call.
+
+    Which arguments apply depends on analysis_type, and passing one that does
+    not apply is refused rather than ignored:
+
+      summary_stats   nothing -- every declared measure at once
+      distribution    measure, bins
+      frequency       column, limit
+      cross_tab       rows, columns, and optionally measure
+      top_n           dimension, measure, n
+      group_compare   dimension, measure
+      pareto          dimension, measure, threshold
+      concentration   dimension, measure
+      ranking_shift   dimension, measure, and four ISO dates:
+                      before_start, before_end, after_start, after_end
+
+    Only columns the contract declares can be named. A column that exists in
+    the table but is not a declared dimension or measure is refused with the
+    declared list, because the contract is what says summing a column does not
+    double-count.
+
+    The full table is written to a file and the first rows come back inline
+    with a note saying what was computed over and what was left out. Read the
+    rest with read_result_file before describing it.
+    """
+    wid = workspace_id or DEFAULT_WORKSPACE_ID
+    con = db.connect(wid)
+    try:
+        return analysis_tools.compute_analysis(
+            con, wid, dataset_name, analysis_type,
+            column=column, dimension=dimension, measure=measure,
+            rows=rows, columns=columns, limit=limit, n=n, bins=bins,
+            threshold=threshold, before_start=before_start,
+            before_end=before_end, after_start=after_start,
+            after_end=after_end,
+        )
     finally:
         con.close()
 

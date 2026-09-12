@@ -214,13 +214,20 @@ def test_run_analysis_says_what_to_do_when_it_refuses(wired):
     assert "propose_dataset_contract" in doc
 
 
-def test_run_analysis_is_honest_about_phase_8(wired):
+def test_run_analysis_is_honest_about_what_it_computes(wired):
     """
     It must not read as though it computes analyses. An agent that believes it
     does will report an answer it never received.
+
+    The assertion this replaces was `"Phase 8" in doc or "not yet" in doc`,
+    which a docstring saying "Phase 8's analyses run from here" would also
+    have passed -- a test that goes green on the opposite meaning. Phase 8
+    arrived, so the sentence had to change; it is pinned now to what the tool
+    does rather than to which phase it is waiting for.
     """
     doc = _doc(wired, "run_analysis")
-    assert "Phase 8" in doc or "not yet" in doc
+    assert "computes nothing" in doc
+    assert "compute_analysis" in doc, "it must name the tool that does"
 
 
 # --------------------------------------------------------------------------

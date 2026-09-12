@@ -29,6 +29,7 @@ from analytics_agent.contract.dataset_contract import (
 from analytics_agent.contract.propose import propose_contract
 from analytics_agent.contract.refusals import Reason, Refusal
 from analytics_agent.state import describe_workflow_state, require_contract
+from analytics_agent.analysis.registry import catalogue
 from analytics_agent.util import db
 
 
@@ -313,14 +314,14 @@ def analyse(con, dataset_name: str, question: str | None = None) -> str:
         lines += [f"  - {c}" for c in gate.caveats]
 
     lines.append("")
+    lines.append("")
+    lines.append("No analysis has been computed here. These can be:")
+    for name, tier, summary in catalogue():
+        lines.append(f"  {name} (tier {tier}) -- {summary}")
     lines.append(
-        "No analysis has been computed. The analysis library is Phase 8; what "
-        "exists today is the contract and the gate, and both are satisfied for "
-        "this dataset."
-    )
-    lines.append(
-        f'NEXT STEP: call describe_dataset(dataset_name="{dataset_name}") for '
-        f"its shape and a sample, or get_workflow_state() to see every dataset."
+        f'NEXT STEP: call compute_analysis(dataset_name="{dataset_name}", '
+        f'analysis_type="summary_stats") for every declared measure at '
+        f"once, or name another analysis from the list above."
     )
     return "\n".join(lines)
 

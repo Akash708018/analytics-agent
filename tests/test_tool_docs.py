@@ -60,6 +60,7 @@ def docs():
 EXPECTED_TOOLS = {
     "apply_cleaning_plan",
     "check_file",
+    "compute_analysis",
     "confirm_dataset_contract",
     "confirm_ingest_spec",
     "describe_dataset",
