@@ -64,7 +64,8 @@ def stat_cells(raw) -> list[Any]:
     ]
 
 
-def ranked_totals(con, scope, dimension: str, total_sql: str):
+def ranked_totals(con, scope, dimension: str, total_sql: str,
+                  extra: str | None = None):
     """(group, total, rows) per group, biggest first, deterministically.
 
     P8-D4: the tiebreak is on the group name, so the same data gives the same
@@ -74,12 +75,17 @@ def ranked_totals(con, scope, dimension: str, total_sql: str):
 
     top_n, pareto and concentration order groups identically. Spelled three
     times they drift, which is P8-D50's argument one module over.
+
+    `extra` narrows WITHIN the scope rather than replacing it -- ranking_shift
+    passes one period at a time. The scope's own predicate is never dropped, so
+    the method note printed above a table stays true of the rows beneath it.
     """
     from ..util.sql_guard import quote_identifier
 
     dim = quote_identifier(dimension)
     table = quote_identifier(scope.dataset_name)
+    where = scope.where if extra is None else f"({scope.where}) AND ({extra})"
     return con.execute(
-        f"SELECT {dim}, {total_sql}, count(*) FROM {table} WHERE {scope.where} "
+        f"SELECT {dim}, {total_sql}, count(*) FROM {table} WHERE {where} "
         f"GROUP BY 1 ORDER BY 2 DESC NULLS LAST, 1 ASC"
     ).fetchall()
