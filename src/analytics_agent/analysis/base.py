@@ -28,7 +28,7 @@ from typing import Any
 from ..util.sql_guard import bind_predicate, negate, quote_identifier
 from .declared import adds_across_groups
 
-__all__ = ["Scope", "ScopeError", "LostRows", "number", "label", "window_clause",
+__all__ = ["Scope", "ScopeError", "LostRows", "ParamsInvalid", "number", "label", "window_clause",
            "scope_for", "ShareBasis", "share_basis"]
 
 
@@ -132,6 +132,22 @@ def share_basis(agg: str | None, group_totals) -> ShareBasis:
 
 class ScopeError(ValueError):
     """The contract describes rows that cannot be selected."""
+
+
+class ParamsInvalid(ValueError):
+    """The caller's arguments are wrong, as opposed to the contract's answer.
+
+    Step 9 measured why this is a separate class: an unparseable date and an
+    undeclared dimension both raised ValueError, so the tool layer reported
+    both as ANALYSIS_NOT_POSSIBLE and told the caller to change the contract.
+    One of those is fixed by editing the call. The reason codes exist because
+    the eval counts recovery per reason, and a code that averages two
+    recoveries measures neither.
+
+    A ValueError subclass on purpose: every test that already asserts
+    pytest.raises(ValueError) on a bad limit or a bad threshold keeps
+    passing, and the tool layer catches this first.
+    """
 
 
 class LostRows(ScopeError):

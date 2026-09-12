@@ -1,0 +1,276 @@
+"""compute_analysis: the gate, the scope, the envelope, and four refusals.
+
+Phase 8, Step 9a. Run from the repo root:
+
+    uv run pytest tests/test_analysis_tools.py -q
+
+These tests assert on STRINGS, because the strings are the whole interface --
+the Phase 4 shape, for the Phase 4 reason. A reason code is asserted with
+reason_of() rather than by matching prose, so improving a sentence does not
+fail a test.
+"""
+
+from __future__ import annotations
+
+import sys
+from dataclasses import dataclass, field
+from datetime import date
+from pathlib import Path
+
+import duckdb
+import pytest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+from analytics_agent import state, workspace  # noqa: E402
+from analytics_agent.contract import ContractRefused  # noqa: E402
+from analytics_agent.contract.refusals import Refusal  # noqa: E402
+from analytics_agent.analysis import registry, tools  # noqa: E402
+from analytics_agent.analysis.base import LostRows  # noqa: E402
+from analytics_agent.analysis.registry import Output  # noqa: E402
+from analytics_agent.contract.refusals import Reason, reason_of  # noqa: E402
+from analytics_agent.util import results  # noqa: E402
+
+WORKSPACE = "analysis_tools_test"
+
+# What the patched require_contract will return, by dataset name. Reset by the
+# fixture; a test that needs a different contract replaces its entry.
+GATES: dict = {}
+
+
+@dataclass
+class FakeMeasure:
+    name: str
+    agg: str | None = "sum"
+    definition: str = "what was charged"
+    unit: str | None = "GBP"
+
+
+@dataclass
+class FakeExclusion:
+    rule: str
+    reason: str = "not real revenue"
+    row_count: int | None = None
+
+
+@dataclass
+class FakeWindow:
+    start: date
+    end: date
+
+
+@dataclass
+class FakeContract:
+    dataset_name: str = "sales"
+    grain: str = "one row = one sale"
+    date_column: str | None = "ts"
+    analysis_window: object = None
+    known_exclusions: list = field(default_factory=list)
+    excluded_columns: list = field(default_factory=list)
+    measures: list = field(default_factory=lambda: [FakeMeasure("amount")])
+    dimensions: list = field(default_factory=lambda: ["status"])
+    primary_key: list = field(default_factory=lambda: ["id"])
+    caveats: list = field(default_factory=lambda: ["v1 agreed at 5 rows"])
+
+
+SALES = """SELECT * FROM (VALUES
+ (1,'shipped',   TIMESTAMP '2024-06-01', 10.50::DECIMAL(18,2)),
+ (2,'cancelled', TIMESTAMP '2024-06-02', 99.00::DECIMAL(18,2)),
+ (3,NULL,        TIMESTAMP '2024-06-03', 20.25::DECIMAL(18,2)),
+ (4,'shipped',   TIMESTAMP '2024-12-31', NULL),
+ (5,'shipped',   TIMESTAMP '2025-01-01', 88.00::DECIMAL(18,2))
+) v(id, status, ts, amount)"""
+
+
+@dataclass
+class FakeDrift:
+    """The gate calls drift.caveat(); nothing here drifts."""
+
+    text: str = ""
+
+    def caveat(self) -> str:
+        return self.text
+
+
+def _gate(**kw) -> state.Gate:
+    kw.setdefault("analysis_window", FakeWindow(date(2024, 1, 1), date(2024, 12, 31)))
+    kw.setdefault("known_exclusions", [FakeExclusion(rule="status = 'cancelled'")])
+    return state.Gate(contract=FakeContract(**kw), version=1, drift=FakeDrift())
+
+
+@pytest.fixture()
+def con(monkeypatch):
+    """A loaded table and a gate that passes for 'sales' and nothing else.
+
+    `require_contract` is patched in the tool module's namespace, the way
+    test_validate_tools.py patches contract_store.current: these tests are
+    about how analysis/tools.py USES a gate, and a fixture contract that has
+    to satisfy the real store's validators is a different test.
+
+    Step 10 is where this shortcut has to go -- P8-O10 is exactly "stand-in
+    contracts looser than the real models".
+    """
+    workspace.reset(WORKSPACE)
+    c = duckdb.connect()
+    c.execute(f"CREATE TABLE sales AS {SALES}")
+
+    GATES.clear()
+    GATES["sales"] = _gate()
+
+    def _require(con_, dataset_name):
+        gate = GATES.get(dataset_name)
+        if gate is None:
+            raise ContractRefused(Refusal(
+                reason=Reason.NO_CONTRACT,
+                what=f"'{dataset_name}' has no confirmed Dataset Contract.",
+                why="no analysis runs without an agreed grain.",
+                state="loaded, no contract",
+                next_call=f'propose_dataset_contract(dataset_name="{dataset_name}")',
+            ))
+        return gate
+
+    monkeypatch.setattr(tools, "require_contract", _require)
+    yield c
+    c.close()
+
+
+def run(con, analysis_type="summary_stats", dataset_name="sales", **params):
+    return tools.compute_analysis(
+        con, WORKSPACE, dataset_name, analysis_type, **params)
+
+
+# --- the catalogue
+
+
+def test_importing_the_package_registers_every_analysis():
+    """A partial catalogue is a wrong answer that reads like a right one."""
+    names = {name for name, _, _ in registry.catalogue()}
+    assert {"summary_stats", "frequency", "top_n", "group_compare",
+            "pareto", "concentration", "ranking_shift"} <= names
+
+
+# --- the result
+
+
+def test_a_result_carries_the_contract_header_and_the_envelope(con):
+    text = run(con)
+    assert reason_of(text) is None
+    assert text.startswith("Under contract v1 for sales: one row = one sale.")
+    assert "rows x 11 columns, written to" in text
+    assert "read_result_file(path=" in text or "1 rows x" in text
+
+
+def test_the_method_note_leads_what_this_shows(con):
+    text = run(con)
+    assert "3 of 5 row(s) analysed" in text
+
+
+def test_the_gates_caveats_travel_into_the_result(con):
+    text = run(con)
+    assert "v1 agreed at 5 rows" in text
+
+
+def test_the_file_it_names_can_actually_be_read_back(con):
+    """The round trip, asserted rather than assumed: a path that does not open
+    is F7 with extra steps."""
+    text = run(con)
+    path = next(line.strip() for line in text.splitlines()
+                if line.strip().endswith(".csv"))
+    page = results.read_result_file(WORKSPACE, path)
+    assert reason_of(page) is None
+    assert "amount" in page
+
+
+def test_each_analysis_writes_under_its_own_label(con):
+    run(con)
+    run(con, "frequency", column="status")
+    names = [p.name for p in results.list_results(WORKSPACE)]
+    assert any(n.startswith("summary_stats_") for n in names)
+    assert any(n.startswith("frequency_") for n in names)
+
+
+# --- the refusals
+
+
+def test_no_contract_passes_the_gates_refusal_straight_through(con):
+    text = run(con, dataset_name="other")
+    assert reason_of(text) is Reason.NO_CONTRACT
+    assert 'propose_dataset_contract(dataset_name="other")' in text
+
+
+def test_an_unknown_analysis_returns_the_whole_valid_list(con):
+    text = run(con, "summry_stats")
+    assert reason_of(text) is Reason.ANALYSIS_NOT_FOUND
+    for name in ("summary_stats", "frequency", "top_n", "group_compare",
+                 "pareto", "concentration", "ranking_shift"):
+        assert name in text
+
+
+def test_arguments_an_analysis_cannot_take_are_params_invalid(con):
+    text = run(con, "summary_stats", n=5)
+    assert reason_of(text) is Reason.ANALYSIS_PARAMS_INVALID
+    assert "compute_analysis(" in text
+
+
+def test_an_unparseable_period_is_params_invalid_not_not_possible(con):
+    text = run(con, "ranking_shift", dimension="status", measure="amount",
+               before_start="last January", before_end="2024-01-31",
+               after_start="2024-03-01", after_end="2024-03-31")
+    assert reason_of(text) is Reason.ANALYSIS_PARAMS_INVALID
+
+
+def test_an_undeclared_column_is_not_possible_and_names_the_contract(con):
+    text = run(con, "frequency", column="id")
+    assert reason_of(text) is Reason.ANALYSIS_NOT_POSSIBLE
+    assert 'propose_dataset_contract(dataset_name="sales")' in text
+
+
+def test_a_measure_with_no_aggregate_is_not_possible(con):
+    GATES["sales"] = _gate(measures=[FakeMeasure("amount", agg=None)])
+    text = run(con, "top_n", dimension="status", measure="amount")
+    assert reason_of(text) is Reason.ANALYSIS_NOT_POSSIBLE
+
+
+# --- the refusal that is not the caller's fault
+
+
+def test_a_result_without_its_method_note_is_unsound_and_writes_nothing(con):
+    """All nine put scope.method_note() first in summary and nothing enforced
+    it. A result that does not say what it was computed over is refused."""
+    registry.REGISTRY["_silent"] = registry.Analysis(
+        name="_silent", tier=1, summary="test double",
+        run=lambda con, gate, scope, **p: Output(
+            headers=["x"], rows=[[1]], summary=["not the method note"],
+            label="silent"),
+    )
+    try:
+        text = run(con, "_silent")
+        assert reason_of(text) is Reason.ANALYSIS_RESULT_UNSOUND
+        assert "Nothing was written" in text
+        assert not any(p.name.startswith("silent_")
+                       for p in results.list_results(WORKSPACE))
+    finally:
+        del registry.REGISTRY["_silent"]
+
+
+def test_lost_rows_is_unsound_rather_than_a_traceback(con):
+    def _loses(con, gate, scope, **params):
+        raise LostRows("its cells count 2 row(s) against 3 in scope.")
+
+    registry.REGISTRY["_lossy"] = registry.Analysis(
+        name="_lossy", tier=1, summary="test double", run=_loses)
+    try:
+        text = run(con, "_lossy")
+        assert reason_of(text) is Reason.ANALYSIS_RESULT_UNSOUND
+        assert 'validate_dataset(dataset_name="sales")' in text
+    finally:
+        del registry.REGISTRY["_lossy"]
+
+
+def test_every_refusal_names_a_call_the_agent_can_make(con):
+    for kwargs in ({"analysis_type": "summry_stats"},
+                   {"analysis_type": "summary_stats", "n": 5},
+                   {"analysis_type": "frequency", "column": "id"}):
+        text = run(con, **kwargs)
+        line = next(l for l in text.splitlines() if l.startswith("NEXT STEP:"))
+        assert "(" in line and ")" in line

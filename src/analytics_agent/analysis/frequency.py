@@ -30,7 +30,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..util.sql_guard import quote_identifier
-from .base import label, number, share_basis
+from .base import ParamsInvalid, label, number, share_basis
 from .declared import AGG_SQL, agg_of, require_dimension, require_measure
 from .registry import Output, register
 from .stats import ranked_totals
@@ -73,7 +73,7 @@ def frequency(con, gate, scope, column: str, limit: int = DEFAULT_LIMIT, **param
             f"frequency takes column and limit; got {', '.join(sorted(params))}."
         )
     if limit < 1:
-        raise ValueError(f"limit must be at least 1; got {limit}.")
+        raise ParamsInvalid(f"limit must be at least 1; got {limit}.")
 
     contract = gate.contract
     require_dimension(contract, column)
@@ -134,7 +134,7 @@ def top_n(con, gate, scope, dimension: str, measure: str,
             f"{', '.join(sorted(params))}."
         )
     if n < 1:
-        raise ValueError(f"n must be at least 1; got {n}.")
+        raise ParamsInvalid(f"n must be at least 1; got {n}.")
 
     contract = gate.contract
     require_dimension(contract, dimension)

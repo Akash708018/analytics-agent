@@ -28,7 +28,7 @@ from decimal import Decimal
 from typing import Any
 
 from ..util.sql_guard import quote_identifier
-from .base import label, number, share_basis
+from .base import ParamsInvalid, label, number, share_basis
 from .declared import AGG_SQL, agg_of, require_dimension, require_measure
 from .registry import Output, register
 from .stats import MAX_GROUPS, ranked_totals
@@ -92,7 +92,7 @@ def pareto(con, gate, scope, dimension: str, measure: str,
             f"{', '.join(sorted(params))}."
         )
     if not 0 < threshold <= 100:
-        raise ValueError(
+        raise ParamsInvalid(
             f"threshold is a percentage above 0 and at most 100; got {threshold}."
         )
 

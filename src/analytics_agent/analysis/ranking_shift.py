@@ -31,7 +31,7 @@ from datetime import date
 from typing import Any
 
 from ..util.sql_guard import quote_identifier
-from .base import label, number, window_clause
+from .base import ParamsInvalid, label, number, window_clause
 from .declared import AGG_SQL, agg_of, require_dimension, require_measure
 from .registry import Output, register
 from .stats import MAX_GROUPS, ranked_totals
@@ -46,12 +46,12 @@ def _period(name: str, start: str, end: str) -> tuple[date, date]:
         first = date.fromisoformat(str(start))
         last = date.fromisoformat(str(end))
     except (TypeError, ValueError) as exc:
-        raise ValueError(
+        raise ParamsInvalid(
             f"the {name} period needs two ISO dates (YYYY-MM-DD); got "
             f"{start!r} and {end!r} -- {exc}"
         ) from exc
     if last < first:
-        raise ValueError(
+        raise ParamsInvalid(
             f"the {name} period ends {last} which is before it starts {first}."
         )
     return first, last

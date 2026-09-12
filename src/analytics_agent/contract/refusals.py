@@ -66,6 +66,21 @@ class Reason(str, Enum):
     # cleaning: two approved actions cannot both run, in the order given.
     ACTIONS_CONFLICT = "ACTIONS_CONFLICT"
 
+    # analysis: an analysis_type nobody registered. Recovery is the catalogue.
+    ANALYSIS_NOT_FOUND = "ANALYSIS_NOT_FOUND"
+    # analysis: the call named an analysis that exists and gave it arguments
+    # it cannot take, or values it cannot parse. Recovery is fixing the call.
+    ANALYSIS_PARAMS_INVALID = "ANALYSIS_PARAMS_INVALID"
+    # analysis: the contract does not permit what was asked -- an undeclared
+    # or excluded column, a measure with no aggregate, a non-additive total,
+    # more groups than a table can hold. Recovery is usually the contract.
+    ANALYSIS_NOT_POSSIBLE = "ANALYSIS_NOT_POSSIBLE"
+    # analysis: the result did not add back to its scope, or arrived without
+    # the note saying what it was computed over. Not a caller error: this is
+    # the failure the whole phase is arranged against, counted rather than
+    # raised as a traceback.
+    ANALYSIS_RESULT_UNSOUND = "ANALYSIS_RESULT_UNSOUND"
+
 
 _REASON_LINE = re.compile(r"^reason:\s*([A-Z_]+)\s*$", re.M)
 
