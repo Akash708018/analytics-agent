@@ -1008,7 +1008,7 @@ Forecasting, multi-dataset joins, scheduled runs. Out of scope until 0–14 are 
 | 5 | Profiling |☑ Done| 01/09/2026| Steps 1-7, 9. 747 unit assertions, 42 acceptance assertions. Phase 2's 20, Phase 3's 35 and Phase 4's 50 still passing.|
 | 6 | Cleaning gate | ☑ Done | 06/09/2026  | Step 1. 15 library-fact tests pinned; 762 unit assertions. Phase 2's 20, Phase 3's 35, Phase 4's 50 and Phase 5's 50 still passing. |
 | 7 | Validation | ☑ Done| 08/09/2026  |  |
-| 8 | Analysis T1–2 | ◐ In progress |  | Steps 1-7b.1 committed: sql_guard, the gate's key check, base.py, the registry, summary_stats, frequency and top_n, declared.py, distribution, cross_tab. Step 7 complete. |
+| 8 | Analysis T1–2 | ☑ Done | 13/09/2026 | Steps 1–10. Nine analyses across Tiers 1–2, the tool layer (compute_analysis), the MCP surface, and acceptance through a real DatasetContract and a real require_contract (closes P8-O10). 1,304 unit assertions; acceptance 54 passed, 0 failed, 5 skipped. Outstanding and printed on every acceptance run: the Olist half of the Done-When (no data on disk — Phase 9 needs it too), the role trap (role never reaches a confirmed contract), ANALYSIS_RESULT_UNSOUND (only a test double provokes it), the rendered MCP schema, and column paging at acceptance level (no fixture is wide enough). |
 | 9 | Analysis T3–5 | ☐ Not started |  |  |
 | 10 | Analysis T6–7 | ☐ Not started |  |  |
 | 11 | Charts | ☐ Not started |  |  |
