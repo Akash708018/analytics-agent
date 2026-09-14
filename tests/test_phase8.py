@@ -51,21 +51,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from analytics_agent import workspace  # noqa: E402
 from analytics_agent.analysis import tools as analysis_tools  # noqa: E402
 from analytics_agent.analysis.registry import catalogue  # noqa: E402
-
-# Phase 9 adds Tier 3. This file asserts that ITS nine are registered,
-# not that nine is all there is -- a later tier must not fail an
-# earlier phase's acceptance for having done its own work.
-PHASE_8 = {
-    "summary_stats",
-    "distribution",
-    "frequency",
-    "cross_tab",
-    "top_n",
-    "group_compare",
-    "pareto",
-    "concentration",
-    "ranking_shift",
-}
 from analytics_agent.contract import store  # noqa: E402
 from analytics_agent.contract.dataset_contract import (  # noqa: E402
     AnalysisWindow,
@@ -91,6 +76,21 @@ WINDOW = AnalysisWindow(start=date(2024, 1, 1), end=date(2024, 12, 31))
 # up pass without comment.
 BEFORE = ("2024-01-01", "2024-03-31")
 AFTER = ("2024-10-01", "2024-12-31")
+
+# Phase 9 adds Tier 3. This file asserts that ITS nine are registered,
+# not that nine is all there is -- a later tier must not fail an
+# earlier phase's acceptance for having done its own work.
+PHASE_8 = {
+    "summary_stats",
+    "distribution",
+    "frequency",
+    "cross_tab",
+    "top_n",
+    "group_compare",
+    "pareto",
+    "concentration",
+    "ranking_shift",
+}
 
 PASSED = 0
 FAILED = 0
