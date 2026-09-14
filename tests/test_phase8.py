@@ -51,6 +51,21 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from analytics_agent import workspace  # noqa: E402
 from analytics_agent.analysis import tools as analysis_tools  # noqa: E402
 from analytics_agent.analysis.registry import catalogue  # noqa: E402
+
+# Phase 9 adds Tier 3. This file asserts that ITS nine are registered,
+# not that nine is all there is -- a later tier must not fail an
+# earlier phase's acceptance for having done its own work.
+PHASE_8 = {
+    "summary_stats",
+    "distribution",
+    "frequency",
+    "cross_tab",
+    "top_n",
+    "group_compare",
+    "pareto",
+    "concentration",
+    "ranking_shift",
+}
 from analytics_agent.contract import store  # noqa: E402
 from analytics_agent.contract.dataset_contract import (  # noqa: E402
     AnalysisWindow,
@@ -233,11 +248,12 @@ def clause_one() -> dict[str, str]:
           f"v{stored.version}, {stored.row_count:,} rows")
 
     registered = {name for name, _, _ in catalogue()}
-    check("nine analyses are registered", len(registered) == 9,
+    check("Phase 8's nine analyses are registered",
+          PHASE_8 <= registered,
           ", ".join(sorted(registered)))
     check("the calls below cover every one of them",
-          set(CALLS) == registered,
-          f"uncalled: {sorted(registered - set(CALLS)) or 'none'}")
+          set(CALLS) == PHASE_8 & registered,
+          f"uncalled: {sorted((PHASE_8 & registered) - set(CALLS)) or 'none'}")
 
     out: dict[str, str] = {}
     for name in sorted(CALLS):
@@ -270,7 +286,7 @@ def clause_two() -> None:
           reason_of(text) is Reason.ANALYSIS_NOT_FOUND)
     missing = [n for n, _, _ in catalogue() if n not in text]
     check("and the refusal lists every valid name", not missing,
-          f"missing: {missing}" if missing else "all nine")
+          f"missing: {missing}" if missing else f"all {len(catalogue())}")
 
     text = run("distribution", measure="revenue", bins=1)
     check("a bad argument is ANALYSIS_PARAMS_INVALID",

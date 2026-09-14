@@ -190,6 +190,7 @@ def test_every_registered_analysis_sits_in_its_build_guide_tier():
         "summary_stats": 1, "distribution": 1, "frequency": 1,
         "cross_tab": 1, "top_n": 1, "group_compare": 2,
         "pareto": 2, "concentration": 2, "ranking_shift": 2,
+        "calendar_coverage": 3,
     }
     entries = catalogue()
     for name, tier, summary in entries:

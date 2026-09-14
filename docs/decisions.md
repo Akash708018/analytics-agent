@@ -3370,3 +3370,224 @@ Olist is not on disk. Phase 8's Done-When asks for it and Phase 9's needs it (ca
 No live call through Claude Desktop has been made. Everything verified is ast parsing and Python-level calls; the rendered JSON schema is unseen.
 ANALYSIS_RESULT_UNSOUND is only provokable with a test double. No real analysis can be made to lose rows on demand.
 No fixture is wide enough to page columns at acceptance level. clean_sales has region 4, product 5, channel 3, so the widest cross_tab it can produce is 7 columns against a 12-column window; broken_sales is the same shape. P8-O15's fix is covered by nine tests in test_results.py against a synthetic 50-column result and by nothing at acceptance level. A make_fixtures.py change would close it.
+## Phase 9, Step 1 - the ground facts (temporal)
+P9-D1. ABSENCE CANNOT BE SELECTED FROM THE DATA. A GROUP BY over the date column returns the
+periods that exist; a period with no rows has no row of its own to return. Measured: four
+months and a NULL group where five months were in the span, November absent entirely rather
+than present as a zero. Every Tier 3 analysis reads its periods off a generated calendar and
+LEFT JOINs the table onto it. This is F10 in the Failure Mode Register, measured rather than
+reasoned.
+P9-D2. THE SERIES IS GENERATED FROM TRUNCATED BOUNDS, NEVER FROM THE RAW MINIMUM. Measured: a
+monthly series started at 2017-01-31 walks Feb 28, Mar 28, Apr 28, May 28 -- February's clamp
+sticks for every later period, and none of those days is a value date_trunc will ever produce,
+so the join finds nothing and every period reads as missing.
+P9-D3. generate_series IS INCLUSIVE AND range IS NOT. Measured: 4 periods against 3 on the same
+arguments. On Olist that difference is October 2018, the last month in the window.
+P9-D4. THE PERIOD COLUMN IS TIMESTAMP WHATEVER THE SOURCE COLUMN WAS. Measured:
+date_trunc over a DATE returns TIMESTAMP. Labels come from strftime per grain, because a month
+rendered 2017-03-01 00:00:00 reads as a day.
+P9-D5. UNDATED ROWS ARE REPORTED, NEVER BUCKETED AND NEVER DROPPED. A NULL date is not a
+missing period: the period is in the window and the row is in scope. Two numbers, two
+sentences.
+P9-D6. WEEKS ARE KEYED BY date_trunc('week'), NOT BY (year, weekofyear). Measured: 2016-01-01
+is week 53 of isoyear 2015 and 2018-12-31 is week 1 of isoyear 2019. Weeks start Monday.
+P9-D7. THE SESSION ZONE IS STATED WHEN, AND ONLY WHEN, THE COLUMN IS TZ-AWARE. Measured: one
+instant truncates to 2017-03-14 under UTC and 2017-03-15 under Asia/Kolkata, and this machine
+resolves to Asia/Kolkata. Measured against that: all five Olist orders timestamps are
+'timestamp without time zone', and a naive TIMESTAMP does not move. A zone line over buckets it
+cannot have affected is noise, and noise teaches a reader to skip the line that matters.
+P9-D8. A COVERAGE ANSWER IS COUNTS, A MISSING LIST AND A LONGEST RUN, NOT THE SERIES. Measured:
+761 daily periods over a two-year window against a 50-row cap. The series is a result file,
+paged by the Step 9c call.
+P9-D9. THE BOUNDS COME FROM analysis_window WHEN SET AND FROM THE OBSERVED SPAN WHEN NOT, AND
+THE TWO ARE NEVER GIVEN THE SAME NAME. Measured in the contract: date_column and
+analysis_window are both optional and the only refused combination is a window without a
+column, so a column with no window is legal and is the common case. Phase 4 already ruled the
+window is reported and never proposed. An observed span is a fact about the data; a window is a
+decision someone made.
+P9-D10. THE DATE COLUMN'S TYPE IS THE CONTRACT'S CHECK, NOT THE ANALYSIS'S. dataset_contract.py
+refuses a VARCHAR date at confirm time with a reload instruction, so the engine's binder error
+is unreachable through a confirmed contract and re-checking it would be a second opinion on a
+settled question. P8-D29's rule, one tier up.
+P9-D11. A WINDOW THAT ENDS MID-PERIOD MAKES THAT PERIOD PARTIAL, AND IT IS LABELLED. Measured
+on the source: Olist orders run 2016-09-04 to 2018-10-17, so September holds 27 days and
+October 17. Unlabelled, that is a ramp at one end of every Phase 11 line chart and a cliff at
+the other, and neither is a movement in the business.
+P9-O1 IS OPEN. The acceptance suite has no path to the Olist database. P8-D74 recorded the data
+as absent; it is not -- local Postgres holds all nine tables and 99,441 orders across 25 of 26
+months. What is missing is a way for a test to reach it that does not pass here and error
+everywhere else.
+C36. A REFLOW SPLIT STRINGS WITHOUT READING WHAT IT PRODUCED. An automated wrap cut string
+literals at the first space under its budget and left the remainder as its own fragment, so the
+file carried orphans reading "50-row " and "a missing list " alone on a line, and copied the f
+prefix onto fragments holding no placeholder -- ruff F541. Because: the script asserted that the
+concatenated string was unchanged, which stays true however ugly the split, and line length plus
+a passing suite were checked instead of the artifact being read. C28 in a new place: a check
+written against the property being preserved rather than the thing being produced. Every string
+group is rejoined to one logical string and re-wrapped whole, with the f prefix decided per
+segment by whether that segment contains a brace.
+C37. A PROJECT CONVENTION WAS INFERRED FROM ONE DOCSTRING INSTEAD OF MEASURED. The Phase 7 facts
+file's prose wraps near 79, so the temporal facts file was written to 79: twelve code lines were
+hand-split and two test functions renamed to fit a limit this project does not use. Measured
+across tests/ and analysis/: eight files run from 92 to 100 columns. C36's fragments are
+downstream of the same guess -- messages that fit at 100 were being broken three ways to reach
+79. A repository's style is measured across its files before it is followed.
+C38. TWO COPIES OF ONE TEST MODULE INTERRUPTED COLLECTION. A stray copy at the repo root and the
+real one in tests/ both claim the module name test_duckdb_temporal_facts under pytest's default
+prepend import mode, so the second is refused as an import file mismatch and the whole run stops
+at collection. Naming one path collects one file, which is why the standalone run passed and the
+suite did not. Measured after the fact: no conftest.py exists at the root or in tests/, and
+pyproject declares no testpaths, so collection walks the rootdir and a test file beside
+pyproject.toml is collected as readily as one inside tests/. The stale __pycache__ entry
+outlives the file it was compiled from and has to go with it.
+C39. A TEST COUNT CANNOT TELL TWO PAYLOADS APART. The superseded 443-line file and the corrected
+403-line file both gave 21 passed and both gave a 1325 suite, so the installed copy was the
+defective one while every measurement said green. A file written by a pasted heredoc is
+confirmed by its digest, not by the tests it passes.
+MEASURED VALIDATION. tests/test_duckdb_temporal_facts.py: 21 passed. Full suite 1304 -> 1325.
+Every fact reproduced on two machines, container and laptop, on DuckDB 1.5.5; the only
+difference between the two runs was the session TimeZone, which is why the zone tests set it
+explicitly.
+
+## Phase 9, Step 1 - the ground facts (temporal)
+P9-D1. ABSENCE CANNOT BE SELECTED FROM THE DATA. A GROUP BY over the date column returns the
+periods that exist; a period with no rows has no row of its own to return. Measured: four
+months and a NULL group where five months were in the span, November absent entirely rather
+than present as a zero. Every Tier 3 analysis reads its periods off a generated calendar and
+LEFT JOINs the table onto it. This is F10 in the Failure Mode Register, measured rather than
+reasoned.
+P9-D2. THE SERIES IS GENERATED FROM TRUNCATED BOUNDS, NEVER FROM THE RAW MINIMUM. Measured: a
+monthly series started at 2017-01-31 walks Feb 28, Mar 28, Apr 28, May 28 -- February's clamp
+sticks for every later period, and none of those days is a value date_trunc will ever produce,
+so the join finds nothing and every period reads as missing.
+P9-D3. generate_series IS INCLUSIVE AND range IS NOT. Measured: 4 periods against 3 on the same
+arguments. On Olist that difference is October 2018, the last month in the window.
+P9-D4. THE PERIOD COLUMN IS TIMESTAMP WHATEVER THE SOURCE COLUMN WAS. Measured:
+date_trunc over a DATE returns TIMESTAMP. Labels come from strftime per grain, because a month
+rendered 2017-03-01 00:00:00 reads as a day.
+P9-D5. UNDATED ROWS ARE REPORTED, NEVER BUCKETED AND NEVER DROPPED. A NULL date is not a
+missing period: the period is in the window and the row is in scope. Two numbers, two
+sentences.
+P9-D6. WEEKS ARE KEYED BY date_trunc('week'), NOT BY (year, weekofyear). Measured: 2016-01-01
+is week 53 of isoyear 2015 and 2018-12-31 is week 1 of isoyear 2019. Weeks start Monday.
+P9-D7. THE SESSION ZONE IS STATED WHEN, AND ONLY WHEN, THE COLUMN IS TZ-AWARE. Measured: one
+instant truncates to 2017-03-14 under UTC and 2017-03-15 under Asia/Kolkata, and this machine
+resolves to Asia/Kolkata. Measured against that: all five Olist orders timestamps are
+'timestamp without time zone', and a naive TIMESTAMP does not move. A zone line over buckets it
+cannot have affected is noise, and noise teaches a reader to skip the line that matters.
+P9-D8. A COVERAGE ANSWER IS COUNTS, A MISSING LIST AND A LONGEST RUN, NOT THE SERIES. Measured:
+761 daily periods over a two-year window against a 50-row cap. The series is a result file,
+paged by the Step 9c call.
+P9-D9. THE BOUNDS COME FROM analysis_window WHEN SET AND FROM THE OBSERVED SPAN WHEN NOT, AND
+THE TWO ARE NEVER GIVEN THE SAME NAME. Measured in the contract: date_column and
+analysis_window are both optional and the only refused combination is a window without a
+column, so a column with no window is legal and is the common case. Phase 4 already ruled the
+window is reported and never proposed. An observed span is a fact about the data; a window is a
+decision someone made.
+P9-D10. THE DATE COLUMN'S TYPE IS THE CONTRACT'S CHECK, NOT THE ANALYSIS'S. dataset_contract.py
+refuses a VARCHAR date at confirm time with a reload instruction, so the engine's binder error
+is unreachable through a confirmed contract and re-checking it would be a second opinion on a
+settled question. P8-D29's rule, one tier up.
+P9-D11. A WINDOW THAT ENDS MID-PERIOD MAKES THAT PERIOD PARTIAL, AND IT IS LABELLED. Measured
+on the source: Olist orders run 2016-09-04 to 2018-10-17, so September holds 27 days and
+October 17. Unlabelled, that is a ramp at one end of every Phase 11 line chart and a cliff at
+the other, and neither is a movement in the business.
+P9-O1 IS OPEN. The acceptance suite has no path to the Olist database. P8-D74 recorded the data
+as absent; it is not -- local Postgres holds all nine tables and 99,441 orders across 25 of 26
+months. What is missing is a way for a test to reach it that does not pass here and error
+everywhere else.
+C36. A REFLOW SPLIT STRINGS WITHOUT READING WHAT IT PRODUCED. An automated wrap cut string
+literals at the first space under its budget and left the remainder as its own fragment, so the
+file carried orphans reading "50-row " and "a missing list " alone on a line, and copied the f
+prefix onto fragments holding no placeholder -- ruff F541. Because: the script asserted that the
+concatenated string was unchanged, which stays true however ugly the split, and line length plus
+a passing suite were checked instead of the artifact being read. C28 in a new place: a check
+written against the property being preserved rather than the thing being produced. Every string
+group is rejoined to one logical string and re-wrapped whole, with the f prefix decided per
+segment by whether that segment contains a brace.
+C37. A PROJECT CONVENTION WAS INFERRED FROM ONE DOCSTRING INSTEAD OF MEASURED. The Phase 7 facts
+file's prose wraps near 79, so the temporal facts file was written to 79: twelve code lines were
+hand-split and two test functions renamed to fit a limit this project does not use. Measured
+across tests/ and analysis/: eight files run from 92 to 100 columns. C36's fragments are
+downstream of the same guess -- messages that fit at 100 were being broken three ways to reach
+79. A repository's style is measured across its files before it is followed.
+C38. TWO COPIES OF ONE TEST MODULE INTERRUPTED COLLECTION. A stray copy at the repo root and the
+real one in tests/ both claim the module name test_duckdb_temporal_facts under pytest's default
+prepend import mode, so the second is refused as an import file mismatch and the whole run stops
+at collection. Naming one path collects one file, which is why the standalone run passed and the
+suite did not. Measured after the fact: no conftest.py exists at the root or in tests/, and
+pyproject declares no testpaths, so collection walks the rootdir and a test file beside
+pyproject.toml is collected as readily as one inside tests/. The stale __pycache__ entry
+outlives the file it was compiled from and has to go with it.
+C39. A TEST COUNT CANNOT TELL TWO PAYLOADS APART. The superseded 443-line file and the corrected
+403-line file both gave 21 passed and both gave a 1325 suite, so the installed copy was the
+defective one while every measurement said green. A file written by a pasted heredoc is
+confirmed by its digest, not by the tests it passes.
+MEASURED VALIDATION. tests/test_duckdb_temporal_facts.py: 21 passed. Full suite 1304 -> 1325.
+Every fact reproduced on two machines, container and laptop, on DuckDB 1.5.5; the only
+difference between the two runs was the session TimeZone, which is why the zone tests set it
+explicitly.
+
+## Phase 9, Step 2 - calendar_coverage
+P9-D12. THE PERIODS COME OFF A GENERATED CALENDAR AND THE TABLE IS JOINED ONTO IT. P9-D1 as
+code: generate_series between truncated bounds, LEFT JOINed to a GROUP BY of the date column, so
+an absent period is a row reading 0 rather than a row that was never returned. Every later Tier
+3 analysis reads its periods the same way. This is F10 in the Failure Mode Register, and the
+suite asserts it twice -- once that the GROUP BY this replaces cannot return the missing month,
+once that the coverage output can.
+P9-D13. THE BOUNDS ARE THE WINDOW'S WHEN THERE IS ONE AND THE OBSERVED SPAN'S WHEN THERE IS NOT,
+AND THE SUMMARY NAMES WHICH. P9-D9 as code. Measured in the contract model: date_column and
+analysis_window are both optional and the only refused combination is a window without a column,
+so a column with no window is legal and is the common case. Phase 4 already ruled the window is
+reported and never proposed; an observed span is a fact about the data and a window is a
+decision somebody made, and the two are never given the same name.
+P9-D14. THE UNDATED ROWS ARE COUNTED HERE, BECAUSE THE SCOPE CANNOT COUNT THEM. scope_for fills
+no_date only when a window exists -- with no window there is nothing to be outside of -- so a
+NULL-dated row sits in analysed and would vanish between the periods. The reconciliation is
+sum(period counts) + undated == scope.analysed and it raises LostRows, which is P8-D45's guard
+on a new way of losing rows.
+P9-D15. THE GRAIN IS AN ARGUMENT WITH FIVE VALUES AND EACH CARRIES ITS OWN LABEL. day, week,
+month, quarter, year. P9-D4: date_trunc returns a TIMESTAMP whatever the column was, so a month
+rendered raw reads as a day; every grain is labelled by strftime and quarter is '%Y-Q' ||
+quarter(p), which has no code of its own. grain is the first fixed-value string in
+compute_analysis's signature, so its five values are in the tool docstring -- the schema the
+model reads -- rather than being discovered through a ParamsInvalid on the first call.
+P9-D16. THE SESSION ZONE IS READ AND STATED ONLY FOR A TZ-AWARE COLUMN. P9-D7. Measured in
+dataset_contract.py: _TEMPORAL_PREFIXES is a prefix tuple, so TIMESTAMP WITH TIME ZONE passes the
+contract's check and a TIMESTAMPTZ date_column is legal. The branch is reachable, not defensive.
+P9-D17. THE LONGEST GAP IS COMPUTED FROM THE ROWS ALREADY FETCHED. Three missing months in a row
+is a feed that stopped; three scattered is a business that was quiet. A second query would be a
+second answer able to disagree with the first.
+P9-D18. NO TZ-AWARE VALUE IS FETCHED INTO PYTHON. DuckDB builds a TIMESTAMPTZ with pytz, which
+this project does not depend on, so a bound fetched to be compared raised InvalidInputException
+naming the missing module. The bounds come back as VARCHAR and every comparison between them is
+made in SQL, where the types already live. A date is not carried across a language boundary to
+be compared on the other side.
+C40. A MEASUREMENT PASSED BECAUSE OF A PACKAGE THE PROJECT DOES NOT HAVE. pytz was installed
+into the container in Step 1 to read tz-aware values out of the probe; the probe was then fixed
+by casting to VARCHAR and the package was left behind, so the harness exercised the TIMESTAMPTZ
+path against an undeclared dependency and reported everything green. Measured after the fact:
+uninstall pytz, re-run, one failure on the tz-aware test with the same exception the repository
+saw. An environment that has more in it than the project declares cannot measure the project.
+C41. TWO EXPECTED VALUES IN THE NEW TESTS WERE REASONED RATHER THAN MEASURED. The week count was
+written 19 and is 20, and a period count was asserted as the integer 0 where base.number()
+renders it to the string "0" before it reaches a cell. Both were caught by running the tests
+rather than by reading them, and both were corrected by measuring first rather than by adjusting
+until green. C37's habit, one layer in.
+P9-O2 IS OPEN. Everything measured so far is container fixtures and Olist, so the module is
+general by construction and not yet by evidence. Olist has nine tables and three of them are
+other temporal shapes for free: order_reviews has two date columns, so a proposal leaves
+date_column unresolved; order_payments has none, which exercises the refusal on real data rather
+than on a fixture built to be refused; order_items carries shipping_limit_date, which Phase 4
+found running past the end of the order data, so its coverage table should show a tail of
+periods nobody wants. The Phase 13 gold questions should span at least three tables with
+different temporal shapes, including one with no date column.
+P9-O3 IS OPEN. compute_analysis's docstring says an argument that does not apply is "refused
+rather than ignored". True of a value: every analysis raises TypeError on an unexpected keyword.
+Not true of None: tools.py strips None before dispatch, so bins=10 to calendar_coverage is
+refused and bins=None is accepted silently. The behaviour is right and the sentence oversells
+it.
+MEASURED VALIDATION. tests/test_calendar_coverage.py: 21 passed. Full suite 1325 -> NNNN. Phase
+8 acceptance: NN passed, N failed, N skipped, after its registration check was changed from a
+count of nine to a subset of its own nine names -- a later tier must not fail an earlier phase's
+acceptance for having done its own work.

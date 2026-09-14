@@ -21,3 +21,4 @@ from . import summary_stats as _summary_stats  # noqa: F401
 from . import group_compare as _group_compare  # noqa: F401
 from . import pareto as _pareto  # noqa: F401
 from . import ranking_shift as _ranking_shift  # noqa: F401
+from . import calendar_coverage as _calendar_coverage  # noqa: F401

@@ -28,7 +28,7 @@ the workflow.
 
 Phase 8 adds one, and it is gated for the same reason run_analysis is:
 
-  compute_analysis      run one of the nine analyses over a dataset,
+  compute_analysis      run one of the ten analyses over a dataset,
                         under the contract in force, and write what it
                         found where it can be read back.
 
@@ -739,6 +739,7 @@ def compute_analysis(
     before_end: str | None = None,
     after_start: str | None = None,
     after_end: str | None = None,
+    grain: str | None = None,
     workspace_id: str | None = None,
 ) -> str:
     """Run one named analysis over a dataset, under the contract in force.
@@ -760,6 +761,11 @@ def compute_analysis(
       concentration   dimension, measure
       ranking_shift   dimension, measure, and four ISO dates:
                       before_start, before_end, after_start, after_end
+      calendar_coverage  grain: day, week, month, quarter or year.
+                      Defaults to month. Which periods hold rows and
+                      which hold none -- a period with no rows cannot
+                      appear in a GROUP BY, so a trend drawn over this
+                      column crosses absent periods without saying so.
 
     Only columns the contract declares can be named. A column that exists in
     the table but is not a declared dimension or measure is refused with the
@@ -779,7 +785,7 @@ def compute_analysis(
             rows=rows, columns=columns, limit=limit, n=n, bins=bins,
             threshold=threshold, before_start=before_start,
             before_end=before_end, after_start=after_start,
-            after_end=after_end,
+            after_end=after_end, grain=grain,
         )
     finally:
         con.close()
