@@ -3557,3 +3557,48 @@ MEASURED VALIDATION. tests/test_phase9.py: 10 passed, 0 failed, 1 skipped. The s
 correlated_shift. Full suite 1346 passed, unchanged by this file: pytest collects it and finds
 no test functions, exactly as it does test_phase8.py, which is why the acceptance tally and the
 suite count have never been the same number.
+
+## Phase 9, Step 3 - the Olist acceptance clause
+P9-D19. THE ACCEPTANCE COPIES THE TABLE IN, BECAUSE THE GATE DOES NOT KNOW ABOUT ATTACHED
+CATALOGS. Querying in place was the plan: attach READ_ONLY, bind a contract, analyse
+olist.public.orders without moving 99,441 rows. Measured: state._loadable_tables reads
+db.user_tables, which lists what the workspace owns, so an attached catalog is not a loaded
+dataset however cleanly it attaches, and all five clauses came back DATASET_NOT_LOADED. The
+contract confirmed without complaint; the gate refused. load_table copies the table instead,
+which is the path a person actually takes, so the acceptance proves what a person can actually
+do. 99,441 rows clears ROW_REFUSE, which is SIZE_GATES.excel_refuse_rows.
+P9-D20. THE CLAUSE SKIPS WITH A NAMED REASON RATHER THAN ERRORING WHEN THE DATABASE IS NOT
+THERE. load_table attaches the source itself and raises LoadRefused when Postgres is down, the
+alias is missing, or the table is too big to copy; mount() catches it and returns the first line
+as the skip reason. A test that reaches a live local database and errors everywhere else is
+worse than no test. This is what P9-O1 was asking for.
+P9-D21. THE SECOND HALF OF THE DONE-WHEN SKIPS EXPLICITLY. correlated_shift is Tier 5 and is not
+built. A script that asserts half a Done-When and says nothing about the other half reads as a
+Done-When met, which is the same failure P8-D74 was arranged against one phase earlier.
+C42. AN ATTACHMENT WAS TREATED AS A PROPERTY OF THE WORKSPACE. ATTACH binds a catalog to one
+DuckDB connection; it is not written into the workspace file and the next connection knows
+nothing about it. This file follows Phase 6's rule of one short-lived handle per call, so every
+helper touching the source has to attach on its own handle -- attach is idempotent for exactly
+that reason, and its docstring was read as "safe to call twice" rather than "expected every
+time". The probe that measured the catalog resolution could not have caught it: it did its
+attach and its information_schema lookup on one connection, so it measured the right fact in the
+wrong shape. A measurement that shares a connection says nothing about code that does not.
+P9-O1 IS CLOSED. tests/test_phase9.py, run as `uv run python tests/test_phase9.py`, copies
+public.orders from the olist source and asserts that calendar_coverage returns 2016-11 across a
+26-month calendar over 99,441 rows, that grain reaches the analysis through the registered MCP
+tool, and that a contract with no date_column refuses as ANALYSIS_NOT_POSSIBLE naming
+confirm_dataset_contract. The alias already existed in ~/.analytics-agent/sources.yaml; nothing
+had to be acquired. P8-D74's "no Olist data is on disk" was wrong when it was written.
+P9-O4 IS OPEN. compute_analysis cannot reach an attached source. server.py advertises querying
+olist.public.orders in place, and postgres.load_table's own refusal tells a caller whose table
+is too big to copy to "query it in place instead -- the table is already attached and needs no
+copy". Both are true of inspection: preview_table, describe_source and row_count reach an
+attached table. Neither is true of analysis, which goes through require_contract. So the advice
+given at the size gate leads to a path that cannot analyse. Widening _loadable_tables would
+close it and is not an acceptance script's decision: a READ_ONLY attached table could be
+analysed but never cleaned, so clean/ and validate/ would have to refuse it coherently, and
+locked decision 22 is the frame for that argument.
+MEASURED VALIDATION. tests/test_phase9.py: 10 passed, 0 failed, 1 skipped. The skip is
+correlated_shift. Full suite 1346 passed, unchanged by this file: pytest collects it and finds
+no test functions, exactly as it does test_phase8.py, which is why the acceptance tally and the
+suite count have never been the same number.
