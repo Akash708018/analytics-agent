@@ -32,45 +32,24 @@ from __future__ import annotations
 from typing import Any
 
 from ..util.sql_guard import quote_identifier
-from .base import LostRows, ParamsInvalid, number
+from .base import LostRows, number
 from .declared import column_types
 from .registry import Output, register
+from .temporal import (
+    DEFAULT_GRAIN,
+    calendar_for,
+    edges,
+    longest_run,
+    per_period_sql,
+    require_date_column,
+)
 
-__all__ = ["GRAINS", "calendar_coverage"]
-
-# date_trunc's name for the period, the step generate_series walks, and how the
-# period is labelled. P9-D4: date_trunc returns a TIMESTAMP whatever the source
-# column was, so a month printed raw reads as a day and every grain is labelled
-# rather than rendered. Quarter has no strftime code of its own (Step 1, F21).
-GRAINS: dict[str, tuple[str, str]] = {
-    "day": ("INTERVAL 1 DAY", "strftime({p}, '%Y-%m-%d')"),
-    "week": ("INTERVAL 1 WEEK", "strftime({p}, '%Y-%m-%d')"),
-    "month": ("INTERVAL 1 MONTH", "strftime({p}, '%Y-%m')"),
-    "quarter": ("INTERVAL 3 MONTH", "strftime({p}, '%Y-Q') || quarter({p})"),
-    "year": ("INTERVAL 1 YEAR", "strftime({p}, '%Y')"),
-}
-
-DEFAULT_GRAIN = "month"
+__all__ = ["calendar_coverage"]
 
 # How many absent periods are named before the list becomes a count. A reader
 # needs the names to go and look; a reader given 300 names has been given a
 # second table inside a sentence. The remainder is stated, never dropped.
 NAMED_MISSING = 12
-
-
-def _runs(flags: list[bool]) -> int:
-    """The longest unbroken run of True in order.
-
-    Six missing months in runs of three, two and one is a different story from
-    six scattered ones: a run is a feed that stopped, a scatter is a business
-    that was quiet. Computed from the rows already fetched rather than by a
-    second query, so there is no second answer to disagree with the first.
-    """
-    longest = current = 0
-    for flag in flags:
-        current = current + 1 if flag else 0
-        longest = max(longest, current)
-    return longest
 
 
 @register(
@@ -85,22 +64,10 @@ def calendar_coverage(con, gate, scope, grain: str = DEFAULT_GRAIN, **params) ->
         raise TypeError(
             f"calendar_coverage takes grain; got {', '.join(sorted(params))}."
         )
-    key = str(grain).strip().lower()
-    if key not in GRAINS:
-        raise ParamsInvalid(
-            f"grain must be one of {', '.join(sorted(GRAINS))}; got {grain!r}."
-        )
-    step, label_sql = GRAINS[key]
-
     contract = gate.contract
-    date_column = getattr(contract, "date_column", None)
-    if not date_column:
-        raise ValueError(
-            f"{contract.dataset_name} has no date_column, so there is no "
-            f"calendar to check. confirm_dataset_contract with date_column set "
-            f"is what fixes that -- and until it is set, no temporal analysis "
-            f"can say what period a row belongs to."
-        )
+    date_column = require_date_column(contract)
+    cal = calendar_for(gate, scope, date_column, grain)
+    key = cal.key
 
     table = quote_identifier(scope.dataset_name)
     col = quote_identifier(date_column)
@@ -111,46 +78,11 @@ def calendar_coverage(con, gate, scope, grain: str = DEFAULT_GRAIN, **params) ->
     tz_aware = "TIME ZONE" in dtype.upper()
 
     window = getattr(contract, "analysis_window", None)
-    if window is not None:
-        lo_sql = f"CAST(DATE '{window.start.isoformat()}' AS TIMESTAMP)"
-        hi_sql = f"CAST(DATE '{window.end.isoformat()}' AS TIMESTAMP)"
-        bounds_text = (
-            f"the declared analysis window, {window.start.isoformat()} to "
-            f"{window.end.isoformat()}"
-        )
-    else:
-        lo_sql = f"(SELECT min({col}) FROM {table} WHERE {scope.where})"
-        hi_sql = f"(SELECT max({col}) FROM {table} WHERE {scope.where})"
-        bounds_text = "the observed span of " + date_column
+    bounds_text = cal.bounds_text
 
-    # Nothing tz-aware is fetched into Python. DuckDB builds a TIMESTAMPTZ
-    # value with pytz, which is not a dependency of this project and is absent
-    # from a clean environment: a run that only fetched the bounds raised
-    # InvalidInputException naming the missing module, and it raised in the
-    # measurement, not in the analysis. So the bounds come back as text and
-    # every comparison between them is made in SQL, where the types already
-    # live. A date is not carried across a language boundary to be compared on
-    # the other side.
-    if window is not None:
-        tests = (
-            f", CAST(seen_lo AS DATE) > DATE '{window.start.isoformat()}'"
-            f", CAST(seen_hi AS DATE) < DATE '{window.end.isoformat()}'"
-            f", lo <> date_trunc('{key}', lo)"
-        )
-    else:
-        tests = ", false, false, false"
-    edges = con.execute(
-        f"WITH e AS (SELECT {lo_sql} AS lo, {hi_sql} AS hi, "
-        f"(SELECT min({col}) FROM {table} WHERE {scope.where}) AS seen_lo, "
-        f"(SELECT max({col}) FROM {table} WHERE {scope.where}) AS seen_hi, "
-        f"(SELECT count(*) FILTER (WHERE {col} IS NULL) FROM {table} "
-        f"WHERE {scope.where}) AS undated) "
-        f"SELECT CAST(lo AS VARCHAR), CAST(hi AS VARCHAR), "
-        f"CAST(seen_lo AS VARCHAR), CAST(seen_hi AS VARCHAR), undated"
-        f"{tests} FROM e"
-    ).fetchall()[0]
     (lo, hi, seen_lo, seen_hi, undated,
-     starts_late, ends_early, opens_mid_period) = edges
+     starts_late, ends_early, opens_mid_period) = edges(
+        con, cal, table, col, scope.where)
 
     headers = ["period", "rows"]
     summary = [scope.method_note(), *gate.caveats]
@@ -160,20 +92,15 @@ def calendar_coverage(con, gate, scope, grain: str = DEFAULT_GRAIN, **params) ->
             f"No row in scope has a {date_column}, so there is no calendar to "
             f"cover. {undated:,} analysed row(s) are undated."
             if undated
-            else f"No rows are in scope, so there is no calendar to cover."
+            else "No rows are in scope, so there is no calendar to cover."
         )
         return Output(headers=headers, rows=[], summary=summary,
                       label="calendar_coverage")
 
-    rows_sql = (
-        f"WITH b AS (SELECT date_trunc('{key}', {lo_sql}) AS lo, "
-        f"date_trunc('{key}', {hi_sql}) AS hi), "
-        f"s AS (SELECT x.g AS period FROM b, "
-        f"generate_series(b.lo, b.hi, {step}) x(g)), "
-        f"d AS (SELECT date_trunc('{key}', {col}) AS m, count(*) AS n "
-        f"FROM {table} WHERE {scope.where} AND {col} IS NOT NULL GROUP BY 1) "
-        f"SELECT {label_sql.format(p='s.period')}, coalesce(d.n, 0) "
-        f"FROM s LEFT JOIN d ON d.m = s.period ORDER BY s.period"
+    rows_sql = per_period_sql(
+        cal, table, col, scope.where,
+        inner=["count(*) AS n"],
+        outer=["coalesce(d.n, 0)"],
     )
     fetched = con.execute(rows_sql).fetchall()
 
@@ -188,7 +115,7 @@ def calendar_coverage(con, gate, scope, grain: str = DEFAULT_GRAIN, **params) ->
     rows: list[list[Any]] = [[r[0], number(r[1])] for r in fetched]
     present = sum(1 for r in fetched if r[1])
     missing = [r[0] for r in fetched if not r[1]]
-    longest = _runs([not r[1] for r in fetched])
+    longest = longest_run([not r[1] for r in fetched])
 
     summary.append(
         f"{len(fetched):,} {key}(s) between {fetched[0][0]} and "
@@ -248,8 +175,8 @@ def calendar_coverage(con, gate, scope, grain: str = DEFAULT_GRAIN, **params) ->
         summary.append(
             f"{date_column} is {dtype}, so its periods were cut at midnight in "
             f"{zone}. The same instant falls in a different {key} under a "
-            f"different session zone -- measured in Step 1, a value at "
-            f"2017-03-14 23:30 UTC lands on the 15th at Asia/Kolkata."
+            f"different session zone, so a period here is a period in that "
+            f"zone and not in any other."
         )
     return Output(headers=headers, rows=rows, summary=summary,
                   label="calendar_coverage")
