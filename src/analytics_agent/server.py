@@ -28,7 +28,7 @@ the workflow.
 
 Phase 8 adds one, and it is gated for the same reason run_analysis is:
 
-  compute_analysis      run one of the ten analyses over a dataset,
+  compute_analysis      run one of the twenty-one analyses over a dataset,
                         under the contract in force, and write what it
                         found where it can be read back.
 
@@ -729,6 +729,7 @@ def compute_analysis(
     column: str | None = None,
     dimension: str | None = None,
     measure: str | None = None,
+    against: str | None = None,
     rows: str | None = None,
     columns: str | None = None,
     limit: int | None = None,
@@ -739,6 +740,8 @@ def compute_analysis(
     before_end: str | None = None,
     after_start: str | None = None,
     after_end: str | None = None,
+    period: str | None = None,
+    baseline: str | None = None,
     grain: str | None = None,
     workspace_id: str | None = None,
 ) -> str:
@@ -761,6 +764,48 @@ def compute_analysis(
       concentration   dimension, measure
       ranking_shift   dimension, measure, and four ISO dates:
                       before_start, before_end, after_start, after_end
+      trend           measure, and grain as below. One measure per
+                      period, with the periods holding no rows blank
+                      rather than zero and the gaps named.
+      seasonality     measure, and grain as below except year. One
+                      measure folded onto the positions of its cycle,
+                      each position's mean over the periods that hold
+                      rows and the periods it lost counted beside it.
+      correlated_shift  measure, against and grain. Whether two
+                      measures change level at the same point in the
+                      calendar, with the rate at which unrelated
+                      series coincide by chance beside the verdict.
+      changepoint     measure and grain. Where the measure changes
+                      level across the calendar, with every
+                      admissible split reported and the splits a gap
+                      could explain excluded rather than caveated.
+      outlier_detection  measure. Unusual values by three methods at
+                      once -- Tukey's fence, the z-score and the
+                      median absolute deviation -- with their bounds
+                      and the masking that makes the z-score miss.
+      mix_shift       measure, dimension, period, baseline and grain.
+                      A change in the measure's per-row average split
+                      into rate, mix and the interaction between
+                      them, which is reported and not folded away.
+      driver_analysis  measure. Every declared dimension ranked by
+                      how much of that measure's variation it
+                      accounts for, against what a grouping of the
+                      same shape would account for by chance.
+      bivariate       measure, against and bins. How against behaves
+                      across the range of measure, binned by value
+                      rather than by row, with the turns counted.
+      correlation     measure and against, both declared measures.
+                      Pearson and Spearman over the rows holding
+                      both values, with the pair count and the gap
+                      between the two coefficients named.
+      growth_decomposition  measure, dimension, period, baseline and
+                      grain as below. The change in one measure
+                      between two periods, split across a dimension,
+                      with the contributions summing to the whole.
+      period_compare  measure, period, baseline, and grain as below.
+                      One measure in two named periods, with the
+                      difference between them and no change computed
+                      from a period that holds no rows.
       calendar_coverage  grain: day, week, month, quarter or year.
                       Defaults to month. Which periods hold rows and
                       which hold none -- a period with no rows cannot

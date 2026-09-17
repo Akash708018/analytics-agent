@@ -22,3 +22,14 @@ from . import group_compare as _group_compare  # noqa: F401
 from . import pareto as _pareto  # noqa: F401
 from . import ranking_shift as _ranking_shift  # noqa: F401
 from . import calendar_coverage as _calendar_coverage  # noqa: F401
+from . import trend as _trend  # noqa: F401
+from . import seasonality as _seasonality  # noqa: F401
+from . import period_compare as _period_compare  # noqa: F401
+from . import growth_decomposition as _growth_decomposition  # noqa: F401
+from . import correlation as _correlation  # noqa: F401
+from . import bivariate as _bivariate  # noqa: F401
+from . import driver_analysis as _driver_analysis  # noqa: F401
+from . import mix_shift as _mix_shift  # noqa: F401
+from . import outlier_detection as _outlier_detection  # noqa: F401
+from . import changepoint as _changepoint  # noqa: F401
+from . import correlated_shift as _correlated_shift  # noqa: F401

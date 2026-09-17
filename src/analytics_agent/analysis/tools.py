@@ -74,7 +74,7 @@ def compute_analysis(
     except ContractRefused as exc:
         return str(exc)
 
-    # The MCP wrapper declares every parameter any of the nine takes,
+    # The MCP wrapper declares every parameter any of the twenty-one takes,
     # because FastMCP builds the JSON schema from the signature and
     # **params exposes nothing -- the agent would see a tool it cannot pass
     # a column to. So it passes all of them and the ones nobody gave arrive

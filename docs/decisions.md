@@ -3508,7 +3508,7 @@ rather than ignored". True of a value: every analysis raises TypeError on an une
 Not true of None: tools.py strips None before dispatch, so bins=10 to calendar_coverage is
 refused and bins=None is accepted silently. The behaviour is right and the sentence oversells
 it.
-MEASURED VALIDATION. tests/test_calendar_coverage.py: 21 passed. Full suite 1325 -> NNNN. Phase
+MEASURED VALIDATION. tests/test_calendar_coverage.py: 21 passed. Full suite 1325 -> 1346. Phase
 8 acceptance: NN passed, N failed, N skipped, after its registration check was changed from a
 count of nine to a subset of its own nine names -- a later tier must not fail an earlier phase's
 acceptance for having done its own work.
@@ -3558,47 +3558,371 @@ correlated_shift. Full suite 1346 passed, unchanged by this file: pytest collect
 no test functions, exactly as it does test_phase8.py, which is why the acceptance tally and the
 suite count have never been the same number.
 
-## Phase 9, Step 3 - the Olist acceptance clause
-P9-D19. THE ACCEPTANCE COPIES THE TABLE IN, BECAUSE THE GATE DOES NOT KNOW ABOUT ATTACHED
-CATALOGS. Querying in place was the plan: attach READ_ONLY, bind a contract, analyse
-olist.public.orders without moving 99,441 rows. Measured: state._loadable_tables reads
-db.user_tables, which lists what the workspace owns, so an attached catalog is not a loaded
-dataset however cleanly it attaches, and all five clauses came back DATASET_NOT_LOADED. The
-contract confirmed without complaint; the gate refused. load_table copies the table instead,
-which is the path a person actually takes, so the acceptance proves what a person can actually
-do. 99,441 rows clears ROW_REFUSE, which is SIZE_GATES.excel_refuse_rows.
-P9-D20. THE CLAUSE SKIPS WITH A NAMED REASON RATHER THAN ERRORING WHEN THE DATABASE IS NOT
-THERE. load_table attaches the source itself and raises LoadRefused when Postgres is down, the
-alias is missing, or the table is too big to copy; mount() catches it and returns the first line
-as the skip reason. A test that reaches a live local database and errors everywhere else is
-worse than no test. This is what P9-O1 was asking for.
-P9-D21. THE SECOND HALF OF THE DONE-WHEN SKIPS EXPLICITLY. correlated_shift is Tier 5 and is not
-built. A script that asserts half a Done-When and says nothing about the other half reads as a
-Done-When met, which is the same failure P8-D74 was arranged against one phase earlier.
-C42. AN ATTACHMENT WAS TREATED AS A PROPERTY OF THE WORKSPACE. ATTACH binds a catalog to one
-DuckDB connection; it is not written into the workspace file and the next connection knows
-nothing about it. This file follows Phase 6's rule of one short-lived handle per call, so every
-helper touching the source has to attach on its own handle -- attach is idempotent for exactly
-that reason, and its docstring was read as "safe to call twice" rather than "expected every
-time". The probe that measured the catalog resolution could not have caught it: it did its
-attach and its information_schema lookup on one connection, so it measured the right fact in the
-wrong shape. A measurement that shares a connection says nothing about code that does not.
-P9-O1 IS CLOSED. tests/test_phase9.py, run as `uv run python tests/test_phase9.py`, copies
-public.orders from the olist source and asserts that calendar_coverage returns 2016-11 across a
-26-month calendar over 99,441 rows, that grain reaches the analysis through the registered MCP
-tool, and that a contract with no date_column refuses as ANALYSIS_NOT_POSSIBLE naming
-confirm_dataset_contract. The alias already existed in ~/.analytics-agent/sources.yaml; nothing
-had to be acquired. P8-D74's "no Olist data is on disk" was wrong when it was written.
-P9-O4 IS OPEN. compute_analysis cannot reach an attached source. server.py advertises querying
-olist.public.orders in place, and postgres.load_table's own refusal tells a caller whose table
-is too big to copy to "query it in place instead -- the table is already attached and needs no
-copy". Both are true of inspection: preview_table, describe_source and row_count reach an
-attached table. Neither is true of analysis, which goes through require_contract. So the advice
-given at the size gate leads to a path that cannot analyse. Widening _loadable_tables would
-close it and is not an acceptance script's decision: a READ_ONLY attached table could be
-analysed but never cleaned, so clean/ and validate/ would have to refuse it coherently, and
-locked decision 22 is the frame for that argument.
-MEASURED VALIDATION. tests/test_phase9.py: 10 passed, 0 failed, 1 skipped. The skip is
-correlated_shift. Full suite 1346 passed, unchanged by this file: pytest collects it and finds
-no test functions, exactly as it does test_phase8.py, which is why the acceptance tally and the
-suite count have never been the same number.
+## Phase 9, Step 4c - trend
+P9-D31. A TREND IS ONE MEASURE PER PERIOD AND NOTHING FITTED. The first and last periods holding
+rows and the difference between them, stated as two endpoints. No slope, no moving average, no
+percentage unless both ends are non-zero. A line fitted across the gap this analysis exists to
+report would be the gap warning's own counter-example, and the arithmetic of change belongs to
+growth_decomposition, which is where Step 4f put it.
+P9-D32. AN ABSENT PERIOD IS BLANK, NEVER ZERO. coalesce(count, 0) is right and coalesce(sum, 0)
+is a claim that the period happened and came to nothing, which is the one thing the data does
+not say. P9-D1 carried into the value column rather than only the count column: the calendar
+makes the absent period visible, and this decides what is written in it.
+P9-D33. A MEASURE DECLARING agg='none' IS REFUSED RATHER THAN AVERAGED. A unit price summed or
+averaged per month produces a number nothing downstream can detect as wrong, which is the reason
+Measure.agg has no default. The refusal names frequency as the analysis that does answer for a
+non-additive measure.
+P9-D34. A GAP IS A CAVEAT AND NEVER FATAL. The reader decides whether a window that is half empty
+is worth reading; the analysis names the gap, names the longest run, and leaves it there. Tier
+5's changepoint may want a different answer and can have one.
+C43. TWO EXPECTED VALUES WERE REASONED RATHER THAN MEASURED, AGAIN. base.number renders a DECIMAL
+sum to two places, so a monthly sum of 10.00 reads "10.00" and not "10"; both test expectations
+were written from the arithmetic rather than from a run. Caught by the tests before shipping.
+C41 one step on, and Step 4c's own note calls it the fifth instance of the habit this session --
+the fix that has actually held since is procedural, not resolve: values that will be asserted are
+produced by a run first and copied second.
+MEASURED VALIDATION. tests/test_trend.py: 15 passed. Full suite 1346 -> 1361. The 15 is not from
+a standalone run: the three Tier 3 test files together measured 53, calendar_coverage's 21 is
+recorded above and seasonality's 17 was measured alone, which leaves 15 and no room for it to be
+anything else.
+
+## Phase 9, Step 4d - seasonality
+P9-D22. avg() OVER A DECIMAL RETURNS DOUBLE WHERE sum() DOES NOT. Measured on DuckDB 1.5.5:
+typeof(avg(amount)) is DOUBLE and typeof(sum(amount)) is DECIMAL(38,2) on the same column. A
+per-position mean therefore does not carry the measure's storage type the way a per-period value
+does, and whatever renders it is rendering a float. The design had assumed the opposite and the
+measurement killed the rationale; the SQL fold survives on its other merit, which is that avg
+skipping NULLs is the absent period declining to be a zero with no Python deciding it.
+P9-D23. THE POSITION IS READ OFF THE PERIOD'S OWN LABEL. seasonality wraps per_period_sql whole
+as a subquery rather than rebuilding the calendar, so there is one place where a period's
+identity is decided and an absent period arrives already present as a NULL. Measured: a nested
+WITH inside a FROM (...) subquery is accepted by DuckDB 1.5.5.
+P9-D24. A YEAR IS REFUSED A CYCLE. Seasonality is variation that comes back, and this calendar
+has nothing above a year for a year to repeat inside. grain='year' raises ParamsInvalid naming
+trend as the analysis that does answer at that grain. Folding twelve years onto one position and
+calling the result a season is the failure this refusal exists against.
+C44. THE f PREFIX WAS CARRIED ONTO A SEGMENT HOLDING NO BRACE. ruff F541, in a summary line
+assembled by concatenation where the neighbouring segments were all interpolated. C36 ruled that
+the f prefix is decided per segment by whether that segment contains a brace, and C36's own
+remedy was not applied to the file that restated it. Found by running the linter, not by reading
+the file.
+P9-O5 IS OPEN. base.number() is handed a float here for the first time in this module family,
+by P9-D22, where trend hands it a DECIMAL and gets "10.00". A later real run proved it does not
+raise on a float, but no test in any Tier 3 file asserts how it renders one, so the decimal
+places in a mean column are unasserted. If analysis/stats.py already owns a mean renderer, that
+is the right home and seasonality should adopt it.
+MEASURED VALIDATION. tests/test_seasonality.py: 17 passed. Full suite 1361 -> 1378. Phase 9
+acceptance unchanged at 10 passed, 0 failed, 1 skipped; the skip is still correlated_shift.
+
+## Phase 9, Step 4e - period_compare
+P9-D25. BOTH PERIODS ARE NAMED AND NEITHER IS DEFAULTED. The latest period is the one most likely
+to be partial, so a "latest against previous" default reaches for exactly the wrong baseline and
+reports a fall that is three days of March against all of February. Phase 4's reported-never-
+proposed rule, applied to a comparison: the comparison is a decision and the caller makes it. The
+cost is a clunkier call and it is worth paying.
+P9-D26. A LABEL THE CALENDAR LACKS AND A LABEL THE TABLE LACKS ARE DIFFERENT ANSWERS. The first
+is ParamsInvalid naming the range and the vocabulary that does exist; the second is a row in the
+output holding no value, with no change taken from it. Only a generated calendar can tell them
+apart -- a GROUP BY has one response to both. P9-D12 used as a lookup rather than as a table.
+P9-D27. A PERIOD'S LENGTH IS A PROPERTY OF THE CALENDAR AND IS REPORTED WHEN THE AGGREGATE ADDS.
+Measured: date_diff('day', p, p + INTERVAL 1 MONTH) gives 28, 29 and 31 across months and 89, 90
+and 92 across quarters. A sum over February against a sum over March sets 28 days of data against
+31, a difference of 10.7% in length alone, before anything in the business moved. Step 8a's
+additive set decides who hears about it: a sum or a count is longer for being longer and a mean
+is not.
+C45. A STUB INVENTED AN AGG_SQL KEY AND A TEST PASSED AGAINST THE INVENTION. The test harness
+that runs a new analysis before it is pasted stubs declared.py, and its AGG_SQL was written from
+what the SQL function is called -- avg -- rather than from the repository, where the keys are
+count, count_distinct, max, mean, median, min and sum. So a fixture declared agg='avg', the
+harness reported 16 passed, and the first real run raised ValueError from the module's own
+refusal. The module was right and the test was wrong, which is the good version of this failure.
+The general form is worse than the instance: everything a stub supplies -- AGG_SQL's keys,
+number()'s rendering, scope_for's fields -- is unverified until a real run touches it, and a
+green harness says nothing about any of it. A second edit followed from the same root: the
+ADDITIVE comment read "sum and count do, the other three do not", where three was true of the
+stub's five keys and false of the real seven.
+P9-O6 IS OPEN. ADDITIVE = frozenset({"sum", "count"}) is restated in period_compare.py and again
+in growth_decomposition.py, where Step 8a already ruled it. Two copies of one ruling is how the
+two drift apart. If declared.py or stats.py exports that set, both should import it.
+P9-O7 IS OPEN. tools.py strips None before dispatch (P9-O3), so a call omitting a required
+parameter reaches the analysis with the argument genuinely missing and the module raises
+TypeError. Whether that surfaces as a refusal a caller can act on or as a traceback out of the
+MCP surface depends on an except clause below tools.py:119, which has not been read. trend and
+seasonality can raise TypeError too, but only on a parameter nobody should have passed;
+period_compare is the first analysis with a required parameter an agent can simply forget.
+MEASURED VALIDATION. tests/test_period_compare.py: 16 passed, after one failure. Full suite
+1378 -> 1394. Phase 9 acceptance unchanged at 10 passed, 0 failed, 1 skipped. The suite count
+doubles as the wiring check: test_declared.py's tier map names period_compare and compares itself
+against the registry, so a green suite proves the registration import took.
+
+## Phase 9, Step 4f - growth_decomposition
+P9-D28. ONLY AN ADDITIVE AGGREGATE CAN BE DECOMPOSED. sum and count split across a dimension's
+members because the members' values add back to the whole; mean, median, min, max and
+count_distinct do not. Per-member changes in an average do not sum to the change in the average,
+and a table of them would look exactly like one that did. P9-D27's set promoted from a caveat to
+a gate, because here the non-additive answer is not incomplete but wrong and undetectably so.
+The refusal names period_compare, which compares a mean between two periods without splitting it.
+P9-D29. AN ABSENT MEMBER IS A ZERO AND AN ABSENT PERIOD IS NOT. The calendar asserts that a
+period's time existed and the data does not cover it, which is why P9-D32 leaves the cell blank.
+Nothing asserts that a member existed: a member with no rows inside a period that does hold rows
+really did contribute nothing, and it has to be zero or the contributions do not sum. Those
+members are named as entrants and leavers so they cannot be read as ordinary movements.
+P9-D30. A VALUE THAT REACHES SQL IS BOUND, NOT INTERPOLATED. quote_identifier covers identifiers,
+and every earlier Tier 3 query passed only identifiers and dates DuckDB itself produced.
+growth_decomposition is the first to pass a caller's string into a query, and it binds it even
+though the membership check above already guarantees the string came out of DuckDB's strftime.
+C46. THE f PREFIX AGAIN, THREE TIMES, ONE STEP AFTER C44. Three consecutive segments of one
+summary line, none holding a brace, all carrying the prefix. Twice in three steps says the C36
+rule does not survive contact with a summary.append block whose neighbours are all interpolated:
+the prefix is coming from the shape of the surrounding code and not from the content of the line.
+What changed is the order of operations rather than the care -- the linter now runs before the
+digest is taken, so the published file is the fixed one and there is no patch step. A process fix
+is the only kind that has held.
+C47. THE SQL WAS SAFE BY EXECUTION ORDER BEFORE IT WAS SAFE BY DESIGN. The grouped query first
+interpolated both period labels and the no-member label straight into string literals. Nothing
+could exploit it, because the membership check above it guarantees those labels came out of
+DuckDB's own strftime -- but that is a property of where the check sits, not of the query, and an
+edit moving the check would remove the guarantee silently. Found by reading the SQL before
+digesting it, not by any test; the test that probes it was written after the fix, which is the
+wrong order.
+P9-O8 IS OPEN. A NULL in the decomposed dimension is labelled "(no <dimension>)" and named in the
+summary as a member rather than a gap. Whether Tier 2's group-wise analyses already have a label
+for the NULL group has not been checked; if they do, that one wins, because two labels for one
+thing is P9-O6 in a different column.
+P9-O9 IS OPEN. growth_decomposition validates its dimension against contract.dimensions in its
+own body rather than through a shared helper, because no require_dimension was known to exist
+alongside require_measure. If declared.py exports one, this should use it and inherit whatever
+refusal text the rest of the tool surface already gives.
+P9-O10 IS OPEN. Two files state how many analyses exist: server.py's module docstring and a
+comment at tools.py:77. They disagreed from Phase 9 Step 2 until Step 4e noticed, and Step 4f had
+to bump both again one step later. A count stated in two places is a count that will be wrong in
+one of them.
+MEASURED VALIDATION. tests/test_growth_decomposition.py: 17 passed, including the injection probe
+the pre-paste harness could only run separately. Full suite 1394 -> 1411, which also proves the
+wiring landed by way of test_declared.py's tier map. Phase 9 acceptance NOT YET RE-RUN at the
+time of writing; nothing in this step goes near Step 3's clauses, so it is expected to hold at 10
+passed, 0 failed, 1 skipped, and expected is not measured.
+
+## Phase 9, Step 5a - correlation
+P9-D38. A CONSTANT COLUMN IS UNDEFINED AND DUCKDB SAYS SO WITH nan, NOT NULL. Measured on DuckDB
+1.5.5: corr over a column taking one value returns nan, which is neither None nor equal to
+itself, and reaches a cell as the string "nan" unless converted back to an absence. Both
+coefficients are blank and the summary says why, because zero would claim the two columns do not
+move together when one of them does not move.
+P9-D39. n IS THE PAIRWISE-COMPLETE COUNT AND IS REPORTED BESIDE EVERY COEFFICIENT. corr drops a
+row missing either value without saying so. Measured: 7 rows, count(x)=6, count(y)=6,
+regr_count=5.
+P9-D40. BELOW THREE PAIRS NO COEFFICIENT IS REPORTED. Any two points lie on a line, so Pearson is
++/-1 by construction. The pair count is still reported and the cells are blank.
+P9-D41. agg IS NOT CONSULTED BY A CORRELATION. Tier 3 refuses agg='none' because a value per
+period would be invented; nothing is combined here, so the constraint does not transfer and
+inheriting it would refuse a legitimate question about a unit price. This ruling is reused by
+bivariate, driver_analysis and mix_shift.
+C48. THE ROW WAS BUILT BEFORE THE GUARD THAT BLANKS IT. Below three pairs the summary said no
+coefficient was reported while the cell read +1.000, because rows were assembled from the raw
+coefficients and the MIN_PAIRS check only appended prose afterwards. A cell contradicting the
+sentence under it is worse than either alone: a reader trusting the table gets a fabricated
+certainty and one trusting the prose learns the table lies.
+C49. AN ARTICLE CHOSEN BY SENTENCE RHYTHM. "an freight". The fix is to name columns without
+articles, which is also correct for a column called order_id. See C59.
+MEASURED VALIDATION. tests/test_correlation.py: 14 tests, corroborated by the 1440 measured at
+Step 5b (1411 + 14 + 15). Line counts and digests confirmed on the first paste: 202 and 172,
+63018e10 and db459935.
+
+## Phase 9, Step 5b - bivariate
+P9-D42. A BIN IS A RANGE OF VALUES, NOT A SLICE OF ROWS. Measured: ntile(4) over ten rows holding
+three distinct values puts x=1.0 in bin 1 and bin 2 and returns bins whose ranges overlap. Binning
+the distinct values and joining every row onto its own value's bin does not, at the cost of uneven
+row counts, which are reported because an uneven bin is a fact about the distribution.
+P9-D43. MORE BINS THAN DISTINCT VALUES YIELDS FEWER BINS, AND THE NUMBER PRODUCED IS REPORTED.
+Measured: ntile(9) over three distinct values gives three. Silence there is indistinguishable from
+six bins having been dropped by a filter.
+P9-D44. THE TURNS ARE COUNTED AND THE CURVE IS NEVER NAMED. Direction changes between consecutive
+bins are reported as a count. Calling it a U or a parabola is fitting a shape, and this analysis
+fits nothing -- the boundary trend drew when it refused a line. A test asserts those words absent.
+C50. THE HARNESS STUB PADDED EVERY FLOAT TO TWO PLACES AND base.number() DOES NOT. A bin bound of
+1.0 rendered "1.00" in the sandbox and "1.0" in the repo. Fourth step in which a stub was the
+thing that was wrong.
+C51. AN ASSERTION WRITTEN FROM INTENT RATHER THAN FROM OUTPUT. The test asserted the summary
+contains "not a defect in the binning"; the line reads "rather than a defect in the binning". I
+wrote the sentence, then wrote the assertion from what I meant it to say.
+MEASURED VALIDATION. tests/test_bivariate.py: 15 passed, after one failure that was C50. Full
+suite 1440 passed, printed. Suite before it, 1425, was never printed and is not claimed.
+
+## Phase 9, Step 5c - driver_analysis
+P9-D45. A SHARE OF VARIANCE IS RANKED AGAINST WHAT CHANCE WOULD GIVE. A grouping into g groups
+over n rows accounts for about (g-1)/(n-1) on structureless data. Measured: id scores 1.000
+against a baseline of 1.000 for an excess of exactly 0.000, region 0.995 against 0.375 for +0.620.
+Without the baseline the ranking ranks cardinality and the primary key wins every time.
+P9-D46. A NEGATIVE EXCESS IS REPORTED AS NEGATIVE. Measured: size scores 0.073 against 0.125.
+Clamping to zero would hide that grouping by it tells you less than nothing.
+P9-D47. A MEASURE THAT DOES NOT VARY HAS NO SHARES. Its total sum of squares is exactly 0.0, so
+every share divides by it. No rows and a sentence, not a zero -- the ruling P9-D38 made for nan.
+P9-D48. NOTHING IS CALLED A DRIVER. The tool carries the guide's name and the output says accounts
+for. The summary states on every run that the top dimension may be caused by the measure, may
+share a cause with it, or may be another name for it.
+C52. TWO ASSERTIONS THAT COULD NOT BOTH HOLD, AND THE PROSE SIDED WITH THE WRONG ONE. One test
+asserted the ranking is region, id, size; another asserted id ranks last. The module docstring
+said "last by excess". id ranks second: its excess is +0.000 and size's is -0.052. The correct
+numbers were printed by the measurement run before a line of the module existed -- "ranks last"
+was a story about what the baseline was for, written instead of read. It surfaced only because the
+two assertions contradicted each other; written alone, the wrong one would have shipped.
+MEASURED VALIDATION. tests/test_driver_analysis.py: 14 passed against the harness. Full suite
+1454 was not printed; it is corroborated by the 1469 measured at Step 5d (1469 - 15).
+
+## Phase 9, Step 5d - mix_shift
+P9-D49. A FLOATING-POINT DECOMPOSITION IS RECONCILED TO A TOLERANCE, NOT EXACTLY. Measured
+residual 7.11e-15 on ten rows. growth_decomposition reconciles in Decimal and demands equality; a
+weighted mean is DOUBLE the whole way down. The tolerance is scaled by the size of the change and
+named as a constant, because an absolute epsilon is wrong at both ends of the range.
+P9-D50. THE INTERACTION TERM IS REPORTED AND NEVER FOLDED. Folding it is what choosing the
+baseline or the period as the weighting base does silently, and the two choices disagree by
+exactly it.
+P9-D51. A GROUP IN ONLY ONE PERIOD HAS NO RATE AND NO MIX. No second mean to subtract and no share
+to reweight; imputing the overall mean for the missing side manufactures a rate effect out of an
+arrival. Its whole effect is a contribution, named as an entry or an exit.
+THIS DOES NOT BREAK P9-D29. That ruling says per-group changes in an average do not sum to the
+change in the average, which is true and is not what happens here. A per-row mean is a weighted
+sum, M = sum of w(g)*m(g), so this decomposes a weighted sum into its weights and its terms.
+Measured: every group's mean rises -- 100 to 110 and 10 to 12 -- while the overall mean falls from
+82.0 to 31.6. Rate totals +8.400 and mix totals -54.000.
+C53. P9-O5 DECLARED ANSWERED AFTER MEASURING A SINGLE CASE OF IT. Step 5b's document said
+base.number() "is no longer on that list" on the strength of one failure showing 1.0 rendering as
+"1.0". That value was a DECIMAL(2,1) literal, not the DOUBLE assumed. The rule is by type: a
+DECIMAL keeps its scale, a DOUBLE drops trailing zeros, an int is plain. Treating a measurement of
+one case as a measurement of the behaviour, which is the harness mistake one level up.
+C54. A TEST FOR AN EMPTY PERIOD AGAINST A CALENDAR THAT HAD NO EMPTY PERIOD. The fixture ran
+January to March with rows in all three and the test asked for 2017-04. What came back was the
+right refusal for the other reason -- P9-D27 distinguishes a label the calendar lacks from one the
+table lacks. First time a Tier 3 ruling caught a Tier 4 test, and it did so by naming the
+distinction it was drawing.
+MEASURED VALIDATION. tests/test_mix_shift.py: 15 passed, after one failure that was C53. Full
+suite 1468 passed and 1 failed, printed: the failure was tests/test_declared.py, whose tier map
+had no mix_shift because the step's wiring had not been run. Passing alone and failing in the
+suite is what that looks like -- the map is compared against catalogue(), and a test file
+importing its own module registers it without the __init__ edit. After the wiring, 1469.
+
+## Phase 9, Step 6a - outlier_detection
+P9-D52. THREE METHODS, ALWAYS, WITH THEIR BOUNDS. Tukey's fence, the z-score and the median
+absolute deviation return different rows rather than different opinions about the same rows, so
+choosing one upstream answers a question the reader did not ask. The agreement is counted at every
+level, because the interesting case on the fixture is the one flagged by two of three.
+P9-D53. THE Z-SCORE MASKS, AND THE MASKING IS NAMED. Measured: ten values from 1 to 10 plus 1000
+and 1010 give a standard deviation of 389.07, so three deviations reach past 1339 and the z-score
+flags nothing while the other two flag both extremes. Two outliers are enough. Whenever it flags
+fewer than the quantile-based methods, the summary says why.
+P9-D54. A MAD OF EXACTLY 0.0 IS NO SCALE. More than half the values on the median leaves the
+robust method without one. Reported as no bounds, not bounds of zero width, which would flag every
+value differing from the median at all.
+P9-D55. A BOUND IS RENDERED AT THE MODULE'S PRECISION, NOT THE COLUMN'S. Measured: quantile_cont
+over DECIMAL(5,1) gives 3.7 where the identical values as DOUBLE give 3.75, so the fence already
+moves with the storage type. Letting the rendering move too puts two kinds of drift in one cell.
+C55. THE AGREEMENT SUMMARY REPORTED THE TWO ENDS AND HID THE MIDDLE. It said how many values every
+method flags and how many exactly one flags. On the fixture both are 0 and the real answer -- both
+extremes flagged by two of three -- appeared nowhere, while two flagged rows sat in the table
+above. Found only because an unrelated assertion failed and the whole summary was printed to take
+the expected string from. Written correctly the first time, the defect would have shipped behind a
+green test, which is an argument for reading output when tests pass and not only when they fail.
+C56. TUKEY BOUNDS TAKEN FROM A MEASUREMENT UNDER THE WRONG TYPE. -4.5 and 17.5 came from a run
+where the values were DOUBLE; the fixture stores them as DECIMAL(5,1), where the fence is -4.55
+and 17.45. Same shape as C53 one step later. The fix removed the dependency rather than correcting
+the number: P9-D55.
+MEASURED VALIDATION. tests/test_outlier_detection.py: 13 passed. Full suite 1482 passed, printed,
+which is 1469 + 13 and confirms both this step's wiring and Step 5d's.
+
+## Phase 9, Step 6b - changepoint
+P9-D56. A GAP IS FATAL TO A SPLIT BESIDE IT. Step 4c ruled that a gap is a caveat and never fatal
+and named this analysis as the one that may need otherwise. It does: a level shift across an
+absent period is a description of the absence. A split flanked by a period holding no rows is
+excluded, the exclusions are named, and a series where every candidate is excluded returns no
+changepoint. The summary quotes the ruling it departs from rather than departing silently.
+P9-D57. EVERY ADMISSIBLE SPLIT IS REPORTED. Any series has a best one; reporting only the winner
+converts arithmetic into a finding.
+P9-D58. A BREAK IS MEASURED AGAINST WITHIN-SEGMENT SPREAD, NOT AGAINST THE RUNNER-UP. Measured: a
+clean step of +40 has its runner-up at +34.29, a margin of 14%, because adjacent splits share all
+but one period and are correlated by construction. The within-segment comparison gives 44.7 times
+for a noisy break and 0.4 for a series with none.
+P9-D59. NO SIGNIFICANCE IS CLAIMED. No test and no p-value; a test needs distributional
+assumptions the contract does not state, and scipy is a Phase 10 dependency.
+C57. THE DISCRIMINATOR WAS BUILT OUT OF THE WRONG COMPARISON. The first draft judged the best
+split by its distance from the runner-up, which sounds right and is wrong for a reason visible in
+one run. The measurement said "does not stand clear" about a perfect step function with no noise
+in it -- obviously wrong rather than subtly wrong, which is the only reason it was noticed instead
+of shipping as a plausible rule.
+C58. F541, THIRD OCCURRENCE, FIVE INSTANCES. C44 and C47 recorded the same. Every one caught by
+ruff running before the digest, so none has reached a paste -- but three occurrences means the
+linter is load-bearing rather than a backstop, and the ordering fixed the outcome and not the
+habit.
+MEASURED VALIDATION. tests/test_changepoint.py: 14 passed. Full suite 1496 was not printed; it is
+corroborated by the 1510 measured at Step 6c (1510 - 14).
+
+## Phase 9, Step 6c - correlated_shift
+P9-D60. THE RATE AT WHICH UNRELATED SERIES COINCIDE IS REPORTED BESIDE THE VERDICT. Measured: 7
+admissible splits and a tolerance window of 3 gives 43% on a twelve-month fixture, and 20 splits
+gives 15% on Olist's twenty-six. A coincidence is evidence only to the extent it is unlikely, and
+the denominator is not the reader's to guess.
+P9-D61. THE TOLERANCE IS A CONSTANT, NOT A PARAMETER. A tolerance the caller can raise is one that
+gets raised until something coincides. Fixing it keeps the chance rate a property of the calendar
+rather than of a choice made after seeing the data.
+P9-D62. A GAP COSTS TWICE. Measured: dropping one month of twelve takes admissible splits from 7
+to 5 and the chance rate from 43% to 60%. An absent period blocks splits beside it and cheapens
+whatever coincidence survives; both effects are reported.
+P9-D63. NOTHING IS SAID TO HAVE MOVED ANYTHING. The summary names the explanation it cannot rule
+out -- a third thing moving both series -- on every run, as driver_analysis does.
+C59. "an volume" -- C49 REGRESSED. The Step 5a entry said to name columns without articles,
+because an article chosen by sentence rhythm is wrong the moment the column is called order_id.
+Ten steps later the same construction went into a fresh summary line. This is different from the
+F541 repeats: those recur because ruff catches them and I have leaned on that, and this recurred
+with nothing watching. A correction that lives only in a step document protects nothing -- there
+is no lint rule for articles and no test asserts English.
+MEASURED VALIDATION. tests/test_correlated_shift.py: 14 passed, printed. Full suite 1510 passed,
+printed. tests/test_phase9.py unchanged at 10 passed, 0 failed, 1 skipped: the skip did not flip,
+and its stated reason -- Tier 5 is not built -- had become false, because the clause was an
+unconditional skip() with no condition to flip.
+
+## Phase 9, Step 7 - the Done-When
+P9-D64. THE ACCEPTANCE SHIFT IS INJECTED INTO THE REAL CALENDAR. Two synthetic measures are added
+to the copied orders table rather than a synthetic table being built, so the gap at 2016-11 and
+the twenty-six month span are the ones clause one already measured. confirm_contract gains an
+optional extra-measures argument; the dataset name stays TABLE.
+P9-D65. THE INJECTED MEASURES DECLARE mean. A per-period sum is value times row count and Olist's
+monthly volume climbs steeply enough to swamp a step of 10 to 50, so a summed series tracks orders
+per month and the clause would pass or fail for a reason unrelated to what it tests.
+P9-D66. THE CLAUSE HAS A NEGATIVE CONTROL. Measured: unrelated series coincide 15% of the time on
+this calendar, so a clause asserting only that a coincidence was reported passes about one time in
+seven. The control moves one series' step six months and asserts it is not reported as coincident.
+THE SPLIT IS REPORTED AFTER THE PERIOD BEFORE THE STEP. Measured: a step beginning 2017-10 is
+reported as breaking after 2017-09, because "breaks after X" names the last period before the
+change. An assertion written for the injection month fails, which is why SPLIT_AFTER exists beside
+INJECTED_AT.
+C60. A COUNT ESTIMATED WHERE IT COULD HAVE BEEN COUNTED. The step document predicted 15 passed;
+the run printed 16. Ten existing plus six checks in clause four, not five -- a clause written in
+that same document and quoted in full sixty lines above the prediction. Nothing turned on it, and
+the number was available by counting.
+P9-D35, P9-D36 AND P9-D37 ARE NOT ASSIGNED. Steps 5a to 6b were numbered from a draft ledger block
+that was discarded before it was ever appended, when the real one turned up. The numbers are left
+unused rather than reclaimed, because five shipped modules cite the range above them --
+correlation.py P9-D38 to D40, bivariate.py D42 and D43, driver_analysis.py D45 to D47,
+mix_shift.py D49, outlier_detection.py D52 to D55. The same choice the Step 4c entry made when it
+numbered its own rulings D31 to D34 out of sequence: consistency with shipped code beats
+consistency with the counter.
+P9-O10 IS OPEN. Two places state how many analyses exist -- server.py's module docstring and
+tools.py:77 -- and both are edited every step. They were already out of step once, tools.py
+reading "nine" through three increments. Deriving the count from the registry is a small change
+that gets slightly larger each step.
+P9-O11 IS OPEN. test_declared.py's tier check iterates catalogue() and not the map, so it catches
+an analysis with no map entry -- which is how Step 5d's unrun wiring was found -- but cannot catch
+a map entry whose analysis was never registered. Had that wiring half-applied, the map would have
+gained mix_shift and nothing would have noticed the missing registration.
+P9-O12 IS OPEN. correlated_shift imports _within and MIN_SEGMENT from changepoint. A private name
+crossing module boundaries is not lovely; the alternative is a second copy of a statistic, which
+P9-O6 already records as how two copies drift apart.
+MEASURED VALIDATION. tests/test_phase9.py: 16 passed, 0 failed, 0 skipped, printed. Clause four's
+six checks: correlated_shift runs on Olist over 99,441 rows; both series break in the same place;
+the break is found after 2017-09 where it was injected; the coincidence rate is reported; 2016-11
+narrows the comparison; and a shift six months away is not reported as coincident. The closing
+line "A skip is an outstanding clause, not a passing one" prints only if SKIPPED and is no longer
+printing. PHASE 9 IS CLOSED: twelve analyses across Tiers 3 to 5, full suite 1510 passed.
+Three risks named in the step document as unverified, all of which came good: store.confirm
+accepted two further confirmations, Binding.from_pairs absorbed the two added columns rather than
+reading them as drift, and the contract model accepts agg="mean".

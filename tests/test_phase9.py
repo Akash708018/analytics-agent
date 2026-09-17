@@ -7,9 +7,11 @@ Asserts the first half of the Done-When from the build guide:
     calendar_coverage finds the missing month in the Olist window
 
 The second half -- correlated_shift firing on an injected synthetic shift --
-is Tier 5 and is not built. It SKIPs here rather than being left unmentioned,
-because a Done-When half-asserted by a script that says nothing about the other
-half reads as a Done-When met.
+is clause four. Two synthetic measures are added to the copied table, each
+stepping at the same month, and the clause asserts the shift is found where it
+was put. Then one of them is moved six months and the clause asserts it is not
+found, because a coincidence reported on this calendar 15% of the time by
+arithmetic is not evidence of anything on its own.
 
 **This clause copies the table in, and the reason is a finding.** Querying
 Olist in place was the plan: attach READ_ONLY, bind a contract, analyse
@@ -97,7 +99,8 @@ def heading(text: str) -> None:
     print("-" * len(text))
 
 
-def confirm_contract(date_column: str | None) -> object:
+def confirm_contract(date_column: str | None,
+                     extra: list | None = None) -> object:
     """A real contract on the copied table, confirmed through the store.
 
     `date_column=None` is legal and is how the refusal is provoked: the model
@@ -122,6 +125,7 @@ def confirm_contract(date_column: str | None) -> object:
             measures=[
                 Measure(name="order_id", agg="count",
                         definition="orders placed"),
+                *(extra or []),
             ],
             dimensions=["order_status"],
             bound_to=Binding.from_pairs(pairs, rows),
@@ -247,20 +251,101 @@ def clause_three() -> None:
 # --------------------------------------------------------------------------
 
 
+# --------------------------------------------------------------------------
+# Clause 4: the injected shift, and a shift that is not there
+# --------------------------------------------------------------------------
+
+# The month the synthetic step begins, and the month the split is reported
+# after. They differ by one on purpose: "breaks after X" names the last period
+# before the change, so a step beginning in October is reported after
+# September. Measured, not assumed.
+INJECTED_AT = "2017-10"
+SPLIT_AFTER = "2017-09"
+DECOY_AT = "2018-04"
+
+
+def _inject(cut_b: str) -> None:
+    """Two synthetic measures on Olist's own calendar, each stepping once.
+
+    agg="mean" on the contract side is what makes this work: a per-period sum
+    is value times row count, and Olist's monthly volume climbs steeply enough
+    to swamp the step. A mean reads exactly 10.0 or 50.0 in every month.
+    """
+    con = db.connect(WORKSPACE)
+    try:
+        for name in ("shift_a", "shift_b"):
+            con.execute(
+                f'ALTER TABLE "{TABLE}" ADD COLUMN IF NOT EXISTS {name} DOUBLE'
+            )
+        dated = f'"{DATE_COLUMN}"'
+        month = "strftime(date_trunc('month', " + dated + "), '%Y-%m')"
+        con.execute(
+            f'UPDATE "{TABLE}" SET shift_a = '
+            f"CASE WHEN {month} < ? THEN 10.0 ELSE 50.0 END", [INJECTED_AT])
+        con.execute(
+            f'UPDATE "{TABLE}" SET shift_b = '
+            f"CASE WHEN {month} < ? THEN 100.0 ELSE 20.0 END", [cut_b])
+    finally:
+        con.close()
+
+
+def clause_four() -> None:
+    heading("Clause 4: correlated_shift finds a shift that was put there")
+
+    extra = [
+        Measure(name="shift_a", agg="mean",
+                definition=f"a synthetic level, stepped at {INJECTED_AT}"),
+        Measure(name="shift_b", agg="mean",
+                definition=f"a second synthetic level, stepped at {INJECTED_AT}"),
+    ]
+
+    _inject(INJECTED_AT)
+    confirm_contract(DATE_COLUMN, extra)
+    text = run("correlated_shift", measure="shift_a", against="shift_b",
+               grain="month")
+
+    if reason_of(text) is not None:
+        check("correlated_shift runs on Olist", False,
+              text.splitlines()[0][:90])
+        return
+    check("correlated_shift runs on Olist", True, f"{ROWS:,} rows")
+
+    check("both series break in the same place",
+          "Both break in the same place" in text,
+          "" if "Both break" in text else text[:140])
+    check(f"the break is found where it was injected, after {SPLIT_AFTER}",
+          f"shift_a after {SPLIT_AFTER}" in text
+          and f"shift_b after {SPLIT_AFTER}" in text,
+          "" if f"shift_a after {SPLIT_AFTER}" in text else text[:140])
+    check("the rate at which unrelated series coincide is reported",
+          "% of the time" in text)
+    check(f"{MISSING} narrows the comparison rather than being ignored",
+          MISSING in text and "admissible count" in text)
+
+    # The control. Without it this clause passes on unrelated series about one
+    # time in seven, which is not a Done-When, it is a coin.
+    _inject(DECOY_AT)
+    confirm_contract(DATE_COLUMN, extra)
+    decoy = run("correlated_shift", measure="shift_a", against="shift_b",
+                grain="month")
+    check("a shift that is not there is not reported",
+          "They do not break in the same place" in decoy,
+          "" if "do not break" in decoy else decoy[:140])
+
+
 def main() -> int:
-    print("Phase 9 acceptance: Tier 3 on a real warehouse table")
+    print("Phase 9 acceptance: Tiers 3 to 5 on a real warehouse table")
 
     workspace.reset(WORKSPACE)
     try:
         why = mount()
         if why:
-            skip("all three clauses", why)
+            skip("all four clauses", why)
         else:
             clause_one()
             clause_two()
             clause_three()
-        skip("correlated_shift on an injected shift",
-             "Tier 5 is not built; the second half of the Done-When is Step 8")
+            clause_four()
     finally:
         workspace.reset(WORKSPACE)
 
