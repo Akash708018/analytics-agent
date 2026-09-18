@@ -196,6 +196,7 @@ def test_every_registered_analysis_sits_in_its_build_guide_tier():
         "mix_shift": 4,
         "outlier_detection": 5, "changepoint": 5,
         "correlated_shift": 5,
+        "hypothesis_test": 6,
     }
     entries = catalogue()
     for name, tier, summary in entries:

@@ -3926,3 +3926,290 @@ printing. PHASE 9 IS CLOSED: twelve analyses across Tiers 3 to 5, full suite 151
 Three risks named in the step document as unverified, all of which came good: store.confirm
 accepted two further confirmations, Binding.from_pairs absorbed the two added columns rather than
 reading them as drift, and the contract model accepts agg="mean".
+
+## Phase 10, Step 1 - the ground facts (inferential)
+P10-D1. THE DEFAULT ttest_ind IS STUDENT, AND ON A REAL SHAPE IT DISAGREES WITH WELCH ACROSS
+THE THRESHOLD. Measured on scipy 1.18.1: n=10 against n=40 with unequal spread, default p
+0.30112502826885873, byte-identical to equal_var=True; Welch 0.045678741450132024. One dataset,
+two tests, "not significant" and "significant". The test's name and its variant are part of the
+result, not decoration on the method note.
+P10-D2. df IS REPORTED AND IT IS FRACTIONAL. Measured: 42.5604830399426, from scipy's result
+object and from the Welch-Satterthwaite formula written out in the facts file, identical to
+printed precision. scipy 1.18.1 carries .df on the result, so the engine reports df whether it
+computed from sequences or from group statistics.
+P10-D3. THE PARAMETRIC PATH NEVER LEAVES SQL. Measured through DuckDB: count, avg and stddev per
+group, six numbers into ttest_ind_from_stats, p 0.045678741450131885 against 0.045678741450132024
+from the sequences -- 1.39e-16 apart, and that with DuckDB's group mean arriving as
+9.999999999999998 rather than 10. The 22 analysis modules read this way already: 58 fetchall
+calls, no column ever materialised into Python.
+P10-D4. DuckDB's stddev IS THE SAMPLE FORM. Measured: stddev and stddev_samp both
+2.138089935299395, stddev_pop 2.0, statistics.stdev 2.138089935299395. analysis/stats.py already
+selects stddev(col) for its seven cells, so the number a summary prints is the number from_stats
+wants and no second spelling is needed. Had it been the population form, every from-stats test
+would have been wrong by sqrt((n-1)/n) -- 3% at n=20 -- and nothing would have raised.
+P10-D5. A NULL IS LOUD AND A NAN IS SILENT, AND ONLY ONE OF THEM IS THE DANGER. Measured:
+fetchall returns [1.0, None, 3.0] and scipy raises TypeError, unsupported operand type(s) for +:
+'float' and 'NoneType'. A NULL reaching a test crashes. A nan does not -- nan_policy defaults to
+propagate, one nan in a hundred returns nan for statistic and p-value with no warning, and
+base.number renders that nan into a cell as the text 'nan' (P8-D1 anticipated it). LostRows
+cannot catch that: the row count is right and the number is not. So nulls are dropped in SQL for
+the row accounting, and nan is screened separately, because the crash is the safe case.
+P10-D6. THE DROPPED COUNT IS A CELL THAT ADDS BACK. Fourteen modules end by comparing their
+output against scope.analysed and raising LostRows when it does not add; Scope.__post_init__
+enforces the same arithmetic one level up. A test that drops nulls has fewer rows than its scope
+by construction, so what it dropped is reported the way no_date is, not left as a discrepancy.
+P10-D7. nan_policy='omit' IS NEVER USED. Measured: it answers, p 6.956525525151315e-111, having
+used 99 of the 100 values it was passed, and reports neither the difference nor the n behind it.
+P10-D8. PAIRING COMES FROM THE CONTRACT'S GRAIN, NEVER FROM THE SHAPES. Measured on one pair of
+columns: paired 2.4837047041582025e-10, independent 0.46850450414327655. Neither is an error, and
+the wrong one is a silent wrong answer.
+P10-D9. YATES IS APPLIED BY DEFAULT ON A 2x2 AND IS STATED. Measured: 0.019041093611085063 with
+the correction, 0.009180710329776822 without. It doubles the p-value and moves it across 0.01.
+P10-D10. EXPECTED-COUNT SCREENING IS OURS. Measured: every expected count 2.5 and
+chi2_contingency returned p 0.2059032107320647 without comment. A zero margin it does refuse,
+with ValueError, so that one is translated rather than screened for.
+P10-D11. THE RANK TEST'S METHOD IS PART OF ITS NAME. Measured on the same five-against-five
+sample: exact 0.6904761904761905, asymptotic 0.6761033140231469.
+P10-D12. MANN-WHITNEY IS NOT A TEST OF MEDIANS AND THE INTERPRETATION LINE DOES NOT SAY IT IS.
+Measured: medians identical at 9.0, p 0.010202431360127625. It tests whether one draw tends to
+exceed the other, and "the median differs" is a different claim that happens to be false here.
+P10-D13. A p-VALUE PRINTS AGAINST A FLOOR. Measured: t -386.7177257388124 and p exactly 0.0. A
+cell reading p = 0 claims a certainty no test delivers.
+P10-D14. THE ASSUMPTION LINE IS SKEW, KURTOSIS AND n, NOT A NORMALITY VERDICT. Measured on one
+lognormal shape, sigma 0.25: shapiro 0.4452161863401883 at n=50 and 1.8946526894357568e-20 at
+n=2000, skew 0.79226039768134. Same distribution, opposite verdicts, and the variable is n. Above
+5000 scipy warns that its own p-value is not accurate.
+P10-D15. THE WALD INTERVAL IS NEVER THE DEFAULT HERE. Measured: proportion_confint(0, 50) returns
+(0.0, 0.0) -- an interval asserting the rate is certainly zero, from fifty observations -- against
+Wilson's (0.0, 0.07134759913335874).
+P10-D16. THE INTERVAL AROUND A MEAN IS THE t FORM. Measured: t-width over z-width
+1.1541830261381394 at n=10, 1.0012130205514738 at n=1000. It matters at the sizes a group
+breakdown produces and costs nothing at the sizes it does not.
+P10-D17. EFFECT SIZE IS HEDGES' g, ALWAYS. Measured: J 0.9577464788732395 at n=10 per group,
+0.9962073324905183 at n=100. At zero variance d is undefined and is refused there, not returned
+as inf.
+P10-D18. sample_adequacy REPORTS THE DETECTABLE EFFECT, NOT OBSERVED POWER. Measured at n=30 per
+group: as d runs 0.1 to 0.8 the p-value falls 0.699953 to 0.002999 and post-hoc power rises
+0.066783 to 0.861423, monotone against each other. Power computed from the observed effect
+restates the p-value and adds nothing. The useful number runs the other way: 63.765610588911635
+per group for d=0.5 at 80% power, reported as 64, because a fractional row count is not a
+recommendation.
+P10-D19. COHORTS KEY ON THE PERSON, AND WHICH COLUMN THAT IS IS MEASURED RATHER THAN READ OFF THE
+NAME. Measured on Olist: 99,441 orders, 99,441 distinct customer_id, 96,096 distinct
+customer_unique_id. A table called customers holding one row per order is an order-to-person
+mapping. Keyed on customer_id the repeat rate is 0.000% across 99,441 entities; keyed on
+customer_unique_id it is 3.119%, 2,997 repeaters of 96,096, with 348 of them ordering three times
+or more.
+P10-D20. A KEY THAT IS DISTINCT PER FACT ROW IS REFUSED BY NAME. The guide's rule is that
+cohort_retention redirects to repeat_behaviour below 5% repeat. 0.000% is below 5%, so the
+redirect fires identically whether the analyst keyed on the person or on the order: a wrong key
+returns a clean grid of zeros with a recommendation printed beneath it, indistinguishable from a
+correct finding about a low-repeat business. The redirect is therefore not the guard.
+count(DISTINCT key) = count(*) is one query and it is asked first.
+P10-D21. TIER 7 EXERCISES THE COLUMN PAGING PATH BY CONSTRUCTION. PREVIEW_COLS is 12 and MAX_COLS
+is 50; a cohort grid over Olist's 26-month span is 26 columns. P8's column-paging clause skips
+because no fixture pairing exceeds 7 -- region 4, product 5, channel 3 -- and Tier 7 needs no
+fixture built wide.
+P10-D22. NUMPY AND PANDAS STAY OUT OF src/ AND tests/. Measured 18/09/2026: both arrived as
+transitive dependencies of statsmodels, neither is imported anywhere in the repository, and
+pyproject declares eight dependencies of which uv add wrote two. A transitive dependency is not a
+licence to import it -- a statsmodels release that drops one would take the engine with it. The
+facts file is written against Python lists throughout.
+
+MEASURED VALIDATION. tests/test_stats_facts.py, 425 lines, sha256
+448e7410a9d985dfaa0bd52012de349e26fe22f5d823b368dcd32e5ea62a3e78, 25 tests, 31 functions, no
+duplicate names. Full suite 1510 -> 1535 in 29.18s. The post-install suite was not run separately
+before the file was written; 1535 = 1510 + 25 exactly, so none of the 1510 broke under numpy
+2.5.3 and pandas 3.0.5. Versions: Python 3.12.14, scipy 1.18.1, statsmodels 0.15.0, DuckDB 1.5.5
+unmoved from Phase 9.
+
+P10-O1 IS OPEN. Rank-based tests are the first thing in this codebase that would materialise a
+column. mannwhitneyu wants raw values; 99,441 Olist rows into Python would break a convention 22
+modules keep. The arithmetic alternative exists -- DuckDB has rank(), U is R1 - n1(n1+1)/2 from
+the rank sum, and the tie correction needs only tie-group sizes -- and so does a declared row
+budget with an explicit refusal above it. Not decided.
+P10-O2 IS OPEN. A DuckDB DOUBLE can hold NaN, so a measure column can carry one before any test
+runs. P10-D5 measured what happens next and nothing here screens for it at the source.
+P10-O3 IS OPEN. tests/test_phase8.py skips its Olist clause citing data that is present: local
+Postgres holds nine tables and 99,441 orders, confirmed three times this step. The fix is the
+skip condition, not the string -- the path tests/test_phase9.py uses is in the repo and works.
+
+C61. A CHECK WAS WRITTEN AGAINST A PROPERTY BOTH OUTCOMES PRESERVE. git diff --stat on a one-row
+table edit reads 1 insertion(+), 1 deletion(-) whether the row carries the old note or the new
+one, so the verification offered for the Phase 9 ledger row could not distinguish applied from
+unapplied and was offered as if it could. C36's shape: a check on a property that survives the
+failure rather than a read of the artifact. grep of the row settled it in one line.
+C62. C61 WAS RESTATED ONE REPLY AFTER IT WAS WRITTEN. The follow-up check was correctly scoped in
+the step document -- whether the table still parses as a table -- and described in the
+accompanying message as the check the failed one should have been. It is not; a pipe count cannot
+distinguish application either. C59's pattern at one reply's distance instead of ten steps, and
+for the same reason: a correction recorded in prose has nothing evaluating it.
+C63. EVIDENCE WAS TRUNCATED BY A DISPLAY CAP AND THE ABSENCE READ AS A RESULT. head -30 on a grep
+asked to prove a module does not use a call means no match in the first thirty lines, not no
+match. Written for readability, then read as exhaustive. C39's shape. The uncapped rerun found 58
+calls across 22 modules and answered the question the capped one could not.
+C64. THE FACTS FILE WAS WRITTEN IN THE IDIOM OF THE LIBRARY UNDER TEST, NOT THE CALLER'S. Every
+input was a numpy array -- np.linspace, np.std(ddof=1), np.median -- because that is how scipy
+examples read, not because anything measured said the engine hands scipy an array. It hands over
+fetchall tuples, and import numpy appears nowhere in the repository. The file would have imported
+a transitive dependency to measure a convention this codebase does not use, and P10-D22 was
+drafted three paragraphs above the import that breaks it. C37's shape. Rewritten against Python
+lists; the rewrite is what found P10-D5, because numpy coerces None where Python raises.
+C65. A TOOL WAS PRESCRIBED BECAUSE THE GENRE USES IT, NOT BECAUSE THE PROJECT DOES. The step
+document called uv run ruff check; ruff is in no dependency group, no lockfile and no guide, and
+no test enforces a style rule -- the only declared dev dependency is pytest. The prescription was
+justified by citing C36 and C37, which are conventions measured by reading the repository rather
+than enforced by a tool. C64's direction, one command later. Replaced by py_compile and an AST
+pass for duplicate test names, which is the failure that would have cost real coverage.
+
+## Phase 10, Step 2 - the selector's ground facts
+
+P10-D23. RANK TESTS COMPUTE IN SQL. P10-O1 IS CLOSED. Measured: midrank sums from a single
+windowed query, rank() + (tie - 1) / 2.0 beside count(*) OVER (PARTITION BY x), give U 21.0 on an
+untied pair and 4000.0 on a tied one, identical to mannwhitneyu in both. The two-sided normal
+approximation with the tie correction gives 0.7014781088666139 and 0.010202431360127625, equal to
+scipy's asymptotic p-value to every printed digit; the tied figure is the one P10-D12 reached
+through mannwhitneyu on two Python lists, so two independent routes land on the same float. Tier 6
+materialises no column and the convention all 22 analysis modules keep extends to rank tests.
+Asserted against scipy and, separately, against the complement identity U_a + U_b = n_a * n_b, so
+a formula and a query wrong in the same direction cannot both pass.
+P10-D24. THE CONTINUITY CORRECTION IS APPLIED. Measured both ways on both samples: with
+continuity matches scipy exactly, without differs in the third digit untied (0.6547208460185769)
+and the fifth tied (0.010164660476580425). mannwhitneyu defaults to use_continuity=True and so
+does the engine's arithmetic.
+P10-D25. THE MIDRANK IS rank() + (tie - 1) / 2.0, NEVER rank() ALONE. Measured on [1, 2, 2, 2, 5]:
+rank() returns 1, 2, 5 -- the minimum rank inside the tie group -- against midranks 1.0, 3.0, 5.0.
+The obvious spelling is the wrong one and it fails quietly: a smaller rank sum, a smaller U, and a
+p-value that is merely plausible. Nothing in DuckDB or scipy flags it.
+P10-D26. ANOVA COMPUTES FROM (n, mean, var_samp) PER GROUP. Measured on three groups: F
+0.02617801047120415 against f_oneway's 0.026178010471204192, p identical at 0.9742060663526558,
+and recomputed from DuckDB's own aggregates the p-value difference is 0.0 exactly. scipy ships no
+f_oneway_from_stats, so this is arithmetic the engine owns rather than borrows, and it agrees.
+P10-D27. var_samp IS THE SAMPLE FORM, LIKE stddev. Measured: 3.5 against var_pop
+2.9166666666666665 on the same six values. P10-D4's fact for the second moment. Had it been the
+population form the within-group sum of squares would be wrong by (n-1)/n per group, in the
+direction that makes every F larger.
+P10-D28. THE CONTINGENCY TABLE IS BUILT FROM GROUP BY AND ORDERED BY BOTH DIMENSIONS. Measured:
+[('north','shop',20), ('north','web',30), ('south','shop',36), ('south','web',14)] becomes
+[[20, 30], [36, 14]], chi2 9.131493506493506 on 1 df. Row and column orders are the sorted
+distinct values of each dimension, so the headers a reader sees and the table scipy tests come
+from one ordering rather than two.
+P10-D29. SCIPY'S ROLE IN TIER 6 IS SCALARS AND ONE SMALL TABLE. What remains of it after D23 and
+D26: f.sf, norm.sf, chi2_contingency, ttest_ind_from_stats, proportion_confint,
+tt_ind_solve_power. Every one takes numbers or a contingency table. No analysis hands scipy a
+column, and the selector's four branches now differ only in which numbers SQL computes.
+
+MEASURED VALIDATION. tests/test_stats_facts.py sha256
+78da0122f350007a5296c7d1800e4b77e25bb6d8a92c60bd737b3982369a1f7a and
+tests/test_selector_facts.py sha256
+08ad5723f1f88720c525660eaa23a0c055519fbf3fed3a8fd9c711c1f4d80693, 32 tests between them, full
+suite 1,542 in 27.80s. The per-file split was not printed separately and is not recorded here.
+
+STEP 1'S DIGEST IS SUPERSEDED, TWICE. That entry records tests/test_stats_facts.py at 425 lines,
+sha256 448e7410a9d985dfaa0bd52012de349e26fe22f5d823b368dcd32e5ea62a3e78, 25 tests. Two rank tests
+were added to the file after that line was written, taking it to 511 lines and sha256
+3c182a88b5dccbd7d70c6d00f1721a5d2f73e50e37069ae8b16347473719bf47, and this step's merge took it
+further still. The 22 decisions in Step 1 stand: they were drawn from the first 25 tests and none
+of those changed. What does not stand is the digest, which now identifies no file on disk. C39's
+point cuts both ways -- a digest proves a heredoc landed intact, and a digest left beside a file
+that has since moved proves something about a file that no longer exists.
+
+P10-O2 IS OPEN. A DuckDB DOUBLE can hold NaN, so a measure column can carry one before any test
+runs. P10-D5 measured what happens next -- silent propagation to a cell reading 'nan' -- and
+nothing screens for it at the source.
+P10-O3 IS OPEN. tests/test_phase8.py skips its Olist clause citing data that is present. The fix
+is the skip condition, not the string.
+P10-O4 IS OPEN. Nothing measures a group of one. Welch's denominator divides by (n - 1) per group
+and the pooled form by (n1 + n2 - 2), so a dimension value with a single row after null-dropping
+is a division by zero somewhere, and null-dropping is exactly what P10-D6 requires. Whether that
+raises, returns nan, or returns inf decides whether it is a refusal by name or a cell reading
+'nan' -- and P10-D5 already showed which of those base.number produces.
+
+C66. A STEP WAS WRITTEN TO ANSWER A QUESTION ALREADY BEING ANSWERED, AND THE EVIDENCE WAS
+BISECTED INSTEAD OF READ. tests/test_selector_facts.py was built to close P10-O1; two tests
+closing it were already in tests/test_stats_facts.py. The first command of the step printed 1,543
+where 1,541 was expected, and the next four exchanges narrowed where the two extra tests lived --
+a combined count, then per-file counts, then a collection count -- when grep -n "^def test_" on
+the changed file answers it in one line and eventually did. The +2 was not a counting anomaly; it
+was the answer arriving ahead of the step written to ask for it. C63's shape in a new place: there
+a capped listing was read as exhaustive, here a summary count was interrogated as though it were
+evidence about its own contents. The duplicate spellings were merged before they could drift,
+which is the outcome C9 and P9-O6 describe wanting and rarely get.
+C67. THE WORSE SQL WAS THE ONE PROPOSED. Two midrank spellings were measured against each other:
+rank() + (tie - 1) / 2.0 in one window level, against avg(row_number()) OVER (PARTITION BY x)
+requiring an inner query and an averaging window outside it. The second was mine and it is worse
+-- two levels for one number, and it rests on row_number()'s ordering within a tie group being
+immaterial, which is true and is a thing a reader must check rather than read. The proposed tests
+also asserted only against scipy, where the kept ones assert the complement identity as well, so
+the proposed pair could have passed with formula and query wrong in the same direction. Recorded
+because the losing version was the one with a step document behind it.
+## Phase 10, Step 2 - the selector's ground facts
+
+P10-D23. RANK TESTS COMPUTE IN SQL. P10-O1 IS CLOSED. Measured: midrank sums from a single
+windowed query, rank() + (tie - 1) / 2.0 beside count(*) OVER (PARTITION BY x), give U 21.0 on an
+untied pair and 4000.0 on a tied one, identical to mannwhitneyu in both. The two-sided normal
+approximation with the tie correction gives 0.7014781088666139 and 0.010202431360127625, equal to
+scipy's asymptotic p-value to every printed digit; the tied figure is the one P10-D12 reached
+through mannwhitneyu on two Python lists, so two independent routes land on the same float. Tier 6
+materialises no column and the convention all 22 analysis modules keep extends to rank tests.
+Asserted against scipy and, separately, against the complement identity U_a + U_b = n_a * n_b, so
+a formula and a query wrong in the same direction cannot both pass.
+P10-D24. THE CONTINUITY CORRECTION IS APPLIED. Measured both ways on both samples: with
+continuity matches scipy exactly, without differs in the third digit untied (0.6547208460185769)
+and the fifth tied (0.010164660476580425). mannwhitneyu defaults to use_continuity=True and so
+does the engine's arithmetic.
+P10-D25. THE MIDRANK IS rank() + (tie - 1) / 2.0, NEVER rank() ALONE. Measured on [1, 2, 2, 2, 5]:
+rank() returns 1, 2, 5 -- the minimum rank inside the tie group -- against midranks 1.0, 3.0, 5.0.
+The obvious spelling is the wrong one and it fails quietly: a smaller rank sum, a smaller U, and a
+p-value that is merely plausible. Nothing in DuckDB or scipy flags it.
+P10-D26. ANOVA COMPUTES FROM (n, mean, var_samp) PER GROUP. Measured on three groups: F
+0.02617801047120415 against f_oneway's 0.026178010471204192, p identical at 0.9742060663526558,
+and recomputed from DuckDB's own aggregates the p-value difference is 0.0 exactly. scipy ships no
+f_oneway_from_stats, so this is arithmetic the engine owns rather than borrows, and it agrees.
+P10-D27. var_samp IS THE SAMPLE FORM, LIKE stddev. Measured: 3.5 against var_pop
+2.9166666666666665 on the same six values. P10-D4's fact for the second moment. Had it been the
+population form the within-group sum of squares would be wrong by (n-1)/n per group, in the
+direction that makes every F larger.
+P10-D28. THE CONTINGENCY TABLE IS BUILT FROM GROUP BY AND ORDERED BY BOTH DIMENSIONS. Measured:
+[('north','shop',20), ('north','web',30), ('south','shop',36), ('south','web',14)] becomes
+[[20, 30], [36, 14]], chi2 9.131493506493506 on 1 df. Row and column orders are the sorted
+distinct values of each dimension, so the headers a reader sees and the table scipy tests come
+from one ordering rather than two.
+P10-D29. SCIPY'S ROLE IN TIER 6 IS SCALARS AND ONE SMALL TABLE. What remains of it after D23 and
+D26: f.sf, norm.sf, chi2_contingency, ttest_ind_from_stats, proportion_confint,
+tt_ind_solve_power. Every one takes numbers or a contingency table. No analysis hands scipy a
+column, and the selector's four branches now differ only in which numbers SQL computes.
+
+MEASURED VALIDATION. tests/test_stats_facts.py sha256
+78da0122f350007a5296c7d1800e4b77e25bb6d8a92c60bd737b3982369a1f7a and
+tests/test_selector_facts.py sha256
+08ad5723f1f88720c525660eaa23a0c055519fbf3fed3a8fd9c711c1f4d80693, 32 tests between them, full
+suite 1,542 in 27.80s. The per-file split was not printed separately and is not recorded here.
+
+STEP 1'S DIGEST IS SUPERSEDED, TWICE. That entry records tests/test_stats_facts.py at 425 lines,
+sha256 448e7410a9d985dfaa0bd52012de349e26fe22f5d823b368dcd32e5ea62a3e78, 25 tests. Two rank tests
+were added to the file after that line was written, taking it to 511 lines and sha256
+3c182a88b5dccbd7d70c6d00f1721a5d2f73e50e37069ae8b16347473719bf47, and this step's merge took it
+further still. The 22 decisions in Step 1 stand: they were drawn from the first 25 tests and none
+of those changed. What does not stand is the digest, which now identifies no file on disk. C39's
+point cuts both ways -- a digest proves a heredoc landed intact, and a digest left beside a file
+that has since moved proves something about a file that no longer exists.
+
+C66. A STEP WAS WRITTEN TO ANSWER A QUESTION ALREADY BEING ANSWERED, AND THE EVIDENCE WAS
+BISECTED INSTEAD OF READ. tests/test_selector_facts.py was built to close P10-O1; two tests
+closing it were already in tests/test_stats_facts.py. The first command of the step printed 1,543
+where 1,541 was expected, and the next four exchanges narrowed where the two extra tests lived --
+a combined count, then per-file counts, then a collection count -- when grep -n "^def test_" on
+the changed file answers it in one line and eventually did. The +2 was not a counting anomaly; it
+was the answer arriving ahead of the step written to ask for it. C63's shape in a new place: there
+a capped listing was read as exhaustive, here a summary count was interrogated as though it were
+evidence about its own contents. The duplicate spellings were merged before they could drift,
+which is the outcome C9 and P9-O6 describe wanting and rarely get.
+C67. THE WORSE SQL WAS THE ONE PROPOSED. Two midrank spellings were measured against each other:
+rank() + (tie - 1) / 2.0 in one window level, against avg(row_number()) OVER (PARTITION BY x)
+requiring an inner query and an averaging window outside it. The second was mine and it is worse
+-- two levels for one number, and it rests on row_number()'s ordering within a tie group being
+immaterial, which is true and is a thing a reader must check rather than read. The proposed tests
+also asserted only against scipy, where the kept ones assert the complement identity as well, so
+the proposed pair could have passed with formula and query wrong in the same direction. Recorded
+because the losing version was the one with a step document behind it.

@@ -33,3 +33,4 @@ from . import mix_shift as _mix_shift  # noqa: F401
 from . import outlier_detection as _outlier_detection  # noqa: F401
 from . import changepoint as _changepoint  # noqa: F401
 from . import correlated_shift as _correlated_shift  # noqa: F401
+from . import hypothesis_test as _hypothesis_test  # noqa: F401
