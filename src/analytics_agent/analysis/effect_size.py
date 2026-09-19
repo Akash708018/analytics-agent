@@ -128,9 +128,13 @@ def _difference(con, gate, scope, dimension: str, measure: str, summary: list[st
     if len(groups) == 2:
         g = hedges_g(groups[0], groups[1])
         raw = groups[0].mean - groups[1].mean
+        # The groups arrive in SQL's order, which is alphabetical, not by size. Naming them in
+        # that order would print "a exceeds b" whenever b is in fact larger -- a right number
+        # inside a wrong sentence, which reads as authoritative and is not.
+        higher, lower = ((groups[0], groups[1]) if raw > 0 else (groups[1], groups[0]))
         summary.append(
             f"Hedges' g {number(g)} — {band(g, G_BANDS)} by Cohen's convention. "
-            f"{label(groups[0].name)} exceeds {label(groups[1].name)} by {number(abs(raw))}"
+            f"{label(higher.name)} exceeds {label(lower.name)} by {number(abs(raw))}"
             f"{f' {unit}' if unit else ''}, which is {number(abs(g))} standard deviation(s)."
         )
         summary.append(

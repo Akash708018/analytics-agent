@@ -27,11 +27,14 @@ from scipy.stats import chi2 as chi2_dist
 from scipy.stats import f as f_dist
 from scipy.stats import norm, t as t_dist
 
+from statsmodels.stats.power import tt_ind_solve_power
+
 from ..util.sql_guard import quote_identifier
 
 __all__ = [
     "GroupStats", "TestResult", "group_stats", "welch", "one_way_anova",
     "mann_whitney", "kruskal_wallis", "chi_square", "hedges_g", "eta_squared", "p_text",
+    "detectable_effect", "rows_for_effect",
 ]
 
 # Below this the float underflows and a cell would read "0". P10-D13: measured at t = -386.7,
@@ -287,3 +290,30 @@ def kruskal_wallis(con, scope, dimension: str, measure: str) -> TestResult:
         note=(f"The rank test for {k} groups. Like Mann-Whitney it compares whole "
               f"distributions rather than means, and needs no variance."),
     )
+
+
+def detectable_effect(n1: int, n2: int, alpha: float = 0.05, power: float = 0.8) -> float:
+    """The smallest standardised difference these group sizes could have detected.
+
+    P10-D18: the useful direction. Post-hoc power computed from the observed effect was measured
+    monotone against the p-value, so it restates what the reader already has; this asks what the
+    rows were capable of resolving, which the p-value does not say.
+
+    `tt_ind_solve_power` requires exactly one unknown (P10-D21) and it is the effect size here.
+    """
+    if n1 < 2 or n2 < 2:
+        raise ValueError("a detectable effect needs at least two rows in each group")
+    return float(tt_ind_solve_power(effect_size=None, nobs1=n1, alpha=alpha, power=power,
+                                    ratio=n2 / n1, alternative="two-sided"))
+
+
+def rows_for_effect(d: float, alpha: float = 0.05, power: float = 0.8) -> int:
+    """Rows per group needed to detect a standardised difference of d, rounded up.
+
+    P10-D18 again: 63.765610588911635 for d=0.5 at 80% power, reported as 64, because a
+    fractional row count is not a recommendation.
+    """
+    if d <= 0.0:
+        raise ValueError("an effect size to detect must be positive")
+    return math.ceil(tt_ind_solve_power(effect_size=d, nobs1=None, alpha=alpha, power=power,
+                                        ratio=1.0, alternative="two-sided"))

@@ -4255,3 +4255,68 @@ P10-O7 IS OPEN. confidence_interval and effect_size have no tests.
 P10-O8 IS OPEN. sample_adequacy is the fourth Tier 6 analysis and is not built. P10-D18 already
 settled what it reports: the effect detectable at the observed n, not observed power.
 
+
+## Phase 10, Step 5 - tests for the two intervals
+
+P10-D43. THE LARGER GROUP IS NAMED AS THE LARGER. Found while writing the tests, not by running
+the module: effect_size printed "{first} exceeds {second}" using the order SQL returned the
+groups in, which is alphabetical. On a fixture where arm a means 11.5 and arm b means 22.5 it read
+"a exceeds b by 11.0" -- the number right, the sentence backwards. A correct figure inside a wrong
+claim reads as authoritative and is worse than either alone. The groups are now ordered by which
+mean is larger before they are named.
+P10-D44. A ONE-ROW GROUP GETS ITS MEAN AND A BLANK INTERVAL, NOT A ZERO-WIDTH ONE. One row does
+produce a mean; it produces no evidence about what the next row would be, and a blank says that
+where a zero-width interval would claim certainty. The same asymmetry from the sizing side:
+effect_size refuses a magnitude entirely, because a difference between a group of one and a group
+of twelve is real and has no standard deviation to be measured in -- and says so, pointing at the
+rank comparison that does not need one.
+P10-D45. COHEN'S BANDS ARE TESTED AS A VOCABULARY. band() is asserted on magnitude, not sign: a
+large negative effect is large. The bands shape a word in a sentence and never a branch, a
+refusal, or a threshold, and the summary says in its own words that they were proposed for
+psychology and that what counts as large is a question about the subject.
+P10-D46. THE INTERVAL TESTS ASSERT ARITHMETIC, NOT ONLY VOCABULARY. low < mean < high, the
+half-width is half the span, and a 99% interval is wider than a 90% one on the same rows. A test
+that only checks the module said "Wilson" would pass over an interval computed wrongly.
+
+MEASURED VALIDATION. tests/test_confidence_interval.py sha256 [FILL], [FILL] lines, 15 tests;
+tests/test_effect_size.py sha256 [FILL], [FILL] lines, 18 tests. Full suite [FILL]. 24 analyses
+registered, three at tier 6.
+
+P10-O7 IS CLOSED.
+P10-O8 IS OPEN. sample_adequacy is the fourth Tier 6 analysis and is not built. P10-D18 settled
+what it reports: the effect detectable at the observed n, never observed power, because power
+computed from the observed effect was measured monotone against the p-value across all eight
+points and therefore carries nothing the p-value did not.
+P10-O3 IS STILL OPEN, narrowed in Step 4: the skip reason is true, the clause is unwritten.
+
+## Phase 10, Step 6 - sample_adequacy, and Tier 6 complete
+
+P10-D47. sample_adequacy REPORTS THE DETECTABLE EFFECT AND REFUSES TO REPORT OBSERVED POWER.
+P10-O8 closed, on P10-D18's measurement: at n=30 per group, as d ran 0.1 to 0.8 the p-value fell
+0.699953 to 0.002999 and post-hoc power rose 0.066783 to 0.861423, monotone throughout. Power
+computed from the effect you observed is the p-value rearranged, and printing both would look
+like two findings and be one. What the reader does not already have is the other direction: the
+smallest difference the rows in scope could reliably detect, reported in standard deviations and
+in the measure's own units, beside the difference actually present and the rows that smaller
+effects would need. The refusal is stated in the summary rather than implied by absence, because
+a reader who expected observed power should learn why it is missing.
+P10-D48. A NON-SIGNIFICANT RESULT IS GIVEN ITS SECOND READING. hypothesis_test says a difference
+was not detectable; it cannot say whether the groups are alike or the rows were too few. When the
+observed difference falls below the detectable floor, sample_adequacy says so in those words: a
+statement about the row count, not about the groups. That sentence is the reason the analysis
+exists and is not an aside.
+P10-D49. MORE THAN TWO GROUPS IS REFUSED BY NAME, NOT APPROXIMATED. The k>2 analogue rests on
+FTestAnovaPower, which nothing in this repository has measured. The same call as Kruskal-Wallis
+before Step 4 built it: an unmeasured number here would be a claim about what a reader's data
+could resolve, which is worse than having no answer.
+P10-D50. TIER 6 IS COMPLETE. hypothesis_test, confidence_interval, effect_size, sample_adequacy --
+the four the build guide names at line 619, all registered, all reading aggregates only. No
+analysis in the tier materialises a column; scipy and statsmodels are used for distribution tails
+and for one power solve, each taking scalars.
+
+MEASURED VALIDATION. src/analytics_agent/analysis/sample_adequacy.py sha256 [FILL], [FILL] lines;
+tests/test_sample_adequacy.py sha256 [FILL], [FILL] lines, 16 tests. 25 analyses registered, four
+at tier 6. Full suite [FILL].
+
+P10-O8 IS CLOSED.
+P10-O3 IS STILL OPEN, narrowed in Step 4: the skip reason is true, the clause is unwritten.
