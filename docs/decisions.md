@@ -4391,3 +4391,46 @@ P10-O3 IS STILL OPEN, narrowed in Step 4: the skip reason is true, the clause is
 P10-O11 IS OPEN. Neither Tier 7 analysis has been run against Olist. Step 1 Part D measured the
 figures they should produce -- 96,096 people, 2,997 repeaters, 3.119% -- and nothing has yet
 checked that the modules reproduce them.
+
+## Phase 10, Step 9 - the Done-When, on the real database
+
+P10-D60. THE DONE-WHEN IS PROVEN. tests/test_phase10.py, 35 passed, 0 failed, 1 skipped, against
+local Postgres. hypothesis_test names Welch on two groups, one-way ANOVA on more and chi-square on
+two dimensions, each reporting its variant and its df; cohort_retention warns at 3.119% and names
+repeat_behaviour. Both halves of the guide's line 939, on real rows rather than a fixture.
+P10-D61. P10-O11 IS CLOSED: THE MODULES REPRODUCE THE HAND MEASUREMENT. Step 1 Part D counted
+96,096 people, 2,997 repeaters and 3.119% by hand in psql on 18/09/2026. repeat_behaviour through
+the real gate produces the same three figures on 19/09/2026. The value of that is not the
+agreement but the independence: one route was a person writing SQL against public.orders joined to
+public.customers, the other was the module's own query under a confirmed contract, and a shared
+mistake would have had to be made twice in two spellings.
+P10-D62. THE ACCEPTANCE SCRIPT TAKES ITS TABLE AS AN ARGUMENT. Phase 9's confirm_contract, run and
+mount close over a module-level TABLE. Phase 10 needs three: order_payments carries the only
+numeric measure in reach (orders is three VARCHARs and five TIMESTAMPs), and the Tier 7 person key
+lives on customers while the date lives on orders, so they are joined in the workspace. That is a
+departure from Phase 9's shape and is stated in the docstring rather than left to be noticed.
+P10-D63. installment_plan IS DERIVED, NOT INJECTED. The Welch branch needs a dimension with two
+values and Olist's payment table has none -- payment_type holds four or five. payment_installments
+> 1 is a real distinction computed from real rows, which is a smaller departure than Phase 9's
+clause four, where two wholly synthetic measures were added to prove correlated_shift. Both are
+recorded rather than hidden, on the same argument: a fixture built to make a clause pass is worth
+less than a clause that says what it was built on.
+P10-D64. THE DERIVED TABLES ARE VISIBLE TO THE GATE. P9-O4 records that an attached catalog is not
+a loadable dataset, because state._loadable_tables reads db.user_tables. Whether a table CREATEd
+in the workspace from copied ones would be visible was not known and is now: it is. Every clause
+above ran against tables built that way.
+
+MEASURED VALIDATION. tests/test_phase10.py sha256
+fe22f08e8183111272fd6f539a974c30704e059bb71241870b3ad2212cbfa3ae, 391 lines, 6 clauses, 35
+passed, 0 failed, 1 skipped. Unit suite unchanged at 1,661: the acceptance script defines no
+test_ functions and pytest collects nothing from it, as with test_phase9.py.
+
+P10-O11 IS CLOSED.
+P10-O3 IS STILL OPEN, and is now scoped. tests/test_phase8.py has no Postgres path at all -- its
+loader is load(fixture: Path, dataset_name: str) off a CSV, with no SOURCE, no load_table and no
+LoadRefused -- and its CALLS dict is keyed to clean_sales' column names, so nothing transfers.
+orders cannot carry all nine: one usable dimension and no numeric measure leaves cross_tab,
+group_compare, pareto and concentration with nothing to compute. The shape it needs is
+order_payments with the derived installment_plan, the three imports that file has never had, a
+parameterised run, and a second CALLS dict beside the fixture one. That is a step, not a clause,
+and it belongs to Phase 8's Done-When rather than Phase 10's.
