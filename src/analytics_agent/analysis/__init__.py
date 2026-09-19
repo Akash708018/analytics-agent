@@ -37,3 +37,4 @@ from . import hypothesis_test as _hypothesis_test  # noqa: F401
 from . import confidence_interval as _confidence_interval  # noqa: F401
 from . import effect_size as _effect_size  # noqa: F401
 from . import sample_adequacy as _sample_adequacy  # noqa: F401
+from . import repeat_behaviour as _repeat_behaviour  # noqa: F401

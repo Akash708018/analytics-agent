@@ -4320,3 +4320,36 @@ at tier 6. Full suite [FILL].
 
 P10-O8 IS CLOSED.
 P10-O3 IS STILL OPEN, narrowed in Step 4: the skip reason is true, the clause is unwritten.
+
+## Phase 10, Step 7 - Tier 7 ground facts, and repeat_behaviour
+
+P10-D51. A COHORT OFFSET IS A PERIOD COUNT, SO BOTH ENDS ARE TRUNCATED BEFORE THEY ARE
+SUBTRACTED. Measured: date_diff('month', ...) over truncated months gives 1 from January to
+February, 0 within January, and 25 from November 2016 to December 2018. Untruncated it counts
+something else, printed in the same run. Every cell of a cohort grid is an offset, so the
+truncation is not tidiness -- it is the difference between a grid and a grid shifted by one.
+P10-D52. A COHORT GRID CANNOT ADD BACK TO ROWS, AND KEEPS A DIFFERENT ACCOUNT. One person
+occupies several rows, so LostRows' usual arithmetic does not apply. What does hold, and what is
+checked: every person belongs to exactly one cohort, so cohort memberships equal distinct people.
+repeat_behaviour keeps both books -- events add back to scope.analysed, people add to the distinct
+key count -- and says in the summary that the people column is not a row count and is not meant
+to be one.
+P10-D53. A KEY DISTINCT PER ROW IS REFUSED BY NAME. Step 1 Part D measured customer_id at 99,441
+distinct across 99,441 orders against customer_unique_id's 96,096, and 0.000% repeat against
+3.119%. count(DISTINCT key) = count(*) is one query and repeat_behaviour asks it before anything
+else. The refusal says what the column is rather than what the analysis cannot do: a key that
+never repeats describes events, and reporting that nobody ever returns would be a fact about the
+column, not about behaviour.
+P10-D54. repeat_behaviour IS BUILT BEFORE cohort_retention BECAUSE THE REDIRECT POINTS AT IT. The
+guide's rule is that cohort_retention recommends repeat_behaviour below 5% repeat. Shipping that
+recommendation before the target exists is the same shape as a ledger describing a state the tree
+does not have, which this phase has now recorded three times.
+
+MEASURED VALIDATION. tests/test_cohort_facts.py sha256 [FILL], [FILL] lines, 7 tests;
+src/analytics_agent/analysis/repeat_behaviour.py sha256 [FILL], [FILL] lines. 26 analyses
+registered, one at tier 7. Full suite [FILL]. Olist: [FILL people], [FILL cohorts],
+[FILL first] to [FILL last], max offset [FILL].
+
+P10-O9 IS OPEN. repeat_behaviour has no tests.
+P10-O10 IS OPEN. cohort_retention is not built.
+P10-O3 IS STILL OPEN, narrowed in Step 4.
