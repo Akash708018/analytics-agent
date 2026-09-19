@@ -4278,9 +4278,9 @@ P10-D46. THE INTERVAL TESTS ASSERT ARITHMETIC, NOT ONLY VOCABULARY. low < mean <
 half-width is half the span, and a 99% interval is wider than a 90% one on the same rows. A test
 that only checks the module said "Wilson" would pass over an interval computed wrongly.
 
-MEASURED VALIDATION. tests/test_confidence_interval.py sha256 [FILL], [FILL] lines, 15 tests;
-tests/test_effect_size.py sha256 [FILL], [FILL] lines, 18 tests. Full suite [FILL]. 24 analyses
-registered, three at tier 6.
+MEASURED VALIDATION. tests/test_confidence_interval.py sha256 0f1263c079482e29a470d7383d35ef378e7580b03a828cd7997133d2378aa2b0, 229 lines, 15
+tests; tests/test_effect_size.py sha256 c27ef0475331dcd423b68f9a71c92b51dbd68ff9e3f582b1c051335439c58fd6, 237 lines, 18 tests. Full suite 1,612.
+24 analyses registered, three at tier 6.
 
 P10-O7 IS CLOSED.
 P10-O8 IS OPEN. sample_adequacy is the fourth Tier 6 analysis and is not built. P10-D18 settled
@@ -4314,9 +4314,9 @@ the four the build guide names at line 619, all registered, all reading aggregat
 analysis in the tier materialises a column; scipy and statsmodels are used for distribution tails
 and for one power solve, each taking scalars.
 
-MEASURED VALIDATION. src/analytics_agent/analysis/sample_adequacy.py sha256 [FILL], [FILL] lines;
-tests/test_sample_adequacy.py sha256 [FILL], [FILL] lines, 16 tests. 25 analyses registered, four
-at tier 6. Full suite [FILL].
+MEASURED VALIDATION. src/analytics_agent/analysis/sample_adequacy.py sha256 e4cd9a83b70e06a13ee9f8d8d8e67ecd1f393aec9743bfa400a9bc1bab80a917,
+161 lines; tests/test_sample_adequacy.py sha256 3e99137f863196626237a42c8bae9f85f70afe75be69e7df8de41410e03ded03, 212 lines, 16 tests. 25
+analyses registered, four at tier 6. Full suite 1,628.
 
 P10-O8 IS CLOSED.
 P10-O3 IS STILL OPEN, narrowed in Step 4: the skip reason is true, the clause is unwritten.
@@ -4345,11 +4345,49 @@ guide's rule is that cohort_retention recommends repeat_behaviour below 5% repea
 recommendation before the target exists is the same shape as a ledger describing a state the tree
 does not have, which this phase has now recorded three times.
 
-MEASURED VALIDATION. tests/test_cohort_facts.py sha256 [FILL], [FILL] lines, 7 tests;
-src/analytics_agent/analysis/repeat_behaviour.py sha256 [FILL], [FILL] lines. 26 analyses
-registered, one at tier 7. Full suite [FILL]. Olist: [FILL people], [FILL cohorts],
-[FILL first] to [FILL last], max offset [FILL].
+MEASURED VALIDATION. tests/test_cohort_facts.py sha256 1f74a70b33adb56635ba29c778c7d71ba0e66ab18411d015ac249a90e9658ce8, 198 lines, 7 tests;
+src/analytics_agent/analysis/repeat_behaviour.py sha256 5953a99337c46474d2595a74fc2c88e12c8c1883bcb0e629f1c4b960a11fa03a, 173 lines. 26 analyses
+registered, one at tier 7. Full suite 1,635. The digest is the one after the ::DATE
+cast of section 1.1; the pre-cast file was 6a307003 and never passed.
+OLIST FIGURES NOT TAKEN. Section 2 of that step was not run, so the people, cohort
+and offset counts it asked for are absent rather than wrong. P10-O11 carries them.
 
 P10-O9 IS OPEN. repeat_behaviour has no tests.
 P10-O10 IS OPEN. cohort_retention is not built.
 P10-O3 IS STILL OPEN, narrowed in Step 4.
+
+## Phase 10, Step 8 - cohort_retention, and Tier 7 complete
+
+P10-D55. A COHORT GRID SHOWS PEOPLE, NOT PERCENTAGES, WITH THE COHORT'S SIZE BESIDE ITS LABEL. A
+percentage computed over three people is noise wearing a rate's clothes, and a reader cannot tell
+one from a rate over three thousand once the denominator is gone. The size column restores it.
+P10-D56. NO COHORT IS SUPPRESSED AND NONE IS FLAGGED AS TOO SMALL. Any cutoff would be a number
+nobody in this repository measured -- the objection that ruled out a threshold-driven selector in
+Step 3 -- and a suppressed cell is indistinguishable from an empty one, so suppression removes
+information while looking like care. The size column is the same information without the
+invention.
+P10-D57. THE 5% REDIRECT IS THE GUIDE'S NUMBER AND IS APPLIED AS A WARNING, NOT A REFUSAL. The
+guide's rule at line 625 is that cohort_retention warns and recommends repeat_behaviour below 5%
+repeat, so the grid is still drawn and the sentence beside it says almost every cell beyond +0 is
+empty and names the analysis that reports the same fact in four rows. Step 1 Part D established
+why the threshold cannot be the guard on its own: it fires identically at 0.000% and at 3.119%,
+so the key check (P10-D53) runs first and separately.
+P10-D58. THE GRID STOPS AT THE COLUMN CAP AND SAYS THE LATER COLUMNS EXIST. MAX_COLS is 50 and
+the headers are the cohort label, its size, then one column per offset, so 48 offsets fit. Olist's
+26-month span is comfortably inside that and still past the 12-column preview, which is the case
+Phase 8's column-paging clause skips for want of a wide enough fixture.
+P10-D59. TIER 7 IS COMPLETE, AND SO IS THE ANALYSIS TIER LIST. cohort_retention and
+repeat_behaviour, the two the build guide names at line 623. Twenty-seven analyses registered
+across seven tiers, none of which materialises a column.
+
+MEASURED VALIDATION. tests/test_repeat_behaviour.py sha256 2750fe15b9311cf7a41077531feb9454a0409cf8b861e26424a1297db4212c69, 165 lines, 11
+tests; src/analytics_agent/analysis/cohort_retention.py sha256 bcf0a546f0e73f4d68dc28615b22633c7c1af84e9a37b445ccd7bbf9692e0d92, 171 lines;
+tests/test_cohort_retention.py sha256 793a26fcc1060267b56cffe09f017a065cde0b71acd7a2c7ac6b74c364d95cb8, 220 lines, 15 tests. 27 analyses
+registered, two at tier 7. Full suite 1,661.
+
+P10-O9 IS CLOSED.
+P10-O10 IS CLOSED.
+P10-O3 IS STILL OPEN, narrowed in Step 4: the skip reason is true, the clause is unwritten.
+P10-O11 IS OPEN. Neither Tier 7 analysis has been run against Olist. Step 1 Part D measured the
+figures they should produce -- 96,096 people, 2,997 repeaters, 3.119% -- and nothing has yet
+checked that the modules reproduce them.
