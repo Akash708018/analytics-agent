@@ -32,13 +32,17 @@ from typing import Any
 from ..util.sql_guard import quote_identifier
 from .base import LostRows, label, number
 from .declared import column_types, is_numeric, require_dimension, require_measure
-from .inferential import (GroupStats, chi_square, eta_squared, group_stats, hedges_g,
+from .inferential import (FINITE, GroupStats, chi_square, eta_squared, group_stats,
+                          hedges_g, kruskal_wallis,
                           mann_whitney, one_way_anova, p_text, welch)
 from .registry import Output, register
 from .stats import MAX_GROUPS
 
 NO_VALUE = "(no value)"
 NO_GROUP = "(no group)"
+# P10-O2: NaN and infinity are not nulls and are not values. They get their own
+# row because a reader who sees them counted separately can go and fix them.
+NOT_FINITE = "(not a number)"
 METHODS = ("auto", "parametric", "rank")
 
 # Below this an expected count makes the chi-square approximation unreliable. Pearson's rule,
@@ -107,10 +111,12 @@ def _difference(con, gate, scope, dimension: str, measure: str, method: str,
 
     excluded = _excluded(con, scope, dimension, measure)
     tested = sum(g.n for g in groups)
-    if tested + excluded[NO_GROUP] + excluded[NO_VALUE] != scope.analysed:
+    if (tested + excluded[NO_GROUP] + excluded[NO_VALUE]
+            + excluded[NOT_FINITE] != scope.analysed):
         raise LostRows(
             f"hypothesis_test lost rows: {tested:,} tested, {excluded[NO_GROUP]:,} with no "
-            f"{dimension}, {excluded[NO_VALUE]:,} with no {measure}, against "
+            f"{dimension}, {excluded[NO_VALUE]:,} with no {measure}, "
+            f"{excluded[NOT_FINITE]:,} whose {measure} is not a finite number, against "
             f"{scope.analysed:,} in scope."
         )
 
@@ -119,7 +125,8 @@ def _difference(con, gate, scope, dimension: str, measure: str, method: str,
         [label(g.name), number(g.n), number(g.mean), number(g.sd), number(g.skewness)]
         for g in groups
     ]
-    for name, count in ((NO_GROUP, excluded[NO_GROUP]), (NO_VALUE, excluded[NO_VALUE])):
+    for name, count in ((NO_GROUP, excluded[NO_GROUP]), (NO_VALUE, excluded[NO_VALUE]),
+                        (NOT_FINITE, excluded[NOT_FINITE])):
         if count:
             rows.append([name, number(count), None, None, None])
 
@@ -165,16 +172,15 @@ def _run_difference(con, scope, dimension: str, measure: str, groups: list[Group
                     method: str, forced: list[GroupStats]):
     """Pick the branch, run it, and return the result with its effect size."""
     two = len(groups) == 2
-    wants_rank = method == "rank" or (method == "auto" and forced and two)
+    wants_rank = method == "rank" or (method == "auto" and forced)
 
     if wants_rank:
-        if not two:
-            raise ValueError(
-                f"method='rank' compares two groups; {dimension} has {len(groups)}. The rank "
-                f"test for more than two is Kruskal-Wallis, which this tier does not build."
-            )
-        result = mann_whitney(con, scope, dimension, measure, groups[0].name, groups[1].name)
-        return result, None, None
+        if two:
+            result = mann_whitney(con, scope, dimension, measure,
+                                  groups[0].name, groups[1].name)
+            return result, None, None
+        # P10-O6 closed: H from the same midrank sums, measured against scipy.stats.kruskal.
+        return kruskal_wallis(con, scope, dimension, measure), eta_squared(groups), "eta squared"
 
     if forced:
         names = ", ".join(repr(label(g.name)) for g in forced)
@@ -277,12 +283,14 @@ def _excluded(con, scope, dimension: str, measure: str) -> dict[str, int]:
     """Rows in scope that no group holds, split by which column is missing."""
     table = quote_identifier(scope.dataset_name)
     dim, col = quote_identifier(dimension), quote_identifier(measure)
-    no_group, no_value = con.execute(
+    no_group, no_value, not_finite = con.execute(
         f"SELECT count(*) FILTER (WHERE {dim} IS NULL), "
-        f"       count(*) FILTER (WHERE {dim} IS NOT NULL AND {col} IS NULL) "
+        f"       count(*) FILTER (WHERE {dim} IS NOT NULL AND {col} IS NULL), "
+        f"       count(*) FILTER (WHERE {dim} IS NOT NULL AND {col} IS NOT NULL "
+        f"                        AND NOT ({FINITE.format(col=col)})) "
         f"FROM {table} WHERE {scope.where}"
     ).fetchall()[0]
-    return {NO_GROUP: no_group, NO_VALUE: no_value}
+    return {NO_GROUP: no_group, NO_VALUE: no_value, NOT_FINITE: not_finite}
 
 
 def _assumption_line(groups: list[GroupStats]) -> str:

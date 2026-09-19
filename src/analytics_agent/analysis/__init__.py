@@ -1,4 +1,4 @@
-"""The analysis package: nine analyses, one registry, one gate in front.
+"""The analysis package: the analyses the build guide's tier lists name, one registry, one gate in front.
 
 **Importing this package registers every analysis.** The registry is populated
 by decorator at import time, so `catalogue()` is only as complete as whatever
@@ -34,3 +34,5 @@ from . import outlier_detection as _outlier_detection  # noqa: F401
 from . import changepoint as _changepoint  # noqa: F401
 from . import correlated_shift as _correlated_shift  # noqa: F401
 from . import hypothesis_test as _hypothesis_test  # noqa: F401
+from . import confidence_interval as _confidence_interval  # noqa: F401
+from . import effect_size as _effect_size  # noqa: F401

@@ -246,9 +246,13 @@ def test_the_rank_test_can_be_asked_for_outright(con):
     assert not said(out, "Method chosen, not requested")
 
 
-def test_the_rank_branch_refuses_more_than_two_groups(con):
-    with pytest.raises(ValueError, match="Kruskal-Wallis"):
-        out_for(con, dimension="region", method="rank")
+def test_the_rank_branch_handles_more_than_two_groups(con):
+    """P10-O6 closed. It used to refuse here and name the missing test; H follows from the same
+    midrank sums Mann-Whitney already uses, measured against scipy.stats.kruskal."""
+    out = out_for(con, dimension="region", method="rank")
+    assert said(out, "Kruskal-Wallis H (tie-corrected)")
+    assert said(out, "df 2")
+    assert said(out, "needs no variance")
 
 
 # --- what it will not do --------------------------------------------------------------

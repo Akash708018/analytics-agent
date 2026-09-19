@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from datetime import date
 from decimal import Decimal
+from pathlib import Path
 from types import SimpleNamespace
 from typing import get_args
 
@@ -186,23 +188,42 @@ def test_top_n_refuses_an_excluded_dimension_and_an_excluded_measure(con):
 
 
 def test_every_registered_analysis_sits_in_its_build_guide_tier():
-    tiers = {
-        "summary_stats": 1, "distribution": 1, "frequency": 1,
-        "cross_tab": 1, "top_n": 1, "group_compare": 2,
-        "pareto": 2, "concentration": 2, "ranking_shift": 2,
-        "calendar_coverage": 3, "trend": 3, "seasonality": 3,
-        "period_compare": 3, "growth_decomposition": 3,
-        "correlation": 4, "bivariate": 4, "driver_analysis": 4,
-        "mix_shift": 4,
-        "outlier_detection": 5, "changepoint": 5,
-        "correlated_shift": 5,
-        "hypothesis_test": 6,
-    }
+    """P10-O5, and P9-O10 with it: the guide is the roster, and this reads it.
+
+    The previous version compared the registry against a dict typed out of the guide. It caught
+    hypothesis_test's omission in Phase 10 Step 3 and it would have kept passing if the guide
+    had changed instead, because nothing tied the two together. Four copies of the roster
+    existed; this removes one and makes a second answerable.
+    """
+    guide = Path(__file__).resolve().parents[1] / "docs" / "analytics_agent_build_guide_v1.2.md"
+    assert guide.exists(), f"the build guide is not at {guide}"
+    lines = guide.read_text(encoding="utf-8").splitlines()
+
+    tiers: dict[str, int] = {}
+    for i, line in enumerate(lines):
+        heading = re.match(r"^#{2,4}\s+\*\*Tier (\d+)\s*[—-]", line)
+        if not heading:
+            continue
+        tier = int(heading.group(1))
+        listing = next((s for s in lines[i + 1:i + 4] if s.strip()), "")
+        for name in re.findall(r"`([a-z_][a-z0-9_]*)`", listing):
+            tiers[name] = tier
+
+    assert len(tiers) >= 20, f"parsed only {len(tiers)} names from the guide: {sorted(tiers)}"
+    assert tiers.get("summary_stats") == 1, "the parse found no Tier 1"
+    assert tiers.get("hypothesis_test") == 6, "the parse found no Tier 6"
+
     entries = catalogue()
     for name, tier, summary in entries:
-        assert name in tiers
-        assert tier == tiers[name]
-    assert dict((name, tier) for name, tier, _ in entries)["top_n"] == 1
+        assert name in tiers, (
+            f"{name} is registered but the build guide's tier lists do not name it"
+        )
+        assert tier == tiers[name], (
+            f"{name} is registered at tier {tier}; the guide puts it at {tiers[name]}"
+        )
+    registered = {name for name, _, _ in entries}
+    unbuilt = sorted(set(tiers) - registered)
+    assert unbuilt == sorted(unbuilt), "sorted() is not the identity, which cannot happen"
 
 
 def test_lost_rows_is_a_scope_error():

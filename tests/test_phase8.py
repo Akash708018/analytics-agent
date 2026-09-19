@@ -24,7 +24,7 @@ than the Pydantic model and a gate that could not refuse. A result computed
 under a hand-built namespace proves the arithmetic works and says nothing
 about the path a person takes.
 
-**The Olist clause is a SKIP, not a pass.** No Olist data is on disk. The
+**The Olist clause is a SKIP, not a pass.** The clause is unwritten; the data is present. The
 fixture half of the Done-When is clauses 1 to 3; the Olist half is outstanding
 and this says so on every run. Phase 9's Done-When needs Olist as well
 (`calendar_coverage` finding the missing month), so acquiring it belongs there.
@@ -416,8 +416,9 @@ def clause_five() -> None:
     heading("Clause 5: the Olist half of the Done-When")
 
     skip("all nine on Olist",
-         "no Olist data is on disk. Clauses 1 to 3 are the fixture half; this "
-         "is outstanding, and Phase 9's Done-When needs Olist as well")
+         "the clause is unwritten, not unreachable: P9-O1 closed when "
+         "tests/test_phase9.py reached local Postgres, and the nine tables and 99,441 "
+         "orders were confirmed again in Phase 10 Step 1. P10-O3 tracks writing it")
 
     skip("the role trap",
          "the guide says summary_stats must skip role=identifier; role is a "

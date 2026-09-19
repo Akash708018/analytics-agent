@@ -4116,7 +4116,7 @@ that has since moved proves something about a file that no longer exists.
 
 P10-O2 IS OPEN. A DuckDB DOUBLE can hold NaN, so a measure column can carry one before any test
 runs. P10-D5 measured what happens next -- silent propagation to a cell reading 'nan' -- and
-nothing screens for it at the source.
+nothing screens for it at the source. (Closed in Step 4, and the prediction in this line was wrong: var_samp, stddev, skewness and kurtosis raise OutOfRangeException rather than propagating, so an unscreened column aborts group_stats instead of printing 'nan'. See P10-D37.)
 P10-O3 IS OPEN. tests/test_phase8.py skips its Olist clause citing data that is present. The fix
 is the skip condition, not the string.
 P10-O4 IS OPEN. Nothing measures a group of one. Welch's denominator divides by (n - 1) per group
@@ -4143,73 +4143,115 @@ immaterial, which is true and is a thing a reader must check rather than read. T
 also asserted only against scipy, where the kept ones assert the complement identity as well, so
 the proposed pair could have passed with formula and query wrong in the same direction. Recorded
 because the losing version was the one with a step document behind it.
-## Phase 10, Step 2 - the selector's ground facts
+## Phase 10, Step 3 - the edges, and hypothesis_test
 
-P10-D23. RANK TESTS COMPUTE IN SQL. P10-O1 IS CLOSED. Measured: midrank sums from a single
-windowed query, rank() + (tie - 1) / 2.0 beside count(*) OVER (PARTITION BY x), give U 21.0 on an
-untied pair and 4000.0 on a tied one, identical to mannwhitneyu in both. The two-sided normal
-approximation with the tie correction gives 0.7014781088666139 and 0.010202431360127625, equal to
-scipy's asymptotic p-value to every printed digit; the tied figure is the one P10-D12 reached
-through mannwhitneyu on two Python lists, so two independent routes land on the same float. Tier 6
-materialises no column and the convention all 22 analysis modules keep extends to rank tests.
-Asserted against scipy and, separately, against the complement identity U_a + U_b = n_a * n_b, so
-a formula and a query wrong in the same direction cannot both pass.
-P10-D24. THE CONTINUITY CORRECTION IS APPLIED. Measured both ways on both samples: with
-continuity matches scipy exactly, without differs in the third digit untied (0.6547208460185769)
-and the fifth tied (0.010164660476580425). mannwhitneyu defaults to use_continuity=True and so
-does the engine's arithmetic.
-P10-D25. THE MIDRANK IS rank() + (tie - 1) / 2.0, NEVER rank() ALONE. Measured on [1, 2, 2, 2, 5]:
-rank() returns 1, 2, 5 -- the minimum rank inside the tie group -- against midranks 1.0, 3.0, 5.0.
-The obvious spelling is the wrong one and it fails quietly: a smaller rank sum, a smaller U, and a
-p-value that is merely plausible. Nothing in DuckDB or scipy flags it.
-P10-D26. ANOVA COMPUTES FROM (n, mean, var_samp) PER GROUP. Measured on three groups: F
-0.02617801047120415 against f_oneway's 0.026178010471204192, p identical at 0.9742060663526558,
-and recomputed from DuckDB's own aggregates the p-value difference is 0.0 exactly. scipy ships no
-f_oneway_from_stats, so this is arithmetic the engine owns rather than borrows, and it agrees.
-P10-D27. var_samp IS THE SAMPLE FORM, LIKE stddev. Measured: 3.5 against var_pop
-2.9166666666666665 on the same six values. P10-D4's fact for the second moment. Had it been the
-population form the within-group sum of squares would be wrong by (n-1)/n per group, in the
-direction that makes every F larger.
-P10-D28. THE CONTINGENCY TABLE IS BUILT FROM GROUP BY AND ORDERED BY BOTH DIMENSIONS. Measured:
-[('north','shop',20), ('north','web',30), ('south','shop',36), ('south','web',14)] becomes
-[[20, 30], [36, 14]], chi2 9.131493506493506 on 1 df. Row and column orders are the sorted
-distinct values of each dimension, so the headers a reader sees and the table scipy tests come
-from one ordering rather than two.
-P10-D29. SCIPY'S ROLE IN TIER 6 IS SCALARS AND ONE SMALL TABLE. What remains of it after D23 and
-D26: f.sf, norm.sf, chi2_contingency, ttest_ind_from_stats, proportion_confint,
-tt_ind_solve_power. Every one takes numbers or a contingency table. No analysis hands scipy a
-column, and the selector's four branches now differ only in which numbers SQL computes.
+P10-D30. P10-O4 IS CLOSED: A GROUP OF ONE IS FORCED SELECTION ON EXACTLY ONE BRANCH. Measured:
+stddev and var_samp return NULL for a one-row group -- group_compare's own summary already says a
+blank spread is not zero -- and of the four branches only the two-group parametric test cannot
+proceed. f_oneway returns F 4.971428571428572 and p 0.08230314431604406; mannwhitneyu returns U
+4.0 and p 0.5581846494226574; chi-square returns an answer worse than a refusal (P10-D32). So a
+group of one is not a uniform refusal, and the selector names which branch it forced and why.
+P10-D31. THE FROM-STATS PATH FAILS LOUDLY WHERE THE SEQUENCE PATH FAILS SILENTLY. Measured:
+ttest_ind_from_stats raises TypeError on the None spread; ttest_ind on the same data returns t and
+p as nan with df 1.0 and no warning. P10-D5 and base.number then put the text 'nan' in a cell and
+LostRows does not catch it, because the row count is right. P10-D3 chose the from-stats path on
+architecture; this is a second and independent reason for it.
+P10-D32. A CONTINGENCY TABLE WITH ONE ROW OR ONE COLUMN IS REFUSED BY NAME. Measured:
+chi2_contingency([[10, 20, 30]]) returns chi2 0.0, dof 0 and p 1.0. No error, no nan, a clean
+p-value on zero degrees of freedom. A reader sees "p = 1.0, no association" where the truth is
+that there is nothing to compare. scipy will not refuse this, so the engine checks the table has
+at least two rows and two columns before it asks.
+P10-D33. ANOVA COALESCES A MISSING VARIANCE TO ZERO, AND ONLY THERE. Measured: coalesce(var_samp,
+0) over a one-row group reproduces f_oneway's F exactly. The closed form takes (n - 1) * var per
+group, which is zero at n = 1, but SQL returns NULL rather than zero, so the coalesce is the
+bridge. It lives in one_way_anova and nowhere else: group_stats leaves the NULL as None, because
+only the caller knows whether its branch can proceed without a variance.
+P10-D34. THE CALLER CHOOSES PARAMETRIC OR RANK; THE ENGINE OVERRIDES ONLY WHERE THE CHOICE DOES
+NOT EXIST. method defaults to auto, which means the parametric test unless a group has one row and
+therefore no variance. P10-D14 rules out the alternative: a normality test is a test of n as much
+as of shape -- the same mild skew passes shapiro at n=50 and is rejected at n=2000 -- so gating on
+a normality p-value would send every large group to the rank branch and call it a finding, and a
+threshold on n or skew would be a number nobody in this repository measured. Forced selection
+fires on a fact a reader can check, never on a constant, and is named in the summary when it does.
+P10-D35. THE TIER 6 ARITHMETIC AND ITS SQL LIVE IN analysis/inferential.py. stats.py holds the
+seven expressions a summary reports; these are different numbers for a different purpose -- count,
+mean, var_samp, skewness, kurtosis per group -- but they carry the risk C9 measured, so they get
+one home. Every Tier 6 analysis interpolates from there rather than spelling its own.
+P10-D36. THE ROWS A TEST EXCLUDES ARE ROWS IN ITS TABLE. P10-D6 required it and this is the shape:
+(no group) for rows with no dimension, (no value) for rows with a dimension and no measure, each
+with its count, so tested + excluded equals scope.analysed and LostRows is satisfied by
+construction rather than by accident. Note the divergence from group_compare, which keeps a null
+dimension as a (null) group: a null group is a group somebody can read, but it is not a group
+anybody chose to compare, so a test excludes it and says so.
 
-MEASURED VALIDATION. tests/test_stats_facts.py sha256
-78da0122f350007a5296c7d1800e4b77e25bb6d8a92c60bd737b3982369a1f7a and
-tests/test_selector_facts.py sha256
-08ad5723f1f88720c525660eaa23a0c055519fbf3fed3a8fd9c711c1f4d80693, 32 tests between them, full
-suite 1,542 in 27.80s. The per-file split was not printed separately and is not recorded here.
+MEASURED VALIDATION. 23 tests in tests/test_hypothesis_test.py, all passing; suite 1,549 at
+the close of this step. 22 analyses registered, hypothesis_test at tier 6. Digests:
+  5ffd2c39bf9004652a9e76012a201b738420322bcd0573e3104d41986c422ddd  src/analytics_agent/analysis/inferential.py
+  c7b911bb5345ce112602a2fc43d304b222fa0f3dfb2aa7f9be5cd1abbcc1ac32  src/analytics_agent/analysis/hypothesis_test.py
+  3b4c2b617539b5b46abbfafd8744cbcf249a9b5e658c0f3ca1c7c0c115a3fc27  tests/test_hypothesis_test.py
 
-STEP 1'S DIGEST IS SUPERSEDED, TWICE. That entry records tests/test_stats_facts.py at 425 lines,
-sha256 448e7410a9d985dfaa0bd52012de349e26fe22f5d823b368dcd32e5ea62a3e78, 25 tests. Two rank tests
-were added to the file after that line was written, taking it to 511 lines and sha256
-3c182a88b5dccbd7d70c6d00f1721a5d2f73e50e37069ae8b16347473719bf47, and this step's merge took it
-further still. The 22 decisions in Step 1 stand: they were drawn from the first 25 tests and none
-of those changed. What does not stand is the digest, which now identifies no file on disk. C39's
-point cuts both ways -- a digest proves a heredoc landed intact, and a digest left beside a file
-that has since moved proves something about a file that no longer exists.
+APPENDED OUT OF ORDER. This section was written during Step 3 and not appended, because its
+MEASURED VALIDATION line carried placeholders and nothing went back for them. It sits after Step
+4's section in the file's history and before it in the numbering. Step 2's section was meanwhile
+appended twice and one copy removed. Both are the same failure the phase keeps recording: the
+ledger describing a state the tree does not have, or not describing one it does.
 
-C66. A STEP WAS WRITTEN TO ANSWER A QUESTION ALREADY BEING ANSWERED, AND THE EVIDENCE WAS
-BISECTED INSTEAD OF READ. tests/test_selector_facts.py was built to close P10-O1; two tests
-closing it were already in tests/test_stats_facts.py. The first command of the step printed 1,543
-where 1,541 was expected, and the next four exchanges narrowed where the two extra tests lived --
-a combined count, then per-file counts, then a collection count -- when grep -n "^def test_" on
-the changed file answers it in one line and eventually did. The +2 was not a counting anomaly; it
-was the answer arriving ahead of the step written to ask for it. C63's shape in a new place: there
-a capped listing was read as exhaustive, here a summary count was interrogated as though it were
-evidence about its own contents. The duplicate spellings were merged before they could drift,
-which is the outcome C9 and P9-O6 describe wanting and rarely get.
-C67. THE WORSE SQL WAS THE ONE PROPOSED. Two midrank spellings were measured against each other:
-rank() + (tie - 1) / 2.0 in one window level, against avg(row_number()) OVER (PARTITION BY x)
-requiring an inner query and an averaging window outside it. The second was mine and it is worse
--- two levels for one number, and it rests on row_number()'s ordering within a tie group being
-immaterial, which is true and is a thing a reader must check rather than read. The proposed tests
-also asserted only against scipy, where the kept ones assert the complement identity as well, so
-the proposed pair could have passed with formula and query wrong in the same direction. Recorded
-because the losing version was the one with a step document behind it.
+P10-O5 IS OPEN. test_declared.py's tier test never opens the build guide. (Closed in Step 4.)
+P10-O6 IS OPEN. Kruskal-Wallis is not built, so method='rank' refuses for more than two groups.
+(Closed in Step 4.)
+## Phase 10, Step 4 - the outstanding, and the two intervals
+
+P10-D37. NaN AND INFINITY ARE SCREENED IN SQL, COUNTED, AND SHOWN. P10-O2 closed. Measured: a
+DOUBLE column accepts both and IS NOT NULL excludes neither -- 3 rows not null against 2 finite.
+What follows is not what P10-D5 predicted. One NaN in a column meets its aggregates three ways:
+var_samp, stddev, skewness and kurtosis all raise OutOfRangeException; max and sum propagate nan;
+min skips it and returns the smallest real value. So an unscreened column reports min 1.0 and max
+nan, which looks corrupt while naming no row, and group_stats does not render a nan cell at all --
+it aborts on var_samp with a message identifying neither the column nor the offending rows. The
+screen is therefore the difference between the module working and failing uselessly, not a
+tidying of a silent answer. NOT isnan(CAST(x AS DOUBLE)) works on INTEGER and DECIMAL as well as
+DOUBLE, so one spelling covers every numeric type; FINITE lives in inferential.py beside the rest
+of the Tier 6 SQL. Screened rows get their own table row, (not a number), because a reader who
+sees them counted separately can go and fix them, and because LostRows would otherwise fire -- 
+correctly -- on rows the module drops and does not report.
+P10-D38. KRUSKAL-WALLIS IS BUILT AND THE RANK BRANCH NO LONGER STOPS AT TWO GROUPS. P10-O6 closed.
+H = 12/(N(N+1)) * sum(R_i^2/n_i) - 3(N+1) over the tie correction, from the same midrank sums
+P10-D23 measured, read against chi-square on k-1. Measured against scipy.stats.kruskal to every
+printed digit: 6.201098901098902 untied, and 7.691358024691331 with a tie term of 80,910, with
+p 0.045024456883389956 and 0.021371884859535267 matching in both. It needs no variance -- H is
+5.142857142857142 with a one-row group among three -- so P10-D30's forced selection now extends
+past two groups rather than refusing.
+P10-D39. THE TIER MAP READS THE BUILD GUIDE. P10-O5 closed, and P9-O10 with it. The previous test
+compared the registry against a dict typed from the guide; it caught Step 3's omission and would
+have kept passing had the guide changed instead. It now parses the tier headings and the
+backticked listing beneath each. It deliberately does not assert that every name in the guide is
+registered: Tier 7's two and Tier 8's are legitimately unbuilt, and a test that fails for work not
+yet done is one people learn to ignore. analysis/__init__.py's docstring no longer carries a
+count, because a count in a docstring goes stale every phase and nothing checks it.
+P10-D40. THE INTERVAL AROUND A MEAN IS THE t FORM AND THE INTERVAL AROUND A SHARE IS WILSON.
+P10-D16 and P10-D15 as built. A group with fewer than two rows gets its mean and no interval,
+stated rather than left blank: one row does produce a mean, it just produces no evidence about
+what the next row would be. The summary spends a line on what a 95% interval means -- a property
+of the procedure across repeated samples, not a probability about this interval -- because that is
+the sentence readers get wrong.
+P10-D41. EFFECT SIZE IS REPORTED IN COHEN'S VOCABULARY AND SAID TO BE A VOCABULARY. Hedges' g for
+two groups, eta squared for more, Cramer's V for two dimensions, each banded small/medium/large
+and each followed by the sentence that the bands were proposed for psychology and that what counts
+as large is a question about the subject. Bands shape a word, never a refusal or a branch.
+P10-D42. P10-O3 IS NARROWED, NOT CLOSED. test_phase8.py's Olist clause said "no Olist data is on
+disk", which P9-O1 recorded as false and Phase 10 Step 1 confirmed false a third time. The
+sentence now says the clause is unwritten rather than unreachable. Writing it -- all nine Tier 1-2
+analyses against Olist through the real gate -- remains open.
+
+MEASURED VALIDATION. Full suite 1,579, from 1,549: 23 for hypothesis_test and 7 for the
+ground facts of this step. 24 analyses registered. Digests:
+  5ffd2c39bf9004652a9e76012a201b738420322bcd0573e3104d41986c422ddd  src/analytics_agent/analysis/inferential.py
+  c7b911bb5345ce112602a2fc43d304b222fa0f3dfb2aa7f9be5cd1abbcc1ac32  src/analytics_agent/analysis/hypothesis_test.py
+  3b4c2b617539b5b46abbfafd8744cbcf249a9b5e658c0f3ca1c7c0c115a3fc27  tests/test_hypothesis_test.py
+  cd83d87b20a4c30985bd902fed983c7703c95a7a86942b3f99719168bd4997fe  tests/test_nan_and_kruskal_facts.py
+
+P10-O3 IS STILL OPEN, narrowed: the skip reason is now true, the clause is still unwritten.
+P10-O7 IS OPEN. confidence_interval and effect_size have no tests.
+P10-O8 IS OPEN. sample_adequacy is the fourth Tier 6 analysis and is not built. P10-D18 already
+settled what it reports: the effect detectable at the observed n, not observed power.
+

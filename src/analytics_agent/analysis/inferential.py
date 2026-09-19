@@ -23,6 +23,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 
+from scipy.stats import chi2 as chi2_dist
 from scipy.stats import f as f_dist
 from scipy.stats import norm, t as t_dist
 
@@ -30,12 +31,18 @@ from ..util.sql_guard import quote_identifier
 
 __all__ = [
     "GroupStats", "TestResult", "group_stats", "welch", "one_way_anova",
-    "mann_whitney", "chi_square", "hedges_g", "eta_squared", "p_text",
+    "mann_whitney", "kruskal_wallis", "chi_square", "hedges_g", "eta_squared", "p_text",
 ]
 
 # Below this the float underflows and a cell would read "0". P10-D13: measured at t = -386.7,
 # scipy returns exactly 0.0, and a cell claiming p = 0 claims a certainty no test delivers.
 P_FLOOR = 1e-300
+
+# P10-O2: a DOUBLE column can hold NaN and infinity, and IS NOT NULL does not exclude them.
+# P10-D5 measured what a nan does downstream -- it propagates silently and base.number renders
+# it into a cell as the text "nan", which LostRows cannot catch because the row count is right.
+# The cast is what makes one spelling work on DECIMAL and INTEGER columns as well as DOUBLE.
+FINITE = "NOT isnan(CAST({col} AS DOUBLE)) AND NOT isinf(CAST({col} AS DOUBLE))"
 
 
 @dataclass(frozen=True)
@@ -90,7 +97,8 @@ def group_stats(con, scope, dimension: str, measure: str) -> list[GroupStats]:
     rows = con.execute(
         f"SELECT {dim}, count({col}), avg({col}), var_samp({col}), "
         f"skewness({col}), kurtosis({col}) "
-        f"FROM {table} WHERE {scope.where} AND {dim} IS NOT NULL AND {col} IS NOT NULL "
+        f"FROM {table} WHERE {scope.where} AND {dim} IS NOT NULL "
+        f"AND {col} IS NOT NULL AND {FINITE.format(col=col)} "
         f"GROUP BY 1 ORDER BY 1"
     ).fetchall()
     return [GroupStats(name=r[0], n=r[1], mean=r[2], variance=r[3],
@@ -160,7 +168,8 @@ def mann_whitney(con, scope, dimension: str, measure: str,
     table = quote_identifier(scope.dataset_name)
     dim = quote_identifier(dimension)
     col = quote_identifier(measure)
-    where = (f"{scope.where} AND {dim} IS NOT NULL AND {col} IS NOT NULL")
+    where = (f"{scope.where} AND {dim} IS NOT NULL AND {col} IS NOT NULL "
+             f"AND {FINITE.format(col=col)}")
     rank_sum, n1 = con.execute(
         f"WITH ranked AS ("
         f"  SELECT {dim} AS g, rank() OVER (ORDER BY {col}) AS r_min, "
@@ -235,3 +244,46 @@ def eta_squared(groups: list[GroupStats]) -> float:
     between = sum(g.n * (g.mean - grand) ** 2 for g in groups)
     within = sum((g.n - 1) * (g.variance or 0.0) for g in groups)
     return between / (between + within) if (between + within) else 0.0
+
+
+def kruskal_wallis(con, scope, dimension: str, measure: str) -> TestResult:
+    """H and its p-value for more than two groups, from the same midrank sums as `mann_whitney`.
+
+    P10-O6 closed. The rank branch stopped at two groups because Kruskal-Wallis was not built and
+    approximating it would have been worse than refusing. The arithmetic is one line past what
+    P10-D23 already computes: H = 12/(N(N+1)) * sum(R_i^2 / n_i) - 3(N+1), divided by the tie
+    correction 1 - sum(t^3 - t)/(N^3 - N), read against chi-square on k - 1.
+
+    Needs no variance, which is what makes it the rank branch's answer to a one-row group.
+    """
+    table = quote_identifier(scope.dataset_name)
+    dim = quote_identifier(dimension)
+    col = quote_identifier(measure)
+    where = (f"{scope.where} AND {dim} IS NOT NULL AND {col} IS NOT NULL "
+             f"AND {FINITE.format(col=col)}")
+    rows = con.execute(
+        f"WITH ranked AS ("
+        f"  SELECT {dim} AS g, rank() OVER (ORDER BY {col}) AS r_min, "
+        f"         count(*) OVER (PARTITION BY {col}) AS tie "
+        f"  FROM {table} WHERE {where}) "
+        f"SELECT g, sum(r_min + (tie - 1) / 2.0), count(*) FROM ranked GROUP BY 1 ORDER BY 1"
+    ).fetchall()
+    tie_term, total = con.execute(
+        f"SELECT coalesce(sum(c * c * c - c), 0), sum(c) FROM ("
+        f"  SELECT count(*) AS c FROM {table} WHERE {where} GROUP BY {col})"
+    ).fetchall()[0]
+
+    k, n = len(rows), int(total)
+    if n < 2:
+        raise ZeroDivisionError("a rank test needs at least two values")
+    h = (12.0 / (n * (n + 1))) * sum(float(r) ** 2 / c for _, r, c in rows) - 3.0 * (n + 1)
+    correction = 1.0 - float(tie_term) / (n ** 3 - n)
+    if correction <= 0.0:
+        raise ZeroDivisionError("every value is tied, so the ranks carry no information")
+    h /= correction
+    return TestResult(
+        name="Kruskal-Wallis H (tie-corrected)",
+        statistic=h, p=float(chi2_dist.sf(h, k - 1)), df=str(k - 1),
+        note=(f"The rank test for {k} groups. Like Mann-Whitney it compares whole "
+              f"distributions rather than means, and needs no variance."),
+    )
