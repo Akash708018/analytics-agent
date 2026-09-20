@@ -4434,3 +4434,84 @@ group_compare, pareto and concentration with nothing to compute. The shape it ne
 order_payments with the derived installment_plan, the three imports that file has never had, a
 parameterised run, and a second CALLS dict beside the fixture one. That is a step, not a clause,
 and it belongs to Phase 8's Done-When rather than Phase 10's.
+
+## Open-item register - reconciled 19/09/2026
+
+Written because the ledger could not answer "what is outstanding". Closures had been recorded two
+ways -- as their own line, and folded into a decision's sentence -- so a grep for "IS CLOSED"
+found six of ten. Three items were also restated in later steps and appear twice. Nothing above
+is edited; this is the index the file lacked.
+
+CLOSED. P9-O1, in Phase 9 Step 3: tests/test_phase9.py reaches local Postgres.
+CLOSED. P9-O10, in Phase 10 Step 4 (P10-D39): the tier test parses the build guide.
+CLOSED. P10-O1, in Phase 10 Step 2 (P10-D23): rank tests compute in SQL.
+CLOSED. P10-O2, in Phase 10 Step 4 (P10-D37): non-finite values screened in SQL.
+CLOSED. P10-O4, in Phase 10 Step 3 (P10-D30): a group of one is forced selection on one branch.
+CLOSED. P10-O5, in Phase 10 Step 4 (P10-D39): the tier map reads the guide.
+CLOSED. P10-O6, in Phase 10 Step 4 (P10-D38): Kruskal-Wallis built.
+CLOSED. P10-O7, in Phase 10 Step 5: confidence_interval and effect_size have tests.
+CLOSED. P10-O8, in Phase 10 Step 6 (P10-D47): sample_adequacy built.
+CLOSED. P10-O9, in Phase 10 Step 8: repeat_behaviour has tests.
+CLOSED. P10-O10, in Phase 10 Step 8: cohort_retention built.
+CLOSED. P10-O11, in Phase 10 Step 9 (P10-D61): the modules reproduce the hand measurement.
+
+STILL OPEN, and unverified: P9-O2, P9-O3, P9-O4, P9-O5, P9-O6, P9-O7, P9-O8, P9-O9, P9-O11,
+P9-O12, P10-O3. Of these only P9-O4 and P10-O3 have been looked at since they were written. The
+other nine are recorded open and nobody has checked whether they still are -- a later step may
+have fixed one incidentally, the way P9-O11 may have been closed by P10-D39 rewriting the very
+test it names.
+
+DUPLICATED, from being restated in a later step: P9-O10, P10-O2, P10-O3, P10-O8.
+
+C68. AN OPEN ITEM WAS CLOSED IN PROSE RATHER THAN IN THE INDEX. Twelve items closed across Phases
+9 and 10; six said so on a line of their own and six were folded into a decision's sentence, so
+the ledger's own grep undercounted by half. The convention was never stated, so both spellings
+looked right while they were being written. A record whose format varies cannot be queried, and a
+record that cannot be queried is a diary rather than a ledger. Closures now get their own line.
+
+C71. THE SAME QUOTE-NESTING ERROR WAS MADE THREE TIMES, AND THE THIRD ONE SHIPPED. A Python
+string inside a python3 heredoc inside a bash heredoc is three levels of quoting. Attempt one
+wrote multi-line strings in single quotes; attempt two ended a triple-quoted literal with
+"DATE\" and produced four quote characters; both were syntax errors that wrote nothing, which is
+the harmless failure. The third ended a replacement with (P9-O4)."\"" and DID write, leaving
+src/analytics_agent/ingest/postgres.py unparseable and the whole suite uncollectable until it was
+repaired. The rule that follows is mechanical rather than a resolution to be careful: a patch
+script never ends a replacement literal on a quote character, and a file that is being rewritten
+rather than patched is written whole with cat > so the nesting does not arise. Twice it cost
+nothing; once it cost a broken tree, and the difference was luck.
+
+CLOSED. P10-O3, 19/09/2026. tests/test_phase8.py now runs all nine Tier 1-2 analyses against
+Olist under a real contract. It needed the Postgres path that file had never had -- load_table,
+LoadRefused, a parameterised run_on, a second contract builder and a second CALLS dict -- because
+its own loader reads a CSV fixture off disk. No single Olist table carries a numeric measure, a
+date and a wide dimension, so order_payments, orders and customers are copied and joined, and
+installment_plan is derived from payment_installments. P9-O4 is why they are copied rather than
+queried in place.
+
+CLOSED. The column-paging skip, 19/09/2026. Its reason was true when written -- region 4,
+product 5, channel 3, so the widest fixture cross_tab is seven columns against a twelve-column
+preview -- and Olist's customer_state has twenty-seven values, so clause 5 pages on real data.
+
+C75. A PREDICTION MADE IN STEP 1 WAS FALSIFIED BY A DECISION TAKEN IN STEP 3, AND NOTHING
+CONNECTED THEM. Phase 10 Step 1 audited Phase 8's five skips and recorded that
+ANALYSIS_RESULT_UNSOUND would become provokable once Tier 6 existed, because Tier 6 drops nulls
+by construction. P10-D36 then required every Tier 6 and 7 module to report what it drops as a row
+that adds back, precisely so LostRows stays satisfied -- which is the right design and which makes
+the skip's reason true again. So the skip stays, and the audit item that promised otherwise was
+wrong from Step 3 onward without anything noticing. The stale skip reasons this cleanup keeps
+finding are records that went false; this is the mirror -- a prediction that a later decision
+falsified. Both are the same failure: a claim and the thing it describes, edited separately.
+
+THE RENDERED SCHEMA SKIP IS PERMANENT AND SHOULD NOT BE REVISITED. FastMCP builds the JSON schema
+from the function signature and no script reaches what a client displays. A call proves
+forwarding, not the schema. Recorded here so a later audit does not count it as outstanding work.
+
+THE ROLE TRAP IS A GUIDE CORRECTION, NOT A CODE CHANGE. The guide says summary_stats must skip
+role=identifier. role is a proposal-time heuristic in evidence.py that never reaches a confirmed
+contract, so the rule is unenforced -- but the protection it describes is real by another
+mechanism: analyses are restricted to the contract's declared measures, so an identifier is out
+of scope because nobody declared it. The guide names the wrong mechanism for a behaviour that
+holds. P10-O13 carries the sentence.
+
+P10-O13 IS OPEN. The build guide's role=identifier rule describes a protection that exists by a
+different mechanism than the one it names. One sentence, in the guide.

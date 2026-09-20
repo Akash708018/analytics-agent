@@ -6,7 +6,11 @@ READ_ONLY), Section 4.2, and Section 8.2 (instructional refusals).
 Two ways to use an attached database:
 
   1. Query it in place -- <alias>.public.orders. Nothing is copied. No size limit,
-     because DuckDB pushes the work down to Postgres.
+     because DuckDB pushes the work down to Postgres. INSPECTION ONLY: preview,
+     describe and row counts reach an attached table; analysis does not, because
+     compute_analysis goes through require_contract and state._loadable_tables
+     reads db.user_tables, which lists what this workspace owns. An attached
+     catalog is not a loaded dataset however cleanly it attaches. That is P9-O4.
   2. Copy a table into the workspace -- load_table(). Subject to a row gate,
      because that data does land in the DuckDB file.
 
@@ -253,9 +257,10 @@ def load_table(
 ) -> LoadResult:
     """Copy a Postgres table into the workspace and register it.
 
-    Prefer querying in place where you can -- attach() then
+    Query in place where inspection is all you need -- attach() then
     `SELECT ... FROM pg.public.orders` copies nothing and has no size limit.
-    Copy when the data will be profiled, cleaned or joined repeatedly.
+    Copy when the data will be profiled, cleaned, joined or ANALYSED: every
+    analysis goes through require_contract, which only sees loaded datasets.
 
     where   Optional SQL predicate, applied on the Postgres side so only
             matching rows cross the wire.
@@ -274,9 +279,10 @@ def load_table(
             f"{ROW_REFUSE:,} row limit for copying into the workspace.\n"
             f"WHY: a copy of that size would fill memory and the workspace "
             f"file.\n"
-            f"NEXT STEP: query it in place instead -- the table is already "
-            f"attached as {db_alias}.{schema}.{table} and needs no copy. Or "
-            f"narrow it with where=... or limit=..."
+            f"NEXT STEP: narrow it with where=... or limit=... . The table is "
+            f"already attached as {db_alias}.{schema}.{table} and can be "
+            f"previewed and described in place, but an attached table cannot be "
+            f"analysed -- require_contract only sees loaded datasets (P9-O4)."
         )
 
     source = f'{db_alias}."{schema}"."{table}"'

@@ -44,7 +44,7 @@ from typing import Any
 
 from ..util.sql_guard import quote_identifier
 from .base import LostRows, ParamsInvalid, number
-from .declared import AGG_SQL, agg_of, require_measure
+from .declared import ADDITIVE_AGGS, AGG_SQL, agg_of, require_dimension, require_measure
 from .registry import Output, register
 from .temporal import (
     DEFAULT_GRAIN,
@@ -59,7 +59,7 @@ __all__ = ["growth_decomposition"]
 # P9-D27's set, and the reason it is a refusal here rather than a caveat: these
 # two add across groups, so their changes add across members. The other five do
 # not. If declared.py or stats.py already exports this, import it -- P9-O6.
-ADDITIVE = frozenset({"sum", "count"})
+ADDITIVE = frozenset(ADDITIVE_AGGS)  # P9-O6: declared.py owns this
 
 # What a NULL in the dimension is called in the output. It is a member like any
 # other: the rows exist and the column does not say which member they belong
@@ -105,14 +105,7 @@ def growth_decomposition(con, gate, scope, measure: str, dimension: str,
             f"compares {agg!r} between two periods without splitting it."
         )
 
-    declared_dimensions = list(getattr(contract, "dimensions", []) or [])
-    if dimension not in declared_dimensions:
-        raise ParamsInvalid(
-            f"{dimension!r} is not a declared dimension of "
-            f"{contract.dataset_name}. Declared: "
-            f"{', '.join(declared_dimensions) or 'none'}. A column nobody "
-            f"declared as a dimension has no agreed meaning to group by."
-        )
+    require_dimension(contract, dimension)
     if period == baseline:
         raise ParamsInvalid(
             f"period and baseline are both {period!r}, so every contribution "

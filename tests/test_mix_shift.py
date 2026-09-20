@@ -172,7 +172,7 @@ def test_a_period_against_itself_is_refused(con):
 
 
 def test_a_column_nobody_declared_as_a_dimension_is_refused(con):
-    with pytest.raises(ParamsInvalid) as excinfo:
+    with pytest.raises(ValueError) as excinfo:
         shifted(con, dimension="ts")
     assert "not a declared dimension" in str(excinfo.value)
 

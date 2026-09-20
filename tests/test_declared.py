@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ast
 import re
 from dataclasses import dataclass, field
 from datetime import date
@@ -303,3 +304,34 @@ def test_share_basis_names_which_of_the_three_refusals_applied():
     assert "inf rather than an error" in share_basis("sum", [0, 0]).reason
     assert share_basis("sum", [None, None]).reason is not None
     assert share_basis("sum", [10, None]).share(None) == ""
+
+
+def test_every_registered_analysis_is_named_in_the_tool_description():
+    """C72: six analyses were built, tested, accepted, and left out of the only list a caller
+    reads.
+
+    compute_analysis's docstring is what FastMCP renders as the tool description. An analysis
+    absent from it is registered, callable, and invisible to the agent deciding what to call --
+    which a reader takes for a refusal rather than an omission.
+
+    P10-D39 made the analysis *count* read the build guide instead of drifting across files.
+    This is the same fix one level down, for the *roster*, which that one did not cover.
+
+    Read from source rather than imported, the way registered_tools() does in test_phase8.py:
+    what matters is the text in the file FastMCP reads, not whatever an import happens to bind.
+    """
+    server = Path(__file__).resolve().parents[1] / "src" / "analytics_agent" / "server.py"
+    assert server.exists(), f"server.py is not at {server}"
+    tree = ast.parse(server.read_text(encoding="utf-8"))
+    doc = next(
+        (ast.get_docstring(node) for node in ast.walk(tree)
+         if isinstance(node, ast.FunctionDef) and node.name == "compute_analysis"),
+        None,
+    )
+    assert doc, "compute_analysis has no docstring in server.py"
+
+    missing = sorted(name for name, _, _ in catalogue() if name not in doc)
+    assert not missing, (
+        f"registered but absent from compute_analysis's parameter table: {', '.join(missing)}. "
+        f"An analysis a caller cannot find is one that does not exist to them."
+    )

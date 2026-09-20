@@ -46,7 +46,7 @@ from typing import Any
 
 from ..util.sql_guard import quote_identifier
 from .base import LostRows, ParamsInvalid, number
-from .declared import require_measure
+from .declared import require_dimension, require_measure
 from .registry import Output, register
 from .temporal import (
     DEFAULT_GRAIN,
@@ -91,12 +91,7 @@ def mix_shift(con, gate, scope, measure: str, dimension: str, period: str,
     # about combining it -- and a measure declaring agg='none' is the classic
     # case here, since "average unit price fell" is the question this answers.
     require_measure(contract, measure)
-    declared = list(getattr(contract, "dimensions", []) or [])
-    if dimension not in declared:
-        raise ParamsInvalid(
-            f"{dimension!r} is not a declared dimension of "
-            f"{contract.dataset_name}. Declared: {', '.join(declared) or 'none'}."
-        )
+    require_dimension(contract, dimension)
     if period == baseline:
         raise ParamsInvalid(
             f"period and baseline are both {period!r}, so every effect is zero "

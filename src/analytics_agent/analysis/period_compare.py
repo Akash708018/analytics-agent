@@ -31,7 +31,7 @@ from typing import Any
 
 from ..util.sql_guard import quote_identifier
 from .base import LostRows, ParamsInvalid, number
-from .declared import AGG_SQL, agg_of, require_measure
+from .declared import ADDITIVE_AGGS, AGG_SQL, agg_of, require_measure
 from .registry import Output, register
 from .temporal import (
     DEFAULT_GRAIN,
@@ -48,7 +48,7 @@ __all__ = ["period_compare"]
 # so the ruling holds here unchanged.
 # If declared.py already exports that set, this should import it rather than
 # restate it -- P9-O6.
-ADDITIVE = frozenset({"sum", "count"})
+ADDITIVE = frozenset(ADDITIVE_AGGS)  # P9-O6: declared.py owns this
 
 # Labels shown when a period nobody has is refused, before the list becomes a
 # count. Long enough to recognise the vocabulary, short enough not to be a

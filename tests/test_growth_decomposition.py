@@ -152,7 +152,7 @@ def test_an_aggregate_that_does_not_add_is_refused(con):
 
 
 def test_a_column_nobody_declared_as_a_dimension_is_refused(con):
-    with pytest.raises(ParamsInvalid) as excinfo:
+    with pytest.raises(ValueError) as excinfo:
         split(con, dimension="ts")
     assert "not a declared dimension" in str(excinfo.value)
 

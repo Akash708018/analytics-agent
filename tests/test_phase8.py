@@ -60,7 +60,8 @@ from analytics_agent.contract.dataset_contract import (  # noqa: E402
     Measure,
 )
 from analytics_agent.contract.refusals import Reason, reason_of  # noqa: E402
-from analytics_agent.ingest.csv_loader import load_csv  # noqa: E402
+from analytics_agent.ingest.csv_loader import LoadRefused, load_csv  # noqa: E402
+from analytics_agent.ingest.postgres import load_table  # noqa: E402
 from analytics_agent.util import db, results  # noqa: E402
 
 WORKSPACE = "phase8_test"
@@ -90,6 +91,39 @@ PHASE_8 = {
     "pareto",
     "concentration",
     "ranking_shift",
+}
+
+# P10-O3. The Olist half of the Done-When needs one table carrying a numeric measure, a date and
+# a dimension wide enough to page. No single Olist table has all three: order_payments has
+# payment_value and no date, orders has the timestamp and no numeric column, customers has
+# customer_state and neither. So three are copied and joined, and installment_plan is derived
+# from payment_installments because the fixture's channel has no counterpart here.
+#
+# P9-O4 is why they are copied at all: an attached catalog is not a loaded dataset, so
+# compute_analysis cannot reach olist.public.order_payments in place.
+SOURCE = "olist"
+OLIST = "olist_payments"
+
+# Inside Olist's 2016-09 to 2018-10 span, two quarters with a gap between them, for the same
+# reason the fixture's are chosen that way.
+OLIST_BEFORE = ("2017-01-01", "2017-03-31")
+OLIST_AFTER = ("2017-10-01", "2017-12-31")
+
+OLIST_CALLS = {
+    "summary_stats": {},
+    "distribution": {"measure": "payment_value", "bins": 10},
+    "frequency": {"column": "payment_type"},
+    "cross_tab": {"rows": "payment_type", "columns": "customer_state",
+                  "measure": "payment_value"},
+    "top_n": {"dimension": "payment_type", "measure": "payment_value", "n": 5},
+    "group_compare": {"dimension": "payment_type", "measure": "payment_value"},
+    "pareto": {"dimension": "payment_type", "measure": "payment_value"},
+    "concentration": {"dimension": "payment_type", "measure": "payment_value"},
+    "ranking_shift": {
+        "dimension": "payment_type", "measure": "payment_value",
+        "before_start": OLIST_BEFORE[0], "before_end": OLIST_BEFORE[1],
+        "after_start": OLIST_AFTER[0], "after_end": OLIST_AFTER[1],
+    },
 }
 
 PASSED = 0
@@ -175,11 +209,76 @@ def confirm_contract(dataset_name: str) -> object:
 
 def run(analysis_type: str, **params) -> str:
     """One analysis on a short-lived connection, through the real gate."""
+    return run_on("clean_sales", analysis_type, **params)
+
+
+def run_on(dataset: str, analysis_type: str, **params) -> str:
+    """The same, against a named dataset. P10-O3 added a second one."""
     con = db.connect(WORKSPACE)
     try:
         return analysis_tools.compute_analysis(
-            con, WORKSPACE, "clean_sales", analysis_type, **params
+            con, WORKSPACE, dataset, analysis_type, **params
         )
+    finally:
+        con.close()
+
+
+def mount_olist() -> str | None:
+    """Copy and join what the Olist clause needs, or the reason there is nothing to test on.
+
+    Three tables because no single one carries a numeric measure, a date and a wide dimension.
+    A LoadRefused -- Postgres down, no alias, a table over the row gate -- becomes a named skip
+    rather than an error, for the reason test_phase9.py gives: a test that reaches a live local
+    database and errors everywhere else is worse than no test.
+    """
+    con = db.connect(WORKSPACE)
+    try:
+        for table in ("order_payments", "orders", "customers"):
+            load_table(con, SOURCE, table)
+        con.execute(
+            f'CREATE OR REPLACE TABLE "{OLIST}" AS SELECT '
+            "p.order_id, p.payment_sequential, p.payment_type, p.payment_value, "
+            "CASE WHEN p.payment_installments > 1 THEN 'instalments' ELSE 'single' END "
+            "AS installment_plan, o.order_purchase_timestamp AS placed, c.customer_state "
+            'FROM "order_payments" p JOIN "orders" o USING (order_id) '
+            'JOIN "customers" c USING (customer_id)'
+        )
+        rows = con.execute(f'SELECT count(*) FROM "{OLIST}"').fetchone()[0]
+        return None if rows else f"{SOURCE}.public.order_payments joined to nothing"
+    except LoadRefused as exc:
+        return str(exc).splitlines()[0]
+    except Exception as exc:  # noqa: BLE001
+        return f"{type(exc).__name__}: {exc}"
+    finally:
+        con.close()
+
+
+def confirm_olist_contract() -> object:
+    """A real contract on the joined table, through the same store as the fixture's."""
+    con = db.connect(WORKSPACE)
+    try:
+        pairs = [
+            (r[0], r[1])
+            for r in con.execute(
+                "SELECT column_name, data_type FROM information_schema.columns "
+                "WHERE table_name = ? ORDER BY ordinal_position",
+                [OLIST],
+            ).fetchall()
+        ]
+        rows = con.execute(f'SELECT count(*) FROM "{OLIST}"').fetchone()[0]
+        contract = DatasetContract(
+            dataset_name=OLIST,
+            grain="one row = one payment on one order",
+            primary_key=["order_id", "payment_sequential"],
+            date_column="placed",
+            measures=[
+                Measure(name="payment_value", agg="sum",
+                        definition="what the payment came to", unit="BRL"),
+            ],
+            dimensions=["payment_type", "installment_plan", "customer_state"],
+            bound_to=Binding.from_pairs(pairs, rows),
+        )
+        return store.confirm(con, contract)
     finally:
         con.close()
 
@@ -413,12 +512,45 @@ def clause_four() -> None:
 
 
 def clause_five() -> None:
-    heading("Clause 5: the Olist half of the Done-When")
+    heading("Clause 5: all nine on Olist, under a real contract")
 
-    skip("all nine on Olist",
-         "the clause is unwritten, not unreachable: P9-O1 closed when "
-         "tests/test_phase9.py reached local Postgres, and the nine tables and 99,441 "
-         "orders were confirmed again in Phase 10 Step 1. P10-O3 tracks writing it")
+    why = mount_olist()
+    if why:
+        skip("all nine on Olist", why)
+        return
+
+    stored = confirm_olist_contract()
+    check("a real contract confirms on the joined table", stored.version == 1,
+          f"v{stored.version}, {stored.row_count:,} rows")
+    check("the calls cover every one of Phase 8's nine",
+          set(OLIST_CALLS) == PHASE_8,
+          f"uncalled: {sorted(PHASE_8 - set(OLIST_CALLS)) or 'none'}")
+
+    wide = ""
+    for name in sorted(OLIST_CALLS):
+        text = run_on(OLIST, name, **OLIST_CALLS[name])
+        ok = reason_of(text) is None
+        check(f"{name} runs on Olist through the real gate", ok,
+              "" if ok else text.splitlines()[0][:90])
+        if not ok:
+            continue
+        check(f"{name} names the contract it computed under",
+              text.startswith(f"Under contract v1 for {OLIST}:"))
+        check(f"{name} says what it was computed over", "row(s) analysed" in text)
+        check(f"{name} wrote a file that exists", Path(path_in(text)).exists(),
+              path_in(text))
+        if name == "cross_tab":
+            wide = text
+
+    # P8-O15, and the skip this clause replaces: no fixture pairing exceeds seven columns
+    # against a twelve-column preview, so the paging path was covered only by a synthetic
+    # fifty-column result in tests/test_results.py. Olist's customer_state has twenty-seven
+    # values, so payment_type by customer_state pages on real data.
+    if wide:
+        check("a real result is wider than the preview window",
+              "column" in wide.lower(),
+              "payment_type by customer_state")
+        check("the wide result names its file", bool(path_in(wide)), path_in(wide))
 
     skip("the role trap",
          "the guide says summary_stats must skip role=identifier; role is a "

@@ -751,8 +751,12 @@ def compute_analysis(
     This computes one of them. An analysis_type nobody registered comes back
     with the full list of valid names, so a wrong guess costs one call.
 
-    Which arguments apply depends on analysis_type, and passing one that does
-    not apply is refused rather than ignored:
+    Which arguments apply depends on analysis_type. Passing one that does not
+    apply WITH A VALUE is refused rather than ignored -- every analysis raises
+    on an unexpected keyword. Passing it as None is not refused: tools.py
+    strips None before dispatch, so bins=10 to calendar_coverage comes back as
+    a refusal and bins=None is accepted silently. The behaviour is right and
+    the shorter sentence oversold it (P9-O3):
 
       summary_stats   nothing -- every declared measure at once
       distribution    measure, bins
@@ -811,6 +815,38 @@ def compute_analysis(
                       which hold none -- a period with no rows cannot
                       appear in a GROUP BY, so a trend drawn over this
                       column crosses absent periods without saying so.
+      hypothesis_test  dimension, and either measure or second_dimension,
+                      plus method (auto, parametric or rank). Whether the
+                      groups differ by more than sampling alone would
+                      produce, naming the test it ran, its variant and its
+                      df. Welch for two groups, one-way ANOVA for more,
+                      chi-square for two dimensions, and a rank test where
+                      a group has one row and therefore no variance.
+      confidence_interval  measure or dimension, and confidence. The range
+                      a mean or a share is consistent with, given how many
+                      rows produced it. Student's t around a mean, Wilson
+                      around a share, with the width stated.
+      effect_size     dimension, and either measure or second_dimension.
+                      How large a difference is in units that do not grow
+                      with the row count -- Hedges' g between two groups,
+                      eta squared across more, Cramer's V between two
+                      dimensions -- banded by Cohen's conventions and said
+                      to be conventions.
+      sample_adequacy  dimension, measure, power and alpha. The smallest
+                      difference these row counts could reliably detect,
+                      in standard deviations and in the measure's units,
+                      beside the difference actually there. Never observed
+                      power, which restates the p-value.
+      cohort_retention  entity and period. How many people from each
+                      starting period came back in each later one, as a
+                      grid of people rather than percentages with the
+                      cohort's size beside its label. Warns and points at
+                      repeat_behaviour when too few return for the shape
+                      to mean anything.
+      repeat_behaviour  entity. How many people appear once and how many
+                      come back, how often and how long they take. Both
+                      refuse an entity that is distinct per row, which
+                      describes events rather than people.
 
     Only columns the contract declares can be named. A column that exists in
     the table but is not a declared dimension or measure is refused with the
