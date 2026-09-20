@@ -4461,6 +4461,11 @@ other nine are recorded open and nobody has checked whether they still are -- a 
 have fixed one incidentally, the way P9-O11 may have been closed by P10-D39 rewriting the very
 test it names.
 
+SUPERSEDED 21/09/2026, and left standing rather than edited. The paragraph above records the state
+as it was BEFORE the fixes that landed in the same commit that wrote it; C78 says how. The current
+list is under "Cleanup Step 1" at the end of this file. Open there: P9-O4's feature half (scoped),
+P9-O5, P9-O11, P9-O12 -- four, not eleven, and each checked against the code rather than inherited.
+
 DUPLICATED, from being restated in a later step: P9-O10, P10-O2, P10-O3, P10-O8.
 
 C68. AN OPEN ITEM WAS CLOSED IN PROSE RATHER THAN IN THE INDEX. Twelve items closed across Phases
@@ -4515,3 +4520,132 @@ holds. P10-O13 carries the sentence.
 
 P10-O13 IS OPEN. The build guide's role=identifier rule describes a protection that exists by a
 different mechanism than the one it names. One sentence, in the guide.
+
+## Cleanup Step 1 - the remaining open items, 21/09/2026
+
+Worked from a plan (`close_remaining_items.md`, 20/09/2026) whose four defects were measured
+before any of it ran; they are C77. The step document is docs/steps/cleanup_step1_close_open_items.md.
+
+CLOSED. P9-O3, 21/09/2026, verified rather than done. server.py:750-759 already scoped the claim
+to a value and named the None case, tools.py stripping it, and the bins=10 / bins=None contrast.
+The fix landed in 03ea6ed; the ledger did not record it. See C77.
+
+CLOSED. P9-O6, 21/09/2026. declared.py:39 owns ADDITIVE_AGGS and period_compare.py:51 and
+growth_decomposition.py:62 both derive from it -- that half landed in 03ea6ed unrecorded. The
+third copy was found in this step: NO_MEMBER = "(no {dimension})" was restated in
+driver_analysis.py, growth_decomposition.py and mix_shift.py, which is the same ruling in a third
+column. It now lives at base.py:42 and the three import it. One declaration remains in src/.
+
+CLOSED. P9-O7, 21/09/2026, by reading. The item said the answer "depends on an except clause
+below tools.py:119, which has not been read". Read: `except (TypeError, ParamsInvalid)` returns a
+Refusal carrying ANALYSIS_PARAMS_INVALID, the analysis summary as state, and an example call. A
+forgotten required parameter surfaces as a refusal a caller can act on, not a traceback out of
+the MCP surface. No code change was needed; the item was an unread file, not a defect.
+
+CLOSED. P9-O9, 21/09/2026, verified rather than done. declared.py:133 defines require_dimension
+and growth_decomposition.py:108 calls it; 03ea6ed deleted the inline eight-line block. Nineteen
+call sites across the tier now share one refusal text.
+
+CLOSED. P10-O13, 21/09/2026. The build guide's line 923 said summary_stats must enforce
+role=identifier. role is a proposal-time heuristic in evidence.py and never reaches a confirmed
+contract, so nothing could enforce it at analysis time -- but the protection holds by a narrower
+and stronger mechanism: every analysis reads only the contract's declared measures. The guide
+named the wrong mechanism for a real behaviour, which is worse than naming none, because a
+reader trusts it. The guide's Phase 8 row was corrected with it.
+
+The role trap stopped being a skip. tests/test_phase8.py carried it as a skip for two phases, and
+once the guide no longer said what the skip quoted, the reason went false -- the stale-skip
+failure this ledger keeps recording, created by this step's own edit. It is now two checks
+against Olist. The first assertion written was the wrong shape: it tested that "order_id" was
+absent from the output and failed, because summary_stats names the key columns it did NOT
+summarise. Measured: "Not summarised: key column(s) order_id, payment_sequential. A column is
+summarised here when the contract declares it as a measure." The identifier appears because the
+protection fired and said so. The check now asserts that line. Phase 8 acceptance 94/0/4 -> 96/0/3.
+
+CLOSED. P9-O2, 21/09/2026. tests/test_phase9.py clause five reports and asserts the temporal
+shape of order_reviews, order_payments and order_items from the real database, so
+calendar_coverage's generality rests on evidence rather than on construction. The item's three
+claims, unchecked since Phase 4, all hold: order_reviews has two date columns
+(review_creation_date, review_answer_timestamp), order_payments has none, order_items has one
+(shipping_limit_date). The first run reported four, none and two. load_table attaches the source,
+so the table exists in two catalogs at once and a query filtered on table_name alone counts every
+column twice. The clause now filters on table_catalog = current_database(). Had the printed
+numbers been recorded rather than questioned, "order_reviews has four date columns" would be in
+this file. Phase 9 acceptance 16/0/0 -> 19/0/0.
+
+CLOSED. P9-O8, 21/09/2026. A null bucket is now named for the column that was empty. The item
+asked which of two spellings wins and this answers it: the Tier 4 spelling, because "(no region)"
+says which column was empty and "(no group)" does not. In hypothesis_test, confidence_interval,
+effect_size and sample_adequacy the constant was both the displayed label and a dictionary key --
+excluded[NO_GROUP] -- so the two were separated: the constants became keys that are not display
+strings ("no_group"), and a _shown() helper builds the label from the column name. Ten display
+sites across four modules, in three shapes, not the four uniform ones the plan assumed. The nine
+test assertions on "(no group)" and "(no value)" are the map that found them.
+
+P9-O8's helper is built one branch at a time, and the reason is measured. A dict literal of all
+three labels evaluates f"(no {measure})" whichever key is asked for, and confidence_interval's
+share branch has a dimension and no measure in scope. The association branches of hypothesis_test
+and effect_size have two dimensions and no measure at all -- a row there is missing either of
+them -- so _shown's measure spelling would name a column that is not what is absent. Those four
+sites use _shown_pair(dimension, second) and render "(no arm or channel)".
+
+C77. A PLAN AND THE TREE IT DESCRIBED WERE WRITTEN A DAY APART AND DISAGREED IN FOUR PLACES.
+`close_remaining_items.md` was read before it was run, and four of its claims were false against
+the repository. (1) It wrote `from .base import NO_MEMBER` into four modules on the strength of
+the sentence "now homed in base.py"; base.py.__all__ did not contain it and the name existed as
+three separate literals, so the import would have raised ImportError in four modules at once.
+(2) It closed "P10-O12", an identifier that has never existed in this file -- the item is P9-O8,
+recorded at line 3692, and closing it under an invented number would have left P9-O8 open
+permanently. (3) Its section 3 said "the edits follow in one block" and no block followed, so run
+alone it left every excluded.items() loop printing the raw key "no_group" as a user-visible label.
+(4) Its commit message named a closure its ledger section did not write, which is C68 and C76 in
+one line. The shape is the one this file keeps recording -- a claim and the thing it describes,
+edited separately -- and this instance is worth naming because the claim was a plan, which is the
+document most likely to be trusted without being checked.
+
+C78. THE REGISTER RECORDED THE STATE BEFORE THE FIXES THAT LANDED IN THE SAME COMMIT. 03ea6ed is
+titled "Open items: P9-O3, O6, O9 and P10-O3 closed". Its only change to this file was adding the
+81-line open-item register, and that register lists P9-O3, P9-O6 and P9-O9 under STILL OPEN while
+the same commit changed exactly the code those three items name. The commit message was right and
+the index was wrong, which is the mirror of C76 rather than a repeat of it: there the message
+promised work the tree lacked, here the tree held work the index denied. Both come of writing the
+record and the thing it records in one pass and checking neither against the other. The register
+was written to stop a grep undercounting closures (C68) and shipped undercounting them itself.
+
+P9-O4's FEATURE HALF REMAINS OPEN, SCOPED 21/09/2026. _loadable_tables is one line at
+state.py:197, and widening it changes what a loaded dataset means at state.py:129 where
+require_contract consults it and at 233 where get_workflow_state walks it. An attached catalog's
+table would need a Binding read from the attached catalog rather than the workspace, a row count
+and age DatasetState expects, and an answer for what validate_dataset and the cleaning tools mean
+against a table they cannot write to. That is a design question about what a dataset is, not a
+filter to loosen, and it is worth less than it looks now that nothing promises it: the cost is a
+capability the product lacks rather than a claim it makes falsely.
+
+STILL OPEN after this step, and each checked against the code on 21/09/2026 rather than inherited:
+P9-O4's feature half (scoped above). P9-O5: no test in any Tier 3 file asserts how base.number()
+renders a float, so the decimal places in a mean column are unasserted; stats.py owns
+STAT_HEADERS, stat_exprs, stat_cells and ranked_totals and no mean renderer, so the item's
+suggested home does not exist as described. P9-O11: test_declared.py's tier check iterates
+catalogue() and cannot catch a map entry whose analysis was never registered -- 03ea6ed's new
+test is the roster check (C72), a different direction, and does not close this. P9-O12:
+correlated_shift still imports _within and MIN_SEGMENT from changepoint.
+
+MEASURED VALIDATION, 21/09/2026. Unit suite 1662 -> 1664; the two added are the association-label
+tests in test_hypothesis_test.py and test_effect_size.py, which cover a branch that had none --
+region and channel are non-null on all fourteen fixture rows, so `missing` was always zero and
+the label was never rendered by a test until arm x channel was used. Acceptance: test_phase8.py
+96 passed, 0 failed, 3 skipped (from 94/0/4); test_phase9.py 19 passed, 0 failed, 0 skipped (from
+16/0/0); test_phase10.py 35 passed, 0 failed, 1 skipped, unchanged. Three skips remain, each
+recorded: ANALYSIS_RESULT_UNSOUND, the rendered MCP schema (permanent), and the non-finite screen.
+Digests:
+  4c6e97707397904f126e6de6e92fd5eca2d6f34e6eb15f4b4e11758e5305b345  docs/analytics_agent_build_guide_v1.2.md
+  6d290033ab77bee29e52993fc60d62731a6d9a32bdab1083eec89f39ddb1058b  src/analytics_agent/analysis/base.py
+  f484d44159417dac51da08ce95b3d0a844d6c87c96fe62134b28b0bdc6508d49  src/analytics_agent/analysis/driver_analysis.py
+  5c68533de7927338f81caf65933b47df985b589e169ab6247754a35fb11b8eff  src/analytics_agent/analysis/growth_decomposition.py
+  13874f57a269d0ce631775d82e84d6f170e11cf6e2453eedc93413f1cb75e5f2  src/analytics_agent/analysis/mix_shift.py
+  9b9a5d5a7acc9e92d299f5b36962d4ac476291dfb008918ed26de48d4fbd9394  src/analytics_agent/analysis/hypothesis_test.py
+  845b05b070956b403517a40cd541c14c414c3533d7f03497497d1714b45f923d  src/analytics_agent/analysis/confidence_interval.py
+  ca8ff94222f982a6f2428b298c9c6222528046cdcd6329beecfcfa96e6c31ce6  src/analytics_agent/analysis/effect_size.py
+  6a5b957e6a66ba1692e15e9fe8b0e0fc91a31006fb8ed067cb693c2c1bbd1039  src/analytics_agent/analysis/sample_adequacy.py
+  5c30e5ec987dff603f366bc7c4adfcd16649967b6358f51a92e452f3f7f68b16  tests/test_phase8.py
+  f5a719c3ee829f7d49fca1912e8b60cce96a2a6ce1ddb4d1359a9ad78b278b7e  tests/test_phase9.py

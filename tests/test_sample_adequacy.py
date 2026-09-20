@@ -169,8 +169,8 @@ def test_the_group_table_adds_back(con):
     out = out_for(con)
     assert cell(out, "a", "n") == "6"
     assert cell(out, "b", "n") == "6"
-    assert cell(out, "(no group)", "n") == "1"
-    assert cell(out, "(no value)", "n") == "1"
+    assert cell(out, "(no arm)", "n") == "1"
+    assert cell(out, "(no score)", "n") == "1"
     assert said(out, "add back to the 14 row(s) in scope")
 
 

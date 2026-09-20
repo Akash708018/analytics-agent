@@ -552,11 +552,19 @@ def clause_five() -> None:
               "payment_type by customer_state")
         check("the wide result names its file", bool(path_in(wide)), path_in(wide))
 
-    skip("the role trap",
-         "the guide says summary_stats must skip role=identifier; role is a "
-         "proposal-time heuristic in evidence.py and never reaches a confirmed "
-         "contract. Clause 1 accepts the behaviour instead: declared columns "
-         "only, and the key named among what was skipped")
+    # P10-O13, closed 21/09/2026. This was a skip for two phases because the build guide said
+    # summary_stats must enforce role=identifier, and role is a proposal-time heuristic in
+    # evidence.py that never reaches a confirmed contract, so nothing could enforce it here.
+    # The guide now names the mechanism that does the work, and this asserts that mechanism on
+    # real data rather than skipping for the one that does not exist: order_id and customer_id
+    # are columns of the joined table and nobody declared them, so they are out of scope.
+    stats = run_on(OLIST, "summary_stats")
+    check("summary_stats reports the declared measure", "payment_value" in stats,
+          "payment_value is the one measure this contract declares")
+    not_summarised = next((ln for ln in stats.splitlines() if "Not summarised" in ln), "")
+    check("an undeclared identifier is named as out of scope rather than summarised",
+          "order_id" in not_summarised,
+          not_summarised.strip()[:160] or "no 'Not summarised' line in the output")
 
 
 def main() -> int:

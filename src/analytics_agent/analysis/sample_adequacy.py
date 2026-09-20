@@ -19,19 +19,39 @@ from __future__ import annotations
 import math
 from typing import Any
 
-from .base import LostRows, label, number
+from .base import NO_MEMBER, LostRows, label, number
 from .declared import column_types, is_numeric, require_dimension, require_measure
 from .inferential import detectable_effect, group_stats, rows_for_effect
 from .registry import Output, register
 from .stats import MAX_GROUPS
 
-NO_VALUE = "(no value)"
-NO_GROUP = "(no group)"
-NOT_FINITE = "(not a number)"
+NO_VALUE = "no_value"        # a key, not a label
+NO_GROUP = "no_group"        # see _shown() below
+NOT_FINITE = "not_finite"
 
 # Cohen's conventions, used here as a scale to quote rows against rather than as thresholds.
 TARGETS = ((0.2, "small"), (0.5, "medium"), (0.8, "large"))
 
+
+def _shown(key: str, dimension: str, measure: str | None = None) -> str:
+    """The row label for an excluded bucket, named for the column it is missing.
+
+    P9-O8: these constants are dictionary keys as well as labels, so the two are separated
+    here rather than by changing the constants. P9-O8 asked which of two spellings for a null
+    group wins; the Tier 4 answer -- name the column -- wins, because "(no region)" says which
+    column was empty and "(no group)" does not.
+
+    Built one branch at a time rather than as a dict of all three. The share branch of
+    confidence_interval has a dimension and no measure, and a dict literal would evaluate
+    f"(no {measure})" there whether or not that key was the one asked for.
+    """
+    if key == NO_GROUP:
+        return NO_MEMBER.format(dimension=dimension)
+    if key == NO_VALUE:
+        return f"(no {measure})"
+    if key == NOT_FINITE:
+        return f"({measure} not a number)"
+    raise KeyError(key)
 
 @register(
     "sample_adequacy",
@@ -86,9 +106,9 @@ def sample_adequacy(con, gate, scope, dimension: str, measure: str,
     rows: list[list[Any]] = [
         [label(g.name), number(g.n), number(g.mean), number(g.sd)] for g in groups
     ]
-    for name, count in excluded.items():
+    for key, count in excluded.items():
         if count:
-            rows.append([name, number(count), None, None])
+            rows.append([_shown(key, dimension, measure), number(count), None, None])
 
     if len(groups) != 2:
         summary.append(

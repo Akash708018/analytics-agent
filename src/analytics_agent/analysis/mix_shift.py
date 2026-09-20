@@ -45,7 +45,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..util.sql_guard import quote_identifier
-from .base import LostRows, ParamsInvalid, number
+from .base import NO_MEMBER, LostRows, ParamsInvalid, number
 from .declared import require_dimension, require_measure
 from .registry import Output, register
 from .temporal import (
@@ -58,7 +58,6 @@ from .temporal import (
 
 __all__ = ["mix_shift"]
 
-NO_MEMBER = "(no {dimension})"
 NAMED = 12
 
 # growth_decomposition reconciles in Decimal and demands equality. A weighted

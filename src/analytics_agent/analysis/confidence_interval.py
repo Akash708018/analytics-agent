@@ -23,15 +23,35 @@ from scipy.stats import t as t_dist
 from statsmodels.stats.proportion import proportion_confint
 
 from ..util.sql_guard import quote_identifier
-from .base import LostRows, label, number
+from .base import NO_MEMBER, LostRows, label, number
 from .declared import column_types, is_numeric, require_dimension, require_measure
 from .inferential import FINITE, group_stats
 from .registry import Output, register
 
-NO_VALUE = "(no value)"
-NO_GROUP = "(no group)"
-NOT_FINITE = "(not a number)"
+NO_VALUE = "no_value"        # a key, not a label
+NO_GROUP = "no_group"        # see _shown() below
+NOT_FINITE = "not_finite"
 
+
+def _shown(key: str, dimension: str, measure: str | None = None) -> str:
+    """The row label for an excluded bucket, named for the column it is missing.
+
+    P9-O8: these constants are dictionary keys as well as labels, so the two are separated
+    here rather than by changing the constants. P9-O8 asked which of two spellings for a null
+    group wins; the Tier 4 answer -- name the column -- wins, because "(no region)" says which
+    column was empty and "(no group)" does not.
+
+    Built one branch at a time rather than as a dict of all three. The share branch of
+    confidence_interval has a dimension and no measure, and a dict literal would evaluate
+    f"(no {measure})" there whether or not that key was the one asked for.
+    """
+    if key == NO_GROUP:
+        return NO_MEMBER.format(dimension=dimension)
+    if key == NO_VALUE:
+        return f"(no {measure})"
+    if key == NOT_FINITE:
+        return f"({measure} not a number)"
+    raise KeyError(key)
 
 @register(
     "confidence_interval",
@@ -105,9 +125,10 @@ def _mean_intervals(con, gate, scope, dimension: str | None, measure: str,
         half = t_dist.ppf(0.5 + confidence / 2.0, g.n - 1) * math.sqrt(g.variance / g.n)
         rows.append([label(g.name), number(g.n), number(g.mean),
                      number(g.mean - half), number(g.mean + half), number(half)])
-    for name, count in excluded.items():
+    for key, count in excluded.items():
         if count:
-            rows.append([name, number(count), None, None, None, None])
+            rows.append([_shown(key, dimension, measure), number(count),
+                         None, None, None, None])
 
     summary.append(
         f"Interval: Student's t on n - 1 degrees of freedom, {pct}. Not the normal interval — "
@@ -159,7 +180,7 @@ def _share_intervals(con, gate, scope, dimension: str, confidence: float,
         rows.append([label(name), number(count), f"{count / scope.analysed:.1%}",
                      f"{low:.1%}", f"{high:.1%}"])
     if missing:
-        rows.append([NO_GROUP, number(missing), None, None, None])
+        rows.append([_shown(NO_GROUP, dimension), number(missing), None, None, None])
 
     summary.append(
         f"Interval: Wilson, {pct}, on each group's share of the {scope.analysed:,} analysed "
@@ -173,8 +194,8 @@ def _share_intervals(con, gate, scope, dimension: str, confidence: float,
     )
     if missing:
         summary.append(
-            f"{missing:,} analysed row(s) have no {dimension} and are shown as {NO_GROUP} so the "
-            f"counts add back to {scope.analysed:,}."
+            f"{missing:,} analysed row(s) have no {dimension} and are shown as "
+            f"{_shown(NO_GROUP, dimension)} so the counts add back to {scope.analysed:,}."
         )
     return Output(headers=headers, rows=rows, summary=summary, label="confidence_interval")
 

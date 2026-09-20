@@ -19,15 +19,15 @@ import math
 from typing import Any
 
 from ..util.sql_guard import quote_identifier
-from .base import LostRows, label, number
+from .base import NO_MEMBER, LostRows, label, number
 from .declared import column_types, is_numeric, require_dimension, require_measure
 from .inferential import FINITE, chi_square, eta_squared, group_stats, hedges_g
 from .registry import Output, register
 from .stats import MAX_GROUPS
 
-NO_VALUE = "(no value)"
-NO_GROUP = "(no group)"
-NOT_FINITE = "(not a number)"
+NO_VALUE = "no_value"        # a key, not a label
+NO_GROUP = "no_group"        # see _shown() below
+NOT_FINITE = "not_finite"
 
 # Cohen's conventions, named as conventions rather than applied as thresholds. They are a
 # vocabulary for talking about a number, not a rule about which numbers matter -- what counts as
@@ -36,6 +36,35 @@ G_BANDS = ((0.2, "small"), (0.5, "medium"), (0.8, "large"))
 ETA_BANDS = ((0.01, "small"), (0.06, "medium"), (0.14, "large"))
 V_BANDS = ((0.1, "small"), (0.3, "medium"), (0.5, "large"))
 
+
+def _shown(key: str, dimension: str, measure: str | None = None) -> str:
+    """The row label for an excluded bucket, named for the column it is missing.
+
+    P9-O8: these constants are dictionary keys as well as labels, so the two are separated
+    here rather than by changing the constants. P9-O8 asked which of two spellings for a null
+    group wins; the Tier 4 answer -- name the column -- wins, because "(no region)" says which
+    column was empty and "(no group)" does not.
+
+    Built one branch at a time rather than as a dict of all three. The share branch of
+    confidence_interval has a dimension and no measure, and a dict literal would evaluate
+    f"(no {measure})" there whether or not that key was the one asked for.
+    """
+    if key == NO_GROUP:
+        return NO_MEMBER.format(dimension=dimension)
+    if key == NO_VALUE:
+        return f"(no {measure})"
+    if key == NOT_FINITE:
+        return f"({measure} not a number)"
+    raise KeyError(key)
+
+
+def _shown_pair(dimension: str, second: str) -> str:
+    """The row label when a row is missing either of two dimensions rather than a measure.
+
+    The association branches cross two dimensions and have no measure in scope, so _shown's
+    measure spelling would name a column that is not what is missing.
+    """
+    return f"(no {dimension} or {second})"
 
 @register(
     "effect_size",
@@ -106,9 +135,9 @@ def _difference(con, gate, scope, dimension: str, measure: str, summary: list[st
     rows: list[list[Any]] = [
         [label(g.name), number(g.n), number(g.mean), number(g.sd)] for g in groups
     ]
-    for name, count in excluded.items():
+    for key, count in excluded.items():
         if count:
-            rows.append([name, number(count), None, None])
+            rows.append([_shown(key, dimension, measure), number(count), None, None])
 
     if len(groups) < 2:
         summary.append(
@@ -193,7 +222,7 @@ def _association(con, gate, scope, dimension: str, second: str, summary: list[st
     rows: list[list[Any]] = [[label(x)] + [number(v) for v in row]
                              for x, row in zip(left, grid)]
     if missing:
-        rows.append([NO_VALUE] + [None] * len(right))
+        rows.append([_shown_pair(dimension, second)] + [None] * len(right))
 
     if len(left) < 2 or len(right) < 2:
         summary.append(
@@ -224,7 +253,8 @@ def _association(con, gate, scope, dimension: str, second: str, summary: list[st
     if missing:
         summary.append(
             f"{missing:,} analysed row(s) have no {dimension} or no {second}, shown as "
-            f"{NO_VALUE} so the counts add back to {scope.analysed:,}."
+            f"{_shown_pair(dimension, second)} so the counts add back to "
+            f"{scope.analysed:,}."
         )
     return Output(headers=headers, rows=rows, summary=summary, label="effect_size")
 

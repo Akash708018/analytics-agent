@@ -14,17 +14,17 @@ Layout: `src/analytics_agent/{ingest,profile,clean,contract,validate,analysis,ch
 
 ## Verify before committing
 All four, every time. Run the suite BEFORE committing, not after (C76: two commits
-recorded a broken tree). Last measured 21/09/2026 at 03ea6ed:
+recorded a broken tree). Last measured 21/09/2026, after the open-item cleanup:
 
-    uv run pytest -q                      # 1662 passed
-    uv run python tests/test_phase8.py    # 94 passed, 0 failed, 4 skipped
-    uv run python tests/test_phase9.py    # 16 passed, 0 failed, 0 skipped
+    uv run pytest -q                      # 1664 passed
+    uv run python tests/test_phase8.py    # 96 passed, 0 failed, 3 skipped
+    uv run python tests/test_phase9.py    # 19 passed, 0 failed, 0 skipped
     uv run python tests/test_phase10.py   # 35 passed, 0 failed, 1 skipped
 
 The acceptance scripts are scripts, not pytest files -- `pytest` collects nothing
-from them, so 1662 excludes them. The four skips are each deliberate and recorded:
-ANALYSIS_RESULT_UNSOUND, the rendered MCP schema (permanent), the role trap, and
-the non-finite screen. A skip is an outstanding clause, not a passing one.
+from them, so 1664 excludes them. The three skips are each deliberate and
+recorded: ANALYSIS_RESULT_UNSOUND, the rendered MCP schema (permanent), and the
+non-finite screen. A skip is an outstanding clause, not a passing one.
 
 ## Conventions
 These are not stylistic. Each came from something going wrong.
@@ -74,7 +74,8 @@ either whole costs more than the work.
 
 - **Open-item register: `docs/decisions.md:4438` to end.** Read it rather than grepping
   for `IS OPEN` -- closures were recorded two ways and a grep undercounts by half (C68).
-  Caveat: the register was reconciled 19/09/2026 and is not self-updating.
+  The register is superseded: it recorded the state before fixes in its own commit (C78).
+  Read the "Cleanup Step 1" section at the END of the file for the current list.
 - Decisions are `P<phase>-D<n>.`, open items `P<phase>-O<n> IS OPEN.`, corrections `C<n>.`
   Grep the identifier and read the surrounding lines; do not open the file.
 - Build guide: tier lists at lines 589-627, phase ledger table at ~1005-1013.

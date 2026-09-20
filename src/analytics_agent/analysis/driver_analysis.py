@@ -39,15 +39,11 @@ from __future__ import annotations
 from typing import Any
 
 from ..util.sql_guard import quote_identifier
-from .base import LostRows, ParamsInvalid, number
+from .base import NO_MEMBER, LostRows, ParamsInvalid, number
 from .declared import require_measure
 from .registry import Output, register
 
 __all__ = ["driver_analysis"]
-
-# What a NULL in a dimension is called, as growth_decomposition calls it.
-# P9-O8 still stands: if Tier 2 has a convention, both should use that one.
-NO_MEMBER = "(no {dimension})"
 
 # A dimension at or above this share of rows-as-groups is reported with its
 # numbers but named as arithmetic rather than as a finding. At 1.0 every row is

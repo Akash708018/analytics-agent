@@ -333,6 +333,52 @@ def clause_four() -> None:
           "" if "do not break" in decoy else decoy[:140])
 
 
+def clause_five() -> None:
+    """P9-O2: calendar_coverage is general by construction and not yet by evidence.
+
+    Everything measured so far is container fixtures and this one table. Olist offers three more
+    temporal shapes for nothing, and each exercises a different branch on real data rather than
+    on a fixture built to be refused.
+
+    The catalog filter is not decoration. load_table attaches the source, so the table exists in
+    two catalogs at once and a query filtered on table_name alone counts every column twice --
+    which on the first run reported four date columns on order_reviews and two on order_items.
+    The counts asserted below were measured on 21/09/2026 after the filter was added, and they
+    are what the item claimed: two, none, and one.
+    """
+    heading("Clause 5: calendar_coverage on three other real temporal shapes")
+
+    for table, column, ndates, expect in (
+        ("order_reviews", None, 2, "two date columns, so a proposal cannot pick one"),
+        ("order_payments", None, 0, "no date column at all, so the refusal fires on real data"),
+        ("order_items", "shipping_limit_date", 1, "a limit date running past the order data"),
+    ):
+        con = db.connect(WORKSPACE)
+        try:
+            load_table(con, SOURCE, table)
+            dates = [
+                r[0] for r in con.execute(
+                    "SELECT column_name FROM information_schema.columns "
+                    "WHERE table_catalog = current_database() AND table_name = ? "
+                    "AND (data_type LIKE '%TIMESTAMP%' OR data_type = 'DATE') "
+                    "ORDER BY ordinal_position",
+                    [table],
+                ).fetchall()
+            ]
+        except LoadRefused as exc:
+            skip(f"{table}", str(exc).splitlines()[0])
+            continue
+        except Exception as exc:  # noqa: BLE001
+            skip(f"{table}", f"{type(exc).__name__}: {exc}")
+            continue
+        finally:
+            con.close()
+
+        check(f"{table} has the shape the item claims", len(dates) == ndates,
+              f"{len(dates)} date column(s): {', '.join(dates) or 'none'} -- {expect}")
+        if column and column not in dates:
+            check(f"{table} carries {column}", False, f"found {dates}")
+
 def main() -> int:
     print("Phase 9 acceptance: Tiers 3 to 5 on a real warehouse table")
 
@@ -346,6 +392,7 @@ def main() -> int:
             clause_two()
             clause_three()
             clause_four()
+            clause_five()
     finally:
         workspace.reset(WORKSPACE)
 

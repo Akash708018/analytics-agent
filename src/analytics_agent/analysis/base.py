@@ -29,7 +29,17 @@ from ..util.sql_guard import bind_predicate, negate, quote_identifier
 from .declared import adds_across_groups
 
 __all__ = ["Scope", "ScopeError", "LostRows", "ParamsInvalid", "number", "label", "window_clause",
-           "scope_for", "ShareBasis", "share_basis"]
+           "scope_for", "ShareBasis", "share_basis", "NO_MEMBER"]
+
+
+# What a NULL in a dimension is called, wherever one is shown. It is a member like
+# any other: the rows exist and the column does not say which member they belong to,
+# which is a fact about those rows and not a gap. Three modules declared this
+# separately until 21/09/2026 -- driver_analysis, growth_decomposition and mix_shift
+# -- which is P9-O6's failure in a third column. P9-O8 asked which of two spellings
+# for a null group wins: this one, because "(no region)" says which column was empty
+# and "(no group)" does not. Callers format it with the dimension name.
+NO_MEMBER = "(no {dimension})"
 
 
 # Four decimal places, thousands separated, trailing zeros dropped. Measured in

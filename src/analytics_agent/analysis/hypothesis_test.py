@@ -30,7 +30,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..util.sql_guard import quote_identifier
-from .base import LostRows, label, number
+from .base import NO_MEMBER, LostRows, label, number
 from .declared import column_types, is_numeric, require_dimension, require_measure
 from .inferential import (FINITE, GroupStats, chi_square, eta_squared, group_stats,
                           hedges_g, kruskal_wallis,
@@ -38,11 +38,11 @@ from .inferential import (FINITE, GroupStats, chi_square, eta_squared, group_sta
 from .registry import Output, register
 from .stats import MAX_GROUPS
 
-NO_VALUE = "(no value)"
-NO_GROUP = "(no group)"
+NO_VALUE = "no_value"        # a key, not a label
+NO_GROUP = "no_group"        # see _shown() below
 # P10-O2: NaN and infinity are not nulls and are not values. They get their own
 # row because a reader who sees them counted separately can go and fix them.
-NOT_FINITE = "(not a number)"
+NOT_FINITE = "not_finite"
 METHODS = ("auto", "parametric", "rank")
 
 # Below this an expected count makes the chi-square approximation unreliable. Pearson's rule,
@@ -50,6 +50,35 @@ METHODS = ("auto", "parametric", "rank")
 # every expected count is 2.5 and says nothing about it, so the sentence is the engine's.
 MIN_EXPECTED = 5.0
 
+
+def _shown(key: str, dimension: str, measure: str | None = None) -> str:
+    """The row label for an excluded bucket, named for the column it is missing.
+
+    P9-O8: these constants are dictionary keys as well as labels, so the two are separated
+    here rather than by changing the constants. P9-O8 asked which of two spellings for a null
+    group wins; the Tier 4 answer -- name the column -- wins, because "(no region)" says which
+    column was empty and "(no group)" does not.
+
+    Built one branch at a time rather than as a dict of all three. The share branch of
+    confidence_interval has a dimension and no measure, and a dict literal would evaluate
+    f"(no {measure})" there whether or not that key was the one asked for.
+    """
+    if key == NO_GROUP:
+        return NO_MEMBER.format(dimension=dimension)
+    if key == NO_VALUE:
+        return f"(no {measure})"
+    if key == NOT_FINITE:
+        return f"({measure} not a number)"
+    raise KeyError(key)
+
+
+def _shown_pair(dimension: str, second: str) -> str:
+    """The row label when a row is missing either of two dimensions rather than a measure.
+
+    The association branches cross two dimensions and have no measure in scope, so _shown's
+    measure spelling would name a column that is not what is missing.
+    """
+    return f"(no {dimension} or {second})"
 
 @register(
     "hypothesis_test",
@@ -125,10 +154,10 @@ def _difference(con, gate, scope, dimension: str, measure: str, method: str,
         [label(g.name), number(g.n), number(g.mean), number(g.sd), number(g.skewness)]
         for g in groups
     ]
-    for name, count in ((NO_GROUP, excluded[NO_GROUP]), (NO_VALUE, excluded[NO_VALUE]),
-                        (NOT_FINITE, excluded[NOT_FINITE])):
+    for key, count in ((NO_GROUP, excluded[NO_GROUP]), (NO_VALUE, excluded[NO_VALUE]),
+                       (NOT_FINITE, excluded[NOT_FINITE])):
         if count:
-            rows.append([name, number(count), None, None, None])
+            rows.append([_shown(key, dimension, measure), number(count), None, None, None])
 
     if len(groups) < 2:
         summary.append(
@@ -237,7 +266,7 @@ def _independence(con, gate, scope, dimension: str, second: str, method: str,
     rows: list[list[Any]] = [[label(x)] + [number(v) for v in row]
                              for x, row in zip(left, table)]
     if missing:
-        rows.append([NO_VALUE] + [None] * len(right))
+        rows.append([_shown_pair(dimension, second)] + [None] * len(right))
 
     if len(left) < 2 or len(right) < 2:
         # P10-D32: chi2_contingency returns chi2 0.0, dof 0 and p 1.0 here -- no error, no nan,
@@ -273,8 +302,8 @@ def _independence(con, gate, scope, dimension: str, second: str, method: str,
     if missing:
         summary.append(
             f"{missing:,} analysed row(s) have no {dimension} or no {second} and are excluded "
-            f"from the table, shown as {NO_VALUE} so the counts add back to "
-            f"{scope.analysed:,}."
+            f"from the table, shown as {_shown_pair(dimension, second)} so the counts "
+            f"add back to {scope.analysed:,}."
         )
     return Output(headers=headers, rows=rows, summary=summary, label="hypothesis_test")
 

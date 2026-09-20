@@ -139,8 +139,8 @@ def test_the_groups_are_the_scopes_rows_and_they_add_back(con):
     out = out_for(con)
     assert cell(out, "a", "n") == "6"
     assert cell(out, "b", "n") == "6"
-    assert cell(out, "(no group)", "n") == "1"
-    assert cell(out, "(no value)", "n") == "1"
+    assert cell(out, "(no arm)", "n") == "1"
+    assert cell(out, "(no score)", "n") == "1"
     assert said(out, "add back to the 14 in scope")
 
 
@@ -256,6 +256,21 @@ def test_the_rank_branch_handles_more_than_two_groups(con):
 
 
 # --- what it will not do --------------------------------------------------------------
+
+def test_the_association_table_names_both_dimensions_on_a_missing_row(con):
+    """P9-O8: this row is missing one of two dimensions and no measure at all, so the label
+    names the pair rather than a measure that is not what is absent.
+
+    Until 21/09/2026 the branch was unasserted -- region and channel are non-null on all
+    fourteen fixture rows, so `missing` was always zero and the label was never rendered by a
+    test. Row 11 has no arm, so arm x channel excludes exactly one.
+    """
+    out = out_for(con, dimension="arm", second_dimension="channel")
+    assert any(r[0] == "(no arm or channel)" for r in out.rows), (
+        f"no row labelled for the missing pair; rows are {[r[0] for r in out.rows]}"
+    )
+    assert said(out, "(no arm or channel)")
+
 
 def test_a_measure_and_a_second_dimension_are_not_both_allowed(con):
     with pytest.raises(ValueError, match="exactly one of measure, second_dimension"):

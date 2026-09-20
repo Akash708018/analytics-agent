@@ -43,7 +43,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..util.sql_guard import quote_identifier
-from .base import LostRows, ParamsInvalid, number
+from .base import NO_MEMBER, LostRows, ParamsInvalid, number
 from .declared import ADDITIVE_AGGS, AGG_SQL, agg_of, require_dimension, require_measure
 from .registry import Output, register
 from .temporal import (
@@ -60,12 +60,6 @@ __all__ = ["growth_decomposition"]
 # two add across groups, so their changes add across members. The other five do
 # not. If declared.py or stats.py already exports this, import it -- P9-O6.
 ADDITIVE = frozenset(ADDITIVE_AGGS)  # P9-O6: declared.py owns this
-
-# What a NULL in the dimension is called in the output. It is a member like any
-# other: the rows exist and the column does not say which member they belong
-# to, which is a fact about those rows and not a gap in the calendar. P9-O8 is
-# whether Tier 2 already has a label for this, in which case use that one.
-NO_MEMBER = "(no {dimension})"
 
 # Labels shown when a period nobody has is refused, as period_compare shows
 # them, and members named in a summary sentence before the list becomes a count.

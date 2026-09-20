@@ -158,8 +158,8 @@ def test_the_excluded_rows_add_back(con):
     """P10-D6 and P10-D36: fourteen in scope, thirteen scored, one with no score, one with no
     arm. LostRows would fire if they did not."""
     out = out_for(con, dimension="arm", measure="score")
-    assert cell(out, "(no group)", "n") == "1"
-    assert cell(out, "(no value)", "n") == "1"
+    assert cell(out, "(no arm)", "n") == "1"
+    assert cell(out, "(no score)", "n") == "1"
     assert said(out, "add back to the 14 row(s) in scope")
 
 
@@ -193,7 +193,7 @@ def test_a_dimension_alone_gives_wilson_intervals_on_shares(con):
     assert said(out, "Not Wald")
     assert cell(out, "a", "n") == "7"
     assert cell(out, "b", "n") == "6"
-    assert cell(out, "(no group)", "n") == "1"
+    assert cell(out, "(no arm)", "n") == "1"
 
 
 def test_the_shares_are_against_the_whole_and_say_so(con):
