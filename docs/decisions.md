@@ -4463,8 +4463,8 @@ test it names.
 
 SUPERSEDED 21/09/2026, and left standing rather than edited. The paragraph above records the state
 as it was BEFORE the fixes that landed in the same commit that wrote it; C78 says how. The current
-list is under "Cleanup Step 1" at the end of this file. Open there: P9-O4's feature half (scoped),
-P9-O5, P9-O11, P9-O12 -- four, not eleven, and each checked against the code rather than inherited.
+list is under "Cleanup Step 2" at the end of this file. Open there: P9-O4's feature half,
+scoped as a design question -- one, not eleven, and each of the others checked against the code.
 
 DUPLICATED, from being restated in a later step: P9-O10, P10-O2, P10-O3, P10-O8.
 
@@ -4649,3 +4649,64 @@ Digests:
   6a5b957e6a66ba1692e15e9fe8b0e0fc91a31006fb8ed067cb693c2c1bbd1039  src/analytics_agent/analysis/sample_adequacy.py
   5c30e5ec987dff603f366bc7c4adfcd16649967b6358f51a92e452f3f7f68b16  tests/test_phase8.py
   f5a719c3ee829f7d49fca1912e8b60cce96a2a6ce1ddb4d1359a9ad78b278b7e  tests/test_phase9.py
+
+## Cleanup Step 2 - the last three small items, 21/09/2026
+
+Step document: docs/steps/cleanup_step2_last_three_items.md. P9-O4's feature half stays open by
+decision and is scoped under Cleanup Step 1.
+
+CLOSED. P9-O5, 21/09/2026. base.number() has been handed a float since P9-D22 and no test in any
+Tier 3 file asserted how it renders one, so the decimal places in a mean column were unasserted.
+tests/test_stats_facts.py now pins them, measured rather than recalled: 10.0 -> '10' (trailing
+zeros dropped), 0.05 -> '0.05', 2.5 -> '2.5', -0.125 -> '-0.125', 1234567.89 -> '1,234,567.89',
+23.583333333333332 -> '23.5833' (four places), and Decimal('10.50') -> '10.50', not rounded,
+because a declared scale is a fact about the column. The item's suggested home does not exist:
+stats.py exports STAT_HEADERS, MAX_GROUPS, stat_exprs, stat_cells and ranked_totals and no mean
+renderer, so base.number() is the renderer and there was nothing for seasonality to adopt.
+
+1e-07 RENDERS AS '0', AND THAT IS NOW PINNED. Rounding to four places gives 0.0000, the two
+rstrips leave the empty string, and base.py:76's `text or "0"` fills the cell. The behaviour is
+right -- a cell cannot be blank -- and it is invisible: a reader sees zero where the value was
+not zero. Found while measuring for P9-O5 rather than looked for.
+
+CLOSED. P9-O11, 21/09/2026, and restated first because P10-D39 changed what it refers to. The
+item was written when test_declared.py's tier check compared the registry against a dict typed
+out in the test; P10-D39 replaced that dict with the build guide, parsed. The direction it names
+was still unasserted: the test computed `unbuilt = sorted(set(tiers) - registered)` and then
+asserted `unbuilt == sorted(unbuilt)`, which is true of every list and tests nothing, so a name
+the guide carries that nothing registers passed silently. It now asserts that every guide-named
+analysis below Tier 8 is registered. Tier 8 is exempt because it is legitimately unbuilt (Phase
+15) -- and measured: its listing is prose, "Port SARIMAX/Prophet from Mandi", with no backticked
+names, so the parse finds none of it and `set(tiers) - registered` is empty today. Proved able to
+fail rather than assumed: with pareto removed from REGISTRY the test raises "the build guide names
+pareto below Tier 8 and nothing registers them". The assertion it replaced could not fail at all.
+
+CLOSED. P9-O12, 21/09/2026. correlated_shift imported _within, MIN_SEGMENT and SEPARATION from
+changepoint -- a private name crossing a module boundary. The alternative the item names, a second
+copy of the statistic, is what P9-O6 records going wrong, so the sharing is declared instead of
+removed: _within is renamed within, and changepoint's __all__ carries within, MIN_SEGMENT and
+SEPARATION beside the analysis. A name another module depends on is part of this module's surface
+whether or not it is spelled that way. Five sites; no _within remains in src/.
+
+C79. A WRONG ANSWER WAS GIVEN FROM A TOOL USED WRONGLY, AND THE OUTPUT LOOKED LIKE A RESULT.
+Asked whether everything was closed, the check ran `comm` over two lists sorted with `sort -V`.
+comm requires both inputs in the same lexical collation, and version sort puts P10 after P9, so
+comm read the files as unsorted and reported P10-O1 through P10-O13 as both "opened but never
+closed" and "closed but never opened" simultaneously -- which cannot both be true and was the
+tell. Re-run with plain `sort`: 24 opened, 20 closed, 4 open. The failure is the family this file
+keeps recording, one step earlier than usual: not a claim edited apart from its subject, but a
+measurement whose instrument was wrong while its output was shaped like an answer. Two
+contradictory lists are a cheap tell; a single plausible wrong list would not have been.
+
+STILL OPEN after this step: P9-O4's feature half, alone, and by decision rather than by omission.
+24 items opened across Phases 9 and 10, 23 closed.
+
+MEASURED VALIDATION, 21/09/2026. Unit suite 1664 -> 1665; the one added is the float-rendering
+test for P9-O5. P9-O11 and P9-O12 add no tests: the first replaces an assertion that could not
+fail with one that can, the second is a rename. Acceptance unchanged: test_phase8.py 96 passed,
+0 failed, 3 skipped; test_phase9.py 19 passed, 0 failed, 0 skipped; test_phase10.py 35 passed,
+0 failed, 1 skipped. Digests:
+  c9442c76862f2f11eb470b1de4feef7fe6eaffcc2ca808bf57f1f0dc897386dd  src/analytics_agent/analysis/changepoint.py
+  5eece3e4a83826c5a168c2cbe2c90b293c3b6f7677d7cc400b6ce599c1eeee79  src/analytics_agent/analysis/correlated_shift.py
+  543340e6f413e18f78944603f4ba825ea1e7f44bf03dc41848ed696f048c49d2  tests/test_stats_facts.py
+  b9dd0215dd6e48b25b5aa2952df2271e7f60d21d4e01d7d7fdc240622ceadae5  tests/test_declared.py

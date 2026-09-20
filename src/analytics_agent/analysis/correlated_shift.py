@@ -40,7 +40,7 @@ from typing import Any
 
 from ..util.sql_guard import quote_identifier
 from .base import LostRows, ParamsInvalid, number
-from .changepoint import MIN_SEGMENT, SEPARATION, _within
+from .changepoint import MIN_SEGMENT, SEPARATION, within
 from .declared import AGG_SQL, agg_of, require_measure
 from .registry import Output, register
 from .temporal import (
@@ -188,7 +188,7 @@ def correlated_shift(con, gate, scope, measure: str, against: str,
         if found is None:
             rows.append([name, "", "", "", number(candidates)])
             continue
-        spread = _within(series, found[0])
+        spread = within(series, found[0])
         rows.append([
             name, found[0],
             f"{found[1]:+,.4f}".rstrip("0").rstrip("."),
@@ -241,7 +241,7 @@ def correlated_shift(con, gate, scope, measure: str, against: str,
 
     weak = [name for name, found in best.items()
             if (lambda s: s is not None and abs(found[1]) < SEPARATION * s)(
-                _within(left if name == measure else right, found[0]))]
+                within(left if name == measure else right, found[0]))]
     if weak:
         summary.append(
             f"{' and '.join(weak)}: the break is smaller than "

@@ -222,9 +222,19 @@ def test_every_registered_analysis_sits_in_its_build_guide_tier():
         assert tier == tiers[name], (
             f"{name} is registered at tier {tier}; the guide puts it at {tiers[name]}"
         )
+    # P9-O11: the check above runs registry -> guide, so it catches an analysis the guide does
+    # not name. The other direction was computed here and thrown away on an assertion true of
+    # every list, so a name the guide carries that nothing registers passed silently -- which is
+    # how a half-applied wiring would have looked. Tier 8 is legitimately unbuilt (Phase 15, and
+    # its listing is prose rather than backticked names, so the parse finds none of it), so only
+    # tiers below 8 are required to exist.
     registered = {name for name, _, _ in entries}
-    unbuilt = sorted(set(tiers) - registered)
-    assert unbuilt == sorted(unbuilt), "sorted() is not the identity, which cannot happen"
+    premature = sorted(n for n in set(tiers) - registered if tiers[n] < 8)
+    assert not premature, (
+        f"the build guide names {', '.join(premature)} below Tier 8 and nothing registers "
+        f"them. An analysis in the roster that no module registers is a wiring step that did "
+        f"not run."
+    )
 
 
 def test_lost_rows_is_a_scope_error():

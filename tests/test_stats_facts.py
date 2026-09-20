@@ -425,6 +425,41 @@ def test_nan_reaches_a_cell_as_text():
     assert number(float("inf")) == "inf"
 
 
+def test_number_renders_a_float_to_four_places_and_a_decimal_to_its_own_scale():
+    """P9-O5: number() has been handed a float since P9-D22 and no test in any Tier 3 file
+    asserted how it renders one, so the decimal places in a mean column were unasserted.
+
+    The Decimal contrast is the whole point of the function. A DECIMAL(18,2) column's 10.50 is
+    two places because somebody declared two; a float's seventeen digits are an artifact of the
+    type. stats.py owns no mean renderer, so base.number() is the home and there was nothing for
+    seasonality to adopt. Measured 21/09/2026.
+    """
+    from decimal import Decimal
+
+    from analytics_agent.analysis.base import number
+
+    for value, expected in (
+        (10.0, "10"),
+        (0.05, "0.05"),
+        (2.5, "2.5"),
+        (-0.125, "-0.125"),
+        (1234567.89, "1,234,567.89"),
+        (23.583333333333332, "23.5833"),
+    ):
+        say(f"number({value!r})", repr(number(value)))
+        assert number(value) == expected, f"number({value!r}) rendered {number(value)!r}"
+
+    # A float small enough to round away still has to fill a cell: rounding to four places
+    # gives 0.0000, the rstrips leave "", and base.py's `text or "0"` makes it "0". So a
+    # reader sees zero where the value was not zero. Pinned because it is invisible.
+    say("number(1e-07)", repr(number(1e-07)))
+    assert number(1e-07) == "0"
+
+    say("number(Decimal('10.50'))", repr(number(Decimal("10.50"))))
+    assert number(Decimal("10.50")) == "10.50", "a declared scale is not the float's to round"
+    assert number(7) == "7"
+
+
 # --- rank tests without leaving SQL -------------------------------------------------------
 
 def test_duckdb_ranks_reproduce_the_mannwhitney_statistic():

@@ -45,7 +45,11 @@ from .temporal import (
     require_date_column,
 )
 
-__all__ = ["changepoint"]
+# P9-O12: correlated_shift reads three of these. They are exported rather than reached for
+# privately, because the alternative is a second copy of the same statistic in the other
+# module, and P9-O6 records what two copies of one ruling do. A name another module depends
+# on is part of this module's surface whether or not it is spelled that way.
+__all__ = ["changepoint", "within", "MIN_SEGMENT", "SEPARATION"]
 
 # Periods each side of a split before it is a level shift rather than an
 # endpoint. Three is the fewest that can have a level at all.
@@ -60,7 +64,7 @@ MIN_SEGMENT = 3
 SEPARATION = 2.0
 
 
-def _within(series, split_label: str) -> float | None:
+def within(series, split_label: str) -> float | None:
     """Pooled standard deviation inside the two segments a split creates.
 
     None when neither segment varies at all, which is not zero spread to divide
@@ -215,7 +219,7 @@ def changepoint(con, gate, scope, measure: str, grain: str = DEFAULT_GRAIN,
     # best is always close behind and a runner-up test calls a clean break
     # unclear. Measured: a step of 40 with no noise has the top two at +40 and
     # +34.29, which no margin rule separates from a series with no break at all.
-    spread = _within(series, best[0])
+    spread = within(series, best[0])
     if spread is None:
         summary.append(
             "Neither side varies within itself at all, so the difference is "
