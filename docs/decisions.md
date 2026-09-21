@@ -5384,3 +5384,75 @@ whole value of "read all six before committing" is that somebody reads them.
 
 MEASURED, 21/09/2026: after the fix, `uv run python tests/test_phase12.py` then
 `git status --short` prints nothing. 36 passed, 0 failed, 0 skipped, unchanged.
+
+## Phase 13, Step 1 - the eval harness, 21/09/2026
+
+Step document: docs/steps/phase13_step1_harness.md, written before the run with five
+predictions. All five held. SCORE: 27/28 (96%) -- correctness 5/5, behavioural 18/19,
+regression 4/4.
+
+P13-D1. THE EVAL REPORTS A SCORE AND EXITS ZERO ON A WRONG ANSWER. It exits non-zero only when
+the harness itself could not run. An eval that fails the build on any wrong answer is a test
+suite, and a test suite cannot carry a score -- the number stops being a measurement the moment
+it has to be 100%. The guide's own words for this phase are "it turns 'I built an AI thing' into
+'I measured whether it was right, and here is the number'", and a number that can only ever be
+one number is not one. The six existing checks stay pass/fail; the eval is the seventh thing to
+run and the first that answers with a figure.
+
+P13-D2. A GOLD ANSWER IS COMPUTED WITHOUT THE TOOL UNDER TEST. Every correctness question
+carries SQL run against the loaded table, and the reply must contain what that SQL returned. An
+answer produced by compute_analysis would agree with compute_analysis forever, including when
+both are wrong. C02 is why this matters in practice: it asserted `count(DISTINCT region)` = 4
+and the tool returned 5, and the tool was right -- DISTINCT excludes NULL and P8-D5 keeps NULL
+as its own group. The question was the answer to something else.
+
+P13-D3. BEHAVIOURAL IS MEASURED WITHOUT AN AGENT, BY EXECUTING THE REFUSAL'S OWN NEXT STEP.
+"Does the agent recover from a gate refusal in one retry" asks about a model, and running one
+and grading it measures one model on one day. Every refusal here carries a NEXT STEP, and
+`Refusal.__post_init__` already rejects one without parentheses because "an instruction the
+agent cannot execute is how the apology loop starts" -- but nothing executed it. A refusal
+recovers in one retry if the call it names, made verbatim, succeeds. B02 and B03 do: both name
+`compute_analysis(dataset_name="clean_sales", analysis_type="summary_stats")` and both come back
+with a result. That tests the property rather than a sample.
+
+P13-D4. THE RETRY PARSES WITH ast AND DISPATCHES THROUGH AN ALLOWLIST, NEVER eval. A harness
+that evaluated whatever string a refusal happened to contain would be a worse defect than any it
+could find. A NEXT STEP is usable when it parses as exactly one call to a registered tool with
+literal arguments and nothing after it.
+
+P13-O1 IS OPEN. Sixteen of thirty-seven refusals name a call an agent can make verbatim. The
+other twenty-one carry prose after the call (`list_datasets() to see what is already here`), a
+second call (`propose_ingest_spec(path="...") then confirm_ingest_spec`), or a placeholder the
+caller must fill (`primary_key=[...]`, `grain=...`). The three are not equally wrong. A
+placeholder is correct -- the caller has to decide, and Refusal's own docstring uses
+`confirm_dataset_contract(contract_json=...)` as its example of a good next_call. Prose glued to
+a call is not: `Refusal` already has a `detail` field, and that is where the guidance belongs.
+F1's entire mitigation is instructional refusals, and an instruction an agent has to parse
+before following is weaker than one it can follow. B04 is the gold question that catches one.
+The fix is mechanical and touches about a dozen sites; it is Step 2's work rather than a
+one-line patch to whichever site the eval happened to test, which would be gaming the
+measurement.
+
+P13-O2 IS OPEN, and it is C86 repeating. confirm_dataset_contract exports a YAML copy to
+docs/contracts/, outside the workspace. C86 taught tests/test_phase12.py to restore what it
+found; eval/run_eval.py confirms a contract too and dirtied docs/contracts/clean_sales.yaml on
+its first run, because the fix was made to one script rather than to the pattern. It now
+restores as well. Two scripts doing the same bookkeeping by hand is the shape P9-O6 records, and
+the answer is a shared helper -- or an export root the test path can set, which the MCP tool
+still must not expose.
+
+TWO MEASUREMENTS OF THE SAME THING DISAGREED, AND THAT IS HOW THE ROSTER'S BUG WAS FOUND. The
+roster first reported 0 of 37 refusals naming a usable call. It rendered f-strings by
+substituting `"x"` into literal parts that already carried quotes, producing `dataset_name=""x""`
+-- a syntax error every time. Nothing about "0 of 37" looked impossible; a probe run minutes
+earlier had said 22, and the disagreement is what caught it. The two surviving numbers are both
+right and answer different questions: 22 of 37 NEXT STEPs *look* like a call under a regex, and
+16 of 37 *are* one this process can make. `propose_dataset_contract(dataset_name="x",
+primary_key=[...])` is in the gap.
+
+MEASURED VALIDATION, 21/09/2026. `uv run python eval/run_eval.py`: 27 passed, 1 failed, 0
+skipped, SCORE 27/28 (96%). The one failure is B04 and is P13-O1. Full suite 1759 and the five
+acceptance scripts unchanged -- 99/0/2, 19/0/0, 35/0/1, 26/0/0, 36/0/0 -- because nothing under
+src/ changed in this step. Digests:
+  ec4e0cc15c60b808cefa4593b9820ae7a6bbe3209bbeed96f5cdd8af6f656fe2  eval/run_eval.py
+  3aa8ed4a233aa171aa6b350f7518f14f2e729f1444d727926a17c0bd2b99d5eb  eval/gold_questions.yaml

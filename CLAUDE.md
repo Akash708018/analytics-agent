@@ -1,9 +1,10 @@
 # analytics-agent
 
 MCP server exposing data loading, profiling, cleaning and contract-gated analysis
-to Claude Desktop. Phases 1-12 done. Phase 13 (eval harness) is next and is
-marked DO NOT SKIP in the guide. Nothing recorded open except P9-O4's feature
-half, scoped as a design question. Nothing recorded
+to Claude Desktop. Phases 1-12 done. Phase 13 (eval harness) is in progress:
+Step 1 built the harness and all three suites, scoring 27/28. Open: P13-O1
+(refusals naming something an agent cannot run verbatim), P13-O2 (two scripts
+restore the contract export by hand), and P9-O4's feature half. Nothing recorded
 open except P9-O4's feature half, scoped as a design question.
 
 ## Stack
@@ -24,6 +25,12 @@ recorded a broken tree). Last measured 21/09/2026, after the open-item cleanup:
     uv run python tests/test_phase10.py   # 35 passed, 0 failed, 1 skipped
     uv run python tests/test_phase11.py   # 26 passed, 0 failed, 0 skipped
     uv run python tests/test_phase12.py   # 36 passed, 0 failed, 0 skipped
+
+The eval harness is the seventh thing to run and the only one that answers
+with a figure rather than pass/fail -- it exits zero on a wrong answer,
+because a suite that must be 100% cannot carry a score (P13-D1):
+
+    uv run python eval/run_eval.py        # SCORE: 27/28 (96%)
 
 The acceptance scripts are scripts, not pytest files -- `pytest` collects nothing
 from them, so 1759 excludes them. The three skips are each deliberate and
