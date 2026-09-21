@@ -86,6 +86,7 @@ EXPECTED_TOOLS = {
     "show_limits",
     "validate_dataset",
     "render_chart",
+    "build_report",
 }
 
 
@@ -182,6 +183,30 @@ def test_the_direct_loaders_point_at_the_conversation(docs):
 
 def test_preview_file_points_at_the_conversation_too(docs):
     assert "propose_ingest_spec" in docs["preview_file"]
+
+
+def test_build_report_tells_claude_the_question_is_the_users_words(docs):
+    """P12-D2: nothing records why a dataset was loaded, so this is the one section with no
+    record behind it. An agent that tidies the question writes the wrong report."""
+    doc = docs["build_report"]
+    assert "in their words" in doc
+    assert "Do not invent one" in doc
+
+
+def test_build_report_says_it_computes_nothing(docs):
+    """Otherwise an agent treats it as expensive and defers it, or reruns analyses first."""
+    assert "computes nothing" in docs["build_report"]
+
+
+def test_build_report_says_an_empty_section_still_appears(docs):
+    doc = docs["build_report"]
+    assert "always has nine" in doc
+    assert "needed no cleaning" in doc
+
+
+def test_build_report_tells_claude_it_cannot_read_the_file(docs):
+    """Rule 4. The same instruction render_chart carries, for the same reason."""
+    assert "You cannot read the file" in docs["build_report"]
 
 
 def test_query_source_is_preferred_over_copying(docs):

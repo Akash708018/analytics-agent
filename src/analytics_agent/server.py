@@ -84,6 +84,7 @@ from .contract import tools as contract_tools
 from .analysis import tools as analysis_tools
 from .profile import tools as profile_tools
 from .clean import tools as clean_tools
+from .report import tools as report_tools
 from .validate import tools as validate_tools
 
 mcp = FastMCP(SERVER_NAME)
@@ -1156,6 +1157,45 @@ def validate_dataset(
     """
     wid = workspace_id or DEFAULT_WORKSPACE_ID
     return validate_tools.validate_dataset(wid, dataset_name)
+
+
+@mcp.tool(annotations=READ_ONLY)
+def build_report(
+    dataset_name: str,
+    question: str,
+    workspace_id: str | None = None,
+) -> str:
+    """Write the full report for a dataset: what was asked, what was done, and how to repeat it.
+
+    Call this at the end of a piece of work, once the analyses the user wanted have run. It
+    computes nothing -- every number in it was recorded by the tool that produced it -- so
+    running it twice costs nothing and running it early produces a report whose later sections
+    say that nothing has happened yet.
+
+    question is what the user actually asked, in their words. Nothing in the workspace records
+    why a dataset was loaded, so this is the one part of the report that has no record behind
+    it. Do not invent one, and do not paraphrase the user into something tidier than they said.
+
+    The report has nine sections and always has nine, whatever has been done: the question, the
+    dataset and its grain, data quality, the cleaning ledger, validation results, findings with
+    their charts, method notes, caveats and exclusions, and a reproduction appendix listing the
+    exact calls that produced every number. A section with nothing behind it appears and says
+    so, because a report missing its cleaning ledger reads as a dataset that needed no cleaning.
+
+    A dataset with no confirmed contract is still reported rather than refused. The report then
+    says no grain was agreed, which is the most important thing a reader could be told about the
+    numbers in it.
+
+    You cannot read the file this writes. The reply gives the table of contents, the key
+    findings, and which sections had nothing to report -- describe the work from those, not from
+    the filename.
+    """
+    wid = workspace_id or DEFAULT_WORKSPACE_ID
+    con = db.connect(wid)
+    try:
+        return report_tools.build_report(con, wid, dataset_name, question)
+    finally:
+        con.close()
 
 
 if __name__ == "__main__":

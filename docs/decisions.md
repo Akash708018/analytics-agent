@@ -5262,3 +5262,53 @@ skipped; test_phase9.py 19/0/0; test_phase10.py 35/0/1; test_phase11.py 26/0/0 -
 nothing in src/ imports report/ until Step 4 registers build_report. Digests:
   8d3df2aee0ca8e9d2d260a58be171619c20cb0ea42c9bce41e83c102bace07ce  src/analytics_agent/report/assemble.py
   b7cd32afbb49eb72af2611791b9f6e03d169e88b94ce576ced21af8c39d53054  tests/test_report_assemble.py
+
+## Phase 12, Step 4 - build_report, 21/09/2026
+
+Step document: docs/steps/phase12_step4_build_report.md, written before the run with six
+predictions. All six held.
+
+P12-D16. A DATASET WITH NO CONTRACT IS REPORTED, NOT REFUSED, AND THIS DIVERGES FROM
+validate_dataset DELIBERATELY. validate/tools.py refuses that case and its reason is good: a
+validation report with nothing to test against "would be a page of NOT RUN". A report is the
+opposite case. P12-D11 already decided every section appears and says why it is empty, and a
+report of a dataset whose grain nobody agreed is still a report -- it says the grain was never
+agreed, which is the most important thing a reader could be told about the numbers in it.
+Refusing would withhold precisely that. build_report refuses one thing only: a dataset that is
+not loaded, because with no table there is nothing for the contract, the profile, the ledger,
+the validation runs or any analysis to refer to.
+
+P12-D17. THE QUESTION IS THE USER'S WORDS AND THE DOCSTRING SAYS SO TWICE. "question is what the
+user actually asked, in their words ... Do not invent one, and do not paraphrase the user into
+something tidier than they said." P12-D2 makes this the one section with no record behind it,
+which means it is the one section an agent can quietly author. The instruction is in the tool
+description because that is what the model reads, and a test asserts both sentences survive an
+edit.
+
+P12-D18. THE DOCSTRING SAYS IT COMPUTES NOTHING. An agent that thinks a report is expensive
+defers it, or re-runs the analyses first to be safe -- and re-running them would add duplicate
+rows to the run log and a second copy of every finding. Saying "it computes nothing -- every
+number in it was recorded by the tool that produced it" is cheaper than any guard against that.
+
+P12-D19. NO FORWARDING GUARD WAS ADDED, AND THAT IS NOT AN OVERSIGHT. C83 was a roster of
+twenty-plus parameters declared in one place and passed in another, and the guard that caught it
+derives the roster from the registry. build_report takes three arguments. A guard for a roster
+that does not exist would be ceremony, and a suite full of ceremony is one nobody reads closely
+enough to notice the guard that matters.
+
+THE CLOSED TOOL ROSTER FIRED AGAIN, ON SCHEDULE. test_tool_docs.py's
+test_the_registered_tools_are_exactly_the_expected_ones failed on build_report before it was
+declared, as it did on render_chart in Phase 11 Step 3. Recorded a second time because the
+contrast with C83 is the useful part: the same file holds a closed roster that cannot miss a
+tool and, until C83, an open one that could not catch a missing parameter. The difference was
+`==` against `<=`.
+
+MEASURED VALIDATION, 21/09/2026. tests/test_report_tools.py: 7 passed, plus 4 docstring guards
+in test_tool_docs.py. Full suite 1748 -> 1759. Acceptance unchanged -- test_phase8.py 99 passed,
+0 failed, 2 skipped; test_phase9.py 19/0/0; test_phase10.py 35/0/1; test_phase11.py 26/0/0 --
+because nothing calls build_report from a script until Step 5, which is the guide's Done-When.
+Digests:
+  de0179097b453d317a12ed6e7535009d2160daeefe7f39c964d1eaff84cd8030  src/analytics_agent/report/tools.py
+  a18a14eaa806d974eaca2f88b65d7eb5f3a899223ecb3f00f6f8131bb3d8a699  src/analytics_agent/server.py
+  74a112986188b67ab363c0337943888162f2944f3c544d83c1895ac6a65c269b  tests/test_report_tools.py
+  d5f2adf4555cb2634b5f2b27a9426ed53e51eb0dac08513179f434a69ecf6412  tests/test_tool_docs.py

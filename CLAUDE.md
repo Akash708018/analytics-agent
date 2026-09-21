@@ -1,10 +1,11 @@
 # analytics-agent
 
 MCP server exposing data loading, profiling, cleaning and contract-gated analysis
-to Claude Desktop. Phases 1-11 done. Phase 12 (report) is in progress: Steps 1-3 done --
+to Claude Desktop. Phases 1-11 done. Phase 12 (report) is in progress: Steps 1-4 done --
 what each mandatory section reads from, analysis/runs.py recording what
-every analysis and chart was called with, and report/assemble.py writing the
-nine sections (P12-D1 to D15). build_report is not registered yet. Nothing recorded
+every analysis and chart was called with, report/assemble.py writing the nine
+sections, and build_report registered (P12-D1 to D19). Step 5 is the guide's
+Done-When: one end-to-end run on merged_multiheader.xlsx. Nothing recorded
 open except P9-O4's feature half, scoped as a design question.
 
 ## Stack
@@ -19,14 +20,14 @@ Layout: `src/analytics_agent/{ingest,profile,clean,contract,validate,analysis,ch
 All five, every time. Run the suite BEFORE committing, not after (C76: two commits
 recorded a broken tree). Last measured 21/09/2026, after the open-item cleanup:
 
-    uv run pytest -q                      # 1748 passed
+    uv run pytest -q                      # 1759 passed
     uv run python tests/test_phase8.py    # 99 passed, 0 failed, 2 skipped
     uv run python tests/test_phase9.py    # 19 passed, 0 failed, 0 skipped
     uv run python tests/test_phase10.py   # 35 passed, 0 failed, 1 skipped
     uv run python tests/test_phase11.py   # 26 passed, 0 failed, 0 skipped
 
 The acceptance scripts are scripts, not pytest files -- `pytest` collects nothing
-from them, so 1748 excludes them. The three skips are each deliberate and
+from them, so 1759 excludes them. The three skips are each deliberate and
 recorded: ANALYSIS_RESULT_UNSOUND and the rendered MCP schema in phase8, the
 non-finite screen in phase10. A skip is an outstanding clause, not a passing one
 -- count them against this line, which is how C80 was found.
