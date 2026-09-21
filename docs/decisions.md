@@ -4768,3 +4768,66 @@ count did. That is the argument for printing a tally either side of a change rat
 the change -- prose hides a format error and a number cannot. The wording that made it feel like
 a special case is what took it out of the format: an entry that wants to say something extra
 should say it after the prefix, not instead of it.
+
+## Phase 11, Step 1 - matplotlib ground facts, 21/09/2026
+
+Step document: docs/steps/phase11_step1_ground_facts.md. Measured with
+`uv run pytest tests/test_matplotlib_facts.py -q -s`, seven tests, all printed values below
+produced by that run. Predictions were written into the step document before it ran; two were
+wrong and both are recorded as such, because a prediction corrected after the fact measures
+nothing.
+
+P11-D1. MATPLOTLIB 3.11.2, NOT THE 3.10.x PREDICTED, AND SEVEN PACKAGES CAME WITH IT. `uv add
+matplotlib` per guide line 943 installed matplotlib 3.11.2 and contourpy 1.4.0, cycler 0.12.1,
+fonttools 4.65.0, kiwisolver 1.5.1, pillow 12.3.0 and pyparsing 3.3.3. numpy 2.5.3 was already
+present as a transitive dependency of statsmodels. The step document predicted 3.10.x and "no
+new top-level dependency beyond matplotlib's own", which understated a seven-package install
+including an image library. Recorded because a dependency count is the kind of thing assumed
+rather than read.
+
+P11-D2. THE BACKEND IS Agg, SET BEFORE pyplot IS IMPORTED, AND get_backend() RETURNS IT
+CAPITALISED. The guide names the GUI backend as the Phase 11 trap. pyplot chooses its backend at
+import time, so `matplotlib.use("Agg")` after `import matplotlib.pyplot` is too late to be a
+guarantee; the facts file sets it above the pyplot import and the chart layer will do the same.
+Measured: `get_backend()` is `'Agg'`, with a capital A -- the prediction said 3.11 would
+normalise to lowercase and it does not, so an equality test against "agg" would fail on a
+correctly configured server. No GUI toolkit reaches sys.modules.
+
+P11-D3. ALL EIGHT KINDS DRAW FROM PLAIN PYTHON LISTS, SO THE CHART LAYER OWNS NO CONVERSION.
+Line, bar, grouped bar, scatter, histogram, box, heatmap and waterfall, each drawn from lists and
+saved, each a real PNG. Sizes: line 23,111 bytes, bar 6,007, grouped bar 6,074, scatter 12,396,
+histogram 12,090, box 5,865, heatmap 9,224, waterfall 9,168. This matters because the engine
+reads every value with fetchall and no analysis materialises a column; had matplotlib needed an
+array, the chart layer would have had to build one and the numpy rule would have been the first
+casualty. Grouped bar and waterfall are compositions rather than artists -- two offset `bar`
+calls, and one `bar` with a `bottom` list.
+
+P11-D4. A None IS A GAP IN A LINE AND A TypeError IN A BAR, SO THE CHART LAYER SCREENS NULLS
+ITSELF. Measured: `ax.plot([1,2,3,4], [1.0, None, 3.0, 4.0])` draws with a gap where the None
+was; `ax.bar` on the same series raises `TypeError: unsupported operand type(s) for +: 'int' and
+'NoneType'`. Every analysis here can return a None cell -- base.number() keeps None as None by
+P8-D9 -- so a series reaching render_chart may hold one. The decision follows from the message
+rather than from the exception: it names no column, no row and no chart, so a caller who sees it
+learns nothing they can act on. render_chart screens nulls before matplotlib sees them and
+refuses in this project's own words, the way every analysis reports what it drops (P10-D36).
+
+P11-D5. CATEGORIES KEEP THE ORDER THEY ARE GIVEN. `ax.bar(["south","north","east","west"], ...)`
+draws tick labels in exactly that order rather than sorted. Load-bearing: ranked_totals hands
+groups back biggest first, and a chart that re-sorted them alphabetically would contradict the
+table printed beside it.
+
+P11-D6. FIGURES ACCUMULATE UNTIL CLOSED, WHICH IS THE LEAK THAT MATTERS IN A LONG-RUNNING SERVER.
+Measured: `len(plt.get_fignums())` goes 0 -> 3 -> 0 across three `plt.figure()` calls and one
+`plt.close("all")`. pyplot holds a reference to every figure it makes, and this server does not
+exit between renders, so every render_chart closes what it opened in a finally.
+
+P11-D7. TWO SAVES OF IDENTICAL DATA ARE BYTE-IDENTICAL, SO A CHART CAN BE ASSERTED BY DIGEST.
+Measured: the same line drawn and saved twice gives two files of 21,677 bytes with equal bytes.
+matplotlib writes no timestamp into the PNG by default. This is what makes a chart testable as
+an artifact rather than only as a shape, and it is the prediction I would have bet least on.
+
+MEASURED VALIDATION, 21/09/2026. tests/test_matplotlib_facts.py: 7 passed. Full suite 1665 ->
+1672. Acceptance unchanged: test_phase8.py 99 passed, 0 failed, 2 skipped; test_phase9.py 19/0/0;
+test_phase10.py 35/0/1. No src/ file changed in this step -- it measures and builds nothing.
+Digest:
+  c9cc25b93716e35c0cd90409ace493367a2919570a5f0823e762d0cc85163ab0  tests/test_matplotlib_facts.py

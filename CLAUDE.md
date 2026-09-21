@@ -1,13 +1,14 @@
 # analytics-agent
 
 MCP server exposing data loading, profiling, cleaning and contract-gated analysis
-to Claude Desktop. Phases 1-10 done; Phase 11 (charts) is unstarted --
-`src/analytics_agent/charts/` holds only an empty `__init__.py`.
+to Claude Desktop. Phases 1-10 done. Phase 11 (charts) is in progress: Step 1
+measured matplotlib's ground facts (P11-D1 to D7); `src/analytics_agent/charts/`
+is still an empty `__init__.py`, so nothing is built yet.
 
 ## Stack
 Python >= 3.12 via `uv` -- run everything through `uv run`, never `pip install`.
 DuckDB 1.5.5, FastMCP 3.4.7, psycopg 3, pydantic 2, openpyxl, PyYAML, scipy,
-statsmodels. PostgreSQL 17 (Homebrew) on localhost:5432 serving `olist` and `testdb`.
+statsmodels, matplotlib 3.11.2 (backend Agg, set before the pyplot import). PostgreSQL 17 (Homebrew) on localhost:5432 serving `olist` and `testdb`.
 Layout: `src/analytics_agent/{ingest,profile,clean,contract,validate,analysis,charts,report,util}`;
 `server.py` registers MCP tools, `state.py` holds the workflow gate.
 27 analyses across 7 tiers. An analysis's shape: `analysis/{registry,base,declared,stats}.py`.
@@ -16,13 +17,13 @@ Layout: `src/analytics_agent/{ingest,profile,clean,contract,validate,analysis,ch
 All four, every time. Run the suite BEFORE committing, not after (C76: two commits
 recorded a broken tree). Last measured 21/09/2026, after the open-item cleanup:
 
-    uv run pytest -q                      # 1665 passed
+    uv run pytest -q                      # 1672 passed
     uv run python tests/test_phase8.py    # 99 passed, 0 failed, 2 skipped
     uv run python tests/test_phase9.py    # 19 passed, 0 failed, 0 skipped
     uv run python tests/test_phase10.py   # 35 passed, 0 failed, 1 skipped
 
 The acceptance scripts are scripts, not pytest files -- `pytest` collects nothing
-from them, so 1665 excludes them. The three skips are each deliberate and
+from them, so 1672 excludes them. The three skips are each deliberate and
 recorded: ANALYSIS_RESULT_UNSOUND and the rendered MCP schema in phase8, the
 non-finite screen in phase10. A skip is an outstanding clause, not a passing one
 -- count them against this line, which is how C80 was found.
