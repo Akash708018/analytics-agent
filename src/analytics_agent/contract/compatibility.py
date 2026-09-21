@@ -180,16 +180,16 @@ class DriftVerdict:
                 "reference, so this one cannot be executed -- not as a "
                 "degraded result, at all."
             ),
-            detail="; ".join(detail),
+            detail="; ".join([
+                *detail,
+                "drafting one against the table as it is now is what to confirm; the "
+                "superseded contract stays in the log",
+            ]),
             state=(
                 f"contract confirmed against {self.row_count_was:,} rows; "
                 f"table now has {self.row_count_now:,}"
             ),
-            next_call=(
-                f'propose_dataset_contract(dataset_name="{self.dataset_name}") '
-                f"to draft one against the table as it is now, and confirm it. "
-                f"The superseded contract stays in the log"
-            ),
+            next_call=f'propose_dataset_contract(dataset_name="{self.dataset_name}")',
         )
 
     def to_text(self) -> str:
@@ -240,7 +240,8 @@ def binding_for(
                     "a contract binds to a loaded table, and nothing here reads "
                     "from disk."
                 ),
-                next_call="list_datasets() to see what is loaded",
+                detail="list_datasets() shows what is loaded.",
+                next_call="list_datasets()",
             ).to_text()
         )
     count = con.execute(f"SELECT count(*) FROM {_q(dataset_name)}").fetchone()[0]
@@ -271,9 +272,10 @@ def classify_drift(
                     "a binding is written when a contract is confirmed. This "
                     "one was drafted or read back without one."
                 ),
+                detail="Draft one and confirm it.",
                 next_call=(
                     f'propose_dataset_contract(dataset_name='
-                    f'"{contract.dataset_name}") and confirm it'
+                    f'"{contract.dataset_name}")'
                 ),
             ).to_text()
         )
@@ -465,7 +467,8 @@ def verify_key(con, dataset_name: str, columns: list[str]) -> KeyVerdict:
                 reason=Reason.DATASET_NOT_LOADED,
                 what=f"there is no table called '{dataset_name}' in this workspace.",
                 why="a key can only be verified against a loaded table.",
-                next_call="list_datasets() to see what is loaded",
+                detail="list_datasets() shows what is loaded.",
+                next_call="list_datasets()",
             ).to_text()
         )
 

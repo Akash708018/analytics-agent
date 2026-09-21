@@ -262,10 +262,12 @@ def confirm(
                     "so that a later reload can be detected. Without it nothing "
                     "can ever tell whether the agreement still holds."
                 ),
+                detail=(
+                    "That drafts one against the loaded table; confirm what it returns."
+                ),
                 next_call=(
                     f'propose_dataset_contract(dataset_name='
-                    f'"{contract.dataset_name}") against the loaded table, and '
-                    f"confirm what it returns"
+                    f'"{contract.dataset_name}")'
                 ),
             ).to_text()
         )

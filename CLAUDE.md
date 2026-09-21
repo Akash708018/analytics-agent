@@ -2,9 +2,9 @@
 
 MCP server exposing data loading, profiling, cleaning and contract-gated analysis
 to Claude Desktop. Phases 1-12 done. Phase 13 (eval harness) is in progress:
-Step 1 built the harness and all three suites, scoring 27/28. Open: P13-O1
-(refusals naming something an agent cannot run verbatim), P13-O2 (two scripts
-restore the contract export by hand), and P9-O4's feature half. Nothing recorded
+Steps 1-2 built the harness and closed what it found,
+scoring 31/31. Step 3 fills the question set to the guide's 30-40. Nothing
+recorded open except P9-O4's feature half. Nothing recorded
 open except P9-O4's feature half, scoped as a design question.
 
 ## Stack
@@ -30,7 +30,7 @@ The eval harness is the seventh thing to run and the only one that answers
 with a figure rather than pass/fail -- it exits zero on a wrong answer,
 because a suite that must be 100% cannot carry a score (P13-D1):
 
-    uv run python eval/run_eval.py        # SCORE: 27/28 (96%)
+    uv run python eval/run_eval.py        # SCORE: 31/31 (100%)
 
 The acceptance scripts are scripts, not pytest files -- `pytest` collects nothing
 from them, so 1759 excludes them. The three skips are each deliberate and

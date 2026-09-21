@@ -31,7 +31,8 @@ def _not_loaded(con, dataset_name: str) -> str:
             "analysis. With no table there is nothing any of those refer to."
         ),
         state=f"loaded: {available}",
-        next_call="list_datasets() to see what is already here",
+        detail="list_datasets() shows what is already here.",
+        next_call="list_datasets()",
     ).to_text()
 
 

@@ -33,16 +33,13 @@ from analytics_agent.ingest import draft  # noqa: E402
 from analytics_agent.ingest.excel import load_excel  # noqa: E402
 from analytics_agent.util import db  # noqa: E402
 
-# confirm_dataset_contract exports a YAML copy of the contract to docs/contracts/, which is
-# outside the workspace and is meant to be version controlled -- "the copy for version control",
-# as the tool says. That is right for real work and wrong for a test: without this, every run of
-# this script leaves docs/contracts/merged_multiheader.yaml modified by a timestamp, the tree is
-# dirty whenever the acceptance scripts have been run, and the discipline of running all six
-# before committing would eventually sweep that churn into a commit. The MCP tool does not take
-# an export root and should not -- a client has no business choosing where the repository's copy
-# goes -- so the script restores what it found, the way it already resets its workspace.
-EXPORT = Path("docs/contracts/merged_multiheader.yaml")
-
+# P13-O2, and the better answer than the one it proposed. confirm_dataset_contract exports a
+# YAML copy of the contract to docs/contracts/, outside the workspace, where it is meant to be
+# version controlled -- so a script that confirms a contract dirties the repository (C86). The
+# first fix taught one script to restore what it found, and the next script that confirmed a
+# contract hit the same thing. contract/tools.confirm reads store.EXPORT_DIR at call time, so
+# pointing it at this script's own workspace means nothing outside is ever written. No restore,
+# no shared bookkeeping, and less code than either.
 WORKSPACE = "phase12_test"
 DATASET = "merged_multiheader"
 FIXTURE = Path("tests/fixtures/merged_multiheader.xlsx")
@@ -265,7 +262,8 @@ def clause_five(server) -> None:
 def main() -> int:
     print("Phase 12 acceptance: the whole pipeline, and one complete document")
     workspace.reset(WORKSPACE)
-    export_before = EXPORT.read_bytes() if EXPORT.exists() else None
+    from analytics_agent.contract import store
+    store.EXPORT_DIR = workspace.workspace_dir(WORKSPACE) / "contracts"
     try:
         if not clause_one():
             print()
@@ -285,10 +283,6 @@ def main() -> int:
             clause_five(server)
     finally:
         workspace.reset(WORKSPACE)
-        if export_before is None:
-            EXPORT.unlink(missing_ok=True)
-        else:
-            EXPORT.write_bytes(export_before)
 
     print()
     print(f"{PASSED} passed, {FAILED} failed, {SKIPPED} skipped")

@@ -5456,3 +5456,57 @@ acceptance scripts unchanged -- 99/0/2, 19/0/0, 35/0/1, 26/0/0, 36/0/0 -- becaus
 src/ changed in this step. Digests:
   ec4e0cc15c60b808cefa4593b9820ae7a6bbe3209bbeed96f5cdd8af6f656fe2  eval/run_eval.py
   3aa8ed4a233aa171aa6b350f7518f14f2e729f1444d727926a17c0bd2b99d5eb  eval/gold_questions.yaml
+
+## Phase 13, Step 2 - closing what the harness found, 21/09/2026
+
+Step document: docs/steps/phase13_step2_refusals.md, written before the run with four
+predictions. Two held, one held exactly, one was wrong. SCORE: 31/31 (100%), from 27/28.
+
+CLOSED. P13-O1, 21/09/2026. Twenty-six of thirty-seven refusals now name a call an agent can
+make verbatim, from sixteen. Ten sites had prose glued to a complete call -- "list_datasets() to
+see what is already here", "propose_dataset_contract(dataset_name="x") and confirm it" -- and
+the sentence moved into `detail`, which renders as its own DETAIL line above NEXT STEP. The
+eleven that remain are right as they are: five are the `(..., extra=...)` form in
+contract/tools.py, meaning "call it again with what you had, plus this", and six carry a
+placeholder the caller must fill. A refusal is now either a call an agent can make, or one that
+explicitly marks what the caller must supply, and nothing in between.
+
+CLOSED. P13-O2, 21/09/2026, and the item named the wrong fix. It asked for a shared helper,
+because two scripts were restoring docs/contracts/*.yaml by hand after confirming a contract.
+contract/tools.confirm reads `store.EXPORT_DIR` at call time, so a script can point it at its
+own workspace and nothing outside is written at all. Both scripts now do that, and both are
+shorter than they were with the restore. The problem was real and the proposed answer was the
+second-best one; writing the fix down as part of the item is what made that visible.
+
+P13-D5. THE FIX BROKE A GOLD QUESTION, WHICH IS THE HARNESS WORKING. B01 asserted that the
+NO_CONTRACT refusal marks a decision the caller must make, and that was true until the prose
+moved. state.py's refusal now names a runnable propose_dataset_contract(dataset_name="...") with
+"show the draft to the user, answer its questions, then call confirm_dataset_contract once they
+agree" in DETAIL. The question was updated to match, with a comment saying what it used to
+assert and why. A gold question that never changes is describing a system that never improves.
+
+C87. TEN SITES WERE EDITED ON AN ASSUMPTION THAT ONE GREP WOULD HAVE CHECKED, AND THE TREE BROKE.
+The prose moved into `detail` at ten refusals, on the assumption that none of the ten already had
+one. contract/compatibility.py:188 did -- a computed `detail="; ".join(detail)` -- so the edit
+produced `SyntaxError: keyword argument repeated` and eighteen collection errors. The guarded
+patch did its job: every replacement asserted its target matched exactly once, and every one did,
+because the guard checked what I was replacing and not what I was adding beside it. A guard
+proves the text you matched is there; it says nothing about the text you introduce. Both halves
+need looking at, and the second half is the one that has no assertion protecting it.
+
+PREDICTION 3 WAS WRONG IN A WAY WORTH KEEPING. I expected two to five existing tests to fail on
+the changed refusal text and none did. Every test asserts on the call --
+`'propose_dataset_contract(dataset_name="other")' in text` -- and the bare call was always a
+substring of the prose version, so removing the prose removed nothing any assertion named. The
+tests were already testing the thing that mattered rather than the sentence around it, which is
+the outcome the C-series keeps asking for and rarely gets to record.
+
+MEASURED VALIDATION, 21/09/2026. `uv run python eval/run_eval.py`: 31 passed, 0 failed, 0
+skipped, SCORE 31/31 (100%) -- correctness 5/5, behavioural 22/22, regression 4/4. The refusal
+roster reads 26 of 37 (70%), from 16 of 37 (43%). Full suite 1759 and the five acceptance
+scripts unchanged -- 99/0/2, 19/0/0, 35/0/1, 26/0/0, 36/0/0 -- because the refusals kept their
+reason, their call and their behaviour, and moved one sentence one line up. Digests:
+  83008a160a2d13fdbb9a89badb8132f9270f3111dbac4c9d137a63b9cd4c8b38  eval/run_eval.py
+  b4ee344c82c5a3005dbafe01c31371d84ca78f48f623838ca1d2e07e2edab788  eval/gold_questions.yaml
+  88e76039d435319b2b2aff30b0f1dff7cc2f55a7a7147619ad9995517cd3b8ae  src/analytics_agent/state.py
+  abf64b98afbac5daa71d263846011a207c58e9b1451bb19e784edc1393d92a93  src/analytics_agent/validate/tools.py

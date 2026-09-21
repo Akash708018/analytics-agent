@@ -157,11 +157,11 @@ def require_contract(con, dataset_name: str) -> Gate:
                     "a definition any number could be traced back to."
                 ),
                 state=f"loaded ({rows:,} rows, {cols} columns), no contract",
-                next_call=(
-                    f'propose_dataset_contract(dataset_name="{dataset_name}"), '
-                    f"show the draft to the user, answer its questions, then "
-                    f"confirm_dataset_contract once they agree"
+                detail=(
+                    "Show the draft to the user, answer its questions, then call "
+                    "confirm_dataset_contract once they agree."
                 ),
+                next_call=f'propose_dataset_contract(dataset_name="{dataset_name}")',
             ).to_text()
         )
 

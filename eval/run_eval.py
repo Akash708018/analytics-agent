@@ -37,12 +37,13 @@ from analytics_agent.util import db  # noqa: E402
 
 QUESTIONS = Path("eval/gold_questions.yaml")
 
-# C86, a second time. confirm_dataset_contract exports a YAML copy to docs/contracts/, outside
-# the workspace, where it is meant to be version controlled. tests/test_phase12.py was taught to
-# restore it; this script confirms a contract too and was not, because the fix was made to one
-# script rather than to the pattern. Anything here that confirms a contract has to put back what
-# it found. The real answer is a shared helper, which is P13-O2.
-EXPORTS = (Path("docs/contracts/clean_sales.yaml"),)
+# P13-O2, and the better answer than the one it proposed. confirm_dataset_contract exports a
+# YAML copy of the contract to docs/contracts/, outside the workspace, where it is meant to be
+# version controlled -- so a script that confirms a contract dirties the repository (C86). The
+# first fix taught one script to restore what it found, and the next script that confirmed a
+# contract hit the same thing. contract/tools.confirm reads store.EXPORT_DIR at call time, so
+# pointing it at this script's own workspace means nothing outside is ever written. No restore,
+# no shared bookkeeping, and less code than either.
 FIXTURES = Path("tests/fixtures")
 
 WITH_CONTRACT = "eval_contract"
@@ -389,7 +390,8 @@ def main() -> int:
         print(f"server.py did not import: {type(exc).__name__}: {exc}")
         return 1
 
-    before = {p: (p.read_bytes() if p.exists() else None) for p in EXPORTS}
+    from analytics_agent.contract import store
+    store.EXPORT_DIR = workspace.workspace_dir(WITH_CONTRACT) / "contracts"
     try:
         if not mount(server):
             print()
@@ -412,11 +414,6 @@ def main() -> int:
     finally:
         for ws in (WITH_CONTRACT, NO_CONTRACT):
             workspace.reset(ws)
-        for path, body in before.items():
-            if body is None:
-                path.unlink(missing_ok=True)
-            else:
-                path.write_bytes(body)
 
     print()
     for suite in ("correctness", "behavioural", "regression"):

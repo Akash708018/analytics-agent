@@ -52,7 +52,8 @@ def _not_loaded(con, dataset_name: str) -> str:
         what=f"there is no dataset called '{dataset_name}' in this workspace.",
         why="validation checks a loaded table, and nothing is read from disk here.",
         state=f"loaded: {available}",
-        next_call="list_datasets() to see what is already here",
+        detail="list_datasets() shows what is already here.",
+        next_call="list_datasets()",
     ).to_text()
 
 
@@ -71,10 +72,11 @@ def _no_contract(dataset_name: str, rows: int, cols: int) -> str:
             "a report saying so would be a page of NOT RUN."
         ),
         state=f"loaded ({rows:,} rows, {cols} columns), no contract",
-        next_call=(
-            f'propose_dataset_contract(dataset_name="{dataset_name}"), show the '
-            f"draft to the user, then confirm_dataset_contract once they agree"
+        detail=(
+            "Show the draft to the user, then call confirm_dataset_contract once "
+            "they agree."
         ),
+        next_call=f'propose_dataset_contract(dataset_name="{dataset_name}")',
     ).to_text()
 
 

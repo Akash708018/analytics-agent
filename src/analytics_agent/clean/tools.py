@@ -98,7 +98,8 @@ def _not_loaded(con, dataset_name: str) -> str:
         what=f"there is no dataset called '{dataset_name}' in this workspace.",
         why="cleaning rebuilds a loaded table, and nothing is read from disk here.",
         state=f"loaded: {available}",
-        next_call='list_datasets() to see what is already here',
+        detail="list_datasets() shows what is already here.",
+        next_call="list_datasets()",
     ).to_text()
 
 

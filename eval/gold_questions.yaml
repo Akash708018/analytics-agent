@@ -69,7 +69,11 @@
   contract: false
   call: {tool: compute_analysis, args: {analysis_type: summary_stats}}
   reason: NO_CONTRACT
-  needs_decision: true   # the grain is the user's to state, so the call carries placeholders
+  # Was needs_decision, and was right until 21/09/2026. P13-O1 moved the prose out of this
+  # refusal's next_call, so it now names a runnable propose_dataset_contract(dataset_name="...")
+  # and the decisions the user must make are in DETAIL. The question had to follow the fix.
+  retry: true
+  expect: ["Show the draft to the user"]
 
 - id: B02
   suite: behavioural
