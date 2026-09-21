@@ -30,6 +30,9 @@ build-backend = "uv_build"
 dev = [
     "pytest>=9.1.1",
 ]
+ui = [
+    "streamlit>=1.64.0",
+]
 
 [tool.pytest.ini_options]
 # The engine's suite. The Track B UI keeps its own tests under ui/tests, which need streamlit

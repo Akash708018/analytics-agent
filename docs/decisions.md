@@ -5858,3 +5858,42 @@ MEASURED VALIDATION, 22/09/2026. tests/test_track_b_facts.py: 6 passed, three co
 before; deselecting this file it ran in 111 s and no test exceeded 1.73 s, so the machine was
 slower, not the suite -- recorded so the next reading is not mistaken for a regression.
   e3a195e1c2a194157267d88f619d4130012977616cfb004914d5362187b3bc31  tests/test_track_b_facts.py  (190 lines)
+
+## Phase 14, Step 2 - the Track B UI on the fake backend, 22/09/2026
+
+Step document: docs/steps/phase14_step2_ui.md (written at the close, and says so).
+
+P14-D9. THE UI IS BUILT HERE, NOT HANDED OFF. The user took the frontend back from the Codex
+prompt and set the design: a warm sunset theme and an ink-on-parchment Journey telling the
+project's story. It is built against webapp/contract.py with ui/fake_backend.py behind it, so
+integration is still one switch: ANALYTICS_UI_BACKEND=real.
+
+P14-D10. EVERY STYLESHEET GOES THROUGH theme.apply, AS ONE BLOCK, AND IS CHECKED. st.html
+sanitises with DOMPurify, which discards a whole style element whose text contains "<" followed
+by a letter, "/" or "!". Measured: an unencoded SVG data URI and a CSS comment naming a tag each
+removed every rule in their block, the theme's included. theme.apply raises on such text instead
+of silently un-theming the app, and SVGs in CSS are percent-encoded.
+
+C97. I DIAGNOSED A RACE THAT DID NOT EXIST. The Journey's styles vanished after a restart and I
+concluded two styles-only st.html calls raced, merged them, and wrote that into a docstring. The
+merge then removed the theme too, because the real cause -- a comment I had just written
+containing a tag name -- was now in the one block. Two fixes had landed between the working and
+failing loads, so the working load had proven nothing about either; I attributed the failure to
+the change I had not made rather than the one I had. The docstring now states the measured cause.
+
+P14-D11. SCREENS REDRAW AFTER STATE-CHANGING CLICKS. The sidebar renders before the page, so a
+confirm left it stale (seen in the browser); ingest and contract call st.rerun() after
+confirming, and a test falsified by removing the rerun fails.
+
+P14-D12. UI TESTS LIVE IN ui/tests AND ARE NOT IN THE ENGINE COUNT. 25 tests,
+`uv run --group ui pytest ui/tests`. AppTest cannot drive a file uploader and switch_page cannot
+reach function pages, so screens render through AppTest.from_function with the app's own theme
+and sidebar, and ingest tests seed the session exactly as a finished upload leaves it.
+
+P14-D13. ADDING STREAMLIT MOVED THE ENGINE'S websockets 17.1 -> 16.1.1. Dependency groups share
+one lockfile. Measured harmless: engine suite 1787 passed on it, the HTTP session test (F7)
+included; acceptance and eval unchanged.
+
+MEASURED VALIDATION, 22/09/2026. `uv run --group ui pytest ui/tests`: 25 passed. Engine
+`uv run pytest -q`: 1787 passed, unchanged. Acceptance 99/0/2, 19/0/0, 35/0/1, 26/0/0, 36/0/0.
+Eval SCORE 76/76 (100%). Journey stylesheet present on five consecutive fresh loads.

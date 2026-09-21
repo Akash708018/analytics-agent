@@ -2,7 +2,8 @@
 
 MCP server exposing data loading, profiling, cleaning and contract-gated analysis
 to Claude Desktop. Phases 1-13 done, then Cleanup Steps 4-7; Phase 14
-(Track B) in progress, Step 1 done. Nothing is recorded open: P9-O4's feature half was closed by the user's
+(Track B) in progress, Steps 1-2 done (UI on the fake backend: ui/,
+`uv run --group ui streamlit run ui/app.py`; its 25 tests: `uv run --group ui pytest ui/tests`). Nothing is recorded open: P9-O4's feature half was closed by the user's
 decision on 21/09/2026 (copy-first; in-place analysis is a later scaling item).
 
 ## Stack
@@ -79,7 +80,7 @@ line carrying digests and suite totals, updating the guide's ledger row if the p
 state changed, then running all six checks and the eval above, reading them, and committing.
 
 ## Navigating the docs -- read narrowly
-`docs/decisions.md` is 5,860 lines and append-only; the build guide is 1,104. Reading
+`docs/decisions.md` is 5,899 lines and append-only; the build guide is 1,104. Reading
 either whole costs more than the work.
 
 - **Open-item register: `docs/decisions.md:4438` to end.** Read it rather than grepping

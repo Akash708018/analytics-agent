@@ -1,0 +1,157 @@
+"""The app, run headless with streamlit's AppTest, on the fake backend.
+
+AppTest cannot drive st.file_uploader, so the ingest tests seed the session exactly as a finished
+upload leaves it; everything after that goes through the real widgets.
+"""
+
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+import pytest
+from streamlit.testing.v1 import AppTest
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
+
+from ui.fake_backend import FakeBackend  # noqa: E402
+
+APP = str(ROOT / "ui" / "app.py")
+SCREENS = {"upload": "ui.screens.ingest", "contract": "ui.screens.contract",
+           "ask": "ui.screens.chat", "files": "ui.screens.files"}
+
+
+def _render(root: str, module: str) -> None:
+    """One screen with the app's own theme and sidebar. AppTest.switch_page resolves pages as
+    files and app.py's pages are functions routed by url_path, so a screen is run this way;
+    test_the_app_itself_starts covers app.py and its navigation."""
+    import importlib
+    import sys
+    sys.path.insert(0, root)
+    from ui import components, journey, theme
+    from ui.screens import ingest
+    theme.apply(journey.stylesheet(), ingest.stylesheet())
+    components.sidebar()
+    importlib.import_module(module).render()
+
+
+def screen(name: str) -> AppTest:
+    return AppTest.from_function(_render, args=(str(ROOT), SCREENS[name]), default_timeout=30)
+
+
+def _text(at: AppTest) -> str:
+    parts = [m.value for m in at.markdown] + [m.value for m in at.caption]
+    parts += [e.value for e in at.error] + [w.value for w in at.warning] + [s.value for s in at.success]
+    return "\n".join(str(p) for p in parts)
+
+
+def test_the_app_itself_starts():
+    at = AppTest.from_file(APP, default_timeout=30).run()
+    assert not at.exception, at.exception
+
+
+@pytest.mark.parametrize("name", list(SCREENS))
+def test_every_screen_renders_without_an_exception(name):
+    at = screen(name).run()
+    assert not at.exception, at.exception
+
+
+def test_the_journey_is_written_and_the_stylesheet_is_one_block():
+    at = AppTest.from_file(APP, default_timeout=30).run()
+    htmls = [h.proto.body for h in at.get("html")]
+    assert any("How this engine was made" in h for h in htmls)
+    styles = [h for h in htmls if h.lstrip().startswith("<style>")]
+    assert len(styles) == 1 and "aa-j-paper" in styles[0] and "aa-ink-in" in styles[0]
+
+
+def test_the_sidebar_shows_the_subset_warning_in_full():
+    at = AppTest.from_file(APP, default_timeout=30).run()
+    htmls = " ".join(h.proto.body for h in at.get("html"))
+    assert "1,000 of 1,000,163 rows" in htmls and "not a random sample" in htmls
+
+
+def test_reset_is_disabled_until_confirmed():
+    at = AppTest.from_file(APP, default_timeout=30).run()
+    reset = [b for b in at.sidebar.button if b.label == "Reset workspace"][0]
+    assert reset.disabled
+    at.sidebar.checkbox[0].check().run()
+    reset = [b for b in at.sidebar.button if b.label == "Reset workspace"][0]
+    assert not reset.disabled
+
+
+def _seed_ingest(at: AppTest, header_rows=None):
+    """Leave the session as a finished upload of sales.csv does."""
+    at.run()
+    from ui.backend import get_backend
+    be = get_backend()
+    ws = at.session_state["workspace_id"]
+    path = be.save_upload(ws, "sales.csv", b"x").path
+    args = {"header_rows": header_rows} if header_rows else {}
+    at.session_state["ingest"] = {"token": ("sales.csv", 1), "path": path, "args": args,
+                                  "draft": be.draft_ingest(ws, path, **args)}
+    return at
+
+
+def test_confirm_is_disabled_while_the_ingest_draft_is_provisional():
+    at = _seed_ingest(screen("upload"))
+    at.run()
+    assert not at.exception, at.exception
+    confirm = [b for b in at.button if b.label == "Confirm and load"][0]
+    assert confirm.disabled
+    assert "Row 2 sits under the merged label" in _text(at)
+
+
+def test_answering_the_header_enables_confirm_and_loading_reaches_the_sidebar():
+    at = _seed_ingest(screen("upload"), header_rows=[1, 2])
+    at.run()
+    confirm = [b for b in at.button if b.label == "Confirm and load"][0]
+    assert not confirm.disabled
+    confirm.click().run()
+    assert not at.exception, at.exception
+    assert "Loaded **sales**" in _text(at)
+    sidebar = " ".join(h.proto.body for h in at.sidebar.get("html"))
+    assert "<b>sales</b>" in sidebar  # redrawn after the click
+
+
+def test_contract_confirm_is_disabled_while_provisional():
+    at = screen("contract").run()
+    assert not at.exception, at.exception
+    confirm = [b for b in at.button if b.label == "Confirm contract"][0]
+    assert confirm.disabled
+    assert "Still needed before this can be confirmed" in _text(at)
+
+
+def test_a_refusal_shows_its_next_step():
+    at = screen("contract").run()
+    from ui.backend import get_backend
+    ws = at.session_state["workspace_id"]
+    at.session_state["contract_result"] = (
+        "geolocation", get_backend().confirm_contract(
+            ws, get_backend().draft_contract(ws, "geolocation")))
+    at.run()
+    text = _text(at)
+    assert "still PROVISIONAL" in text and "Next step:" in text
+
+
+def test_asking_for_a_chart_shows_the_image_and_its_description():
+    at = screen("ask").run()
+    at.chat_input[0].set_value("show me a chart").run()
+    assert not at.exception, at.exception
+    assert len(at.get("image")) == 1
+    assert "highest 15,873 at East" in _text(at)
+
+
+def test_a_failed_turn_is_shown_and_the_conversation_survives():
+    at = screen("ask").run()
+    at.chat_input[0].set_value("fail").run()
+    assert "did not answer in time" in _text(at)
+    at.chat_input[0].set_value("hello").run()
+    assert "Try *show me a chart*" in _text(at)
+
+
+def test_the_fake_is_the_default_backend(monkeypatch):
+    monkeypatch.delenv("ANALYTICS_UI_BACKEND", raising=False)
+    from ui import backend
+    backend.get_backend.clear()
+    assert isinstance(backend.get_backend(), FakeBackend)
