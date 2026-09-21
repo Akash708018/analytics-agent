@@ -6117,3 +6117,22 @@ browser; the assistant now says so rather than calling a tool it lacks.
 
 MEASURED VALIDATION, 22/09/2026. Engine 1832 -> 1839; UI 35; acceptance 99/0/2, 19/0/0, 35/0/1,
 26/0/0, 36/0/0; eval 76/76. Two live runs, both answers matched SQL.
+
+## Phase 14 - the measures' answers moved out of the grid, 22/09/2026
+
+Reported by the user: "Still needed: units: definition; units: aggregation; unit_price: ...;
+order_value: ..." -- why is it asking? Answered: a measure has no default aggregation by design
+(summing a unit price means nothing) and needs a one-line definition every number traces to.
+
+P14-D35. EACH MEASURE'S TWO ANSWERS ARE THEIR OWN FIELDS. They were the last two columns of a wide
+data_editor: off-screen at ordinary widths, editable only by double-click, and so asked for while
+invisible. Now the grid holds roles only, and under it "How each measure adds up" gives every
+measure a "how it combines" selectbox (no pre-selection, help text per aggregation) and a "what it
+means" text box; the still-needed list points there. Seen on the real engine: three measures, six
+labelled fields, the grid down to column/type/distinct/nulls/examples/role. Because these are
+widgets AppTest can drive, the one-click confirm is at last tested end to end.
+Doing so found a further fault: after a successful confirm the screen dropped its draft,
+re-drafted with no answers, and showed "Still needed: Grain; ..." beneath "confirmed". The
+confirmed draft is now kept. Falsified: dropping it fails the one-click test.
+
+MEASURED VALIDATION, 22/09/2026. UI tests 35 -> 37; engine 1839.

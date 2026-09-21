@@ -29,6 +29,8 @@ def _role_of(draft: ContractDraft, name: str, suggested: str) -> str:
     return suggested if suggested in ROLES else "ignore"
 
 
+AGG_HELP = ("sum: add them up (units). mean / median: the typical value (a price). min / max. "
+            "count / count_distinct: how many. none: meaningful per row only, never combined.")
 DATE_MIN = _dt.date(1900, 1, 1)
 DATE_MAX = _dt.date(2100, 12, 31)
 
@@ -44,19 +46,22 @@ def _iso(value) -> str | None:
     return value.isoformat() if isinstance(value, _dt.date) else None
 
 
-def form_answers(rows: list[dict], grain: str, start, end, caveats: str) -> dict:
+def form_answers(rows: list[dict], grain: str, start, end, caveats: str,
+                 aggregations: dict | None = None, definitions: dict | None = None) -> dict:
     """The form as the engine's draft_contract takes it. Reading, not deciding: which of these
     is enough is the engine's call."""
+    aggregations, definitions = aggregations or {}, definitions or {}
     return dict(
         grain=grain.strip() or None,
         primary_key=[r["column"] for r in rows if r["role"] == "key"],
         date_column=next((r["column"] for r in rows if r["role"] == "date"), None),
         measures=[r["column"] for r in rows if r["role"] == "measure"],
         dimensions=[r["column"] for r in rows if r["role"] == "dimension"],
-        aggregations={r["column"]: r["aggregation"] for r in rows
-                      if r["role"] == "measure" and r["aggregation"]},
-        measure_definitions={r["column"]: r["definition"].strip() for r in rows
-                             if r["role"] == "measure" and (r["definition"] or "").strip()},
+        aggregations={r["column"]: aggregations[r["column"]] for r in rows
+                      if r["role"] == "measure" and aggregations.get(r["column"])},
+        measure_definitions={r["column"]: definitions[r["column"]].strip() for r in rows
+                             if r["role"] == "measure"
+                             and (definitions.get(r["column"]) or "").strip()},
         analysis_window_start=_iso(start), analysis_window_end=_iso(end),
         caveats=[c.strip() for c in caveats.splitlines() if c.strip()])
 
@@ -136,8 +141,6 @@ def render() -> None:
         "distinct": c.distinct_count, "nulls": c.null_count,
         "examples": ", ".join(c.sample_values[:3]),
         "role": _role_of(draft, c.name, c.suggested_role),
-        "aggregation": draft.aggregations.get(c.name),
-        "definition": draft.measure_definitions.get(c.name, ""),
     } for c in draft.columns])
     edited = st.data_editor(
         rows, hide_index=True, width="stretch", key=f"contract_cols_{name}",
@@ -148,24 +151,42 @@ def render() -> None:
             "nulls": st.column_config.NumberColumn(disabled=True),
             "examples": st.column_config.TextColumn(disabled=True),
             "role": st.column_config.SelectboxColumn(options=list(ROLES), required=True),
-            "aggregation": st.column_config.SelectboxColumn(
-                options=list(AGGREGATIONS), help="Measures only. 'none' = per-row only."),
-            "definition": st.column_config.TextColumn(help="Measures only: one line."),
         })
+
+    # Each measure's two answers as their own fields, not the last two columns of a wide grid:
+    # there they sat off-screen and took a double-click to edit, and the user was told to fill
+    # what they could not see (P14-D35).
+    measures = [r["column"] for r in edited if r["role"] == "measure"]
+    aggregations: dict[str, str | None] = {}
+    definitions: dict[str, str] = {}
+    if measures:
+        st.subheader("How each measure adds up")
+        st.caption("For every measure, say how it may be combined and what it means. There is no "
+                   "default on purpose: summing a price or a rate gives a number that means "
+                   "nothing. **none** = per row only, never combined.")
+        for m in measures:
+            a, d = st.columns([1, 2])
+            aggregations[m] = a.selectbox(
+                f"{m} — how it combines", AGGREGATIONS, index=None, placeholder="choose…",
+                key=_seed(f"c_agg_{name}_{m}", draft.aggregations.get(m)),
+                help=AGG_HELP)
+            definitions[m] = d.text_input(
+                f"{m} — what it means", placeholder="e.g. units x unit_price, before tax",
+                key=_seed(f"c_def_{name}_{m}", draft.measure_definitions.get(m, "")))
     caveats = st.text_area("Caveats (one per line)",
                            key=_seed(f"c_caveats_{name}", "\n".join(draft.caveats)))
 
-    answers = form_answers(edited, grain, start, end, caveats)
+    answers = form_answers(edited, grain, start, end, caveats, aggregations, definitions)
     left, right = st.columns([1, 1])
     check = left.button("Check what's missing", type="secondary", width="stretch")
     confirm = right.button("Confirm contract", width="stretch")
     if check or confirm:
         fresh, result = submit(be, ws, name, answers, confirm=confirm)
+        # Kept after a confirm too. It used to be dropped, the screen re-drafted with no answers,
+        # and "Still needed: Grain; ..." appeared under "confirmed" (measured in AppTest, P14-D35).
         drafts[name] = fresh
         if result is not None:
             st.session_state["contract_result"] = (name, result)
-            if result.ok:
-                drafts.pop(name, None)
         else:
             st.session_state.pop("contract_result", None)
         st.rerun()  # redraw: the sidebar shows the new stage, the list below the fresh check
@@ -178,7 +199,10 @@ def render() -> None:
         st.markdown(f"> {q}")
     if draft.provisional:
         st.warning("**Still needed before this can be confirmed:** "
-                   + "; ".join(plain(item) for item in draft.provisional))
+                   + "; ".join(plain(item) for item in draft.provisional)
+                   + ("\n\nMeasures are answered under *How each measure adds up*, above."
+                      if any(item.startswith("measures[") or "aggregation" in item
+                             or "definition" in item for item in draft.provisional) else ""))
     st.caption(draft.message)
 
     shown = st.session_state.get("contract_result")

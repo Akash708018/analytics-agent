@@ -189,13 +189,12 @@ def test_submit_confirms_the_form_as_it_is_now_on_the_real_engine():
 def test_form_answers_reads_roles_and_ignores_blank_definitions():
     import datetime as dt
     from ui.screens.contract import form_answers, plain
-    rows = [{"column": "id", "role": "key", "aggregation": None, "definition": ""},
-            {"column": "d", "role": "date", "aggregation": None, "definition": ""},
-            {"column": "rev", "role": "measure", "aggregation": "sum", "definition": " money "},
-            {"column": "qty", "role": "measure", "aggregation": None, "definition": "  "},
-            {"column": "reg", "role": "dimension", "aggregation": None, "definition": ""},
-            {"column": "junk", "role": "ignore", "aggregation": None, "definition": ""}]
-    a = form_answers(rows, "  one row = one sale ", dt.date(2024, 1, 1), None, "x\n\n y ")
+    rows = [{"column": "id", "role": "key"}, {"column": "d", "role": "date"},
+            {"column": "rev", "role": "measure"}, {"column": "qty", "role": "measure"},
+            {"column": "reg", "role": "dimension"}, {"column": "junk", "role": "ignore"}]
+    a = form_answers(rows, "  one row = one sale ", dt.date(2024, 1, 1), None, "x\n\n y ",
+                     {"rev": "sum", "qty": None, "junk": "sum"},
+                     {"rev": " money ", "qty": "  ", "junk": "ignored: not a measure"})
     assert a["primary_key"] == ["id"] and a["date_column"] == "d"
     assert a["measures"] == ["rev", "qty"] and a["dimensions"] == ["reg"]
     assert a["aggregations"] == {"rev": "sum"} and a["measure_definitions"] == {"rev": "money"}
@@ -293,3 +292,26 @@ def test_a_window_older_than_ten_years_can_be_set():
     at.run()
     assert at.date_input(key="c_from_geolocation").value == dt.date(2001, 3, 4)
 
+
+
+def test_a_fully_filled_form_confirms_in_one_click():
+    """P14-D35: each measure's aggregation and definition are their own fields, so the whole
+    form -- and the one-click confirm the user could not reach -- is driven here end to end."""
+    import datetime as dt
+    at = screen("contract").run()
+    at.text_input(key="c_grain_geolocation").input("one row = one location sample")
+    at.date_input(key="c_from_geolocation").set_value(dt.date(2016, 9, 1))
+    at.date_input(key="c_to_geolocation").set_value(dt.date(2018, 10, 31))
+    for m, meaning in (("geolocation_lat", "latitude"), ("geolocation_lng", "longitude")):
+        at.selectbox(key=f"c_agg_geolocation_{m}").set_value("none")
+        at.text_input(key=f"c_def_geolocation_{m}").input(meaning)
+    [b for b in at.button if b.label == "Confirm contract"][0].click().run()
+    assert not at.exception, at.exception
+    assert not at.warning, [w.value for w in at.warning]
+    assert any("Contract **v2** for **geolocation** confirmed" in s.value for s in at.success)
+
+
+def test_the_measure_fields_offer_no_default():
+    at = screen("contract").run()
+    agg = at.selectbox(key="c_agg_geolocation_geolocation_lat")
+    assert agg.value is None and "none" in agg.options
