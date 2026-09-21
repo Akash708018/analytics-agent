@@ -5591,3 +5591,52 @@ occurrences is where a pattern stops being bad luck.
 
 MEASURED, 21/09/2026: importing run_eval and calling mount(server) directly leaves
 docs/contracts/ holding clean_sales.yaml alone, unmodified. Eval SCORE 67/67 unchanged.
+
+## Phase 13, Step 4 - the rest of the Failure Mode Register, 21/09/2026
+
+Step document: docs/steps/phase13_step4_register.md. SCORE 75/75 (100%) over 40 questions -- 14
+correctness, 12 behavioural, 14 regression. Phase 13 is done.
+
+P13-D8. FOURTEEN OF THE FIFTEEN REGISTER IDS HAVE A REGRESSION CHECK, AND THE FIFTEENTH IS NAMED.
+Added: F1 (get_workflow_state names the exact next call), F3 (a sparse 2 GB CSV is announced
+with its size before anything reads it -- WARN, not a refusal, because a CSV streams), F4 (a
+50-column result previews 12 and names the rest), F5 (a preview shows 15 numbered lines of 501),
+F6 (the merged two-row header spreadsheet loads 150 rows through its spec), F8 (a constructed
+pivot export -- region plus twelve month columns -- is named as one), F10 (trend names the absent
+month in its warning), F13 (reset_workspace is blocked without confirm and empties the workspace
+with it). F2, the lock error under two or more users, is Track B, which is Phase 14 and not
+built. A green check for a scenario the product cannot yet be in would be a false report, so it
+is left out and says so.
+
+P13-D9. EVERY NEW CHECK IS FALSIFIED BEFORE IT IS TRUSTED. Eight checks passed on their first
+run, and a check that passes first time has not yet shown it can fail. Each was pointed at an
+input that should fail it: F1 at a workspace where every dataset is contracted, F3 at a 29 KB
+file, F8 at clean_sales, F10 at a month holding rows, F13 at a loaded workspace. The ones
+asserting exact values -- F4's "12 of 50", F5's at most 20 lines, F6's 150 rows -- need no
+separate proof. This is the step the method was missing: P9-O11 and C83 were both checks that
+could not fail, and both were found long after they were written.
+
+C91. I WROTE A CHECK THAT COULD NOT FAIL, AFTER RECORDING THAT FAILURE TWICE. The F10 check
+asserted `GAP_MONTH in text`. trend builds its calendar with every period as a row -- absent
+periods included, blank -- so "2024-07" was in the table whether or not anything warned about
+it. Pointed at 2024-03, a month holding rows, it passed. It now finds the warning line, "1
+month(s) hold no rows and are blank above, not zero: 2024-07.", and asserts the month is on it;
+pointed at 2024-03 it fails. The difference from P9-O11 and C83 is only when it was caught:
+before the commit, by P13-D9, rather than a phase later by accident. Knowing a failure mode by
+name did not stop me writing it; a step that tries to break each check did.
+
+C92. CLAUDE.md CONTRADICTED ITSELF, AND I WROTE BOTH HALVES. Syncing it after Step 3 appended a
+sentence rather than replacing one, so its opening paragraph said "Nothing recorded open except
+P9-O4's feature half" twice, and "How a step runs" still said "running all four checks" when
+there were six and the eval. A guarded replace asserts that what it matches is present exactly
+once; it does not assert that the result reads as one thought (the lesson of C87, met again).
+It is the file loaded into every session, which makes it the most expensive place in the
+repository for a claim to drift from what it describes. Rewritten, with the line count of this
+file measured rather than carried over.
+
+MEASURED VALIDATION, 21/09/2026. `uv run python eval/run_eval.py`: 75 passed, 0 failed, 0
+skipped, SCORE 75/75 (100%) -- correctness 14/14, behavioural 47/47, regression 14/14. Full suite
+1759 and the five acceptance scripts unchanged -- 99/0/2, 19/0/0, 35/0/1, 26/0/0, 36/0/0 --
+because nothing under src/ changed. The tree was clean after every eval run. Digests:
+  a45f3cc28dd3735610ffcd7252d0c486a4561ef8802d15ddb967a0ee98acf25d  eval/run_eval.py
+  b61c98c95f6420c652f2a3daaca45885214e1273aa1de22c5391a62ffe7b765d  eval/gold_questions.yaml

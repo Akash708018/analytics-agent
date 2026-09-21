@@ -35,7 +35,7 @@ from analytics_agent.contract.refusals import reason_of  # noqa: E402
 from analytics_agent.ingest import draft  # noqa: E402
 from analytics_agent.ingest.csv_loader import load_csv  # noqa: E402
 from analytics_agent.ingest.excel import load_excel  # noqa: E402
-from analytics_agent.util import db  # noqa: E402
+from analytics_agent.util import db, results  # noqa: E402
 
 QUESTIONS = Path("eval/gold_questions.yaml")
 
@@ -447,7 +447,143 @@ def coercion_is_counted() -> tuple[bool, str]:
         workspace.reset(ws)
 
 
+def _scratch(name: str) -> Path:
+    """A path inside the eval's own workspace, which is reset at the end. Constructed files --
+    a pivot-shaped CSV, a sparse 2 GB one -- belong here, never in the repository."""
+    return workspace.workspace_dir(WITH_CONTRACT) / name
+
+
+def workflow_state_names_the_next_call() -> tuple[bool, str]:
+    """F1: an agent that skips a gate loops on apologies unless something tells it where it is
+    and what to call. get_workflow_state is that, on demand."""
+    from analytics_agent import server
+    text = server.get_workflow_state(workspace_id=NO_CONTRACT)
+    want = f'propose_dataset_contract(dataset_name="{DATASET}")'
+    return want in text, f"names {want}: {want in text}"
+
+
+def size_gate_speaks_before_loading() -> tuple[bool, str]:
+    """F3: a large file is announced before it is read. Measured on a sparse 2 GB CSV, which
+    uses no disk: a CSV streams, so the verdict is WARN rather than a refusal, and it names the
+    size. What must not happen is silence."""
+    from analytics_agent.ingest import sizegate
+    big = _scratch("sparse.csv")
+    with open(big, "wb") as f:
+        f.write(b"a,b\n1,2\n")
+        f.truncate(2 * 1024 ** 3)
+    try:
+        g = sizegate.check_file(big)
+    finally:
+        big.unlink(missing_ok=True)
+    verdict = getattr(getattr(g, "verdict", None), "name", str(g))
+    message = str(getattr(g, "message", ""))
+    ok = verdict in ("WARN", "REFUSE") and "GB" in message
+    return ok, f"{verdict}: {message[:70]}"
+
+
+def wide_results_are_paged_not_dumped() -> tuple[bool, str]:
+    """F4: an agent misreads a wide table dumped inline. The preview caps its columns and names
+    the rest, so nothing past the window is silently absent."""
+    r = results.write_result(WITH_CONTRACT, label="wide",
+                             headers=[f"c{i}" for i in range(50)],
+                             rows=[[i] * 50 for i in range(3)])
+    text = r.to_text()
+    ok = "Showing 12 of 50 columns" in text and "c49" in text
+    return ok, "12 of 50 shown, c49 named" if ok else text.splitlines()[-1][:80]
+
+
+def preview_reads_only_what_it_shows() -> tuple[bool, str]:
+    """F5: a preview must not load the file to show fifteen lines of it."""
+    from analytics_agent import server
+    text = server.preview_file(path=str(FIXTURES / "clean_sales.csv"))
+    numbered = [ln for ln in text.splitlines() if ln[:1].isdigit() and ": " in ln[:6]]
+    ok = 0 < len(numbered) <= 20
+    return ok, f"{len(numbered)} numbered line(s) of 501"
+
+
+def merged_header_spreadsheet_loads() -> tuple[bool, str]:
+    """F6: the loader end to end, not the merge parse (F11) or the name assembly (F14)."""
+    from analytics_agent.ingest import draft
+    from analytics_agent.ingest.excel import load_excel
+    d = draft.draft_for_path(str(FIXTURES / "merged_multiheader.xlsx"))
+    ws = "eval_f6"
+    workspace.reset(ws)
+    con = db.connect(ws)
+    try:
+        spec = draft.spec_from_json(d.spec.model_dump_json())
+        r = load_excel(con, spec.path, **spec.to_loader_kwargs(load_excel))
+    finally:
+        con.close()
+        workspace.reset(ws)
+    ok = r.row_count == 150 and d.spec.header_rows == [1, 2]
+    return ok, f"{r.row_count} rows, header rows {d.spec.header_rows}"
+
+
+def pivot_export_is_named() -> tuple[bool, str]:
+    """F8: a pivot dump read as records gives a table of twelve measures nobody declared.
+
+    No fixture is pivot-shaped, so this one is constructed -- region plus twelve month columns
+    -- and said to be, as clean_gapped is (P13-D7)."""
+    from analytics_agent.ingest import draft
+    f = _scratch("pivot.csv")
+    months = [f"2024-{m:02d}" for m in range(1, 13)]
+    f.write_text("\n".join(["region," + ",".join(months)] + [
+        f"{r}," + ",".join(str(100 + i) for i in range(12))
+        for r in ("North", "South", "East", "West")]) + "\n", encoding="utf-8")
+    try:
+        v = draft.draft_for_path(str(f)).pivot
+    finally:
+        f.unlink(missing_ok=True)
+    ok = v.is_pivot_dump and len(v.period_columns) == 12 and "pivot" in v.message
+    return ok, f"is_pivot_dump={v.is_pivot_dump}, {len(v.period_columns)} period column(s)"
+
+
+def trend_names_the_missing_period() -> tuple[bool, str]:
+    """F10: a trend across an absent period must name it, not draw through it."""
+    from analytics_agent import server
+    text = server.compute_analysis(dataset_name=GAPPED, analysis_type="trend",
+                                   measure="revenue", grain="month",
+                                   workspace_id=WITH_CONTRACT)
+    # Asserted on the warning line, not on the month appearing anywhere. The first version
+    # checked `GAP_MONTH in text`, and trend builds its calendar with every period as a row --
+    # absent ones included, blank -- so the month was in the table whether or not anything
+    # warned about it. Falsified before it was trusted: pointed at 2024-03, which holds rows,
+    # it still passed. A check that cannot fail is what P9-O11 and C83 were.
+    warning = [ln for ln in text.splitlines() if "hold no rows" in ln]
+    ok = reason_of(text) is None and any(GAP_MONTH in ln for ln in warning)
+    return ok, warning[0].strip()[:90] if warning else "no 'hold no rows' line"
+
+
+def reset_needs_confirmation_and_empties() -> tuple[bool, str]:
+    """F13: the stdio process outlives a chat, so state leaks unless it can be cleared -- and
+    clearing it must not happen by accident."""
+    from analytics_agent import server
+    ws = "eval_f13"
+    workspace.reset(ws)
+    con = db.connect(ws)
+    try:
+        load_csv(con, str(FIXTURES / "clean_sales.csv"), DATASET)
+    finally:
+        con.close()
+    try:
+        asked = server.reset_workspace(workspace_id=ws)
+        server.reset_workspace(confirm=True, workspace_id=ws)
+        after = server.list_datasets(workspace_id=ws)
+    finally:
+        workspace.reset(ws)
+    ok = asked.startswith("BLOCKED") and "empty" in after
+    return ok, f"unconfirmed blocked: {asked.startswith('BLOCKED')}; emptied: {'empty' in after}"
+
+
 CHECKS = {
+    "workflow_state_names_the_next_call": workflow_state_names_the_next_call,
+    "size_gate_speaks_before_loading": size_gate_speaks_before_loading,
+    "wide_results_are_paged_not_dumped": wide_results_are_paged_not_dumped,
+    "preview_reads_only_what_it_shows": preview_reads_only_what_it_shows,
+    "merged_header_spreadsheet_loads": merged_header_spreadsheet_loads,
+    "pivot_export_is_named": pivot_export_is_named,
+    "trend_names_the_missing_period": trend_names_the_missing_period,
+    "reset_needs_confirmation_and_empties": reset_needs_confirmation_and_empties,
     "no_bare_paths": no_bare_paths,
     "coercion_is_counted": coercion_is_counted,
     "merge_ranges_without_openpyxl": merge_ranges_without_openpyxl,

@@ -283,3 +283,54 @@
   fmr: F9
   question: Silent type coercion must be counted, not hidden.
   check: coercion_is_counted
+
+# --- Step 4: the rest of the register. F2 is Track B with two or more users, which is Phase 14 and
+# --- not built; a green check for a scenario that cannot occur would be a false report.
+
+- id: R01
+  suite: regression
+  fmr: F1
+  question: An agent that skips a gate can ask where it is and be told the exact next call.
+  check: workflow_state_names_the_next_call
+
+- id: R03
+  suite: regression
+  fmr: F3
+  question: A 2 GB file is announced, with its size, before anything reads it.
+  check: size_gate_speaks_before_loading
+
+- id: R04
+  suite: regression
+  fmr: F4
+  question: A fifty-column result is previewed in a window that names what it leaves out.
+  check: wide_results_are_paged_not_dumped
+
+- id: R05
+  suite: regression
+  fmr: F5
+  question: A preview shows fifteen lines without reading the other five hundred.
+  check: preview_reads_only_what_it_shows
+
+- id: R06
+  suite: regression
+  fmr: F6
+  question: A spreadsheet with a merged two-row header loads 150 rows through its spec.
+  check: merged_header_spreadsheet_loads
+
+- id: R08
+  suite: regression
+  fmr: F8
+  question: A pivot table export is named as one rather than loaded as records.
+  check: pivot_export_is_named
+
+- id: R10
+  suite: regression
+  fmr: F10
+  question: A trend across a month with no rows names the month.
+  check: trend_names_the_missing_period
+
+- id: R13
+  suite: regression
+  fmr: F13
+  question: A workspace can be cleared between tasks, and only on confirmation.
+  check: reset_needs_confirmation_and_empties

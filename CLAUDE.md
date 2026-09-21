@@ -1,11 +1,8 @@
 # analytics-agent
 
 MCP server exposing data loading, profiling, cleaning and contract-gated analysis
-to Claude Desktop. Phases 1-12 done. Phase 13 (eval harness) is in progress:
-Steps 1-3 built the harness, closed what it found, and
-filled the set to 32 questions across three tables, scoring 67/67. Nothing
-recorded open except P9-O4's feature half. Nothing recorded
-open except P9-O4's feature half, scoped as a design question.
+to Claude Desktop. Phases 1-13 done; next is Phase 14 (Track B). Nothing is
+recorded open except P9-O4's feature half, scoped as a design question.
 
 ## Stack
 Python >= 3.12 via `uv` -- run everything through `uv run`, never `pip install`.
@@ -17,7 +14,7 @@ Layout: `src/analytics_agent/{ingest,profile,clean,contract,validate,analysis,ch
 
 ## Verify before committing
 All six, every time. Run the suite BEFORE committing, not after (C76: two commits
-recorded a broken tree). Last measured 21/09/2026, after the open-item cleanup:
+recorded a broken tree). Last measured 21/09/2026, at the close of Phase 13:
 
     uv run pytest -q                      # 1759 passed
     uv run python tests/test_phase8.py    # 99 passed, 0 failed, 2 skipped
@@ -30,7 +27,7 @@ The eval harness is the seventh thing to run and the only one that answers
 with a figure rather than pass/fail -- it exits zero on a wrong answer,
 because a suite that must be 100% cannot carry a score (P13-D1):
 
-    uv run python eval/run_eval.py        # SCORE: 67/67 (100%)
+    uv run python eval/run_eval.py        # SCORE: 75/75 (100%), 40 questions
 
 The acceptance scripts are scripts, not pytest files -- `pytest` collects nothing
 from them, so 1759 excludes them. The three skips are each deliberate and
@@ -78,16 +75,17 @@ fix is a numbered sub-step beneath it (`1.1`, `4.2`) with its own expected outpu
 the same document -- never in chat only, never in another file. Close a step by
 appending `P<n>-D<n>.` entries with their measured figures plus a `MEASURED VALIDATION`
 line carrying digests and suite totals, updating the guide's ledger row if the phase's
-state changed, then running all four checks above, reading them, and committing.
+state changed, then running all six checks and the eval above, reading them, and committing.
 
 ## Navigating the docs -- read narrowly
-`docs/decisions.md` is 4,517 lines and append-only; the build guide is 1,104. Reading
+`docs/decisions.md` is 5,642 lines and append-only; the build guide is 1,104. Reading
 either whole costs more than the work.
 
 - **Open-item register: `docs/decisions.md:4438` to end.** Read it rather than grepping
   for `IS OPEN` -- closures were recorded two ways and a grep undercounts by half (C68).
   The register is superseded: it recorded the state before fixes in its own commit (C78).
-  Read the "Cleanup Step 1" section at the END of the file for the current list.
+  The closing section of the most recent step, at the END of the file, carries the
+  current state; the guide's phase ledger row summarises it.
 - Decisions are `P<phase>-D<n>.`, open items `P<phase>-O<n> IS OPEN.`, corrections `C<n>.`
   Grep the identifier and read the surrounding lines; do not open the file.
 - Build guide: tier lists at lines 589-627, phase ledger table at ~1005-1013.
