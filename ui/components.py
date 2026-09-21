@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import html
+import re
 
 import streamlit as st
 
@@ -15,11 +16,26 @@ def backend() -> Backend:
     return get_backend()
 
 
+# The only shape new_workspace_id() produces. A URL can therefore name a session's workspace but
+# never "local" (Claude Desktop's, P14-D4) nor anything path-like.
+_WS_IN_URL = re.compile(r"^ws_[0-9a-f]{12}$")
+
+
 def workspace_id() -> str:
-    """This browser session's workspace, created on first use and kept for the session."""
+    """This browser session's workspace, kept in the URL so a reload finds it again.
+
+    Session state alone died with every refresh: a reload is a new Streamlit session, so it
+    made a new, empty workspace and orphaned the old one (P14-D20, seen in the browser). The id
+    is 48 random bits -- whoever holds the URL holds the workspace, like any share link.
+    """
     if "workspace_id" not in st.session_state:
-        st.session_state["workspace_id"] = backend().new_workspace_id()
-    return st.session_state["workspace_id"]
+        from_url = st.query_params.get("ws", "")
+        st.session_state["workspace_id"] = (
+            from_url if _WS_IN_URL.match(from_url) else backend().new_workspace_id())
+    wid = st.session_state["workspace_id"]
+    if st.query_params.get("ws") != wid:
+        st.query_params["ws"] = wid
+    return wid
 
 
 def show_refusal(refusal: Refusal) -> None:

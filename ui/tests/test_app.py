@@ -178,3 +178,48 @@ def test_the_fake_is_the_default_backend(monkeypatch):
     from ui import backend
     backend.get_backend.clear()
     assert isinstance(backend.get_backend(), FakeBackend)
+
+
+def test_the_app_runs_on_the_real_backend(monkeypatch):
+    """ANALYTICS_UI_BACKEND=real: every screen renders against the engine, on a fresh workspace."""
+    monkeypatch.setenv("ANALYTICS_UI_BACKEND", "real")
+    from analytics_agent import workspace
+    from analytics_agent.webapp.real_backend import RealBackend
+    from ui import backend
+    backend.get_backend.clear()
+    try:
+        assert isinstance(backend.get_backend(), RealBackend)
+        at = AppTest.from_file(APP, default_timeout=60).run()
+        assert not at.exception, at.exception
+        ws = at.session_state["workspace_id"]
+        assert ws.startswith("ws_")
+        assert any("Nothing loaded yet" in c.value for c in at.sidebar.caption)
+        for name in SCREENS:
+            s = screen(name)
+            s.session_state["workspace_id"] = ws
+            assert not s.run().exception, name
+    finally:
+        backend.get_backend.clear()
+        if "ws" in locals():
+            workspace.reset(ws)
+            workspace.workspace_dir(ws).rmdir()
+
+
+def test_a_reload_keeps_the_workspace_through_the_url():
+    """P14-D20: a reload is a new session; the ws query parameter carries the workspace over."""
+    first = AppTest.from_file(APP, default_timeout=30).run()
+    ws = first.session_state["workspace_id"]
+    assert first.query_params["ws"] == [ws] or first.query_params["ws"] == ws
+    reload = AppTest.from_file(APP, default_timeout=30)
+    reload.query_params["ws"] = ws
+    reload.run()
+    assert reload.session_state["workspace_id"] == ws
+
+
+@pytest.mark.parametrize("bad", ["local", "../etc", "ws_XYZ", "ws_0123456789abcdef"])
+def test_a_url_cannot_name_claude_desktops_workspace_or_a_path(bad):
+    at = AppTest.from_file(APP, default_timeout=30)
+    at.query_params["ws"] = bad
+    at.run()
+    assert at.session_state["workspace_id"] != bad
+    assert at.session_state["workspace_id"].startswith("ws_")

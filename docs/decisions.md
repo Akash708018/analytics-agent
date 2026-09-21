@@ -5921,3 +5921,45 @@ portfolio repository holds uncommitted work of the user's, so the correction is 
 MEASURED VALIDATION, 22/09/2026. `uv run --group ui pytest ui/tests`: 25 -> 26 passed (the motion
 test). Engine 1787 passed, eval 76/76, nothing under src/ changed. Portfolio repository: HEAD
 d89ac19 and its 22 uncommitted entries, unchanged before and after.
+
+## Phase 14, Step 3 - the real backend, 22/09/2026
+
+Step document: docs/steps/phase14_step3_real_backend.md.
+
+P14-D17. THE UI CALLS THE ENGINE IN-PROCESS, NOT OVER MCP. Every MCP tool returns text and the
+screens need structure; the contract forbids the UI parsing text, so webapp/real_backend.py calls
+the engine's functions and returns the contract's dataclasses. One lock per workspace around every
+engine call (P14-D8); tools that exist only as text (loading a spec, storing a contract) are called
+as the MCP layer calls them and their refusals converted once, by refusal_from_text, which reads
+both refusal shapes the engine produces.
+
+P14-D18. A GUESS NEVER REACHES A FORM AS IF IT WERE AN ANSWER. Measured: with grain unresolved,
+propose_contract's contract holds the guess "one row = one order_id". A form prefilled with it
+and sent back would have settled the engine's guess as the person's statement. Every field named
+in unresolved reaches the UI blank; seen in the browser as an empty grain field. Falsified.
+
+P14-D19. A BROWSER SESSION'S CONTRACT EXPORT STAYS IN ITS WORKSPACE. Cleanup Step 5 namespaced
+exports per workspace under docs/contracts -- right for a second MCP workspace, wrong for a web
+visitor, whose confirmations would have dirtied the repository. The backend exports into
+<workspace>/contracts/, gitignored and removed by reset.
+
+P14-D20. THE WORKSPACE ID LIVES IN THE URL. A reload is a new Streamlit session; with the id in
+session state only, every refresh made a new empty workspace and orphaned the old one (seen in the
+browser). ?ws= carries it, accepted only as ^ws_[0-9a-f]{12}$ -- never "local", never a path.
+48 random bits: whoever holds the URL holds the workspace, as with any share link.
+
+P14-D21. LOOKING CREATES NOTHING. workspace_dir and db.connect create on touch, so the sidebar's
+listing made a directory and a database for every page view (seen: one per server start). Reads
+of a workspace never written to answer empty without creating it.
+
+P14-O1 IS OPEN. ABANDONED WORKSPACES ARE NEVER REMOVED. A workspace someone used and left stays on
+disk; with D21 only visits that upload create one, but nothing expires them. Needed before public
+hosting (guide Phase 14 items 5-7): an age-based sweep, measured against real sizes.
+
+MEASURED VALIDATION, 22/09/2026. `uv run pytest -q`: 1787 -> 1803 passed (16 in
+tests/test_real_backend.py). Acceptance unchanged: 99/0/2, 19/0/0, 35/0/1, 26/0/0, 36/0/0. Eval
+SCORE 76/76 (100%). `uv run --group ui pytest ui/tests`: 26 -> 32. 0 ws_ directories left after
+the full runs; docs/contracts unchanged. real_backend.py 450 lines. Digests:
+  b0fa6dde6d1745ba958ed1c1b7588c9fdfaccacbfe0f3740d92bb58d43e550ad  src/analytics_agent/webapp/real_backend.py
+  1b4b699d1efb997fd2fcbde9103e06ed26f1d0265be1637b483102e34f5f3e19  tests/test_real_backend.py
+  ebd01f119865168a84c02d5876f7bc98a7daa5a0e967d8040b72008209a33a7f  ui/components.py
