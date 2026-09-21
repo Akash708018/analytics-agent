@@ -5107,3 +5107,58 @@ test_phase11.py 26 passed, 0 failed, 0 skipped. Digests:
   d451ac622453f0922e1fed37b232a20a0f039486ca6cdc4e2a52dc526fd47c32  src/analytics_agent/analysis/growth_decomposition.py
   17ef7bb62a6e5a15e87293fd36f1506ada3b65382414b28a04f100a14b8926f2  tests/test_growth_decomposition.py
   03daf6a771409ca8093720ea12d267de024d0aa649f4f30de8722303a1738481  tests/test_phase11.py
+
+## Phase 12, Step 1 - what each mandatory section can be built from, 21/09/2026
+
+Step document: docs/steps/phase12_step1_sources.md, written before the run with eight
+predictions. All eight held, which has not happened before in this build and is itself worth
+noting: the questions were about what the repository contains rather than what a library does,
+and this repository is legible in a way scipy is not.
+
+P12-D1. FIVE OF THE NINE SECTIONS ARE A FORMATTING JOB. The cleaning ledger, validation results,
+the data quality summary, dataset and grain, and caveats and exclusions all read from records
+that already exist and are already queryable per dataset: clean/ledger.py's LedgerEntry (which
+carries the SQL statement it ran, plus plan and action ids and before/after counts, and a line()
+that renders one), validate/runs.py's ValidationRun with latest and history, profile/runs.py's
+ProfileRun with latest, history and all_latest, and contract/store.py's StoredContract with
+current, history, history_text and summarise. Phase 12 assembles these rather than computing
+anything.
+
+P12-D2. THE QUESTION ASKED IS STORED NOWHERE AND MUST BE AN ARGUMENT. Nothing in the workspace
+records why a dataset was loaded. build_report takes it from the caller, which is right -- the
+question belongs to the person, not to the data -- and it is the one section with no record
+behind it.
+
+P12-D3. A WRITTEN RESULT KEEPS ITS TABLE AND LOSES EVERYTHING ELSE. Measured: write_result opens
+the file, writes the header row and the data rows, and returns. The `summary` it is handed goes
+into the returned Result object and not onto disk, and no parameters are stored at all. So a
+result file on disk is a table and a filename: top_n_20260921-124920.csv says an analysis called
+top_n ran at a time, and does not say it was called with dimension="region", measure="revenue"
+and n=3, nor that 500 of 500 rows were analysed. The method note, which every analysis is
+required to lead with and which tools.py refuses a result for lacking, does not survive the call
+that produced it.
+
+P12-D4. THE ANALYSIS TIER IS THE ONE TIER THAT RECORDS NOTHING. `ensure_table` appears in five
+modules -- validate/runs, contract/store, clean/plan, clean/ledger, profile/runs -- each keeping
+its own runs in the workspace catalog, each with latest and history per dataset. Analyses and
+charts keep nothing. The convention is established five times over and the newest tier declines
+it, which is why the report cannot be assembled as specified rather than why some feature is
+missing.
+
+P12-O1 IS OPEN, and it is Phase 12's real work. "A reproduction appendix listing exact tool
+calls" cannot be written from what exists. The three candidate answers are not equal. Taking the
+calls as an argument to build_report means the appendix records what the agent says it ran,
+which is the failure this whole codebase is arranged against -- a claim and the thing it
+describes, written separately, and the reproduction section is precisely where that must not
+happen. Reconstructing approximately from filenames and saying so produces an appendix that
+cannot be replayed, which is not an appendix. Recording analysis and chart runs the way the
+other five tiers already record theirs is the answer that fits: a run row carrying dataset,
+analysis_type, the parameters as given, the result path, the chart path, the summary lines and a
+timestamp. It also closes the "findings with charts" section, which otherwise cannot say which
+chart belongs to which finding, because nothing links a PNG to the analysis that produced it.
+
+MEASURED VALIDATION, 21/09/2026. This step builds nothing and changes no file under src/ or
+tests/, so every figure is the baseline restated after the fact: full suite 1714 passed;
+test_phase8.py 99 passed, 0 failed, 2 skipped; test_phase9.py 19/0/0; test_phase10.py 35/0/1;
+test_phase11.py 26 passed, 0 failed, 0 skipped. Measured before the step and again before the
+commit.

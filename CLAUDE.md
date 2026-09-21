@@ -1,9 +1,10 @@
 # analytics-agent
 
 MCP server exposing data loading, profiling, cleaning and contract-gated analysis
-to Claude Desktop. Phases 1-11 done. Phase 12 (report) and 13 (eval harness) are
-unstarted. Nothing is recorded open except P9-O4's feature half, scoped as a
-design question.
+to Claude Desktop. Phases 1-11 done. Phase 12 (report) is in progress: Step 1
+measured what each mandatory section can be built from (P12-D1 to D4). Open:
+P12-O1, the reproduction appendix has no source because the analysis tier
+records no runs; and P9-O4's feature half, scoped as a design question.
 
 ## Stack
 Python >= 3.12 via `uv` -- run everything through `uv run`, never `pip install`.
