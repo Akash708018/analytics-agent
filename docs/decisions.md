@@ -5805,3 +5805,56 @@ MEASURED VALIDATION, 21/09/2026. Falsified first: 2 failed, 1 passed, the failur
   89eb6f0b141f22178a11d63af9f0f72b78d92a604e41f833c1a2995b4912c56b  src/analytics_agent/webapp/contract.py
   1eabf51014c71b1324c0a11716fa65b24c7f52f6a6a1ce087e3cedaf652f05d8  tests/test_ingest_spec_dtype.py
   25c365f924cdcdd7c3b8eafe4fd899a531e0542a105ba3f527ec7a74e4175ea6  pyproject.toml
+
+## Phase 14, Step 1 - Track B ground facts, 22/09/2026
+
+Step document: docs/steps/phase14_step1_ground_facts.md. tests/test_track_b_facts.py, 6 tests
+over 7 facts (F3 and F4 are one sequence). Nothing in src/ changed.
+
+P14-D1. TWO HANDLES ON ONE FILE IN ONE PROCESS SHARE IT (F1, as predicted). A table created on
+one is read on the other. Streamlit's thread-per-session in one process is compatible with
+util/db.connect opening a handle per call.
+
+P14-D2. connect_read_only BESIDE AN OPEN connect() IN ONE PROCESS RAISES (F2, as predicted).
+BinderException, "Unique file handle conflict: Cannot attach "ws" - the database file ... is
+already attached". Track A never overlaps two calls; Track B can, if one session's calls overlap
+(a Streamlit rerun while a tool still runs). propose_cleaning_plan and validate_dataset open the
+read-only handle, so an overlap on one workspace would fail with an error the user did not cause.
+
+P14-D3. A SECOND PROCESS IS LOCKED OUT OF A FILE THE FIRST HOLDS (F3, as predicted). IOException,
+"Could not set lock on file ... Conflicting lock is held in ...". Register F2, reproduced.
+P14-D4. AND GETS IN ONCE THE FIRST CLOSES (F4, as predicted). The lock lives exactly as long as
+the handle, and db.connect's handles live one call. Consequences: Track B must run as ONE
+process (no multi-worker server), and must never use Claude Desktop's workspace id "local" --
+the two processes would collide whenever their calls overlapped.
+
+P14-D5. TWO THREADS ON TWO WORKSPACES DO NOT TOUCH (F5, as predicted). 25 rounds each of CREATE
+OR REPLACE and a read, started on a barrier: no error, each saw only its own value.
+
+P14-D6. THE SECOND WRITER TO ONE TABLE IS REFUSED AT ITS WRITE, AND ONLY IT ABORTS. The
+prediction was wrong: it said the second COMMIT raises. Measured: the second connection's CREATE
+OR REPLACE raises TransactionException "Catalog write-write conflict" immediately; that
+connection's transaction is then aborted ("Current transaction is aborted (please ROLLBACK)")
+until it rolls back; the first commits untouched and its value stands. My first rewrite of the
+test asserted the wrong line too -- it queried the aborted connection and read the error as the
+first commit failing -- and a probe separating each statement is what settled it.
+
+P14-D7. EACH HTTP CLIENT HAS ITS OWN STABLE SESSION ID (F7, as predicted). FastMCP 3.4.7 over
+Streamable HTTP: one client's two calls returned the same ctx.session_id, a second client a
+different one; both 32 hex characters, which validate_workspace_id accepts. The first run failed
+on the test, not the library: under "from __future__ import annotations" FastMCP resolves the
+ctx annotation at module scope, where Context had been imported only inside the function.
+
+P14-D8. WHAT THIS DECIDES FOR STEP 2. D2 and D6 are the same hazard -- two calls on ONE workspace
+at once -- and D1 and D5 say different workspaces are safe. So the Track B backend serialises
+calls per workspace (one lock per workspace id) and runs everything else concurrently; no
+change to util/db. D3/D4 fix the deployment shape: one process, and Track B ids that can never
+equal DEFAULT_WORKSPACE_ID. D7 means a session id is available if the backend talks MCP over
+HTTP; whether it does is Step 2's decision, not this one's.
+
+MEASURED VALIDATION, 22/09/2026. tests/test_track_b_facts.py: 6 passed, three consecutive runs.
+`uv run pytest -q`: 1781 -> 1787 passed. Acceptance unchanged: 99/0/2, 19/0/0, 35/0/1, 26/0/0,
+36/0/0. Eval SCORE 76/76 (100%). Tree clean. The suite ran in 97-128 s against 22-44 s the day
+before; deselecting this file it ran in 111 s and no test exceeded 1.73 s, so the machine was
+slower, not the suite -- recorded so the next reading is not mistaken for a regression.
+  e3a195e1c2a194157267d88f619d4130012977616cfb004914d5362187b3bc31  tests/test_track_b_facts.py  (190 lines)
