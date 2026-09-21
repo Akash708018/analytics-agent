@@ -133,3 +133,153 @@
   fmr: F15
   question: A type change must go through CTAS rather than UPDATE, and lose no rows.
   check: ctas_type_change
+
+# --- Step 3: to the guide's 30-40, across three tables and both loaders -----------------------
+
+- id: C06
+  suite: correctness
+  question: How many product groups does a frequency of product have?
+  dataset: clean_sales
+  sql: SELECT count(*) FROM (SELECT product FROM clean_sales GROUP BY product)
+  call: {tool: compute_analysis, args: {analysis_type: frequency, column: product}}
+  expect: ["{answer} rows"]
+
+- id: C07
+  suite: correctness
+  question: Which region sold the most units?
+  dataset: clean_sales
+  sql: SELECT region FROM clean_sales GROUP BY region ORDER BY sum(units) DESC LIMIT 1
+  call: {tool: compute_analysis, args: {analysis_type: top_n, dimension: region,
+                                        measure: units, n: 3}}
+  expect: ["{answer}"]
+
+- id: C08
+  suite: correctness
+  question: How many rows survive once July is removed?
+  dataset: clean_gapped
+  sql: SELECT count(*) FROM clean_gapped
+  call: {tool: compute_analysis, args: {analysis_type: summary_stats}}
+  expect: ["{answer} of {answer} row(s) analysed."]
+
+- id: C09
+  suite: correctness
+  question: How many months hold rows in the gapped copy?
+  dataset: clean_gapped
+  sql: SELECT count(*) FROM (SELECT 1 FROM clean_gapped GROUP BY strftime(order_date, '%Y-%m'))
+  call: {tool: compute_analysis, args: {analysis_type: calendar_coverage, grain: month}}
+  expect: ["{answer} month(s) hold rows"]
+
+- id: C10
+  suite: correctness
+  question: How many rows came out of the merged two-row header spreadsheet?
+  dataset: merged_multiheader
+  sql: SELECT count(*) FROM merged_multiheader
+  call: {tool: compute_analysis, args: {analysis_type: summary_stats}}
+  expect: ["{answer} of {answer} row(s) analysed."]
+
+- id: C11
+  suite: correctness
+  question: How many channel groups are there?
+  dataset: clean_sales
+  sql: SELECT count(*) FROM (SELECT channel FROM clean_sales GROUP BY channel)
+  call: {tool: compute_analysis, args: {analysis_type: frequency, column: channel}}
+  expect: ["{answer} rows"]
+
+- id: C12
+  suite: correctness
+  question: Which product earned the most revenue?
+  dataset: clean_sales
+  sql: SELECT product FROM clean_sales GROUP BY product ORDER BY sum(revenue) DESC LIMIT 1
+  call: {tool: compute_analysis, args: {analysis_type: top_n, dimension: product,
+                                        measure: revenue, n: 5}}
+  expect: ["{answer}"]
+
+- id: C13
+  suite: correctness
+  question: Which region leads the spreadsheet-loaded table by revenue?
+  dataset: merged_multiheader
+  sql: SELECT region FROM merged_multiheader GROUP BY region ORDER BY sum(revenue) DESC LIMIT 1
+  call: {tool: compute_analysis, args: {analysis_type: top_n, dimension: region,
+                                        measure: revenue, n: 3}}
+  expect: ["{answer}"]
+
+- id: C14
+  suite: correctness
+  question: Which channel sold the most units?
+  dataset: clean_sales
+  sql: SELECT channel FROM clean_sales GROUP BY channel ORDER BY sum(units) DESC LIMIT 1
+  call: {tool: compute_analysis, args: {analysis_type: top_n, dimension: channel,
+                                        measure: units, n: 3}}
+  expect: ["{answer}"]
+
+# The guide's own example of a caveat: "a trend request on a dataset with a missing quarter
+# must produce a gap warning, not a clean line". No fixture has a missing period, so
+# clean_gapped is clean_sales with 2024-07 removed -- a constructed condition, said to be one.
+- id: B06
+  suite: behavioural
+  question: A month with no rows must be named, not skipped over.
+  dataset: clean_gapped
+  call: {tool: compute_analysis, args: {analysis_type: calendar_coverage, grain: month}}
+  expect: ["hold none: 2024-07", "A gap is not a zero"]
+
+- id: B07
+  suite: behavioural
+  question: Summary stats must say which columns it did not summarise, and why.
+  dataset: merged_multiheader
+  call: {tool: compute_analysis, args: {analysis_type: summary_stats}}
+  expect: ["Not summarised"]
+
+- id: B08
+  suite: behavioural
+  question: Ranking by a measure declared non-additive must be refused, not totalled.
+  dataset: clean_sales
+  call: {tool: compute_analysis, args: {analysis_type: top_n, dimension: region,
+                                        measure: unit_price, n: 3}}
+  reason: ANALYSIS_NOT_POSSIBLE
+  retry: true
+  expect: ["non-additive"]
+
+- id: B09
+  suite: behavioural
+  question: A chart kind nobody draws must come back with the ones that exist.
+  dataset: clean_sales
+  call: {tool: render_chart, args: {analysis_type: frequency, chart: piechart, column: region}}
+  reason: ANALYSIS_NOT_POSSIBLE
+  retry: true
+  expect: ["line, bar"]
+
+- id: B10
+  suite: behavioural
+  question: A report of a dataset with no contract is written, and says the grain was never agreed.
+  dataset: clean_sales
+  contract: false
+  call: {tool: build_report, args: {question: "anything at all"}}
+  expect: ["nothing to report", "Dataset and grain"]
+
+- id: B11
+  suite: behavioural
+  question: A single-measure chart handed several measures must name the fix, not choose.
+  dataset: clean_sales
+  call: {tool: render_chart, args: {analysis_type: summary_stats, chart: bar}}
+  reason: ANALYSIS_NOT_POSSIBLE
+  retry: true
+  expect: ["Name one with y"]
+
+- id: B12
+  suite: behavioural
+  question: An analysis on the gapped table still names the contract it ran under.
+  dataset: clean_gapped
+  call: {tool: compute_analysis, args: {analysis_type: frequency, column: region}}
+  expect: ["Under contract v1 for clean_gapped"]
+
+- id: R07
+  suite: regression
+  fmr: F7
+  question: No tool returns a bare path; every disk-write carries its own description.
+  check: no_bare_paths
+
+- id: R09
+  suite: regression
+  fmr: F9
+  question: Silent type coercion must be counted, not hidden.
+  check: coercion_is_counted

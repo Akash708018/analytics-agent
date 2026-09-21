@@ -73,6 +73,20 @@ class _Refused(Exception):
         super().__init__(text)
 
 
+def _as_call(tool: str, dataset_name: str, analysis_type: str, params: dict) -> str:
+    """A call a caller can retype, with the arguments that were actually used.
+
+    The same shape analysis/runs.AnalysisRun.call() renders for the reproduction appendix, and
+    for the same reason: a call naming only the analysis is one that fails the moment the
+    analysis takes a parameter.
+    """
+    from .runs import _literal
+
+    parts = [f'dataset_name="{dataset_name}"', f'analysis_type="{analysis_type}"']
+    parts += [f"{k}={_literal(v)}" for k in sorted(params) for v in (params[k],)]
+    return f"{tool}({', '.join(parts)})"
+
+
 def _produce(con, dataset_name: str, analysis_type: str, params: dict):
     """Gate, look up, scope, run, and check the result describes itself.
 
@@ -256,10 +270,11 @@ def render_chart(
                 "result has. Nothing was written."
             ),
             state=f"contract v{gate.version} for {dataset_name}",
-            next_call=(
-                f'compute_analysis(dataset_name="{dataset_name}", '
-                f'analysis_type="{analysis_type}")'
-            ),
+            # The parameters the analysis was given, not just its name. Without them this
+            # named a call that fails for every analysis that takes one -- frequency without
+            # its column is refused, and a refusal whose recovery is itself refused is worse
+            # than no recovery at all. Found by gold question B09 on 21/09/2026.
+            next_call=_as_call("compute_analysis", dataset_name, analysis_type, used),
         ).to_text()
 
     # x, y and title are stored beside the analysis parameters because call() has to render an

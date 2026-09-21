@@ -5510,3 +5510,66 @@ reason, their call and their behaviour, and moved one sentence one line up. Dige
   b4ee344c82c5a3005dbafe01c31371d84ca78f48f623838ca1d2e07e2edab788  eval/gold_questions.yaml
   88e76039d435319b2b2aff30b0f1dff7cc2f55a7a7147619ad9995517cd3b8ae  src/analytics_agent/state.py
   abf64b98afbac5daa71d263846011a207c58e9b1451bb19e784edc1393d92a93  src/analytics_agent/validate/tools.py
+
+## Phase 13, Step 3 - filling the question set, 21/09/2026
+
+Step document: docs/steps/phase13_step3_questions.md, written before the run with five
+predictions. Four held. SCORE 67/67 (100%) over 32 questions -- 14 correctness, 12 behavioural,
+6 regression -- from 31/31 over 14.
+
+P13-D6. A GOLD QUESTION WITH NO `reason` IS A CAVEAT RATHER THAN A REFUSAL. The guide asks for
+"cases where the correct behaviour is to refuse or caveat", and a suite testing only refusals
+would miss the half where the tool answers and warns. A caveat question asserts the call
+succeeds and that the reply contains what the caller needs to know. B06 is the guide's own
+example and it passes: calendar_coverage on a table with a month removed prints "11 month(s)
+hold rows and 1 hold none: 2024-07" and "A gap is not a zero -- nothing says whether the
+business stopped".
+
+P13-D7. THE GAPPED TABLE IS CONSTRUCTED, AND SAYING SO IS THE POINT. Measured: no fixture has a
+missing period. clean_sales holds all twelve months of 2024 and broken_sales all nineteen of its
+span; gaps_and_dupes is named for blanks and repeats in the HEADER, not for time. So
+clean_gapped is clean_sales with 2024-07 removed, written out and loaded through load_csv rather
+than made with CTAS -- a table created behind the loader's back is not a loaded dataset as far
+as the gate is concerned, and a gold question needing a back door would be testing one. Three
+tables now, which is what P9-O2 asked for.
+
+C88. A GOLD QUESTION ACCUSED THE PRODUCT OF A DEFECT IT DOES NOT HAVE. R09 tested that coercion
+failures are counted (F9) by searching `str(result)` for the word "null", and reported the
+mitigation missing. `LoadResult` carries `coercion_failures` and `coercion_total`; reading them
+gives 10 failures counted per column, {'units': 7, 'unit_price': 3}. The check was looking at
+the wrong surface. This is worth naming because the failure mode of an eval is not that it
+misses things -- it is that it reports a defect that is not there, and a team that has been
+told three times to look at something correct stops looking. A gold question is a claim about
+the product and carries the same burden as any other.
+
+The route to it was the product working. The default load raised LoadRefused at row 5101 --
+"Column 'units' was read as BIGINT, but this row holds 'n/a' ... Nothing has been dropped, the
+load stopped instead" -- and named the reload that counts them. The check had not expected the
+refusal at all, and the crash is what sent me to read LoadResult.
+
+C89. A REFUSAL NAMED A RECOVERY THAT WAS ITSELF REFUSED, AND I WROTE IT. Gold question B09
+called render_chart with a chart kind nobody draws. The refusal was right, and its NEXT STEP was
+`compute_analysis(dataset_name="clean_sales", analysis_type="frequency")` -- the analysis and
+none of the parameters it had just been given. frequency without its column is refused, so the
+recovery offered was one that fails. I added this in Phase 11 Step 3 and nothing caught it,
+because Step 3's tests asserted `'compute_analysis(dataset_name="sales"' in text` and that
+substring was present either way. The call now carries the parameters actually used, rendered
+through the same `_literal` the reproduction appendix uses, so the two cannot drift. A refusal
+whose recovery is itself refused is worse than no recovery: it costs the caller a turn and
+teaches them the tool is unreliable.
+
+PREDICTION 5 WAS WRONG AND THE PROJECT IS BETTER FOR IT. The step document predicted the score
+would not be 100% at the end, on the grounds that finding something and fixing it in the same
+step is optimistic. Both failures were fixable where they were found -- one a real defect, one a
+wrong question -- and neither needed an open item. Recorded because the previous step's wrong
+prediction was pessimistic too (P12-D23), and two in a row suggests I am calibrating the
+codebase as more fragile than it is.
+
+MEASURED VALIDATION, 21/09/2026. `uv run python eval/run_eval.py`: 67 passed, 0 failed, 0
+skipped, SCORE 67/67 (100%) -- correctness 14/14, behavioural 47/47, regression 6/6 across six
+Failure Mode Register ids (F7, F9, F11, F12, F14, F15). The refusal roster is unchanged at 26 of
+37 (70%). Full suite 1759 and the five acceptance scripts unchanged -- 99/0/2, 19/0/0, 35/0/1,
+26/0/0, 36/0/0 -- because the one src/ change lengthens a refusal's next_call and every existing
+assertion on it names a substring that is still there. Digests:
+  eval/run_eval.py, eval/gold_questions.yaml and src/analytics_agent/analysis/tools.py as
+  printed in the commit.

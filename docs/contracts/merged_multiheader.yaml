@@ -4,9 +4,9 @@
 # This file is rewritten on every confirmation and is never read back, so an
 # edit here changes nothing and will be overwritten. To change the contract,
 # call propose_dataset_contract with the correction and confirm the result.
-dataset_name: clean_sales
+dataset_name: merged_multiheader
 version: 1
-confirmed_at: '2026-09-21T14:09:14.636903'
+confirmed_at: '2026-09-21T14:09:14.730856'
 fingerprint: facdb163024e
 grain: one row = one order
 primary_key:

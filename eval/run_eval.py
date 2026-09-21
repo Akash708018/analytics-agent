@@ -32,7 +32,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from analytics_agent import workspace  # noqa: E402
 from analytics_agent.contract.refusals import reason_of  # noqa: E402
+from analytics_agent.ingest import draft  # noqa: E402
 from analytics_agent.ingest.csv_loader import load_csv  # noqa: E402
+from analytics_agent.ingest.excel import load_excel  # noqa: E402
 from analytics_agent.util import db  # noqa: E402
 
 QUESTIONS = Path("eval/gold_questions.yaml")
@@ -49,6 +51,14 @@ FIXTURES = Path("tests/fixtures")
 WITH_CONTRACT = "eval_contract"
 NO_CONTRACT = "eval_bare"
 DATASET = "clean_sales"
+
+#: The month removed from clean_gapped. No fixture has a missing period -- gaps_and_dupes is
+#: about blanks and repeats in the HEADER, not about time -- so the guide's caveat case ("a
+#: trend request on a dataset with a missing quarter must produce a gap warning, not a clean
+#: line") is constructed here, from a known condition, and said to be constructed.
+GAP_MONTH = "2024-07"
+GAPPED = "clean_gapped"
+EXCEL = "merged_multiheader"
 
 PASSED = 0
 FAILED = 0
@@ -84,7 +94,7 @@ def heading(text: str) -> None:
     print("-" * len(text))
 
 
-def truth(sql: str, workspace_id: str = WITH_CONTRACT) -> str:
+def truth(sql: str, workspace_id: str = WITH_CONTRACT) -> str:  # noqa: D401
     """The answer, computed against the table rather than asked of the tool."""
     con = db.connect(workspace_id)
     try:
@@ -99,10 +109,16 @@ def truth(sql: str, workspace_id: str = WITH_CONTRACT) -> str:
 # --- setup -----------------------------------------------------------------------------------
 
 def mount(server) -> bool:
-    """Two workspaces: one with a confirmed contract, one deliberately without."""
+    """Three tables, because one is not a spread and P9-O2 asked for at least three.
+
+    clean_sales as it comes; clean_gapped, the same rows with one month removed so the guide's
+    caveat case has something to catch; and merged_multiheader through the Excel path with its
+    date column cleaned, so the questions are not all about one loader.
+    """
     csv = FIXTURES / "clean_sales.csv"
+    xlsx = FIXTURES / "merged_multiheader.xlsx"
     if not csv.exists():
-        skip("the fixture", f"{csv} is not on disk; run from the repository root")
+        skip("the fixtures", f"{csv} is not on disk; run from the repository root")
         return False
 
     for ws in (WITH_CONTRACT, NO_CONTRACT):
@@ -113,41 +129,82 @@ def mount(server) -> bool:
         finally:
             con.close()
 
-    proposal = server.propose_dataset_contract(
-        dataset_name=DATASET,
-        grain="one row = one order",
-        primary_key=["order_id"],
-        date_column="order_date",
+    # The gapped copy, written out and loaded through the real path rather than made with CTAS:
+    # a table created behind the loader's back is not a loaded dataset as far as the gate is
+    # concerned, and a gold question that needed a back door would be testing one.
+    rows = csv.read_text(encoding="utf-8").splitlines()
+    header, body = rows[0], rows[1:]
+    date_at = header.split(",").index("order_date")
+    kept = [r for r in body if not r.split(",")[date_at].startswith(GAP_MONTH)]
+    gapped_csv = workspace.workspace_dir(WITH_CONTRACT) / "clean_gapped.csv"
+    gapped_csv.write_text("\n".join([header, *kept]) + "\n", encoding="utf-8")
+    con = db.connect(WITH_CONTRACT)
+    try:
+        load_csv(con, str(gapped_csv), GAPPED)
+        if xlsx.exists():
+            spec = draft.spec_from_json(draft.draft_for_path(str(xlsx)).spec.model_dump_json())
+            load_excel(con, spec.path, **spec.to_loader_kwargs(load_excel))
+    finally:
+        con.close()
+
+    if xlsx.exists():
+        server.propose_cleaning_plan(dataset_name=EXCEL, workspace_id=WITH_CONTRACT)
+        server.apply_cleaning_plan(dataset_name=EXCEL, approved_action_ids=["C001"],
+                                   workspace_id=WITH_CONTRACT)
+
+    shape = dict(
         measures=["revenue", "units", "unit_price"],
         dimensions=["region", "product", "channel"],
         aggregations={"revenue": "sum", "units": "sum", "unit_price": "none"},
-        measure_definitions={
+        definitions={
             "revenue": "units x unit_price, gross of tax",
             "units": "items on the order",
             "unit_price": "price of one item; summing it means nothing",
         },
-        analysis_window_start="2024-01-01",
-        analysis_window_end="2024-12-31",
+        date_column="order_date",
+        window=("2024-01-01", "2024-12-31"),
         workspace_id=WITH_CONTRACT,
     )
+    for name in (DATASET, GAPPED) + ((EXCEL,) if xlsx.exists() else ()):
+        if not contract_for(server, name, **shape):
+            return False
+    return True
+
+
+def invoke(server, call: dict, workspace_id: str, dataset: str = DATASET) -> str:
+    tool = getattr(server, call["tool"])
+    args = dict(call.get("args") or {})
+    args.setdefault("dataset_name", dataset)
+    return tool(workspace_id=workspace_id, **args)
+
+
+def contract_for(server, dataset: str, *, measures, dimensions, aggregations,
+                 definitions, date_column, window, workspace_id) -> bool:
+    """Propose and confirm, through the registered tools. Returns whether it stuck."""
+    proposal = server.propose_dataset_contract(
+        dataset_name=dataset,
+        grain="one row = one order",
+        primary_key=["order_id"],
+        date_column=date_column,
+        measures=measures,
+        dimensions=dimensions,
+        aggregations=aggregations,
+        measure_definitions=definitions,
+        analysis_window_start=window[0],
+        analysis_window_end=window[1],
+        workspace_id=workspace_id,
+    )
     if "```" not in proposal:
-        skip("the contract", "the proposal carried no JSON to confirm")
+        skip(f"the contract for {dataset}", proposal.splitlines()[0][:80])
         return False
     body = proposal.rsplit("```", 2)[-2]
     if body.startswith("json"):
         body = body[4:]
-    confirmed = server.confirm_dataset_contract(contract_json=body, workspace_id=WITH_CONTRACT)
+    confirmed = server.confirm_dataset_contract(contract_json=body, workspace_id=workspace_id)
     if reason_of(confirmed) is not None:
-        skip("the contract", confirmed.splitlines()[0][:80])
+        skip(f"the contract for {dataset}", confirmed.splitlines()[0][:80])
         return False
     return True
-
-
-def invoke(server, call: dict, workspace_id: str) -> str:
-    tool = getattr(server, call["tool"])
-    args = dict(call.get("args") or {})
-    args.setdefault("dataset_name", DATASET)
-    return tool(workspace_id=workspace_id, **args)
 
 
 # --- the retry -------------------------------------------------------------------------------
@@ -187,8 +244,9 @@ def as_call(step: str, server) -> tuple[str, dict] | None:
 # --- the suites -------------------------------------------------------------------------------
 
 def run_correctness(server, q: dict) -> None:
+    dataset = q.get("dataset", DATASET)
     answer = truth(q["sql"])
-    reply = invoke(server, q["call"], WITH_CONTRACT)
+    reply = invoke(server, q["call"], WITH_CONTRACT, dataset)
     if reason_of(reply) is not None:
         check("correctness", f"{q['id']} {q['question']}", False, reply.splitlines()[0][:80])
         return
@@ -200,8 +258,21 @@ def run_correctness(server, q: dict) -> None:
 
 def run_behavioural(server, q: dict) -> None:
     ws = NO_CONTRACT if q.get("contract") is False else WITH_CONTRACT
-    reply = invoke(server, q["call"], ws)
+    reply = invoke(server, q["call"], ws, q.get("dataset", DATASET))
     got = reason_of(reply)
+
+    # A question with no `reason` is a caveat rather than a refusal: the call is supposed to
+    # succeed and to say something the caller needs to know. The guide asks for both -- "cases
+    # where the correct behaviour is to refuse or caveat" -- and a suite that only tested
+    # refusals would miss the half where the tool answers and warns.
+    if "reason" not in q:
+        if not check("behavioural", f"{q['id']} answers rather than refusing",
+                     got is None, str(got.value) if got else ""):
+            return
+        for phrase in q.get("expect", []):
+            check("behavioural", f"{q['id']} caveats: {phrase!r}", phrase in reply)
+        return
+
     if not check("behavioural", f"{q['id']} refuses with {q['reason']}",
                  got is not None and got.value == q["reason"],
                  str(got.value if got else "no refusal")):
@@ -312,7 +383,66 @@ def ctas_type_change() -> tuple[bool, str]:
                f"{'150 row(s) before, 150 after' in applied}"
 
 
+def no_bare_paths() -> tuple[bool, str]:
+    """F7: an agent handed a path it cannot open writes a confident report about data it never
+    saw. Every disk-write returns the path AND what is in the file."""
+    from analytics_agent import server
+    reply = server.compute_analysis(dataset_name=DATASET, analysis_type="summary_stats",
+                                    workspace_id=WITH_CONTRACT)
+    wants = ("rows x", "written to", "What this shows:", "row(s) analysed")
+    missing = [w for w in wants if w not in reply]
+    path_lines = [ln for ln in reply.splitlines() if ".csv" in ln]
+    ok = not missing and len(reply.splitlines()) > 8 and len(path_lines) >= 1
+    return ok, (f"missing {missing}" if missing
+                else f"{len(reply.splitlines())} lines around {len(path_lines)} path(s)")
+
+
+def coercion_is_counted() -> tuple[bool, str]:
+    """F9: a value that will not coerce is nulled, and the count of how many says so.
+
+    mixed_types.xlsx puts its bad values below row 5000 on purpose, so the default
+    inference_rows never sees them: the sniffer calls the column BIGINT and then meets text.
+    That is the only way a coercion failure can happen at all.
+    """
+    from analytics_agent.ingest.excel import load_excel
+    fixture = FIXTURES / "mixed_types.xlsx"
+    if not fixture.exists():
+        return True, "mixed_types.xlsx is not on disk; nothing to coerce"
+    from analytics_agent.ingest.csv_loader import LoadRefused
+    ws = "eval_f9"
+    workspace.reset(ws)
+    con = db.connect(ws)
+    try:
+        # Half one: the default load refuses rather than coercing quietly. Measured -- it names
+        # the row, the column, the value and the type it was read as, and says nothing was
+        # dropped because the load stopped instead.
+        refused = ""
+        try:
+            load_excel(con, str(fixture), "f9")
+        except LoadRefused as exc:
+            refused = str(exc)
+        loud = "does not fit its column" in refused and "Nothing has been dropped" in refused
+
+        # Half two: the reload it tells you to do counts them per column, which is the
+        # mitigation the register names.
+        # LoadResult carries coercion_failures and coercion_total. The first version of this
+        # check searched str(result) for the word "null" and reported the mitigation missing
+        # when it was there -- a gold question can be wrong about the product in either
+        # direction, and this one was wrong in the direction that accuses it.
+        result = load_excel(con, str(fixture), "f9", on_error="null")
+        failures = getattr(result, "coercion_failures", None)
+        total = getattr(result, "coercion_total", None)
+        counted = failures is not None and total is not None and total > 0
+        return loud and counted, (
+            f"refusal names the row: {loud}; {total} failure(s) counted per column: {failures}")
+    finally:
+        con.close()
+        workspace.reset(ws)
+
+
 CHECKS = {
+    "no_bare_paths": no_bare_paths,
+    "coercion_is_counted": coercion_is_counted,
     "merge_ranges_without_openpyxl": merge_ranges_without_openpyxl,
     "multiheader_csv_types": multiheader_csv_types,
     "bounded_fill_does_not_leak": bounded_fill_does_not_leak,
