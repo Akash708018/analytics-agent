@@ -4710,3 +4710,61 @@ fail with one that can, the second is a rename. Acceptance unchanged: test_phase
   5eece3e4a83826c5a168c2cbe2c90b293c3b6f7677d7cc400b6ce599c1eeee79  src/analytics_agent/analysis/correlated_shift.py
   543340e6f413e18f78944603f4ba825ea1e7f44bf03dc41848ed696f048c49d2  tests/test_stats_facts.py
   b9dd0215dd6e48b25b5aa2952df2271e7f60d21d4e01d7d7fdc240622ceadae5  tests/test_declared.py
+
+## Cleanup Step 3 - the column-paging skip, 21/09/2026
+
+Step document: docs/steps/cleanup_step3_column_paging.md.
+
+CLOSED. The column-paging skip, 21/09/2026, and properly this time -- the 19/09/2026 entry
+below closed it in the ledger only. It was recorded closed on 19/09/2026 and kept firing on every acceptance run for two more days, because the closure was
+written and the skip was not removed. tests/test_phase8.py's fixture branch is now a check
+stating the real reason -- region 4, product 5, channel 3, so seven columns against a twelve-
+column window -- rather than a skip implying work remains. A fixture that cannot reach a branch
+is not an outstanding clause. The no-result guard beside it, also labelled "column paging",
+became a failing check: a missing cross_tab result is a defect, not an outstanding clause.
+
+C80. A CLOSURE DESCRIBED WORK THAT NOTHING PERFORMED, AND THE SKIP IT CLOSED WENT ON PRINTING.
+The 19/09 entry said "Olist's customer_state has twenty-seven values, so clause 5 pages on real
+data". Two things were wrong with a sentence that reads as a measurement. The clause checked that
+the result was wider than the preview window and that it named its file; neither reads past the
+twelfth column, so width was proven and paging was not -- the sentence was true of the data and
+false of the test. And the skip the entry closed was still in the file, so the ledger and the
+acceptance run disagreed on every run for two days, in opposite directions from C78: there the
+index denied work the tree held, here the index claimed work the tree lacked. Both come of
+writing a closure from the reasoning rather than from a command's output. The rule this project
+already has would have caught it -- no claim recorded as verified without its output -- and the
+entry carried no output because none was produced.
+
+MEASURED, 21/09/2026, and this is what the 19/09 entry should have carried:
+
+    cross_tab on Olist, payment_type by customer_state
+      page 1          rows 1 to 6 of 6, columns 1 to 12 of 29
+      start_col=13    rows 1 to 6 of 6, columns 13 to 24 of 29
+
+Twenty-nine columns, not the twenty-seven the reasoning implied: customer_state's cardinality is
+not the result's width, because the grid carries a row-label column and cross_tab's own columns.
+A count derived from a dimension's value count is a prediction; this is the measurement, and they
+differ by two. Paging does work on real data, which is the one part the closure got right.
+
+HOW THIS WAS FOUND, because the method is the point. Asked whether everything was fixed, the
+answer was not repeated from the previous turn -- the skips were counted. phase8 reported three
+and phase10 one, four in all, against CLAUDE.md's "three", and the name missing from CLAUDE.md's
+list was the one the ledger had already closed. A tally that disagrees with a sentence is the
+cheapest defect this project has: two numbers, one command, no judgement required.
+
+MEASURED VALIDATION, 21/09/2026. Unit suite unchanged at 1665 -- this step touches one acceptance
+script. test_phase8.py 96 passed, 0 failed, 3 skipped -> 99 passed, 0 failed, 2 skipped, the
+three added being the fixture-width check and the two paging reads. test_phase9.py 19/0/0 and
+test_phase10.py 35/0/1, unchanged. Three skips remain in all, each permanent and recorded:
+ANALYSIS_RESULT_UNSOUND, the rendered MCP schema, and the non-finite screen. Digest:
+  8cb49a5da7c016fc208c8c00fa4df52a8ef92ffbbfd03e81787f446f43ba6674  tests/test_phase8.py
+
+C81. C68 WAS REPEATED IN THE ENTRY DIRECTLY AFTER THE ONE DESCRIBING IT. The closure above was
+first written as "CLOSED, PROPERLY THIS TIME. The column-paging skip" -- which reads correctly
+and does not match `^CLOSED\. `, the form every other closure uses and the form C68 established
+after a grep undercounted by half. It was caught in one command: the closure count printed before
+and after the append, and it did not move. Nothing about the sentence looked wrong; only the
+count did. That is the argument for printing a tally either side of a change rather than reading
+the change -- prose hides a format error and a number cannot. The wording that made it feel like
+a special case is what took it out of the format: an entry that wants to say something extra
+should say it after the prefix, not instead of it.

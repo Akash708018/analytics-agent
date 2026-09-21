@@ -436,7 +436,7 @@ def clause_three(texts: dict[str, str]) -> None:
 
     wide = path_in(texts.get("cross_tab", ""))
     if not wide:
-        skip("column paging", "no cross_tab result")
+        check("the fixture produced a cross_tab result to page", False, "no cross_tab result")
         return
     page = results.read_result_file(WORKSPACE, wide)
     if "more columns" in page:
@@ -445,11 +445,16 @@ def clause_three(texts: dict[str, str]) -> None:
               reason_of(later) is None and "columns 13 to" in later,
               "P8-O15: they were written and returnable by nothing")
     else:
-        skip("column paging",
-             "no pairing in this fixture is wide enough: region 4, product 5, "
-             "channel 3, so the widest cross_tab is 7 columns against a "
-             "12-column window. P8-O15's fix is covered by "
-             "tests/test_results.py, on a 50-column result")
+        # Not a skip since 21/09/2026. The ledger recorded the column-paging skip closed on
+        # 19/09/2026, and it kept firing on every acceptance run for two more days -- the
+        # role-trap failure in a second place. The fixture genuinely cannot reach the branch
+        # (region 4, product 5, channel 3: seven columns against a twelve-column window), and
+        # a fixture that cannot reach a branch is not an outstanding clause. Paging is proven
+        # where the width is real: on Olist in the clause below, and on a synthetic
+        # fifty-column result in tests/test_results.py.
+        check("the fixture is too narrow to page, and says so rather than skipping",
+              "more columns" not in page,
+              "region 4, product 5, channel 3: 7 columns against a 12-column window")
 
 
 # --------------------------------------------------------------------------
@@ -551,6 +556,17 @@ def clause_five() -> None:
               "column" in wide.lower(),
               "payment_type by customer_state")
         check("the wide result names its file", bool(path_in(wide)), path_in(wide))
+        # The 19/09/2026 closure said clause five "pages on real data". It did not: these two
+        # checks are what that sentence described and nothing did. Width was proven; reaching
+        # past the twelfth column was not.
+        real = results.read_result_file(WORKSPACE, path_in(wide))
+        check("the real result's first page says which columns it holds",
+              "columns 1 to" in real,
+              real.splitlines()[0][:90] if real else "no page returned")
+        beyond = results.read_result_file(WORKSPACE, path_in(wide), start_col=13)
+        check("the columns past the twelfth are reachable on real data",
+              reason_of(beyond) is None and "columns 13 to" in beyond,
+              beyond.splitlines()[0][:90] if beyond else "no page returned")
 
     # P10-O13, closed 21/09/2026. This was a skip for two phases because the build guide said
     # summary_stats must enforce role=identifier, and role is a proposal-time heuristic in
