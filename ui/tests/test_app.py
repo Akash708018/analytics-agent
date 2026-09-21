@@ -137,12 +137,71 @@ def test_answering_the_header_enables_confirm_and_loading_reaches_the_sidebar():
     assert "<b>sales</b>" in sidebar  # redrawn after the click
 
 
-def test_contract_confirm_is_disabled_while_provisional():
+def test_confirm_is_always_available_and_reports_what_is_still_missing_freshly():
+    """P14-D30: Confirm was disabled on a stale draft until "Update draft" was clicked. Now it
+    checks the form as it is; with the grain and window typed in, only the measures remain."""
+    import datetime as dt
     at = screen("contract").run()
     assert not at.exception, at.exception
     confirm = [b for b in at.button if b.label == "Confirm contract"][0]
-    assert confirm.disabled
-    assert "Still needed before this can be confirmed" in _text(at)
+    assert not confirm.disabled
+    at.text_input[0].input("one row = one location sample")
+    at.date_input[0].set_value(dt.date(2016, 1, 1))
+    at.date_input[1].set_value(dt.date(2018, 12, 31))
+    [b for b in at.button if b.label == "Confirm contract"][0].click().run()
+    missing = " ".join(w.value for w in at.warning)
+    assert "geolocation_lat" in missing          # still missing: the measures' answers
+    assert "grain" not in missing.lower() and "window" not in missing.lower()  # typed ones went
+    assert not at.success                        # nothing stored
+
+
+def test_submit_confirms_the_form_as_it_is_now_on_the_real_engine():
+    """The one-click path, and what is stored is what is on screen -- not an earlier draft."""
+    from analytics_agent import workspace
+    from analytics_agent.webapp.real_backend import RealBackend
+    from ui.screens.contract import submit
+    be = RealBackend()
+    ws = be.new_workspace_id()
+    try:
+        path = be.save_upload(ws, "clean_sales.csv",
+                              (ROOT / "tests/fixtures/clean_sales.csv").read_bytes()).path
+        assert be.confirm_ingest(ws, be.draft_ingest(ws, path).spec).ok
+        answers = dict(grain="one row = one order", primary_key=["order_id"],
+                       date_column="order_date", measures=["units", "unit_price", "revenue"],
+                       dimensions=["region", "product", "channel"],
+                       aggregations={"units": "sum", "unit_price": "none", "revenue": "sum"},
+                       measure_definitions={"units": "items", "unit_price": "one item's price",
+                                            "revenue": "units x unit_price"},
+                       analysis_window_start="2024-01-01", analysis_window_end="2024-12-31",
+                       caveats=[])
+        earlier, _ = submit(be, ws, "clean_sales", answers, confirm=False)  # a check first
+        assert earlier.provisional == []
+        edited = {**answers, "grain": "one row = one order line, as edited after the check"}
+        fresh, result = submit(be, ws, "clean_sales", edited, confirm=True)
+        assert result is not None and result.ok, result
+        stored = (workspace.workspace_dir(ws) / "contracts" / "clean_sales.yaml").read_text()
+        assert "as edited after the check" in stored   # the form now, not the earlier draft
+    finally:
+        workspace.reset(ws)
+        workspace.workspace_dir(ws).rmdir()
+
+
+def test_form_answers_reads_roles_and_ignores_blank_definitions():
+    import datetime as dt
+    from ui.screens.contract import form_answers, plain
+    rows = [{"column": "id", "role": "key", "aggregation": None, "definition": ""},
+            {"column": "d", "role": "date", "aggregation": None, "definition": ""},
+            {"column": "rev", "role": "measure", "aggregation": "sum", "definition": " money "},
+            {"column": "qty", "role": "measure", "aggregation": None, "definition": "  "},
+            {"column": "reg", "role": "dimension", "aggregation": None, "definition": ""},
+            {"column": "junk", "role": "ignore", "aggregation": None, "definition": ""}]
+    a = form_answers(rows, "  one row = one sale ", dt.date(2024, 1, 1), None, "x\n\n y ")
+    assert a["primary_key"] == ["id"] and a["date_column"] == "d"
+    assert a["measures"] == ["rev", "qty"] and a["dimensions"] == ["reg"]
+    assert a["aggregations"] == {"rev": "sum"} and a["measure_definitions"] == {"rev": "money"}
+    assert a["grain"] == "one row = one sale" and a["analysis_window_end"] is None
+    assert a["caveats"] == ["x", "y"]
+    assert plain("measures[rev].agg") == "rev: aggregation" and "window" in plain("analysis_window")
 
 
 def test_a_refusal_shows_its_next_step():
@@ -223,3 +282,14 @@ def test_a_url_cannot_name_claude_desktops_workspace_or_a_path(bad):
     at.run()
     assert at.session_state["workspace_id"] != bad
     assert at.session_state["workspace_id"].startswith("ws_")
+
+
+def test_a_window_older_than_ten_years_can_be_set():
+    """P14-D31: Streamlit's default date range starts ten years before today, and an earlier
+    date was dropped silently -- the window could never be filled for older data."""
+    import datetime as dt
+    at = screen("contract").run()
+    at.date_input(key="c_from_geolocation").set_value(dt.date(2001, 3, 4))
+    at.run()
+    assert at.date_input(key="c_from_geolocation").value == dt.date(2001, 3, 4)
+

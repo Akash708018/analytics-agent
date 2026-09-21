@@ -4,7 +4,7 @@ MCP server exposing data loading, profiling, cleaning and contract-gated analysi
 to Claude Desktop. Phases 1-13 done, then Cleanup Steps 4-7; Phase 14
 (Track B) in progress, Steps 1-4 done (UI in ui/, on the fake backend or the engine with
 ANALYTICS_UI_BACKEND=real;
-`uv run --group ui streamlit run ui/app.py`; its 32 tests: `uv run --group ui pytest ui/tests`). Open: P14-O1 (abandoned web workspaces never expire). The agent's live check:
+`uv run --group ui streamlit run ui/app.py`; its 35 tests: `uv run --group ui pytest ui/tests`). Open: P14-O1 (abandoned web workspaces never expire). The agent's live check:
 `uv run python scripts/agent_live.py` (needs keys in the gitignored .env). Otherwise nothing: P9-O4's feature half was closed by the user's
 decision on 21/09/2026 (copy-first; in-place analysis is a later scaling item).
 
@@ -82,7 +82,7 @@ line carrying digests and suite totals, updating the guide's ledger row if the p
 state changed, then running all six checks and the eval above, reading them, and committing.
 
 ## Navigating the docs -- read narrowly
-`docs/decisions.md` is 6,048 lines and append-only; the build guide is 1,104. Reading
+`docs/decisions.md` is 6,080 lines and append-only; the build guide is 1,104. Reading
 either whole costs more than the work.
 
 - **Open-item register: `docs/decisions.md:4438` to end.** Read it rather than grepping

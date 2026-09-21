@@ -73,7 +73,10 @@ def sidebar() -> None:
                      width="stretch"):
             result = be.reset_workspace(ws)
             st.session_state.pop("reset_confirm", None)
-            for key in ("ingest", "contract_draft", "chat"):
+            for key in [k for k in st.session_state
+                        if k in ("ingest", "contract_draft", "contract_result", "chat")
+                        or k.startswith(("c_grain_", "c_from_", "c_to_", "c_rows_",
+                                         "c_caveats_", "contract_cols_"))]:
                 st.session_state.pop(key, None)
             st.toast(result.message)
             st.rerun()

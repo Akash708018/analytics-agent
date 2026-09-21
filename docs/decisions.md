@@ -6046,3 +6046,35 @@ spare port with the new setting: listening on 127.0.0.1:8599 only; a request to 
 refused, localhost 200. Hosting (Phase 14 items 5-7) sets its own address. Also:
 use_container_width, removed by Streamlit after 2025-12-31, replaced with width="stretch" in all
 five places the startup warning pointed at. UI tests 32 passed.
+
+## Phase 14 - the Contract screen could not be confirmed, 22/09/2026
+
+Reported by the user: every field filled, Confirm still said to fill in what is above. The engine
+was checked first and was right: with the answers the form sends, clean_sales drafts with nothing
+unresolved and confirms. The faults were all in the screen.
+
+P14-D30. CONFIRM CHECKS THE FORM AS IT IS NOW. It was disabled on the stored draft, refreshed only
+by a separate "Update draft" click -- and, worse, it sent that stored draft, so an edit made after
+"Update draft" was silently not what got stored: the contract could differ from the one on screen.
+Now Confirm (and "Check what's missing") send the current form to the engine; Confirm stores it
+only if nothing is missing, else the freshly checked list is shown, in words ("units:
+aggregation") rather than engine paths. Tests: the AppTest shows Confirm enabled and a fresh list
+(the old test asserted the disabled button); submit() on the real engine stores an edit made after
+a check. Form fields are keyed per dataset and seeded once.
+
+P14-D31. ANY DATE CAN BE PICKED. Streamlit's date_input allows, by default, only the ten years
+before today: on 22/09/2026 nothing before 22/09/2016. An earlier "from" date was dropped
+silently (measured: 2016-01-01 set, value None; 2018-12-31 kept), so the analysis window could
+never be filled for older data -- Olist's own data begins in 2016. min 1900-01-01, max 2100-12-31.
+Falsified: without them the test fails.
+
+C99. I MISATTRIBUTED A LOST VALUE, AND WROTE THE WRONG CAUSE INTO A COMMENT. Seeing the "from" date
+come back None after a click, I concluded that unkeyed fields were rebuilt and lost their input,
+keyed every field, and wrote "measured" beside that cause. Falsifying it showed otherwise: the
+test for it passed with the field unkeyed, because the draft echoes what was typed. The date was
+lost to the ten-year range (D31). The keying stays for a reason that is reasoned, not measured --
+a column marked "ignore" is not echoed and would reset -- and the comment now says so; the test
+that could not fail was removed. The instrument was right (P13-D9 caught it); I had written the
+conclusion before running it.
+
+MEASURED VALIDATION, 22/09/2026. UI tests 32 -> 35; engine 1832 passed.
