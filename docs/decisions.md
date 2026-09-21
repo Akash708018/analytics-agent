@@ -4911,3 +4911,65 @@ its own run: it expected the lowest value of [4.0, 3.0, 2.0, 1234.56] to be 1 ra
 the corrected line spells the series out beside it. Digests:
   6bd9de77dbed7ab25baee6689c54140f16ae45b8b25b924cf9e246a4a0c569eb  src/analytics_agent/charts/render.py
   d62927aacb4d83f8080bb9a9895da80dcf874ca10435388f2087d8be4d8f25f5  tests/test_charts_render.py
+
+## Phase 11, Step 3a - the parameters compute_analysis never passed, 21/09/2026
+
+Step document: docs/steps/phase11_step3a_parameter_forwarding.md. Found while reading
+compute_analysis to mirror its shape for render_chart, and fixed before Step 3 rather than after,
+because Step 3 would otherwise have copied the pattern into a second tool.
+
+C83. EIGHT OF TWENTY-SEVEN ANALYSES COULD NOT BE CALLED THROUGH THE TOOL AN AGENT USES, AND THE
+REFUSAL BLAMED THE AGENT. Measured before any edit: compute_analysis declared 20 parameters,
+forwarded 14, and some registered analysis wanted 23. Six were never declared, so FastMCP's
+schema did not contain them and no caller could pass one -- alpha and power (sample_adequacy),
+confidence (confidence_interval), entity (cohort_retention, repeat_behaviour, REQUIRED by both),
+method (hypothesis_test), second_dimension (effect_size, hypothesis_test). Three more were
+declared and dropped on the way through -- against (bivariate, correlated_shift, correlation),
+baseline and period (growth_decomposition, mix_shift, period_compare, and period for
+cohort_retention). Eight analyses were therefore uncallable, each missing a required argument:
+bivariate, correlated_shift, correlation, growth_decomposition, mix_shift, period_compare,
+repeat_behaviour, cohort_retention. Four more could not be fully used.
+
+The failure surfaced as a lie about the caller. Proved rather than reasoned: correlation's
+signature is `(con, gate, scope, measure, against, **params)`, calling it without `against`
+raises `TypeError: correlation() missing 1 required positional argument: 'against'`, and
+tools.py's `except (TypeError, ParamsInvalid)` turns that into ANALYSIS_PARAMS_INVALID --
+"correlation was called with arguments it cannot take." The agent passed the argument; the
+server dropped it; the refusal named the agent. An agent that believes that refusal stops
+asking, which is worse than a traceback, because a traceback is obviously a defect and a
+refusal reads as an answer.
+
+The docstring was ahead of the signature the whole time. Lines 818 to 848 document
+second_dimension, method, confidence, alpha, power and entity, every one of which the signature
+did not declare -- so the tool description instructed the agent to pass fields the schema did
+not contain. C72 recorded the opposite direction, analyses missing from the docstring; this is
+the docstring correct and the schema behind it.
+
+P11-D16. THE PARAMETER ROSTER IS READ FROM THE REGISTRY, NOT TYPED OUT.
+test_analysis_tool_docs.py had `test_every_parameter_any_analysis_takes_is_declared`, which
+compared a hand-written set of fifteen names with `<=`. A subset assertion against a stale
+hand-typed roster cannot fail for the thing it exists to catch, and it passed for two phases
+while six names were missing. It now derives the union from `REGISTRY` by `inspect.signature`,
+and a second test asserts the other half nobody had written: every declared parameter is also
+forwarded. Declaring and forwarding are two edits and they were made apart -- the same shape as
+every C entry in this file. This is the third place the hand-typed-roster pattern has been
+removed, after P10-D39 (the tier test) and C72 (the docstring roster).
+
+P11-O1 IS OPEN. No acceptance script calls a Tier 3 to 7 analysis through the registered MCP
+tool. P8-D76 records tests/test_phase8.py calling the registered tool and proving its arguments
+reach the right names, but only for Phase 8's nine, which take none of the nine parameters C83
+names. That is why three green acceptance runs and 1,698 unit tests said nothing while eight
+analyses were unreachable: every one of them was exercised through the registry or the tools
+layer directly, and the only path a real client takes is the one nothing walks. The unit guard
+added here catches the defect class structurally; an acceptance clause that actually calls
+period_compare or correlation through server.compute_analysis on Olist would catch it
+behaviourally, and those are not the same thing.
+
+MEASURED VALIDATION, 21/09/2026. The two guard tests were written before the fix and failed as
+predicted, naming exactly six undeclared and three unforwarded parameters with the analyses that
+want each. After the fix: tests/test_analysis_tool_docs.py 8 passed. Full suite 1698 -> 1699, the
+one added being the forwarding half that had never existed. Acceptance unchanged and expected to
+be -- test_phase8.py 99/0/2, test_phase9.py 19/0/0, test_phase10.py 35/0/1 -- because none of
+them calls this tool, which is P11-O1. Digests:
+  9f06a65dcd97af5ebc5587b551e0cb83419bf045a4a208ca11155fdce9ecf381  src/analytics_agent/server.py
+  668b284220e0181092feb20953d705e70182ae3289697cc4102d6b203b9d62f2  tests/test_analysis_tool_docs.py

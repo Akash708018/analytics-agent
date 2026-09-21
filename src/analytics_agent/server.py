@@ -743,6 +743,12 @@ def compute_analysis(
     period: str | None = None,
     baseline: str | None = None,
     grain: str | None = None,
+    second_dimension: str | None = None,
+    method: str | None = None,
+    entity: str | None = None,
+    confidence: float | None = None,
+    alpha: float | None = None,
+    power: float | None = None,
     workspace_id: str | None = None,
 ) -> str:
     """Run one named analysis over a dataset, under the contract in force.
@@ -863,10 +869,12 @@ def compute_analysis(
         return analysis_tools.compute_analysis(
             con, wid, dataset_name, analysis_type,
             column=column, dimension=dimension, measure=measure,
-            rows=rows, columns=columns, limit=limit, n=n, bins=bins,
-            threshold=threshold, before_start=before_start,
+            against=against, rows=rows, columns=columns, limit=limit, n=n,
+            bins=bins, threshold=threshold, before_start=before_start,
             before_end=before_end, after_start=after_start,
-            after_end=after_end, grain=grain,
+            after_end=after_end, period=period, baseline=baseline, grain=grain,
+            second_dimension=second_dimension, method=method, entity=entity,
+            confidence=confidence, alpha=alpha, power=power,
         )
     finally:
         con.close()

@@ -18,13 +18,13 @@ Layout: `src/analytics_agent/{ingest,profile,clean,contract,validate,analysis,ch
 All four, every time. Run the suite BEFORE committing, not after (C76: two commits
 recorded a broken tree). Last measured 21/09/2026, after the open-item cleanup:
 
-    uv run pytest -q                      # 1698 passed
+    uv run pytest -q                      # 1699 passed
     uv run python tests/test_phase8.py    # 99 passed, 0 failed, 2 skipped
     uv run python tests/test_phase9.py    # 19 passed, 0 failed, 0 skipped
     uv run python tests/test_phase10.py   # 35 passed, 0 failed, 1 skipped
 
 The acceptance scripts are scripts, not pytest files -- `pytest` collects nothing
-from them, so 1698 excludes them. The three skips are each deliberate and
+from them, so 1699 excludes them. The three skips are each deliberate and
 recorded: ANALYSIS_RESULT_UNSOUND and the rendered MCP schema in phase8, the
 non-finite screen in phase10. A skip is an outstanding clause, not a passing one
 -- count them against this line, which is how C80 was found.
