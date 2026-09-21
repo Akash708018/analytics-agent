@@ -14,24 +14,29 @@ import streamlit as st
 
 from analytics_agent.webapp.contract import DTYPES, HEADER_JOINS, IngestDraft
 from ui import components as ui
+from ui import theme
 
 INFER = "(infer)"
 
 _GRID_CSS = """
 <style>
 .aa-grid { width: 100%; border-collapse: separate; border-spacing: 0; font-size: .86rem;
-  border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,126,95,.2); }
-.aa-grid th, .aa-grid td { padding: .38rem .6rem; border-bottom: 1px solid rgba(255,126,95,.1); }
-.aa-grid th { background: rgba(91,42,85,.5); color: var(--peach); font-weight: 600;
-  text-align: left; font-family: 'Cinzel', serif; letter-spacing: .06em; }
-.aa-grid td.rn { color: var(--parchment-dim); width: 3.2rem; text-align: right;
+  border-radius: 9px; overflow: hidden; border: 1px solid #cdae938c; background: #fbf4e9ee;
+  box-shadow: 0 15px 40px #7141240b; }
+.aa-grid th, .aa-grid td { padding: .4rem .65rem; border-bottom: 1px solid #e3cdb4; }
+.aa-grid th { background: #efdcc2; color: #945836; font: 500 .72rem/1.4 var(--mono);
+  letter-spacing: .09em; text-align: left; }
+.aa-grid td.rn { color: #945836; width: 3.2rem; text-align: right; font: 500 .75rem var(--mono);
   font-variant-numeric: tabular-nums; }
-.aa-grid tr.hdr td { background: rgba(255,212,138,.14); color: var(--gold); font-weight: 600; }
-.aa-grid tr.skip td { color: rgba(205,181,154,.5); text-decoration: line-through; }
-.aa-grid tr.data td { color: var(--parchment); }
-.aa-grid td.empty { color: rgba(205,181,154,.35); }
-.aa-legend span { margin-right: 1rem; font-size: .8rem; color: var(--parchment-dim); }
-.aa-legend b.h { color: var(--gold); } .aa-legend b.s { text-decoration: line-through; }
+.aa-grid tr.hdr td { background: #eac29d; color: #503326; font-weight: 600; }
+.aa-grid tr.skip td { color: #b39a85; text-decoration: line-through; }
+.aa-grid tr.data td { color: var(--text); }
+.aa-grid td.empty { color: #cbb29b; }
+.aa-legend { margin-top: .4rem; }
+.aa-legend span { margin-right: 1rem; font: 500 .72rem var(--mono); letter-spacing: .05em;
+  color: var(--muted); }
+.aa-legend b.h { background: #eac29d; color: #503326; padding: 0 .3rem; border-radius: 3px; }
+.aa-legend b.s { text-decoration: line-through; }
 </style>
 """
 
@@ -68,7 +73,8 @@ def _draft(**kwargs) -> None:
 
 
 def render() -> None:
-    st.title("Upload & read")
+    theme.eyebrow("01 / Ingest")
+    st.title("Upload & *read.*")
     st.caption("Show the engine a file. It proposes how to read it; you correct what it "
                "could not work out; nothing loads until you agree.")
     be, ws = ui.backend(), ui.workspace_id()
@@ -134,7 +140,7 @@ def render() -> None:
     with left:
         st.subheader("The sheet, as it is")
         st.html(_grid_html(draft, draft.header_rows, int(data_start), int(footer)))
-        st.html('<div class="aa-legend"><span><b class="h">gold</b> header</span>'
+        st.html('<div class="aa-legend"><span><b class="h">header</b> row</span>'
                 '<span><b class="s">struck</b> skipped</span>'
                 + (f"<span>merged: {html.escape(', '.join(g.merged_ranges))}</span>"
                    if g.merged_ranges else "") + "</div>")

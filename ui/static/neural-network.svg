@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 100" fill="none" role="img" aria-label="Fully connected neural network with three input, four hidden, and two output nodes">
+  <g stroke="#875537" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 33.317 24.057 L 84.683 14.943 M 33.285 26.108 L 84.715 36.892 M 32.637 27.767 L 85.363 59.233 M 31.849 28.787 L 86.151 82.213 M 32.67 47.288 L 85.33 16.712 M 33.302 48.974 L 84.698 39.026 M 33.302 51.026 L 84.698 60.974 M 32.67 52.712 L 85.33 83.288 M 31.849 71.213 L 86.151 17.787 M 32.637 72.233 L 85.363 40.767 M 33.285 73.892 L 84.715 63.108 M 33.317 75.943 L 84.683 85.057 M 95.139 15.658 L 146.861 32.342 M 94.137 17.47 L 147.863 62.53 M 95.389 37.652 L 146.611 34.348 M 94.921 40.223 L 147.079 63.777 M 94.921 59.777 L 147.079 36.223 M 95.389 62.348 L 146.611 65.652 M 94.137 82.53 L 147.863 37.47 M 95.139 84.342 L 146.861 67.658" stroke-width="1.2" opacity=".45"/>
+    <g stroke-width="1.6">
+      <circle cx="28" cy="25" r="5.4"/>
+      <circle cx="28" cy="50" r="5.4"/>
+      <circle cx="28" cy="75" r="5.4"/>
+      <circle cx="90" cy="14" r="5.4"/>
+      <circle cx="90" cy="38" r="5.4"/>
+      <circle cx="90" cy="62" r="5.4"/>
+      <circle cx="90" cy="86" r="5.4"/>
+      <circle cx="152" cy="34" r="5.4"/>
+      <circle cx="152" cy="66" r="5.4"/>
+    </g>
+  </g>
+</svg>

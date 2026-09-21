@@ -70,8 +70,9 @@ def _identifier(name: str) -> str:
 
 
 def _png(values: list[float], width: int = 360, height: int = 200) -> bytes:
-    """A small sunset bar chart as a real PNG, in pure Python (zlib + struct)."""
-    bg, bars = (28, 18, 38), [(214, 84, 122), (255, 126, 95), (254, 180, 123), (255, 212, 138)]
+    """A small bar chart as a real PNG, in pure Python (zlib + struct), in the portfolio's
+    palette: sandstone paper, terracotta, copper, sunset and sand bars."""
+    bg, bars = (251, 244, 233), [(157, 71, 44), (162, 89, 52), (200, 121, 72), (215, 162, 121)]
     top = max(values) or 1.0
     slot = width // max(len(values), 1)
     rows = []

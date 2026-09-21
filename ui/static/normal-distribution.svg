@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 100" fill="none" role="img" aria-label="Normal distribution with axes and mean guide">
+  <g stroke="#875537" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 16 12 V 84 H 171" stroke-width="1.4"/>
+    <path d="m 12.8 16 3.2-4 3.2 4 M 167 80.8 171 84 167 87.2" stroke-width="1.4"/>
+    <path d="M 94 84 V 22" stroke-width="1.2" stroke-dasharray="3 4" opacity=".55"/>
+    <path d="M 16 83.803 C 20 83.686, 24 83.494, 28 82.99 C 32 82.486, 36 81.669, 40 80.061 C 44 78.452, 48 76.014, 52 72.297 C 56 68.58, 60 63.525, 64 57.518 C 68 51.51, 72 44.567, 76 38.355 C 80 32.142, 84 26.793, 88 24.074 C 92 21.355, 96 21.355, 100 24.074 C 104 26.793, 108 32.142, 112 38.355 C 116 44.567, 120 51.51, 124 57.518 C 128 63.525, 132 68.58, 136 72.297 C 140 76.014, 144 78.452, 148 80.061 C 152 81.669, 156 82.486, 160 82.99 C 164 83.494, 168 83.686, 172 83.803" stroke-width="1.7"/>
+    <path d="M 94 81 V 87" stroke-width="1.2"/>
+  </g>
+</svg>

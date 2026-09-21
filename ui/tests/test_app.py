@@ -60,9 +60,32 @@ def test_every_screen_renders_without_an_exception(name):
 def test_the_journey_is_written_and_the_stylesheet_is_one_block():
     at = AppTest.from_file(APP, default_timeout=30).run()
     htmls = [h.proto.body for h in at.get("html")]
-    assert any("How this engine was made" in h for h in htmls)
+    page = next(h for h in htmls if "aa-j-rail" in h)
+    assert "How this engine <em>was made.</em>" in page
+    assert page.count('class="aa-j-ch"') == 15  # every chapter
+    # The portfolio's field notes for this project, in its own words.
+    assert "{ contract: confirmed }" in page and "propose → approve → apply" in page
     styles = [h for h in htmls if h.lstrip().startswith("<style>")]
-    assert len(styles) == 1 and "aa-j-paper" in styles[0] and "aa-ink-in" in styles[0]
+    assert len(styles) == 1  # one checked block: theme.apply, C97
+    assert "aa-field" in styles[0] and "aa-inscribe" in styles[0] and "--accent: #9d472c" in styles[0]
+
+
+def _style(at: AppTest) -> str:
+    return next(h.proto.body for h in at.get("html") if h.proto.body.lstrip().startswith("<style>"))
+
+
+def test_the_motion_switch_stops_every_animation():
+    """Compares on with off. The first version looked for "animation: none" after the last
+    reduced-motion query -- text the Journey's own query already holds -- and passed with the
+    switch disconnected (P14-D14)."""
+    from ui import theme
+    at = AppTest.from_file(APP, default_timeout=30).run()
+    on = _style(at)
+    at.sidebar.toggle[0].set_value(False).run()
+    assert not at.exception, at.exception
+    off = _style(at)
+    assert theme._PAUSED not in on
+    assert theme._PAUSED in off and off.replace(theme._PAUSED, "") == on
 
 
 def test_the_sidebar_shows_the_subset_warning_in_full():

@@ -5897,3 +5897,27 @@ included; acceptance and eval unchanged.
 MEASURED VALIDATION, 22/09/2026. `uv run --group ui pytest ui/tests`: 25 passed. Engine
 `uv run pytest -q`: 1787 passed, unchanged. Acceptance 99/0/2, 19/0/0, 35/0/1, 26/0/0, 36/0/0.
 Eval SCORE 76/76 (100%). Journey stylesheet present on five consecutive fresh loads.
+
+## Phase 14, Step 2b - the UI on the portfolio's design system, 22/09/2026
+
+Step document: docs/steps/phase14_step2b_portfolio_design.md.
+
+P14-D14. A CHECK THAT COULD NOT FAIL, CAUGHT BY THE FALSIFICATION STEP. The motion-switch test
+looked for "animation: none" after the last reduced-motion query; the Journey's own query holds
+that text, so it passed with the switch disconnected. Rewritten to compare the stylesheet with
+motion on and off. P13-D9 (falsify every new check) is what found it -- the same family as C91,
+caught before the commit rather than after.
+
+P14-D15. ONE VISUAL SYSTEM FOR THE PRODUCT AND THE PORTFOLIO. The UI takes akash-portfolio's
+tokens, type, components, motion and assets instead of its own dusk theme. Assets are copied with
+provenance (ui/static/SOURCES.md): Lucide under ISC, the portfolio's own diagrams and generated
+artwork; the diagrams without a provenance record were left out.
+
+P14-D16. THE PORTFOLIO'S AGENT SECTION IS STALE, AND WAS NOT EDITED. It describes this repository
+as of 08/09/2026: Phases 0-7 done, 8-14 not started, 26 tools, run_analysis computing nothing.
+Today: Phases 0-13 done and 14 in progress, 29 tools, 27 analyses behind compute_analysis. The
+portfolio repository holds uncommitted work of the user's, so the correction is offered, not made.
+
+MEASURED VALIDATION, 22/09/2026. `uv run --group ui pytest ui/tests`: 25 -> 26 passed (the motion
+test). Engine 1787 passed, eval 76/76, nothing under src/ changed. Portfolio repository: HEAD
+d89ac19 and its 22 uncommitted entries, unchanged before and after.

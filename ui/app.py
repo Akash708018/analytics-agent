@@ -18,16 +18,18 @@ import streamlit as st  # noqa: E402
 from ui import components, journey, theme  # noqa: E402
 from ui.screens import chat, contract, files, ingest  # noqa: E402
 
-st.set_page_config(page_title="Analyst's Map", page_icon="🌅", layout="wide")
+st.set_page_config(page_title="Analytics Agent", page_icon=":material/insights:", layout="wide")
 # One stylesheet per render, every page's rules included: see theme.apply.
 theme.apply(journey.stylesheet(), ingest.stylesheet())
 
 pages = [
-    st.Page(journey.render, title="Journey", icon="📜", url_path="journey", default=True),
-    st.Page(ingest.render, title="Upload & read", icon="📥", url_path="upload"),
-    st.Page(contract.render, title="Contract", icon="🤝", url_path="contract"),
-    st.Page(chat.render, title="Ask", icon="✨", url_path="ask"),
-    st.Page(files.render, title="Files", icon="🗂️", url_path="files"),
+    # One outline icon family throughout, as the portfolio does with Lucide.
+    st.Page(journey.render, title="Journey", icon=":material/route:", url_path="journey",
+            default=True),
+    st.Page(ingest.render, title="Upload & read", icon=":material/upload_file:", url_path="upload"),
+    st.Page(contract.render, title="Contract", icon=":material/verified:", url_path="contract"),
+    st.Page(chat.render, title="Ask", icon=":material/forum:", url_path="ask"),
+    st.Page(files.render, title="Files", icon=":material/folder_open:", url_path="files"),
 ]
 page = st.navigation(pages)
 components.sidebar()

@@ -5,12 +5,14 @@ from __future__ import annotations
 import streamlit as st
 
 from ui import components as ui
+from ui import theme
 
 _KINDS = {"chart": "Charts", "report": "Reports", "result": "Result tables"}
 
 
 def render() -> None:
-    st.title("Files")
+    theme.eyebrow("04 / Keep")
+    st.title("What was *written.*")
     st.caption("Everything the engine wrote, newest first. Each comes with its own account of "
                "what it holds.")
     be, ws = ui.backend(), ui.workspace_id()

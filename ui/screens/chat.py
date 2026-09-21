@@ -9,6 +9,9 @@ import streamlit as st
 
 from analytics_agent.webapp.contract import Artifact, ChatTurn
 from ui import components as ui
+from ui import theme
+
+AVATAR = ":material/insights:"
 
 
 def _artifact(art: Artifact) -> None:
@@ -17,7 +20,7 @@ def _artifact(art: Artifact) -> None:
         st.image(be.read_artifact(ws, art.path), caption=art.title)
         st.caption(art.description)  # the plotted values, in the engine's words
     else:
-        st.markdown(f"📜 **{art.title}** — {art.description} Open it on **Files**.")
+        st.markdown(f"**{art.title}** — {art.description} Open it on **Files**.")
 
 
 def _turn(turn: ChatTurn) -> None:
@@ -31,19 +34,21 @@ def _turn(turn: ChatTurn) -> None:
         with st.expander(f"What I did ({len(turn.tool_calls)} step"
                          f"{'s' if len(turn.tool_calls) != 1 else ''})"):
             for call in turn.tool_calls:
-                mark = "🔴 refused" if call.refused else "🟢"
-                st.markdown(f"**{call.name}** {mark}")
+                mark = " · :red[refused]" if call.refused else ""
+                st.markdown(f"`{call.name}`{mark}")
                 st.code(json.dumps(call.arguments, indent=2), language="json")
                 st.code(call.result, language=None)
 
 
 def render() -> None:
-    st.title("Ask")
+    theme.eyebrow("03 / Analyse")
+    st.title("Ask in your *own words.*")
     st.caption("Ask in your own words. Every number comes from an analysis run under the "
                "dataset's contract.")
     log: list[dict] = st.session_state.setdefault("chat", [])
     for entry in log:
-        with st.chat_message(entry["role"], avatar="🌅" if entry["role"] == "assistant" else None):
+        with st.chat_message(entry["role"],
+                             avatar=AVATAR if entry["role"] == "assistant" else ":material/person:"):
             if entry.get("turn") is not None:
                 _turn(entry["turn"])
             else:
@@ -53,9 +58,9 @@ def render() -> None:
     if message:
         history = [{"role": e["role"], "content": e["content"]} for e in log]
         log.append({"role": "user", "content": message})
-        with st.chat_message("user"):
+        with st.chat_message("user", avatar=":material/person:"):
             st.markdown(message)
-        with st.chat_message("assistant", avatar="🌅"):
+        with st.chat_message("assistant", avatar=AVATAR):
             with st.spinner("Reading the data…"):
                 turn = ui.backend().chat(ui.workspace_id(), history, message)
             _turn(turn)

@@ -1,13 +1,15 @@
 [server]
 maxUploadSize = 100
 headless = true
+enableStaticServing = true
 
 [browser]
 gatherUsageStats = false
 
+# The portfolio's "warm data studio" tokens (akash-portfolio dist/styles.css).
 [theme]
-base = "dark"
-primaryColor = "#ff7e5f"
-backgroundColor = "#1c1226"
-secondaryBackgroundColor = "#2a1a35"
-textColor = "#f6e7d0"
+base = "light"
+primaryColor = "#9d472c"
+backgroundColor = "#f1e3d0"
+secondaryBackgroundColor = "#fbf4e9"
+textColor = "#37271f"

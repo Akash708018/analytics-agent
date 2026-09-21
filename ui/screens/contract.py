@@ -13,6 +13,7 @@ import streamlit as st
 
 from analytics_agent.webapp.contract import AGGREGATIONS, ROLES, ContractDraft
 from ui import components as ui
+from ui import theme
 
 
 def _role_of(draft: ContractDraft, name: str, suggested: str) -> str:
@@ -32,7 +33,8 @@ def _iso(value) -> str | None:
 
 
 def render() -> None:
-    st.title("Contract")
+    theme.eyebrow("02 / Agree")
+    st.title("The *contract.*")
     st.caption("No analysis runs without an agreement on what one row is and what each number "
                "means. The engine drafts it from the data; you settle what the data cannot say.")
     be, ws = ui.backend(), ui.workspace_id()

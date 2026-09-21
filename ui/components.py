@@ -34,14 +34,14 @@ def sidebar() -> None:
     ws = workspace_id()
     be = backend()
     with st.sidebar:
-        st.html('<div class="aa-title" style="font-size:1.15rem">Your workspace</div>')
+        st.html('<div class="aa-eyebrow">Your workspace</div>')
         datasets = be.list_datasets(ws)
         if not datasets:
             st.caption("Nothing loaded yet. Start on **Upload & read**.")
         for d in datasets:
             st.html(
                 f'<div class="aa-card" style="padding:.7rem .85rem;margin:.3rem 0">'
-                f'<b>{html.escape(d.name)}</b><br>'
+                f'{theme.icon("database")}<b>{html.escape(d.name)}</b><br>'
                 f'<span class="aa-muted" style="font-size:.8rem">{d.rows:,} rows · '
                 f'{d.columns} cols · {html.escape(d.loaded)}</span><br>'
                 f'{theme.pill(html.escape(d.stage), theme.stage_kind(d.stage))}</div>')
@@ -49,6 +49,9 @@ def sidebar() -> None:
                 st.html(f'<div class="aa-subset">{html.escape(note)}</div>')
             st.caption(f"Next: `{d.next_step}`")
         st.divider()
+        # The portfolio's "Pause motion": stops every animation, keeps two faint marks.
+        st.toggle("Motion", value=theme.motion_on(), key="motion",
+                  help="Turn off to stop the ink and every other animation.")
         confirm = st.checkbox("I want to empty this workspace", key="reset_confirm")
         if st.button("Reset workspace", disabled=not confirm, type="secondary",
                      use_container_width=True):
