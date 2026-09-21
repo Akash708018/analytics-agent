@@ -5693,3 +5693,36 @@ behavioural 48/48, regression 14/14. Tree clean after every eval run. Digests:
   ac689261ad483a1755c5e805345b60d5e9d974ac7ac734a0bc3d0897556ebc54  tests/test_analysis_tools.py
   a68853d8c76a43d4597cc8b3401e991be0831eb71a51add571d354cc232c9f39  eval/run_eval.py
   ab5d8fcb3a1b8f6a0f12fdefdfc90a77841dd4133f2c5f748f95b7390a3d28b0  eval/gold_questions.yaml
+
+## Cleanup Step 5 - contract exports anchored and kept apart per workspace, 21/09/2026
+
+Step document: docs/steps/cleanup_step5_contract_export.md. Decided with the user: namespace
+per workspace.
+
+C94. ONE PATH IN THE ENGINE CAME FROM THE WORKING DIRECTORY, AND EVERY WORKSPACE SHARED IT.
+store.EXPORT_DIR was Path("docs/contracts"). config.py:74 derives PROJECT_ROOT from __file__
+precisely because Claude Desktop's working directory is not the code's to assume, and the export
+was the one path that did not use it; it reached the repository only because the launcher
+passes --directory. And every workspace exported <dataset>.yaml into the same directory, so two
+workspaces with a dataset of the same name overwrote each other's copy -- invisible in Track A
+with its one workspace, certain in Track B with one per session. Found by the pre-Phase-14 audit
+scanning for module-level state, not by any test: no test confirmed a contract from a second
+workspace into the real directory, because P13-O2 taught every script not to.
+
+CL5-D1. THE DEFAULT WORKSPACE EXPORTS FLAT; ANY OTHER EXPORTS UNDER ITS ID. EXPORT_DIR is
+PROJECT_ROOT/docs/contracts. contract/tools.workspace_export_root returns it for the default
+workspace, so docs/contracts/clean_sales.yaml and everything version-controlled so far stays
+where it is, and EXPORT_DIR/<workspace_id>/ otherwise, through validate_workspace_id because the
+id becomes a path segment. An explicit export_root is used as given. EXPORT_DIR is still read at
+call time, so the scripts that redirect it keep deciding the root. Four tests, falsified first:
+4 failed on the unfixed tree, as predicted.
+
+MEASURED VALIDATION, 21/09/2026. `uv run pytest -q`: 1762 -> 1766 passed. Acceptance
+unchanged: 99/0/2, 19/0/0, 35/0/1, 26/0/0, 36/0/0. Eval SCORE 76/76 (100%). Tree clean after
+every run; docs/contracts holds clean_sales.yaml only, as before. Digests:
+  769d8919f070a07e705f28d532cd756aae42f919456ceacd4fd68675a207c334  src/analytics_agent/contract/store.py
+  bc9ec55b2c9c310a7ae1bf9df9550ccd71b5015fd5c64c1ed42ac8b046f3cc1a  src/analytics_agent/contract/tools.py
+  f019f3266a2766348439d08160803edae5c4a0a33e1fe2de55d179095731363e  src/analytics_agent/server.py
+  5018589a94159fba1451cc38881b386028896a5800019213a095b91318ced5ea  tests/test_contract_tools.py
+
+STILL OPEN after this step: P9-O4's feature half, awaiting the user's choice of design.

@@ -663,11 +663,14 @@ def confirm_dataset_contract(
 
     Storing is append-only. A new version supersedes the previous one rather
     than replacing it, so what was agreed during any past window stays
-    recoverable, and a copy is written to docs/contracts/ for version control.
+    recoverable, and a copy is written to docs/contracts/ for version control --
+    docs/contracts/<workspace_id>/ for any workspace but the default, so two
+    workspaces with a dataset of the same name keep their own copy.
     """
-    con = db.connect(workspace_id or DEFAULT_WORKSPACE_ID)
+    wid = workspace_id or DEFAULT_WORKSPACE_ID
+    con = db.connect(wid)
     try:
-        return contract_tools.confirm(con, contract_json)
+        return contract_tools.confirm(con, contract_json, workspace_id=wid)
     finally:
         con.close()
 

@@ -19,6 +19,7 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
+from analytics_agent.config import DEFAULT_WORKSPACE_ID, validate_workspace_id
 from analytics_agent.contract import ContractRefused, store
 from analytics_agent.contract.dataset_contract import (
     DatasetContract,
@@ -212,8 +213,32 @@ def propose(
         return str(exc)
 
 
-def confirm(con, contract_json: str, export_root: Path | str | None = None) -> str:
-    """Store a confirmed contract and write the version-controlled export."""
+def workspace_export_root(workspace_id: str | None) -> Path:
+    """Where a workspace's contract exports go.
+
+    The default workspace keeps docs/contracts/<dataset>.yaml, as it always has. Any other
+    workspace gets docs/contracts/<workspace_id>/, so two workspaces with a dataset of the same
+    name cannot overwrite one another's copy -- Track A never has two, Track B has one per
+    session (C94). store.EXPORT_DIR is read at call time, so the scripts that redirect it
+    (P13-O2) still decide the root.
+    """
+    root = Path(store.EXPORT_DIR)
+    if workspace_id is None or workspace_id == DEFAULT_WORKSPACE_ID:
+        return root
+    return root / validate_workspace_id(workspace_id)
+
+
+def confirm(
+    con,
+    contract_json: str,
+    export_root: Path | str | None = None,
+    workspace_id: str | None = None,
+) -> str:
+    """Store a confirmed contract and write the version-controlled export.
+
+    export_root, when given, is used exactly as given. Otherwise the root is the workspace's
+    own, from `workspace_export_root()`.
+    """
     try:
         contract = contract_from_json(contract_json)
     except ValueError as exc:
@@ -230,7 +255,7 @@ def confirm(con, contract_json: str, export_root: Path | str | None = None) -> s
     try:
         export = store.write_export(
             stored.contract,
-            root=export_root if export_root is not None else store.EXPORT_DIR,
+            root=export_root if export_root is not None else workspace_export_root(workspace_id),
         )
     except Exception as exc:
         # The contract IS stored -- the database is authoritative. Losing the

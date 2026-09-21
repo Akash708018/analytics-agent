@@ -157,6 +157,45 @@ def test_confirming_writes_the_export(loaded, tmp_path):
     assert (tmp_path / "order_items.yaml").exists()
 
 
+def test_the_export_dir_is_the_repository_not_the_working_directory():
+    """C94. Every other path in this engine comes from __file__ (config.py:74); this one came
+    from wherever the process was started."""
+    from analytics_agent.config import PROJECT_ROOT
+    assert store.EXPORT_DIR.is_absolute()
+    assert store.EXPORT_DIR == PROJECT_ROOT / "docs" / "contracts"
+
+
+def test_the_default_workspace_exports_where_it_always_has(loaded, tmp_path, monkeypatch):
+    from analytics_agent.config import DEFAULT_WORKSPACE_ID
+    monkeypatch.setattr(store, "EXPORT_DIR", tmp_path)
+    tools.confirm(loaded, _json_of(_settled(loaded)), workspace_id=DEFAULT_WORKSPACE_ID)
+    assert (tmp_path / "order_items.yaml").exists()
+
+
+def test_another_workspace_exports_under_its_own_id(loaded, tmp_path, monkeypatch):
+    monkeypatch.setattr(store, "EXPORT_DIR", tmp_path)
+    text = tools.confirm(loaded, _json_of(_settled(loaded)), workspace_id="session_a")
+    assert (tmp_path / "session_a" / "order_items.yaml").exists()
+    assert not (tmp_path / "order_items.yaml").exists()
+    assert "session_a" in text
+
+
+def test_two_workspaces_with_one_dataset_name_keep_their_own_export(loaded, tmp_path,
+                                                                    monkeypatch):
+    """What Track B would hit with its second user: same dataset name, different contract."""
+    import yaml
+    from analytics_agent.config import DEFAULT_WORKSPACE_ID
+    monkeypatch.setattr(store, "EXPORT_DIR", tmp_path)
+    tools.confirm(loaded, _json_of(_settled(loaded)), workspace_id=DEFAULT_WORKSPACE_ID)
+    changed = _settled(loaded, measure_definitions={"price": "item price, INCLUDES freight"})
+    tools.confirm(loaded, _json_of(changed), workspace_id="session_b")
+    mine = (tmp_path / "order_items.yaml").read_text()
+    theirs = (tmp_path / "session_b" / "order_items.yaml").read_text()
+    assert "INCLUDES freight" not in mine
+    assert "INCLUDES freight" in theirs
+    assert yaml.safe_load(mine) != yaml.safe_load(theirs)
+
+
 def test_a_fenced_json_block_is_accepted(loaded, tmp_path):
     """The agent will paste back what it was shown, fences and all."""
     payload = "```json\n" + _json_of(_settled(loaded)) + "\n```"
