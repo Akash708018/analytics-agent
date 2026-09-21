@@ -128,7 +128,7 @@ def render() -> None:
                 help="Every row that names the columns. Stacked headers take several.")
             join = st.selectbox("Join stacked headers with", HEADER_JOINS,
                                 index=HEADER_JOINS.index(draft.header_join))
-            if st.form_submit_button("Re-read with these choices", use_container_width=True):
+            if st.form_submit_button("Re-read with these choices", width="stretch"):
                 _draft(header_rows=sorted(header_rows) or None, header_join=join)
                 st.rerun()
         name = st.text_input("Dataset name", value=draft.dataset_name)
@@ -157,7 +157,7 @@ def render() -> None:
             "name": st.column_config.TextColumn(required=True),
             "type": st.column_config.SelectboxColumn(options=[INFER, *DTYPES], required=True),
         },
-        hide_index=True, use_container_width=True, key=f"cols_{len(draft.columns)}_{draft.header_rows}")
+        hide_index=True, width="stretch", key=f"cols_{len(draft.columns)}_{draft.header_rows}")
 
     if draft.unresolved:
         st.warning("**Still a guess:** " + ", ".join(draft.unresolved))

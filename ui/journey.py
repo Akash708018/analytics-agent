@@ -330,6 +330,6 @@ def render() -> None:
     st.html(page_html(nonce))
     _, mid, _ = st.columns([1, 1, 1])
     with mid:
-        if st.button("Write it again", use_container_width=True, type="secondary"):
+        if st.button("Write it again", width="stretch", type="secondary"):
             st.session_state["journey_nonce"] = nonce + 1
             st.rerun()

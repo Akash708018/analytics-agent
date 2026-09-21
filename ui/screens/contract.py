@@ -73,7 +73,7 @@ def render() -> None:
         "definition": draft.measure_definitions.get(c.name, ""),
     } for c in draft.columns]
     edited = st.data_editor(
-        rows, hide_index=True, use_container_width=True, key=f"contract_cols_{name}",
+        rows, hide_index=True, width="stretch", key=f"contract_cols_{name}",
         column_config={
             "column": st.column_config.TextColumn(disabled=True),
             "type": st.column_config.TextColumn(disabled=True),

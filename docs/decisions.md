@@ -6036,3 +6036,13 @@ MEASURED VALIDATION, 22/09/2026. `uv run pytest -q`: 1821 -> 1832. Acceptance un
   0c91893bd7d52409a0ff6a017184df74fba258ec08b80bec3510d64356251793  src/analytics_agent/webapp/agent.py
   7bf2f60c43531de944a5934f2149f1cc95cefd6cff54f65c1f5b664fcf129779  src/analytics_agent/charts/render.py
   c98bef3a48fe5803468e7f445dfec1f0fabb1d99a829e0bdb855c3ed79508ea1  tests/test_agent.py
+
+## Phase 14 - the local UI listens on this machine only, 22/09/2026
+
+P14-D29. .streamlit/config.toml sets server.address = "localhost". The user's first real-backend
+run printed "Network URL: http://192.168.1.5:8501" and listened on *:8501 -- anyone on the same
+network could have opened the app, uploaded files and spent the .env's model quota. Measured on a
+spare port with the new setting: listening on 127.0.0.1:8599 only; a request to the LAN address
+refused, localhost 200. Hosting (Phase 14 items 5-7) sets its own address. Also:
+use_container_width, removed by Streamlit after 2025-12-31, replaced with width="stretch" in all
+five places the startup warning pointed at. UI tests 32 passed.

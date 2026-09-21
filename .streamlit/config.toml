@@ -1,4 +1,8 @@
 [server]
+# This machine only. Streamlit's default listens on every interface, so with the real backend
+# anyone on the same network could open the app, upload files and spend the .env's model quota
+# (seen at startup: "Network URL: http://192.168.1.5:8501"). Hosting sets its own address.
+address = "localhost"
 maxUploadSize = 100
 headless = true
 enableStaticServing = true

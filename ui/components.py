@@ -70,7 +70,7 @@ def sidebar() -> None:
                   help="Turn off to stop the ink and every other animation.")
         confirm = st.checkbox("I want to empty this workspace", key="reset_confirm")
         if st.button("Reset workspace", disabled=not confirm, type="secondary",
-                     use_container_width=True):
+                     width="stretch"):
             result = be.reset_workspace(ws)
             st.session_state.pop("reset_confirm", None)
             for key in ("ingest", "contract_draft", "chat"):

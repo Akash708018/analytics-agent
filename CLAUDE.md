@@ -82,7 +82,7 @@ line carrying digests and suite totals, updating the guide's ledger row if the p
 state changed, then running all six checks and the eval above, reading them, and committing.
 
 ## Navigating the docs -- read narrowly
-`docs/decisions.md` is 6,038 lines and append-only; the build guide is 1,104. Reading
+`docs/decisions.md` is 6,048 lines and append-only; the build guide is 1,104. Reading
 either whole costs more than the work.
 
 - **Open-item register: `docs/decisions.md:4438` to end.** Read it rather than grepping
