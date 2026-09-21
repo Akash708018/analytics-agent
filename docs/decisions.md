@@ -5312,3 +5312,52 @@ Digests:
   a18a14eaa806d974eaca2f88b65d7eb5f3a899223ecb3f00f6f8131bb3d8a699  src/analytics_agent/server.py
   74a112986188b67ab363c0337943888162f2944f3c544d83c1895ac6a65c269b  tests/test_report_tools.py
   d5f2adf4555cb2634b5f2b27a9426ed53e51eb0dac08513179f434a69ecf6412  tests/test_tool_docs.py
+
+## Phase 12, Step 5 - the Done-When, 21/09/2026
+
+Step document: docs/steps/phase12_step5_done_when.md, written before the run with eight
+predictions. Seven held. The eighth is P12-D23.
+
+P12-D20. THE DONE-WHEN PASSES: 36 passed, 0 failed, 0 skipped. tests/test_phase12.py runs the
+whole pipeline on merged_multiheader.xlsx in one process -- the ingest spec across a two-row
+merged header, 150 rows loaded, a profile, a cleaning plan the data actually needed, a contract
+somebody agreed, validation against it, seven analyses, a chart, and the report. The document is
+8,748 bytes with all nine sections present in the guide's order and none of them empty.
+
+P12-D21. THE CLEANING STEP IS NOT DECORATION, AND THE DATA CHOSE IT. order_date arrives from the
+spreadsheet as VARCHAR, which is what a date in a spreadsheet is. propose_cleaning_plan offered
+exactly one action -- "C001 CONVERT_TYPE on order_date: read order_date as DATE (150 row(s))" --
+and without it the contract cannot be confirmed at all: the validator refuses with "date_column
+'order_date' is VARCHAR, not a date. A date held as text sorts lexically and cannot carry an
+analysis window." So the pipeline's order is forced by the data rather than chosen for the
+script: clean before contract, or there is no contract.
+
+P12-D22. THE ACCEPTANCE GOES THROUGH server.py FOR EVERYTHING BELOW THE LOAD. C83 is the reason:
+eight analyses were uncallable through the MCP surface while every test passed, because every
+test reached the analysis through the registry or the tools layer. A Done-When that did the same
+would prove the pipeline works for callers who do not exist. growth_decomposition is in the
+analysis list on purpose -- revenue is DOUBLE, and until C85 that analysis refused every float
+measure.
+
+P12-D23. THE PREDICTION THAT SOMETHING WOULD BREAK WAS WRONG, AND IT IS THE FIRST TIME IN THIS
+BUILD THAT A WHOLE-SYSTEM STEP FOUND NOTHING. The step document said: "Something will need
+adjusting. Nine phases have never run in sequence in one process. I do not know what, which is
+why this prediction is worth writing down rather than leaving as a feeling." Nothing needed
+adjusting. Every earlier integration step found something -- C83 in Phase 11 Step 3, C85 in
+Phase 11 Step 4, P12-O1 in Phase 12 Step 1 -- so this is a fact about the codebase rather than
+about the prediction being lazy: the parts had already been made to fit one at a time. Recorded
+because a wrong pessimistic prediction is as much a measurement as a wrong optimistic one, and
+the project has not had one of these before.
+
+THE ONLY CHANGE AFTER THE FIRST RUN WAS TO A CHECK OF MY OWN THAT COULD NOT FAIL. "No section
+had nothing to report" first looked for section names inside a slice of the reply taken after
+the words "nothing to report", so a change to that wording would have made it pass without
+testing anything. It now asserts directly that the phrase to_text() prints is absent. P9-O11 and
+C83 were each a check that could not fail; writing a third in the step that closes the phase
+would have been careless.
+
+MEASURED VALIDATION, 21/09/2026. Acceptance is now five scripts: test_phase8.py 99 passed, 0
+failed, 2 skipped; test_phase9.py 19/0/0; test_phase10.py 35/0/1; test_phase11.py 26/0/0;
+test_phase12.py 36 passed, 0 failed, 0 skipped. Full suite 1759, unchanged -- test_phase12.py is
+a script and pytest collects nothing from it, as with the other four. Digest:
+  71694c84ab3fc6d8b4f0eab4d7a9c6bd1ba4b2457314289e2ecff853eb00c2d9  tests/test_phase12.py

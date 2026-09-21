@@ -1,11 +1,9 @@
 # analytics-agent
 
 MCP server exposing data loading, profiling, cleaning and contract-gated analysis
-to Claude Desktop. Phases 1-11 done. Phase 12 (report) is in progress: Steps 1-4 done --
-what each mandatory section reads from, analysis/runs.py recording what
-every analysis and chart was called with, report/assemble.py writing the nine
-sections, and build_report registered (P12-D1 to D19). Step 5 is the guide's
-Done-When: one end-to-end run on merged_multiheader.xlsx. Nothing recorded
+to Claude Desktop. Phases 1-12 done. Phase 13 (eval harness) is next and is
+marked DO NOT SKIP in the guide. Nothing recorded open except P9-O4's feature
+half, scoped as a design question. Nothing recorded
 open except P9-O4's feature half, scoped as a design question.
 
 ## Stack
@@ -17,7 +15,7 @@ Layout: `src/analytics_agent/{ingest,profile,clean,contract,validate,analysis,ch
 27 analyses across 7 tiers. An analysis's shape: `analysis/{registry,base,declared,stats}.py`.
 
 ## Verify before committing
-All five, every time. Run the suite BEFORE committing, not after (C76: two commits
+All six, every time. Run the suite BEFORE committing, not after (C76: two commits
 recorded a broken tree). Last measured 21/09/2026, after the open-item cleanup:
 
     uv run pytest -q                      # 1759 passed
@@ -25,6 +23,7 @@ recorded a broken tree). Last measured 21/09/2026, after the open-item cleanup:
     uv run python tests/test_phase9.py    # 19 passed, 0 failed, 0 skipped
     uv run python tests/test_phase10.py   # 35 passed, 0 failed, 1 skipped
     uv run python tests/test_phase11.py   # 26 passed, 0 failed, 0 skipped
+    uv run python tests/test_phase12.py   # 36 passed, 0 failed, 0 skipped
 
 The acceptance scripts are scripts, not pytest files -- `pytest` collects nothing
 from them, so 1759 excludes them. The three skips are each deliberate and
