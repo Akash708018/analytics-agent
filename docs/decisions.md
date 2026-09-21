@@ -5224,3 +5224,41 @@ passed, 0 failed, 2 skipped; test_phase9.py 19/0/0; test_phase10.py 35/0/1; test
   872c2bf5ceb09dbc1863cf318dc635913347d8c2da8f663a09d15d9768f3fbcc  src/analytics_agent/analysis/tools.py
   e3b4846b6195364c90403cbaec8a27d2acc4e550dc222bc56d86f688c63a5cd3  tests/test_analysis_runs.py
   720d9ad70d88f46a7b033e127c1a79b498664fea61ae66407a3e0f78cc2b5840  tests/test_analysis_tools.py
+
+## Phase 12, Step 3 - assembling the report, 21/09/2026
+
+Step document: docs/steps/phase12_step3_assemble.md, written before the run with six
+predictions. All six held.
+
+P12-D11. A SECTION WITH NO RECORD STILL APPEARS, AND SAYS WHY. A report that drops "cleaning
+ledger" because nothing was cleaned reads as a report of a dataset that needed no cleaning, and
+those are different claims. clean/ledger.describe() already worked this way -- "Nothing has been
+cleaned. Every table is as it was" -- and all nine sections follow it. Measured on a workspace
+that had loaded, contracted, analysed and charted and done nothing else: nine headings written,
+four of them reporting nothing.
+
+P12-D12. WHICH SECTIONS WERE EMPTY IS CARRIED ON THE Report, NOT LEFT TO BE COUNTED. `to_text()`
+prints them under "Sections present with nothing to report, which is a finding of its own",
+because the caller cannot read the file either and a reader who has to count headings to notice
+an absence will not notice it.
+
+P12-D13. THE REPORT COMPUTES NOTHING. Every number in it was produced by a tool that recorded it
+at the time -- profile runs, the cleaning ledger, validation runs, the stored contract, analysis
+runs. A report that recalculated its own figures could disagree with the result files it cites
+and a reader would have no way to tell which was wrong.
+
+P12-D14. THE METHOD NOTES SECTION DEDUPLICATES. Ten runs of one analysis over one scope produce
+ten identical method notes, and a section listing all ten says nothing the first one did not. A
+test pins it, because the obvious implementation lists them all.
+
+P12-D15. A Report HAS NO ACCESSOR RETURNING A BARE PATH, WHICH IS NOW THREE. `Result` (locked
+decision 20), `Chart` (P11-D12), and this. The same sentence appears in all three docstrings on
+purpose: the accessor that exists is the one that gets used, and Rule 4 is what that protects.
+
+MEASURED VALIDATION, 21/09/2026. tests/test_report_assemble.py: 16 passed. Full suite 1732 ->
+1748. The first write of assemble.py measured 107 characters wide against the repository's 105;
+three lines wrapped, now 97. Acceptance unchanged -- test_phase8.py 99 passed, 0 failed, 2
+skipped; test_phase9.py 19/0/0; test_phase10.py 35/0/1; test_phase11.py 26/0/0 -- because
+nothing in src/ imports report/ until Step 4 registers build_report. Digests:
+  8d3df2aee0ca8e9d2d260a58be171619c20cb0ea42c9bce41e83c102bace07ce  src/analytics_agent/report/assemble.py
+  b7cd32afbb49eb72af2611791b9f6e03d169e88b94ce576ced21af8c39d53054  tests/test_report_assemble.py
