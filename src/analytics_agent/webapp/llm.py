@@ -37,12 +37,21 @@ _KEEP = {"type", "description", "properties", "required", "items", "enum", "form
 
 class ProviderError(Exception):
     """A provider call failed. `retryable` -- rate limit, server error, timeout -- lets the loop
-    fail over; anything else (a bad key, a rejected request) is reported, not retried."""
+    fail over; anything else (a bad key, a rejected request) is reported, not retried.
 
-    def __init__(self, provider: str, message: str, retryable: bool) -> None:
+    `kind` names the cases the loop treats specially: "daily_quota" (never waited on; Gemini
+    moves to its next model), "tool_use_failed" (the provider refused the model's own tool call;
+    the session tells the model and retries). `summary` is the one sentence a person reads.
+    """
+
+    def __init__(self, provider: str, message: str, retryable: bool, *, kind: str = "",
+                 summary: str = "", model: str | None = None) -> None:
         super().__init__(f"{provider}: {message}")
         self.provider = provider
         self.retryable = retryable
+        self.kind = kind
+        self.model = model
+        self.summary = f"{provider}: {summary or message}"
 
 
 @dataclass(frozen=True)
@@ -190,6 +199,42 @@ def _wait_for(exc: urllib.error.HTTPError, detail: str, attempt: int) -> float:
     return BACKOFF_S[min(attempt, len(BACKOFF_S) - 1)]
 
 
+def _classify(provider: str, code: int, body: str) -> ProviderError:
+    """An HTTP error as a ProviderError, with the kind and one readable sentence.
+
+    Read from the whole body, before any truncation: the quota id sits deep in Gemini's
+    details. Measured 22/09/2026: a spent free tier answers 429 with quotaId
+    "GenerateRequestsPerDayPerProjectPerModel-FreeTier" and "retry in 59s" -- a wait that would
+    not help for hours; other models kept their own quota (P14-D32).
+    """
+    message = body
+    try:
+        err = json.loads(body).get("error", {})
+        message = err.get("message", body) if isinstance(err, dict) else body
+    except (json.JSONDecodeError, AttributeError):
+        pass
+    first = message.strip().split("\n")[0][:240]
+    if code == 429 and "PerDay" in body:
+        m = re.search(r"model:\s*([\w.\-]+)", message)
+        # A model name can hold dots (3.8) but not end in one: "model: gemini-3.8-flash." in a
+        # sentence must not name a model that does not exist.
+        model = m.group(1).rstrip(".") if m else None
+        return ProviderError(provider, f"HTTP 429: {body[:500]}", True, kind="daily_quota",
+                             model=model, summary=f"the free daily quota"
+                             f"{' for ' + model if model else ''} is used up")
+    if code == 400 and "tool_use_failed" in body:
+        return ProviderError(provider, f"HTTP 400: {body[:500]}", False, kind="tool_use_failed",
+                             summary=f"refused the model's tool call ({first})")
+    if code == 429:
+        return ProviderError(provider, f"HTTP 429: {body[:500]}", True,
+                             summary="rate limit reached; try again in a minute")
+    if code >= 500:
+        return ProviderError(provider, f"HTTP {code}: {body[:500]}", True,
+                             summary=f"the service is unavailable right now ({first})")
+    return ProviderError(provider, f"HTTP {code}: {body[:500]}", False,
+                         summary=f"HTTP {code}: {first}")
+
+
 def _request(provider: str, url: str, headers: dict, body: dict | None = None) -> dict:
     data = None if body is None else json.dumps(body).encode("utf-8")
     for attempt in range(ATTEMPTS):
@@ -199,15 +244,15 @@ def _request(provider: str, url: str, headers: dict, body: dict | None = None) -
             with urllib.request.urlopen(req, timeout=TIMEOUT_S) as resp:
                 return json.loads(resp.read().decode("utf-8"))
         except urllib.error.HTTPError as exc:
-            detail = exc.read().decode("utf-8", errors="replace")[:500]
-            busy = exc.code in (429, 500, 502, 503, 504)
+            detail = exc.read().decode("utf-8", errors="replace")
+            error = _classify(provider, exc.code, detail)
+            busy = exc.code in (429, 500, 502, 503, 504) and error.kind != "daily_quota"
             if busy and attempt + 1 < ATTEMPTS:
                 wait = _wait_for(exc, detail, attempt)
                 if wait <= MAX_WAIT_S:
                     _sleep(wait + 0.25)
                     continue
-            raise ProviderError(provider, f"HTTP {exc.code}: {detail}",
-                                retryable=exc.code == 429 or exc.code >= 500) from None
+            raise error from None
         except (urllib.error.URLError, TimeoutError, OSError) as exc:
             if attempt + 1 < ATTEMPTS:
                 _sleep(BACKOFF_S[min(attempt, len(BACKOFF_S) - 1)])
@@ -232,6 +277,7 @@ class GeminiSession:
     def __init__(self, provider: "Gemini", system: str, history: list[dict], message: str,
                  tools: list[ToolSpec]) -> None:
         self._p = provider
+        self._model = provider.model()  # pinned: signature parts belong to the model that wrote them
         self._body: dict = {
             "systemInstruction": {"parts": [{"text": system}]},
             "contents": [{"role": "model" if m["role"] == "assistant" else "user",
@@ -243,7 +289,7 @@ class GeminiSession:
         }
 
     def step(self) -> Reply:
-        data = self._p.post(self._body)
+        data = self._p.post(self._body, self._model)
         candidates = data.get("candidates") or []
         if not candidates or "content" not in candidates[0]:
             reason = (candidates[0].get("finishReason") if candidates
@@ -275,6 +321,18 @@ class GeminiSession:
 _NUMBERED_FLASH = re.compile(r"^gemini-(\d+)(?:\.(\d+))?-flash$")
 
 
+def gemini_ladder(names: list[str]) -> list[str]:
+    """Every model worth trying, best first: the alias, the numbered flash models high to low,
+    then the lite alias. The free quota is per model per day, so the next rung has its own."""
+    first = choose_gemini_model(names)
+    numbered = sorted(((int(m.group(1)), int(m.group(2) or 0), n)
+                       for n in names if (m := _NUMBERED_FLASH.match(n))), reverse=True)
+    ladder = [first] + [n for *_, n in numbered]
+    if "gemini-flash-lite-latest" in names:
+        ladder.append("gemini-flash-lite-latest")
+    return list(dict.fromkeys(ladder))
+
+
 def choose_gemini_model(names: list[str]) -> str:
     """Google's own alias for the current Flash model if it is offered, else the highest-NUMBERED
     plain flash model.
@@ -300,7 +358,8 @@ class Gemini:
     name = "gemini"
 
     def __init__(self) -> None:
-        self._model: str | None = None
+        self._ladder: list[str] | None = None
+        self._spent: dict[str, str] = {}  # model -> the day its free quota ran out
 
     def _key(self) -> str:
         return os.environ.get("GEMINI_API_KEY", "")
@@ -308,23 +367,48 @@ class Gemini:
     def available(self) -> bool:
         return bool(self._key())
 
-    def model(self) -> str:
-        """GEMINI_MODEL, or a stable flash model from the provider's own list -- measured, not
-        recalled."""
-        if self._model is None:
-            self._model = os.environ.get("GEMINI_MODEL") or self._discover()
-        return self._model
+    def ladder(self) -> list[str]:
+        """GEMINI_MODEL alone if set; otherwise the provider's own list, best first -- measured,
+        not recalled."""
+        if self._ladder is None:
+            pinned = os.environ.get("GEMINI_MODEL")
+            self._ladder = [pinned] if pinned else self._discover()
+        return self._ladder
 
-    def _discover(self) -> str:
+    def _discover(self) -> list[str]:
         data = _request("gemini", f"{GEMINI_URL}/models?pageSize=1000",
                         {"x-goog-api-key": self._key()})
         names = [m["name"].removeprefix("models/") for m in data.get("models", [])
                  if "generateContent" in m.get("supportedGenerationMethods", [])]
-        return choose_gemini_model(names)
+        return gemini_ladder(names)
 
-    def post(self, body: dict) -> dict:
-        return _request("gemini", f"{GEMINI_URL}/models/{self.model()}:generateContent",
-                        {"x-goog-api-key": self._key()}, body)
+    def _today(self) -> str:
+        return time.strftime("%Y-%m-%d")
+
+    def model(self) -> str:
+        """The best model whose free quota has not run out today."""
+        for name in self.ladder():
+            if self._spent.get(name) != self._today():
+                return name
+        raise ProviderError("gemini", "every model's free daily quota is used up", True,
+                            kind="daily_quota", summary="every model's free daily quota is used "
+                            "up; it resets tomorrow")
+
+    def has_another_model(self) -> bool:
+        return any(self._spent.get(n) != self._today() for n in self.ladder())
+
+    def post(self, body: dict, model: str | None = None) -> dict:
+        model = model or self.model()
+        try:
+            return _request("gemini", f"{GEMINI_URL}/models/{model}:generateContent",
+                            {"x-goog-api-key": self._key()}, body)
+        except ProviderError as exc:
+            if exc.kind == "daily_quota":
+                # The alias has no quota of its own; the error names the model serving it, and
+                # both are spent for today.
+                for spent in {model, exc.model} - {None}:
+                    self._spent[spent] = self._today()
+            raise
 
     def start(self, system, history, message, tools) -> GeminiSession:
         return GeminiSession(self, system, history, message, tools)
@@ -345,8 +429,25 @@ class GroqSession:
             "parameters": to_json_schema(t.parameters)}} for t in tools]
 
     def step(self) -> Reply:
-        data = self._p.post({"messages": self._messages, "tools": self._tools,
-                             "tool_choice": "auto"})
+        for _ in range(3):
+            try:
+                data = self._p.post({"messages": self._messages, "tools": self._tools,
+                                     "tool_choice": "auto"})
+                break
+            except ProviderError as exc:
+                if exc.kind != "tool_use_failed":
+                    raise
+                # Groq refuses a call to a tool it was not given and returns no message; the
+                # model copied an engine NEXT STEP naming one (seen live: propose_dataset_contract).
+                # Tell it, and let it answer instead (P14-D33).
+                m = re.search(r"tool '([\w]+)'", str(exc))
+                self._messages.append({"role": "user", "content": (
+                    f"[system] {m.group(1) if m else 'That tool'} is not one of your tools. Do not "
+                    f"call it. Answer the person in words; if a step is theirs to do, say which "
+                    f"screen does it.")})
+        else:
+            raise ProviderError("groq", "the model kept calling tools it does not have", False,
+                                summary="the model kept calling tools it does not have")
         try:
             message = data["choices"][0]["message"]
         except (KeyError, IndexError):
@@ -420,5 +521,5 @@ def configured() -> list[Provider]:
 
 
 __all__ = ["Call", "Gemini", "Groq", "Provider", "ProviderError", "Reply", "Session", "ToolSpec",
-           "choose_gemini_model", "configured", "convert_schema",
+           "choose_gemini_model", "configured", "gemini_ladder", "convert_schema",
            "load_env", "to_json_schema"]

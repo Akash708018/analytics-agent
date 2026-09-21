@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import asyncio
 import functools
+import re
 from collections.abc import Callable
 from contextlib import AbstractContextManager
 
@@ -78,6 +79,34 @@ def run_tool(call: Call, workspace_id: str) -> str:
                 f"lists\n\nreason: ANALYSIS_NOT_POSSIBLE")
 
 
+#: Where the person does what the engine's NEXT STEP asks, when the tool is not the assistant's.
+SCREEN_FOR: dict[str, str] = {
+    "propose_dataset_contract": "the Contract screen", "confirm_dataset_contract": "the Contract screen",
+    "propose_ingest_spec": "the Upload & read screen", "confirm_ingest_spec": "the Upload & read screen",
+    "load_csv": "the Upload & read screen", "load_excel": "the Upload & read screen",
+    "check_file": "the Upload & read screen", "preview_file": "the Upload & read screen",
+    "reset_workspace": "the sidebar's Reset",
+    "propose_cleaning_plan": "no screen yet -- cleaning is not in the web app",
+    "apply_cleaning_plan": "no screen yet -- cleaning is not in the web app",
+    "load_postgres_table": "no screen -- databases are not connected to the web app",
+    "query_source": "no screen -- databases are not connected to the web app",
+    "describe_source": "no screen -- databases are not connected to the web app",
+}
+_NAMED_CALL = re.compile(r"\b([a-z_]+)\(")
+
+
+def _with_screen_notes(text: str) -> str:
+    """A tool reply whose NEXT STEP names a tool the assistant lacks, with a note saying where the
+    person does it. Seen live: gpt-oss copied "NEXT STEP: call propose_dataset_contract(...)" into
+    a tool call Groq refused, failing the turn (P14-D33)."""
+    named = [n for n in dict.fromkeys(_NAMED_CALL.findall(text)) if n in SCREEN_FOR]
+    if not named:
+        return text
+    notes = "\n".join(f"- {n}: not one of your tools; the person does it on {SCREEN_FOR[n]}."
+                       for n in named)
+    return f"{text}\n\n[Note for the assistant]\n{notes}"
+
+
 def _trim(text: str) -> str:
     if len(text) <= RESULT_CHARS:
         return text
@@ -96,24 +125,35 @@ def answer(workspace_id: str, history: list[dict], message: str, *,
             "No model is configured. Add GEMINI_API_KEY (or GROQ_API_KEY) to the .env file at "
             "the repository root and restart the app."))
     failures: list[str] = []
+    calls: list[ToolCall] = []
     for provider in providers:
-        # Per attempt: an attempt abandoned for the next provider may have drawn a chart the
-        # final answer never mentions. It stays in Files, not under this answer (P14-D28).
-        before = {a.path for a in list_artifacts()}
-        calls: list[ToolCall] = []
-        try:
-            text = _turn(provider, workspace_id, history, message, lock, calls)
-        except ProviderError as exc:
-            failures.append(str(exc))
-            if exc.retryable:
-                continue
-            # Every failure, not the last: a Gemini 429 followed by a fatal Groq error was once
-            # reported as the Groq error alone, hiding why Gemini had been skipped (P14-D25).
-            return ChatTurn(reply="", tool_calls=calls,
-                            error="The model failed: " + "; ".join(failures))
-        new = [a for a in list_artifacts() if a.path not in before]
-        return ChatTurn(reply=text, tool_calls=calls, artifacts=new)
-    return ChatTurn(reply="", error="Every model provider failed this turn: " + "; ".join(failures))
+        # A spent daily quota is per model: Gemini tries its next model before the next
+        # provider (P14-D32). Bounded by the ladder's length.
+        for _attempt in range(6):
+            # Per attempt: an abandoned attempt may have drawn a chart the final answer never
+            # mentions. It stays in Files, not under this answer (P14-D28).
+            before = {a.path for a in list_artifacts()}
+            calls = []
+            try:
+                text = _turn(provider, workspace_id, history, message, lock, calls)
+            except ProviderError as exc:
+                failures.append(exc.summary)
+                more = getattr(provider, "has_another_model", lambda: False)()
+                if exc.kind == "daily_quota" and more:
+                    continue
+                if exc.retryable:
+                    break
+                # Every failure, not the last (P14-D25), each as one readable sentence.
+                return ChatTurn(reply="", tool_calls=calls, error=_failed(failures))
+            new = [a for a in list_artifacts() if a.path not in before]
+            return ChatTurn(reply=text, tool_calls=calls, artifacts=new)
+    return ChatTurn(reply="", tool_calls=calls, error=_failed(failures))
+
+
+def _failed(failures: list[str]) -> str:
+    return ("The assistant could not answer this time.\n\n"
+            + "\n".join(f"- {f}" for f in failures)
+            + "\n\nNothing in your workspace changed. Try again shortly.")
 
 
 def _turn(provider: Provider, workspace_id: str, history: list[dict], message: str,
@@ -130,7 +170,7 @@ def _turn(provider: Provider, workspace_id: str, history: list[dict], message: s
             calls.append(ToolCall(call.name, dict(call.args), result,
                                   refused=reason_of(result) is not None
                                   or result.lstrip().startswith("BLOCKED")))
-            results.append((call, _trim(result)))
+            results.append((call, _trim(_with_screen_notes(result))))
         session.add_results(results)
     return (reply.text + "\n\n" if reply.text else "") + (
         f"I stopped after {MAX_ROUNDS} rounds of tool calls without a final answer. What I ran is "

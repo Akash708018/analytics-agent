@@ -57,6 +57,13 @@ def main() -> int:
             print("     " + call.result.splitlines()[0][:110] if call.result else "")
         print(f"\nA: {turn.reply}" if turn.reply else "")
         print(f"artifacts: {[a.path for a in turn.artifacts]}")
+        for p in providers:  # which model answered: the ladder may have moved past spent ones
+            spent = sorted(getattr(p, "_spent", {}))
+            try:
+                now = p.model()
+            except llm.ProviderError as exc:
+                now = f"none left ({exc.summary})"
+            print(f"{p.name}: now on {now}" + (f"; spent today: {spent}" if spent else ""))
         if turn.error:
             print(f"ERROR: {turn.error}")
         return 1 if turn.error else 0

@@ -223,7 +223,7 @@ def test_gemini_calls_are_read_and_the_models_content_echoed_verbatim(monkeypatc
     replies = iter([{"candidates": [{"content": content}]},
                     {"candidates": [{"content": {"role": "model", "parts": [{"text": "done"}]}}]}])
     sent = []
-    monkeypatch.setattr(g, "post", lambda body: (sent.append(body), next(replies))[1])
+    monkeypatch.setattr(g, "post", lambda body, model=None: (sent.append(body), next(replies))[1])
     s = g.start("sys", [{"role": "assistant", "content": "earlier"}], "q", [])
     r = s.step()
     assert r.calls[0].name == "list_datasets" and r.text == "checking"
@@ -238,7 +238,8 @@ def test_gemini_calls_are_read_and_the_models_content_echoed_verbatim(monkeypatc
 def test_gemini_with_no_candidate_is_a_fatal_error(monkeypatch):
     g = llm.Gemini()
     monkeypatch.setattr(g, "model", lambda: "m")
-    monkeypatch.setattr(g, "post", lambda body: {"promptFeedback": {"blockReason": "SAFETY"}})
+    monkeypatch.setattr(g, "post",
+                        lambda body, model=None: {"promptFeedback": {"blockReason": "SAFETY"}})
     with pytest.raises(ProviderError) as exc:
         g.start("s", [], "q", []).step()
     assert not exc.value.retryable and "SAFETY" in str(exc.value)
@@ -435,3 +436,120 @@ def test_only_the_successful_attempts_artifacts_come_back(contracted):
 
 def test_the_rules_forbid_inventing_units():
     assert "no unit or currency" in agent.SYSTEM
+
+
+DAILY = (b'{"error":{"code":429,"message":"You exceeded your current quota. Quota exceeded for '
+         b'metric: generate_content_free_tier_requests, limit: 20, model: gemini-3.8-flash. '
+         b'Please retry in 59.2s.","details":[{"violations":[{"quotaId":'
+         b'"GenerateRequestsPerDayPerProjectPerModel-FreeTier"}]}]}}')
+
+
+def test_a_spent_daily_quota_is_never_waited_on(monkeypatch):
+    """P14-D32: the 59 s "retry" on a daily quota was waited twice before failing over."""
+    waits = []
+    monkeypatch.setattr(llm.urllib.request, "urlopen",
+                        lambda req, timeout: (_ for _ in ()).throw(_http_error(429, DAILY)))
+    monkeypatch.setattr(llm, "_sleep", waits.append)
+    with pytest.raises(ProviderError) as exc:
+        llm._request("gemini", "https://x", {})
+    assert exc.value.kind == "daily_quota" and exc.value.model == "gemini-3.8-flash"
+    assert waits == [] and "daily quota for gemini-3.8-flash is used up" in exc.value.summary
+
+
+def test_gemini_climbs_its_ladder_when_a_models_day_is_spent(monkeypatch):
+    g = llm.Gemini()
+    monkeypatch.setattr(g, "_discover", lambda: ["gemini-flash-latest", "gemini-3.8-flash",
+                                                 "gemini-3.7-flash"])
+    tried = []
+
+    def request(provider, url, headers, body=None):
+        model = url.split("/models/")[1].split(":")[0]
+        tried.append(model)
+        if model in ("gemini-flash-latest", "gemini-3.8-flash"):
+            raise llm._classify("gemini", 429, DAILY.decode())
+        return {"candidates": [{"content": {"role": "model", "parts": [{"text": "ok"}]}}]}
+    monkeypatch.setattr(llm, "_request", request)
+    with pytest.raises(ProviderError):
+        g.start("s", [], "q", []).step()             # the alias is spent, and names 3.8
+    assert g.model() == "gemini-3.7-flash"           # 3.8 skipped: the alias's error named it
+    assert g.start("s", [], "q", []).step().text == "ok"
+    assert tried == ["gemini-flash-latest", "gemini-3.7-flash"]
+
+
+def test_the_loop_retries_gemini_on_its_next_model_before_groq(contracted):
+    be, ws = contracted
+
+    class Laddered(Scripted):
+        name = "gemini"
+
+        def __init__(self):
+            super().__init__([Reply(text="from the second model")])
+            self.left = 1
+
+        def has_another_model(self):
+            return True
+
+        def start(self, *a):
+            if self.left:
+                self.left -= 1
+                raise llm._classify("gemini", 429, DAILY.decode())
+            return super().start(*a)
+    groq = Scripted([Reply(text="should not be reached")])
+    turn = agent.answer(ws, [], "q", lock=lambda: be._workspace(ws),
+                        list_artifacts=lambda: be.list_artifacts(ws), providers=[Laddered(), groq])
+    assert turn.reply == "from the second model" and groq.replies
+
+
+def test_groq_recovers_when_its_model_calls_a_tool_it_was_not_given(monkeypatch):
+    """P14-D33: gpt-oss copied a NEXT STEP into a call to propose_dataset_contract; Groq
+    refused it with 400 tool_use_failed and the whole turn failed."""
+    q = llm.Groq()
+    monkeypatch.setattr(q, "model", lambda: "m")
+    refusal = ('{"error":{"message":"Tool call validation failed: attempted to call tool '
+               "'propose_dataset_contract' which was not in request.tools\","
+               '"code":"tool_use_failed"}}')
+    replies = iter([llm._classify("groq", 400, refusal),
+                    {"choices": [{"message": {"role": "assistant",
+                                              "content": "Confirm it on the Contract screen."}}]}])
+    sent = []
+
+    def post(body):
+        sent.append([dict(m) for m in body["messages"]])
+        r = next(replies)
+        if isinstance(r, Exception):
+            raise r
+        return r
+    monkeypatch.setattr(q, "post", post)
+    reply = q.start("sys", [], "q", []).step()
+    assert reply.text == "Confirm it on the Contract screen."
+    note = sent[1][-1]
+    assert note["role"] == "user" and "propose_dataset_contract is not one of your tools" in (
+        note["content"])
+
+
+def test_a_next_step_naming_a_screen_tool_is_annotated():
+    text = 'NEXT STEP: call propose_dataset_contract(dataset_name="t")'
+    out = agent._with_screen_notes(text)
+    assert "propose_dataset_contract: not one of your tools" in out and "Contract screen" in out
+    plain = 'NEXT STEP: call compute_analysis(dataset_name="t", analysis_type="trend")'
+    assert agent._with_screen_notes(plain) == plain
+
+
+def test_a_failed_turn_reads_as_sentences_not_json(contracted):
+    be, ws = contracted
+    daily = Scripted([], fail=llm._classify("gemini", 429, DAILY.decode()))
+    turn = agent.answer(ws, [], "q", lock=lambda: be._workspace(ws),
+                        list_artifacts=lambda: be.list_artifacts(ws), providers=[daily])
+    assert turn.error.startswith("The assistant could not answer this time.")
+    assert "daily quota for gemini-3.8-flash is used up" in turn.error and "{" not in turn.error
+
+
+def test_the_screen_note_reaches_the_model_through_the_loop(contracted):
+    """Wiring, not just the function: the first test of the note passed with it unwired."""
+    be, ws = contracted
+    p = Scripted([Reply(calls=[Call("1", "compute_analysis", {"dataset_name": "not_loaded",
+                                                              "analysis_type": "frequency"})]),
+                  Reply(text="Load it first.")])
+    _answer(be, ws, p)
+    to_model = p.seen[0][1]
+    assert "[Note for the assistant]" in to_model and "Upload & read screen" in to_model

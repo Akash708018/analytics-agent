@@ -6078,3 +6078,42 @@ that could not fail was removed. The instrument was right (P13-D9 caught it); I 
 conclusion before running it.
 
 MEASURED VALIDATION, 22/09/2026. UI tests 32 -> 35; engine 1832 passed.
+
+## Phase 14 - a spent free quota and a refused tool call, 22/09/2026
+
+Reported by the user from the Ask screen: a raw JSON error naming a Gemini 429 and a Groq 400. The
+workspace's dataset had no contract yet, so the right answer was "confirm it on the Contract
+screen"; neither provider got there.
+
+P14-D32. A SPENT DAILY QUOTA IS NEVER WAITED ON, AND GEMINI HAS A LADDER. Measured: the free quota
+is per model per day (quotaId GenerateRequestsPerDayPerProjectPerModel-FreeTier, limit 20 on
+gemini-3.8-flash) -- much of that day's 20 spent by my own live testing. The 429 still said "retry
+in 59s", which the loop honoured twice before failing over. Other models kept their own quota:
+3.7-flash, 3.5-flash and flash-lite-latest all 200. Now the quota id marks the error "daily_quota",
+never waited on; Gemini keeps a ladder (alias, numbered flash high to low, lite) and remembers a
+spent model -- and the model an alias's error names -- until the day changes; the loop tries
+Gemini's next rung before the next provider. Live: spent [gemini-3.8-flash, gemini-flash-latest],
+answered on gemini-3.7-flash, figures matching SQL (channel: Online 190 / 38.0%, Wholesale 162 /
+32.4%, Retail 148 / 29.6%). A model name read from a quota message has any trailing full stop
+stripped -- the test data's "gemini-3.8-flash." named a model that does not exist.
+
+P14-D33. A CALL TO A TOOL THE MODEL WAS NOT GIVEN NO LONGER ENDS THE TURN. gpt-oss copied the engine's
+"NEXT STEP: call propose_dataset_contract(...)" into a tool call; Groq refused it (400
+tool_use_failed) and returns no message, so the turn failed. Now the Groq session tells the model
+the tool is not its own and retries (at most three times); and at the source, a tool reply whose
+text names a tool the assistant lacks gains a note saying where the person does it (the Contract
+screen, Upload & read, the sidebar's Reset; "no screen yet" for cleaning and databases).
+
+P14-D34. A FAILED TURN READS AS SENTENCES. One line per provider ("gemini: the free daily quota for
+gemini-3.8-flash is used up"), no JSON, and "nothing in your workspace changed".
+
+Falsified: waiting on a daily quota, no Groq recovery, no ladder retry in the loop -- each fails its
+test. The first test of the screen note passed with the note unwired (it tested the function, not
+the loop); a loop-level test was added and fails unwired.
+
+P14-O2 IS OPEN. CLEANING HAS NO SCREEN IN THE WEB APP. A dataset whose contract needs a cleaning step
+first (a date column stored as text, as merged_multiheader's is) cannot be confirmed from the
+browser; the assistant now says so rather than calling a tool it lacks.
+
+MEASURED VALIDATION, 22/09/2026. Engine 1832 -> 1839; UI 35; acceptance 99/0/2, 19/0/0, 35/0/1,
+26/0/0, 36/0/0; eval 76/76. Two live runs, both answers matched SQL.
