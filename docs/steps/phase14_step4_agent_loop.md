@@ -84,3 +84,45 @@ model reads and are passed whole.
    no GEMINI_/GROQ_API_KEY in the environment); scripts/agent_live.py says so and exits 1.
    Nothing here has been shown to work against a real model. This clause stays open until the
    script runs with a key and its output is pasted here.
+
+## The live run (the outstanding clause), 22/09/2026
+
+The user created .env with GEMINI_API_KEY and GROQ_API_KEY and ran scripts/agent_live.py. Every
+diagnostic after that printed names and error text only, never a key.
+
+L1. User's run: Gemini chose "gemini-omni-1.1-flash"; Groq's model discovery 403 "error code:
+    1010"; the turn reported only the Groq error. Diagnosis, measured:
+    - Gemini: my discovery sorted names as strings and "omni" sorts after "3.8"; that model's
+      free tier answered 429 on the first request. gemini-flash-latest 200 (serving
+      gemini-3.8-flash); gemini-2.5-flash -- the name I would have hard-coded -- 404 "no longer
+      available to new users".
+    - Groq: Cloudflare's 1010 refuses Python's default User-Agent; the same request with a
+      named agent returned 200. llama-3.3-70b-versatile is no longer offered; openai/gpt-oss-120b is.
+    - The earlier Gemini failure was dropped from the message when Groq failed fatally.
+    L1.1: gemini-flash-latest if offered, else the highest-NUMBERED plain flash model; a named
+    User-Agent on every request; every provider's failure in the message (P14-D25).
+L2. Gemini 503 "high demand"; Groq 429 tokens-per-minute (8,000; each request ~5,000 tokens,
+    measured: descriptions 14,943 chars, schemas 4,009, system 967). L2.1: wait as the provider
+    asks (Retry-After, "try again in Xs", retryDelay) and retry, up to a cap (P14-D26).
+L3. Gemini made its first real tool call (get_workflow_state, answered), then 429 at 5 requests a
+    minute asking 40.26 s -- over the 20 s cap, so it failed over; Groq then refused gpt-oss's own
+    call, `"question": null`, because `nullable` is OpenAPI, not JSON Schema. L3.1: the cap is one
+    rate-limit window, 60 s; Groq gets JSON Schema with type lists (P14-D26, D27).
+L4. SUCCESS. Gemini, four tool calls: get_workflow_state, run_analysis, compute_analysis
+    (group_compare region x revenue), render_chart (bar, y=total). Answer: South leads, 378,416.78,
+    27.5% of 123 orders; table of all regions; the 28 null-region rows named as kept. Checked
+    against SQL computed without the tool: South 123 / 378,416.78 / 27.5, North 108 / 320,593.28 /
+    23.3, West 124 / 317,651.57 / 23.1, East 117 / 288,064.05 / 20.9, (null) 28 / 73,171.16 / 5.3,
+    all 500 / 1,377,896.84 -- every figure matches. But the chart drew the (all) roll-up as a sixth
+    bar, "highest value 1.378e+06 at (all)" (C98, fixed in charts/render.py).
+L5. Rerun after C98: a first attempt failed over mid-turn; Groq answered via top_n, its render_chart
+    refused for want of y, and the model retried with the y the refusal named (C93, working live).
+    Correct figure again. Two small findings: the abandoned attempt's chart was listed under the
+    answer (per-turn snapshot; now per attempt, P14-D28), and the model wrote "$378,416.78" -- a
+    currency nothing states (a rule added to the system prompt).
+Falsified this round: removing the User-Agent, restoring string sorting, reporting only the last
+failure, sending OpenAPI nullables to Groq, taking the artifact snapshot per turn -- each fails
+its test. The roll-up test failed on the unfixed render layer.
+
+Final: engine 1803 -> 1832; acceptance 99/0/2, 19/0/0, 35/0/1, 26/0/0, 36/0/0; eval 76/76; UI 32.
+The live clause is CLOSED by L4.

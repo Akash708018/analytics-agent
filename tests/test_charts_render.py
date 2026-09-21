@@ -245,3 +245,21 @@ def test_there_is_no_accessor_that_returns_a_bare_path():
     names = [n for n in dir(Chart) if not n.startswith("_")]
     assert "to_text" in names
     assert not any(n in names for n in ("path_text", "as_path", "filename", "location"))
+
+
+# --- the (all) roll-up (C98) -------------------------------------------------------------------
+
+def test_the_rollup_row_is_not_drawn_beside_the_groups_it_totals():
+    """C98, found by the first live agent run: group_compare's (all) row was drawn as a sixth bar,
+    1.378e+06 beside groups of ~3e+05, and named as the chart's highest value."""
+    rows = [["south", "378,416.78"], ["north", "320,593.28"], ["(all)", "1,377,896.84"]]
+    ex = series_from_output(out(rows=rows, headers=["region", "total"]))
+    assert ex.x == ["south", "north"]
+    assert ex.series[0].values == [378416.78, 320593.28]
+    assert any("(all)" in note and "not drawn" in note for note in ex.dropped)
+
+
+def test_an_rollup_that_is_the_only_row_is_the_answer_and_is_drawn():
+    """confidence_interval with no dimension returns one row, (all): it is the result."""
+    ex = series_from_output(out(rows=[["(all)", "12.5"]], headers=["group", "mean"]))
+    assert ex.x == ["(all)"] and ex.dropped == []

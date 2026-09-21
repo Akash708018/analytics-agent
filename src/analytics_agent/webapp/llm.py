@@ -13,6 +13,8 @@ from __future__ import annotations
 
 import json
 import os
+import re
+import time
 import urllib.error
 import urllib.request
 from dataclasses import dataclass, field
@@ -22,6 +24,9 @@ from typing import Any, Protocol
 from analytics_agent.config import PROJECT_ROOT
 
 TIMEOUT_S = 60
+#: Sent on every request. Python's default "Python-urllib/3.x" is refused by Groq's edge with
+#: HTTP 403 "error code: 1010" (Cloudflare's banned-signature code); measured: default 403, this 200.
+USER_AGENT = "analytics-agent/0.1 (+https://github.com/Akash708018/analytics-agent)"
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta"
 GROQ_URL = "https://api.groq.com/openai/v1"
 
@@ -132,21 +137,83 @@ def convert_schema(schema: Any, *, drop: frozenset[str] = frozenset({"workspace_
     return out
 
 
+def to_json_schema(schema: Any) -> Any:
+    """The converted (OpenAPI-subset) schema in standard JSON Schema, for OpenAI-compatible
+    providers: `nullable: true` becomes a type list with "null".
+
+    Groq validates a model's tool call against the schema it was given and does not know the
+    OpenAPI keyword, so gpt-oss's `"question": null` for an optional field was refused with
+    "expected string, but got null" (measured live, P14-D27). Gemini keeps `nullable`.
+    """
+    if isinstance(schema, list):
+        return [to_json_schema(s) for s in schema]
+    if not isinstance(schema, dict):
+        return schema
+    out = {k: (to_json_schema(v) if k != "properties"
+               else {name: to_json_schema(sub) for name, sub in v.items()})
+           for k, v in schema.items() if k != "nullable"}
+    if schema.get("nullable") and isinstance(out.get("type"), str):
+        out["type"] = [out["type"], "null"]
+    return out
+
+
 # --- HTTP --------------------------------------------------------------------------------------
+
+#: Waiting on a busy provider. Measured on the free tiers, 22/09/2026: Gemini answered 503 "high
+#: demand", and Groq 429 on tokens-per-minute with "Please try again in 3.9675s" -- each request
+#: carries ~5,000 tokens of tool manuals against Groq's 8,000 a minute. A wait the provider asks
+#: for is honoured up to MAX_WAIT_S; a longer one (a spent daily quota) fails over instead of
+#: stalling the person (P14-D26).
+ATTEMPTS = 3
+#: One rate-limit window. Gemini's free tier allows 5 requests a minute on gemini-3.8-flash and
+#: asked for "retry in 40.26s"; a 20 s cap failed over instead (measured, P14-D26). A per-minute
+#: limit always clears within 60 s; a spent daily quota asks for hours and still fails over.
+MAX_WAIT_S = 60.0
+BACKOFF_S = (2.0, 5.0)
+_WAIT_HINT = re.compile(r"(?:try again in|retry in)\s+([0-9.]+)\s*(ms|s)\b", re.I)
+_RETRY_DELAY = re.compile(r'"retryDelay"\s*:\s*"([0-9.]+)s"')
+_sleep = time.sleep  # a test replaces it
+
+
+def _wait_for(exc: urllib.error.HTTPError, detail: str, attempt: int) -> float:
+    """Seconds the provider asked us to wait: Retry-After, Groq's "try again in Xs", Gemini's
+    retryDelay -- else a short backoff."""
+    header = exc.headers.get("Retry-After") if exc.headers else None
+    if header and header.replace(".", "", 1).isdigit():
+        return float(header)
+    m = _WAIT_HINT.search(detail)
+    if m:
+        return float(m.group(1)) / (1000 if m.group(2).lower() == "ms" else 1)
+    m = _RETRY_DELAY.search(detail)
+    if m:
+        return float(m.group(1))
+    return BACKOFF_S[min(attempt, len(BACKOFF_S) - 1)]
+
 
 def _request(provider: str, url: str, headers: dict, body: dict | None = None) -> dict:
     data = None if body is None else json.dumps(body).encode("utf-8")
-    req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json",
-                                                          **headers})
-    try:
-        with urllib.request.urlopen(req, timeout=TIMEOUT_S) as resp:
-            return json.loads(resp.read().decode("utf-8"))
-    except urllib.error.HTTPError as exc:
-        detail = exc.read().decode("utf-8", errors="replace")[:500]
-        raise ProviderError(provider, f"HTTP {exc.code}: {detail}",
-                            retryable=exc.code == 429 or exc.code >= 500) from None
-    except (urllib.error.URLError, TimeoutError, OSError) as exc:
-        raise ProviderError(provider, f"no response ({type(exc).__name__})", True) from None
+    for attempt in range(ATTEMPTS):
+        req = urllib.request.Request(url, data=data, headers={
+            "Content-Type": "application/json", "User-Agent": USER_AGENT, **headers})
+        try:
+            with urllib.request.urlopen(req, timeout=TIMEOUT_S) as resp:
+                return json.loads(resp.read().decode("utf-8"))
+        except urllib.error.HTTPError as exc:
+            detail = exc.read().decode("utf-8", errors="replace")[:500]
+            busy = exc.code in (429, 500, 502, 503, 504)
+            if busy and attempt + 1 < ATTEMPTS:
+                wait = _wait_for(exc, detail, attempt)
+                if wait <= MAX_WAIT_S:
+                    _sleep(wait + 0.25)
+                    continue
+            raise ProviderError(provider, f"HTTP {exc.code}: {detail}",
+                                retryable=exc.code == 429 or exc.code >= 500) from None
+        except (urllib.error.URLError, TimeoutError, OSError) as exc:
+            if attempt + 1 < ATTEMPTS:
+                _sleep(BACKOFF_S[min(attempt, len(BACKOFF_S) - 1)])
+                continue
+            raise ProviderError(provider, f"no response ({type(exc).__name__})", True) from None
+    raise AssertionError("unreachable")
 
 
 # --- Gemini ------------------------------------------------------------------------------------
@@ -204,6 +271,31 @@ class GeminiSession:
         self._body["contents"].append({"role": "user", "parts": parts})
 
 
+#: gemini-<major>[.<minor>]-flash exactly: no lite, image, tts, preview or other variant.
+_NUMBERED_FLASH = re.compile(r"^gemini-(\d+)(?:\.(\d+))?-flash$")
+
+
+def choose_gemini_model(names: list[str]) -> str:
+    """Google's own alias for the current Flash model if it is offered, else the highest-NUMBERED
+    plain flash model.
+
+    The first version sorted names as strings, took the last, and got "gemini-omni-1.1-flash" --
+    "omni" sorts after "3.8" -- whose free tier returned 429 on the first request. Measured on a
+    free key, 22/09/2026: gemini-flash-latest 200 (serving gemini-3.8-flash); gemini-2.5-flash 404
+    "no longer available to new users" (P14-D25).
+    """
+    if "gemini-flash-latest" in names:
+        return "gemini-flash-latest"
+    numbered = [(int(m.group(1)), int(m.group(2) or 0), n)
+                for n in names if (m := _NUMBERED_FLASH.match(n))]
+    if numbered:
+        return max(numbered)[2]
+    flash = [n for n in names if "flash" in n]
+    if flash or names:
+        return (flash or names)[0]
+    raise ProviderError("gemini", "the model list offers nothing that generates", False)
+
+
 class Gemini:
     name = "gemini"
 
@@ -228,12 +320,7 @@ class Gemini:
                         {"x-goog-api-key": self._key()})
         names = [m["name"].removeprefix("models/") for m in data.get("models", [])
                  if "generateContent" in m.get("supportedGenerationMethods", [])]
-        stable = [n for n in names if "flash" in n and not any(
-            tag in n for tag in ("preview", "exp", "lite", "image", "tts", "live", "thinking"))]
-        pool = stable or [n for n in names if "flash" in n] or names
-        if not pool:
-            raise ProviderError("gemini", "the model list offers nothing that generates", False)
-        return sorted(pool, reverse=True)[0]
+        return choose_gemini_model(names)
 
     def post(self, body: dict) -> dict:
         return _request("gemini", f"{GEMINI_URL}/models/{self.model()}:generateContent",
@@ -254,8 +341,8 @@ class GroqSession:
             + [{"role": m["role"], "content": m["content"]} for m in history if m.get("content")]
             + [{"role": "user", "content": message}])
         self._tools = [{"type": "function", "function": {
-            "name": t.name, "description": t.description, "parameters": t.parameters}}
-            for t in tools]
+            "name": t.name, "description": t.description,
+            "parameters": to_json_schema(t.parameters)}} for t in tools]
 
     def step(self) -> Reply:
         data = self._p.post({"messages": self._messages, "tools": self._tools,
@@ -333,4 +420,5 @@ def configured() -> list[Provider]:
 
 
 __all__ = ["Call", "Gemini", "Groq", "Provider", "ProviderError", "Reply", "Session", "ToolSpec",
-           "configured", "convert_schema", "load_env"]
+           "choose_gemini_model", "configured", "convert_schema",
+           "load_env", "to_json_schema"]

@@ -44,6 +44,8 @@ cleaning), tell them where: the Upload & read screen, the Contract screen. You c
 - Charts appear to the person automatically under your answer. You cannot see them: describe a \
 chart only from the numbers its reply gives.
 - Carry every caveat a result prints -- a subset warning, a gap, excluded rows -- into your answer.
+- Add no unit or currency the contract does not state: a measure defined as "units x unit_price" \
+is a number, not dollars.
 - Answer in plain language, briefly, and name the analysis you ran."""
 
 
@@ -93,9 +95,11 @@ def answer(workspace_id: str, history: list[dict], message: str, *,
         return ChatTurn(reply="", error=(
             "No model is configured. Add GEMINI_API_KEY (or GROQ_API_KEY) to the .env file at "
             "the repository root and restart the app."))
-    before = {a.path for a in list_artifacts()}
     failures: list[str] = []
     for provider in providers:
+        # Per attempt: an attempt abandoned for the next provider may have drawn a chart the
+        # final answer never mentions. It stays in Files, not under this answer (P14-D28).
+        before = {a.path for a in list_artifacts()}
         calls: list[ToolCall] = []
         try:
             text = _turn(provider, workspace_id, history, message, lock, calls)
@@ -103,7 +107,10 @@ def answer(workspace_id: str, history: list[dict], message: str, *,
             failures.append(str(exc))
             if exc.retryable:
                 continue
-            return ChatTurn(reply="", tool_calls=calls, error=f"The model failed: {exc}")
+            # Every failure, not the last: a Gemini 429 followed by a fatal Groq error was once
+            # reported as the Groq error alone, hiding why Gemini had been skipped (P14-D25).
+            return ChatTurn(reply="", tool_calls=calls,
+                            error="The model failed: " + "; ".join(failures))
         new = [a for a in list_artifacts() if a.path not in before]
         return ChatTurn(reply=text, tool_calls=calls, artifacts=new)
     return ChatTurn(reply="", error="Every model provider failed this turn: " + "; ".join(failures))

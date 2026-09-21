@@ -275,6 +275,7 @@ def test_http_errors_are_classified_and_never_carry_the_key(monkeypatch):
             raise urllib.error.HTTPError(req.full_url, code, "x", {}, io.BytesIO(b"{}"))
         return f
     monkeypatch.setenv("GEMINI_API_KEY", "SECRET-KEY-123")
+    monkeypatch.setattr(llm, "_sleep", lambda s: None)
     for code, retry in ((429, True), (503, True), (400, False), (403, False)):
         monkeypatch.setattr(llm.urllib.request, "urlopen", raise_(code))
         with pytest.raises(ProviderError) as exc:
@@ -294,3 +295,143 @@ def test_env_file_loads_names_without_overwriting(tmp_path, monkeypatch):
     monkeypatch.setattr(os, "environ", private)
     assert llm.load_env(env) == ["GEMINI_API_KEY"]
     assert private["GEMINI_API_KEY"] == "abc" and private["GROQ_API_KEY"] == "kept"
+
+
+def test_gemini_model_choice_prefers_the_alias_then_the_highest_number():
+    """P14-D25: string sorting chose gemini-omni-1.1-flash, whose free tier refused at once."""
+    listed = ["gemini-2.5-flash", "gemini-3.8-flash", "gemini-omni-1.1-flash", "gemini-3.5-flash",
+              "gemini-3.1-flash-lite", "gemini-3-flash-preview", "gemini-flash-latest"]
+    assert llm.choose_gemini_model(listed) == "gemini-flash-latest"
+    no_alias = [n for n in listed if n != "gemini-flash-latest"]
+    assert llm.choose_gemini_model(no_alias) == "gemini-3.8-flash"
+    assert llm.choose_gemini_model(["gemini-3.8-flash", "gemini-3.10-flash"]) == "gemini-3.10-flash"
+
+
+def test_every_request_names_its_user_agent(monkeypatch):
+    """Groq's edge refuses Python's default agent with 403 / 1010 (P14-D25)."""
+    seen = {}
+
+    class Resp:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def read(self):
+            return b"{}"
+
+    def capture(req, timeout):
+        seen.update({k.lower(): v for k, v in req.header_items()})
+        return Resp()
+    monkeypatch.setattr(llm.urllib.request, "urlopen", capture)
+    llm._request("groq", "https://example.invalid", {"Authorization": "Bearer x"})
+    assert seen["user-agent"] == llm.USER_AGENT and "urllib" not in seen["user-agent"].lower()
+
+
+def test_a_fatal_failure_after_a_retryable_one_reports_both(contracted):
+    be, ws = contracted
+    limited = Scripted([], fail=ProviderError("gemini", "HTTP 429: quota", retryable=True))
+    blocked = Scripted([], fail=ProviderError("groq", "HTTP 403: 1010", retryable=False))
+    turn = agent.answer(ws, [], "hi", lock=lambda: be._workspace(ws),
+                        list_artifacts=lambda: be.list_artifacts(ws), providers=[limited, blocked])
+    assert "gemini: HTTP 429" in turn.error and "groq: HTTP 403" in turn.error
+
+
+def _http_error(code, body=b"{}", headers=None):
+    import io
+    import urllib.error
+    return urllib.error.HTTPError("https://x", code, "x", headers or {}, io.BytesIO(body))
+
+
+def test_a_busy_provider_is_waited_on_as_it_asks_then_succeeds(monkeypatch):
+    """P14-D26: Groq's own "try again in 3.9675s" is honoured, then the call goes through."""
+    waits, calls = [], []
+
+    class Ok:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def read(self):
+            return b'{"ok": true}'
+
+    def urlopen(req, timeout):
+        calls.append(1)
+        if len(calls) == 1:
+            raise _http_error(429, b'{"error":{"message":"Please try again in 3.9675s."}}')
+        return Ok()
+    monkeypatch.setattr(llm.urllib.request, "urlopen", urlopen)
+    monkeypatch.setattr(llm, "_sleep", waits.append)
+    assert llm._request("groq", "https://x", {}) == {"ok": True}
+    assert len(calls) == 2 and abs(waits[0] - (3.9675 + 0.25)) < 1e-6
+
+
+def test_a_long_wait_fails_over_instead_of_stalling(monkeypatch):
+    """A spent daily quota asks for longer than MAX_WAIT_S: no sleep, straight to the next
+    provider."""
+    waits = []
+    body = b'{"error":{"details":[{"retryDelay": "3600s"}]}}'
+
+    def urlopen(req, timeout):
+        raise _http_error(429, body)
+    monkeypatch.setattr(llm.urllib.request, "urlopen", urlopen)
+    monkeypatch.setattr(llm, "_sleep", waits.append)
+    with pytest.raises(ProviderError) as exc:
+        llm._request("gemini", "https://x", {})
+    assert exc.value.retryable and waits == []
+
+
+def test_a_503_is_retried_with_backoff_then_reported(monkeypatch):
+    waits = []
+    monkeypatch.setattr(llm.urllib.request, "urlopen",
+                        lambda req, timeout: (_ for _ in ()).throw(_http_error(503)))
+    monkeypatch.setattr(llm, "_sleep", waits.append)
+    with pytest.raises(ProviderError) as exc:
+        llm._request("gemini", "https://x", {})
+    assert exc.value.retryable and len(waits) == llm.ATTEMPTS - 1
+
+
+def test_groq_gets_json_schema_nullables_and_gemini_keeps_openapi():
+    """P14-D27: Groq refused gpt-oss's `question: null` because `nullable` is not JSON Schema."""
+    ra = next(s for s in agent.tool_specs() if s.name == "run_analysis")
+    assert ra.parameters["properties"]["question"] == {"type": "string", "nullable": True}
+    js = llm.to_json_schema(ra.parameters)
+    assert js["properties"]["question"] == {"type": ["string", "null"]}
+    assert js["properties"]["dataset_name"] == {"type": "string"}
+    q = llm.Groq()
+    session = q.start("s", [], "m", [ra])
+    sent = session._tools[0]["function"]["parameters"]["properties"]["question"]
+    assert sent == {"type": ["string", "null"]}
+
+
+def test_only_the_successful_attempts_artifacts_come_back(contracted):
+    """P14-D28: an attempt that drew a chart and then failed over leaves the chart in Files, not
+    under an answer that never mentions it."""
+    be, ws = contracted
+
+    class DrawsThenFails(Scripted):
+        def start(self, system, history, message, tools):
+            session = super().start(system, history, message, tools)
+            outer, step = self, session.step
+
+            def failing_step():
+                if not outer.replies:
+                    raise ProviderError("gemini", "HTTP 429", retryable=True)
+                return step()
+            session.step = failing_step
+            return session
+    first = DrawsThenFails([Reply(calls=[Call("1", "render_chart", {
+        "dataset_name": "clean_sales", "analysis_type": "frequency", "chart": "bar",
+        "column": "region", "y": "rows"})])])
+    second = Scripted([Reply(text="answered without a chart")])
+    turn = agent.answer(ws, [], "q", lock=lambda: be._workspace(ws),
+                        list_artifacts=lambda: be.list_artifacts(ws), providers=[first, second])
+    assert turn.reply == "answered without a chart" and turn.artifacts == []
+    assert any(a.kind == "chart" for a in be.list_artifacts(ws))  # still in Files
+
+
+def test_the_rules_forbid_inventing_units():
+    assert "no unit or currency" in agent.SYSTEM

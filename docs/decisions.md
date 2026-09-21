@@ -5999,3 +5999,40 @@ directories after the runs. Digests:
   96a3ce565bf36cd0f7f262ab9ef6d8b2d33909c41876ea3f87c6f80b351a5eee  tests/test_agent.py
   4473284668381e48d45e3a05b15b4f949df0585867214a87724d6c2b10df0205  tests/conftest.py
   756228f73d9009431328bc649ce3e8c15c91ee15107e1b8aec565df98baa2dba  scripts/agent_live.py
+
+## Phase 14, Step 4 - the live run, 22/09/2026
+
+P14-D25. MODELS AND HEADERS AS THE PROVIDERS ACTUALLY BEHAVE. String-sorted discovery chose
+gemini-omni-1.1-flash (free tier 429 at once); now gemini-flash-latest, else the highest-numbered
+plain flash model. gemini-2.5-flash, the name memory offered, is 404 for new users. Groq's edge
+refuses Python's default User-Agent (403 / 1010); every request names its agent. A fatal failure
+now reports every provider's failure, not the last.
+
+P14-D26. A BUSY PROVIDER IS WAITED ON, FOR ONE RATE-LIMIT WINDOW. Free tiers answered 503 and 429
+(Gemini 5 requests a minute; Groq 8,000 tokens a minute against ~5,000 per request). The wait the
+provider names is honoured up to 60 s and retried; a longer one fails over.
+
+P14-D27. EACH PROVIDER GETS ITS OWN SCHEMA DIALECT. Groq validates a model's call against the schema
+and refused gpt-oss's null for an optional field because nullable is OpenAPI. Groq gets JSON Schema
+type lists; Gemini keeps nullable.
+
+P14-D28. A TURN'S ARTIFACTS ARE THE SUCCESSFUL ATTEMPT'S. An attempt abandoned for failover may draw
+a chart; it stays in Files, not under an answer that never mentions it. And the model is told to
+add no unit or currency the contract does not state, after it wrote "$378,416.78".
+
+C98. THE ROLL-UP ROW WAS DRAWN AS A PEER. group_compare's (all) row became a sixth bar, four times the
+tallest region, and the chart's named maximum. It predates Track B and reached Claude Desktop the
+same way; nothing caught it because every chart test used results without a roll-up, and the Phase
+11 acceptance checked that a chart was drawn, not what it compared. Found by the first live agent
+answer, read against SQL. charts/render.py now leaves (all) out when other rows remain and says so;
+drawn when it is the only row. Falsified on the unfixed layer.
+
+THE LIVE CLAUSE IS CLOSED: a real model answered a real question through the loop with four tool
+calls, and every figure matched SQL computed without the tool (step document, L4).
+
+MEASURED VALIDATION, 22/09/2026. `uv run pytest -q`: 1821 -> 1832. Acceptance unchanged: 99/0/2,
+19/0/0, 35/0/1, 26/0/0, 36/0/0. Eval SCORE 76/76 (100%). UI 32. Digests:
+  10e05385475d41e5b6eb8d4ab6c90b677dfdc7458958a5786fd1afaf399fbfb2  src/analytics_agent/webapp/llm.py
+  0c91893bd7d52409a0ff6a017184df74fba258ec08b80bec3510d64356251793  src/analytics_agent/webapp/agent.py
+  7bf2f60c43531de944a5934f2149f1cc95cefd6cff54f65c1f5b664fcf129779  src/analytics_agent/charts/render.py
+  c98bef3a48fe5803468e7f445dfec1f0fabb1d99a829e0bdb855c3ed79508ea1  tests/test_agent.py

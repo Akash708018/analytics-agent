@@ -47,6 +47,8 @@ KINDS = ("line", "bar", "grouped_bar", "scatter", "histogram", "box", "heatmap",
 
 #: Kinds that plot one series against the x labels, and so need exactly one measure.
 _SINGLE = ("line", "bar", "histogram", "waterfall")
+#: The label group_compare and confidence_interval give the row computed over all the others.
+ROLLUP_LABEL = "(all)"
 
 _STAMP_FORMAT = "%Y%m%d-%H%M%S"
 _LABEL_RE = re.compile(r"^[A-Za-z][A-Za-z0-9_]*$")
@@ -171,7 +173,19 @@ def series_from_output(output, x: str | None = None, y: Sequence[str] | None = N
             f"{x_name!r} is not a column of this result. Columns: {', '.join(headers)}."
         )
     x_at = headers.index(x_name)
-    labels = [("" if r[x_at] is None else str(r[x_at])) for r in output.rows]
+    rows = output.rows
+    rollup_note: list[str] = []
+    # A roll-up row totals the rows beside it; drawn as a peer it dwarfs them and becomes the
+    # chart's "highest value". Found by the first live agent run: group_compare's (all) bar at
+    # 1.378e+06 beside regions of ~3e+05 (C98). Left in when it is the only row -- then it is the
+    # answer (confidence_interval with no dimension) -- and always kept in the table.
+    kept = [r for r in rows if r[x_at] != ROLLUP_LABEL]
+    if kept and len(kept) < len(rows):
+        rows = kept
+        rollup_note.append(
+            f"The {ROLLUP_LABEL} row totals the groups shown and is not drawn beside them; the "
+            f"table beside this chart still holds it.")
+    labels = [("" if r[x_at] is None else str(r[x_at])) for r in rows]
 
     if y is not None:
         wanted = [str(name) for name in y]
@@ -184,7 +198,7 @@ def series_from_output(output, x: str | None = None, y: Sequence[str] | None = N
     else:
         wanted = [
             h for i, h in enumerate(headers)
-            if i != x_at and is_numeric_column([r[i] for r in output.rows])
+            if i != x_at and is_numeric_column([r[i] for r in rows])
         ]
     if not wanted:
         raise ChartRefused(
@@ -194,9 +208,9 @@ def series_from_output(output, x: str | None = None, y: Sequence[str] | None = N
     series: list[Series] = []
     for name in wanted:
         at = headers.index(name)
-        series.append(Series(name=name, values=[as_number(r[at]) for r in output.rows]))
+        series.append(Series(name=name, values=[as_number(r[at]) for r in rows]))
 
-    dropped: list[str] = []
+    dropped: list[str] = list(rollup_note)
     for s in series:
         empty = len(s.values) - len(s.present)
         if empty:
