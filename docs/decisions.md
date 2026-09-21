@@ -5361,3 +5361,26 @@ failed, 2 skipped; test_phase9.py 19/0/0; test_phase10.py 35/0/1; test_phase11.p
 test_phase12.py 36 passed, 0 failed, 0 skipped. Full suite 1759, unchanged -- test_phase12.py is
 a script and pytest collects nothing from it, as with the other four. Digest:
   71694c84ab3fc6d8b4f0eab4d7a9c6bd1ba4b2457314289e2ecff853eb00c2d9  tests/test_phase12.py
+
+C86. THE ACCEPTANCE SCRIPT LEFT A FILE IN THE REPOSITORY, AND THE FIRST COMMIT OF THIS STEP
+CONTAINED IT. confirm_dataset_contract exports a YAML copy of the contract to docs/contracts/,
+which is outside the workspace and is meant to be version controlled -- the tool calls it "the
+copy for version control", and clean_sales.yaml has been tracked since Phase 7. That is right
+for real work and wrong for a test. workspace.reset() cleans the workspace and the export is not
+in it, so every run of tests/test_phase12.py left docs/contracts/merged_multiheader.yaml
+modified by a timestamp. `git add -A` swept it into 0a11796 before it had been looked at.
+
+Two things follow. The file is removed from the repository, because it is the output of a test
+rather than a record of work anybody did. And the script restores what it found -- deleting the
+export if there was none, rewriting the bytes if there was -- in the same `finally` that resets
+its workspace. The MCP tool takes no export root and should not: a client has no business
+choosing where the repository's copy goes.
+
+The reason this is worth an entry rather than a quiet fix is what it would have cost. The rule
+here is to run all six checks before committing; with this in place, running them leaves the
+tree dirty, so every commit after every acceptance run would carry a one-line timestamp change
+nobody intended. A discipline that reliably produces noise is one people stop reading, and the
+whole value of "read all six before committing" is that somebody reads them.
+
+MEASURED, 21/09/2026: after the fix, `uv run python tests/test_phase12.py` then
+`git status --short` prints nothing. 36 passed, 0 failed, 0 skipped, unchanged.
