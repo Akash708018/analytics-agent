@@ -1,0 +1,247 @@
+"""The render layer: what it draws, what it refuses, and what it says about a file nobody can see.
+
+The values an analysis hands over are display strings -- `base.number()` has already run -- so
+half of these tests are about the parse back. The other half are about Rule 4: a chart that
+returns a path and nothing else is the one failure this layer exists to prevent.
+"""
+
+from __future__ import annotations
+
+import sys
+from datetime import datetime
+from pathlib import Path
+
+import pytest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+import matplotlib.pyplot as plt  # noqa: E402
+
+from analytics_agent import workspace  # noqa: E402
+from analytics_agent.analysis.registry import Output  # noqa: E402
+from analytics_agent.charts.render import (  # noqa: E402
+    KINDS,
+    Chart,
+    ChartRefused,
+    as_number,
+    charts_dir,
+    is_numeric_column,
+    render,
+    series_from_output,
+)
+
+WORKSPACE = "charts_test"
+T1 = datetime(2026, 9, 21, 12, 0, 0)
+
+PNG_MAGIC = b"\x89PNG\r\n\x1a\n"
+
+
+@pytest.fixture
+def ws():
+    workspace.reset(WORKSPACE)
+    try:
+        yield WORKSPACE
+    finally:
+        workspace.reset(WORKSPACE)
+
+
+def out(rows=None, headers=None, summary=None) -> Output:
+    """An Output shaped the way every analysis builds one: strings and Nones."""
+    return Output(
+        headers=headers or ["group", "one", "two"],
+        rows=rows if rows is not None else [
+            ["south", "4.0", "1.0"],
+            ["north", "3.0", "2.5"],
+            ["east", "2.0", "3.0"],
+            ["west", "1,234.56", "4.0"],
+        ],
+        summary=summary or ["14 of 14 row(s) analysed."],
+        label="fake",
+    )
+
+
+# --- the parse back ------------------------------------------------------------------------
+
+def test_a_thousands_separator_survives_the_round_trip():
+    """base.number() writes '1,234.56'; an axis needs 1234.56."""
+    assert as_number("1,234.56") == 1234.56
+    assert as_number("11.5") == 11.5
+    assert as_number("6") == 6.0
+
+
+def test_a_negative_that_rounded_away_parses():
+    """Measured on a real Output: a skew of about -1e-9 renders as the string '-0'."""
+    assert as_number("-0") == 0.0
+
+
+def test_an_empty_cell_is_a_gap_not_a_zero():
+    """P8-D9 keeps None as None. A zero here would draw a point that is not in the data."""
+    assert as_number(None) is None
+    assert as_number("") is None
+    assert as_number("   ") is None
+
+
+def test_a_non_finite_value_is_refused_and_says_why():
+    """P8-D1 lets nan and inf reach a cell as text so a reader sees them. An axis cannot."""
+    for text in ("nan", "inf", "-inf"):
+        with pytest.raises(ChartRefused, match="finite"):
+            as_number(text)
+    with pytest.raises(ChartRefused, match="finite"):
+        as_number(float("nan"))
+
+
+def test_a_group_label_is_refused_as_a_measure():
+    with pytest.raises(ChartRefused, match="not a number"):
+        as_number("south")
+
+
+def test_a_boolean_is_not_a_magnitude():
+    with pytest.raises(ChartRefused, match="true/false"):
+        as_number(True)
+
+
+def test_a_column_is_numeric_only_when_every_filled_cell_parses():
+    assert is_numeric_column(["1", "2.5", None]) is True
+    assert is_numeric_column(["1", "south"]) is False
+    assert is_numeric_column([None, None]) is False
+
+
+# --- what gets extracted -------------------------------------------------------------------
+
+def test_the_first_column_is_the_x_and_the_numeric_rest_are_the_measures():
+    e = series_from_output(out())
+    assert e.x == ["south", "north", "east", "west"]
+    assert [s.name for s in e.series] == ["one", "two"]
+    assert e.series[0].values == [4.0, 3.0, 2.0, 1234.56]
+
+
+def test_naming_y_takes_only_that_measure():
+    e = series_from_output(out(), y=["two"])
+    assert [s.name for s in e.series] == ["two"]
+
+
+def test_a_column_that_is_not_there_is_refused_with_the_list():
+    with pytest.raises(ChartRefused, match="Columns: group, one, two"):
+        series_from_output(out(), y=["three"])
+
+
+def test_a_result_with_no_numeric_column_is_refused():
+    o = out(headers=["group", "note"], rows=[["a", "x"], ["b", "y"]])
+    with pytest.raises(ChartRefused, match="no column"):
+        series_from_output(o)
+
+
+def test_an_empty_result_is_refused_rather_than_drawn_blank():
+    with pytest.raises(ChartRefused, match="no rows"):
+        series_from_output(out(rows=[]))
+
+
+def test_empty_points_are_counted_and_named():
+    o = out(rows=[["a", "1.0", "2.0"], ["b", None, "3.0"]])
+    e = series_from_output(o)
+    assert len(e.dropped) == 1
+    assert "1 of 2 point(s) in one are empty" in e.dropped[0]
+
+
+# --- drawing -------------------------------------------------------------------------------
+
+def test_every_kind_the_guide_names_writes_a_png(ws):
+    """Eight kinds, guide line 943, each from an Output rather than from prepared numbers."""
+    single = {"line", "bar", "histogram", "waterfall"}
+    for kind in KINDS:
+        chart = render(ws, kind=kind, output=out(), label="k",
+                       y=["one"] if kind in single else None, now=T1)
+        assert chart.path.exists(), f"{kind} wrote nothing"
+        assert chart.path.read_bytes()[:8] == PNG_MAGIC, f"{kind} is not a PNG"
+        assert chart.path.suffix == ".png"
+
+
+def test_two_renders_of_the_same_data_are_byte_identical(ws):
+    """P11-D7 measured matplotlib writing no timestamp, which is what makes this assertable."""
+    a = render(ws, kind="bar", output=out(), label="same", y=["one"], now=T1)
+    b = render(ws, kind="bar", output=out(), label="same", y=["one"], now=T1)
+    assert a.path != b.path, "the collision counter did not fire"
+    assert a.path.read_bytes() == b.path.read_bytes()
+
+
+def test_a_chart_lands_in_the_workspace_charts_directory(ws):
+    chart = render(ws, kind="line", output=out(), label="where", y=["one"], now=T1)
+    assert chart.path.parent == charts_dir(ws)
+    assert chart.path.parent.name == "charts"
+
+
+def test_an_unknown_kind_is_refused_with_the_list():
+    with pytest.raises(ChartRefused, match="Available: line, bar"):
+        render(WORKSPACE, kind="piechart", output=out(), label="x")
+
+
+def test_a_label_that_is_not_a_filename_is_refused():
+    with pytest.raises(ChartRefused, match="becomes a filename"):
+        render(WORKSPACE, kind="line", output=out(), label="two words", y=["one"])
+
+
+def test_a_single_measure_kind_refuses_two_measures_and_says_to_name_one():
+    with pytest.raises(ChartRefused, match="Name one with y"):
+        render(WORKSPACE, kind="line", output=out(), label="x")
+
+
+def test_scatter_needs_two_measures():
+    with pytest.raises(ChartRefused, match="Two are needed"):
+        render(WORKSPACE, kind="scatter", output=out(), label="x", y=["one"])
+
+
+def test_a_row_with_an_empty_measure_is_dropped_and_reported(ws):
+    o = out(rows=[["a", "1.0", "2.0"], ["b", None, "3.0"], ["c", "3.0", "4.0"]])
+    chart = render(ws, kind="bar", output=o, label="holes", y=["one"], now=T1)
+    assert chart.drawn_count == 2
+    assert chart.point_count == 3
+    assert any("are empty and are not drawn" in n for n in chart.notes)
+
+
+def test_a_measure_that_is_entirely_empty_is_refused_rather_than_drawn(ws):
+    o = out(rows=[["a", None, "2.0"], ["b", None, "3.0"]])
+    with pytest.raises(ChartRefused, match="nothing to place"):
+        render(ws, kind="bar", output=o, label="empty", y=["one"], now=T1)
+
+
+def test_rendering_leaves_no_figure_open(ws):
+    """P11-D6: pyplot holds every figure it makes and this server does not exit between calls."""
+    plt.close("all")
+    for _ in range(3):
+        render(ws, kind="bar", output=out(), label="leak", y=["one"], now=T1)
+    assert plt.get_fignums() == []
+
+
+def test_a_refused_render_also_leaves_no_figure_open(ws):
+    """The finally, not the happy path. A refusal after the figure opens is the leak that hides."""
+    plt.close("all")
+    o = out(rows=[["a", None, "2.0"], ["b", None, "3.0"]])
+    with pytest.raises(ChartRefused):
+        render(ws, kind="bar", output=o, label="leak", y=["one"], now=T1)
+    assert plt.get_fignums() == []
+
+
+# --- Rule 4 --------------------------------------------------------------------------------
+
+def test_the_text_carries_the_path_the_counts_and_the_numbers(ws):
+    chart = render(ws, kind="bar", output=out(), label="rule4", y=["one"],
+                   dataset_name="olist", now=T1)
+    text = chart.to_text()
+    assert str(chart.path) in text
+    assert "You cannot see this image" in text
+    assert "4 of 4 point(s) drawn" in text
+    assert "group across the x axis" in text
+    assert "for olist" in text
+    # one = [4.0, 3.0, 2.0, 1234.56], so the lowest is 2 at east -- not 1, which is what
+    # this line asserted first and is why the series is spelled out here.
+    assert "lowest 2 at east" in text
+    assert "highest 1,235 at west" in text
+    assert "first 4, last 1,235" in text
+    assert "14 of 14 row(s) analysed." in text
+
+
+def test_there_is_no_accessor_that_returns_a_bare_path():
+    """util.results.Result makes the same promise: the one that exists is the one that gets used."""
+    names = [n for n in dir(Chart) if not n.startswith("_")]
+    assert "to_text" in names
+    assert not any(n in names for n in ("path_text", "as_path", "filename", "location"))

@@ -4831,3 +4831,83 @@ MEASURED VALIDATION, 21/09/2026. tests/test_matplotlib_facts.py: 7 passed. Full 
 test_phase10.py 35/0/1. No src/ file changed in this step -- it measures and builds nothing.
 Digest:
   c9cc25b93716e35c0cd90409ace493367a2919570a5f0823e762d0cc85163ab0  tests/test_matplotlib_facts.py
+
+## Phase 11, Step 2 - the render layer, 21/09/2026
+
+Step document: docs/steps/phase11_step2_render_layer.md. Scope agreed before building: the render
+layer only. `render_chart` is wired in Step 3, where the gate and the Rule 4 envelope get their
+own attention; nothing in this step is reachable from server.py, which is why all three
+acceptance scripts are unchanged.
+
+C82. THE TOOL SURFACE WAS ARGUED FOR ON A CLAIM THAT WAS ONE THIRD FALSE, AND THE CLAIM WAS
+CHECKED BEFORE IT COST ANYTHING. Choosing between charting an analysis result and charting a
+written CSV, the first was recommended partly because its values "stay typed" against a CSV where
+base.number() has already rendered them. Measured immediately after, on a real hypothesis_test
+Output: `[('a','str'), ('6','str'), ('11.5','str'), ('1.8708','str'), ('-0','str')]`. Every
+analysis builds its rows with number() and label(), so an Output cell is a display string or
+None and the parse back is unavoidable on either path. The two reasons that actually decided it
+survive -- the gate, and Output.summary carrying Rule 4's key values -- so the choice stands and
+the argument for it does not. Recorded because the failure mode is the one this file keeps
+naming: a claim about a thing, written without looking at the thing. It cost nothing here only
+because the look happened before the code did.
+
+P11-D8. THE PARSE BACK LIVES IN ONE FUNCTION. `as_number` is the inverse of `base.number()` and
+the only place a display string becomes a magnitude; the eight drawing branches see numbers and
+nothing else. It survives what number() produces: thousands separators, four-place rounding,
+trailing zeros stripped, a Decimal's own scale, None for an empty cell, and `-0` for a negative
+that rounded away -- measured on a real Output, not imagined. A dimension's member is a string
+that does not parse, which is also how `is_numeric_column` tells a measure column from a label
+column without reaching for a contract this layer cannot see.
+
+P11-D9. CHARTS LAND IN workspace/<id>/charts/, BESIDE results/ AND NOT INSIDE IT. Guide line 721
+puts charts in the workspace next to outputs. Beside rather than inside because a PNG is not a
+result file: `read_result_file` pages rows out of a CSV and can do nothing with an image, so a
+chart sharing that directory would be offered to a reader who cannot open it.
+
+P11-D10. THE CHART LAYER SCREENS NULLS AND SAYS HOW MANY IT DROPPED. P11-D4 measured `ax.bar` on
+a series holding a None raising `TypeError: unsupported operand type(s) for +: 'int' and
+'NoneType'` -- a message naming no column, no row and no chart. Every analysis here can return a
+None cell (P8-D9), so the points are dropped before matplotlib sees them and the Chart carries
+"N of M point(s) in <measure> are empty and are not drawn; the table beside this chart still
+holds them." That is P10-D36's rule in a new place: an artifact that quietly holds less than its
+caption claims is the failure, not the dropping.
+
+P11-D11. A NON-FINITE VALUE IS REFUSED RATHER THAN PLOTTED. P8-D1 lets nan and inf reach a cell
+as text so a reader sees them. An axis cannot show either, and a chart that silently omitted them
+would be a claim about a distribution that is not the one measured. `as_number` refuses the
+strings 'nan', 'inf', '-inf' and the float equivalents, naming P8-D1 in the message so a reader
+knows why the value exists at all.
+
+P11-D12. `Chart` HAS NO ACCESSOR THAT RETURNS A BARE PATH, AND A TEST ASSERTS THERE IS NONE.
+Modelled on util.results.Result and for the same reason, which Rule 4 states: the accessor that
+exists is the one that gets used. `to_text()` carries the path, how many of how many points were
+drawn, what is on each axis, the lowest and highest value of every measure and where each falls,
+the first and last, and the analysis's own summary sentences. A PNG is the one artifact in this
+engine that literally cannot be read back, so the description is not a convenience.
+
+P11-D13. THE FOUR SINGLE-MEASURE KINDS REFUSE A RESULT OFFERING MORE THAN ONE, AND NAME THE FIX.
+line, bar, histogram and waterfall draw one measure. Handed a result with two, they refuse with
+both names and "Name one with y" rather than picking the first, because picking would answer a
+question nobody asked -- the same reasoning P8's registry uses when an unknown analysis_type
+returns the valid list instead of something adjacent.
+
+P11-D14. THE FIGURE IS CLOSED IN A `finally`, AND THE REFUSAL PATH IS THE ONE TESTED. P11-D6
+measured pyplot holding a reference to every figure it makes, and this server does not exit
+between renders. The happy path closing is easy; the leak that hides is a refusal raised after
+the figure opens, so there is a test that provokes one and asserts `plt.get_fignums() == []`.
+
+P11-D15. GROUPED BAR AND WATERFALL ARE COMPOSITIONS, NOT ARTISTS. P11-D3 measured both: grouped
+bar is one `bar` call per measure at offset positions, waterfall is one `bar` with a running
+`bottom`. Recorded because neither has a matplotlib function to look for, and a later reader
+searching for one would conclude the library cannot do it.
+
+MEASURED VALIDATION, 21/09/2026. tests/test_charts_render.py: 26 passed. Full suite 1672 -> 1698.
+All eight kinds draw from a real Output shape and write a PNG whose first eight bytes are the
+magic number. Two renders of the same data are byte-identical, so the determinism P11-D7 measured
+is now load-bearing in a test rather than only recorded. Acceptance unchanged and expected to be:
+test_phase8.py 99 passed, 0 failed, 2 skipped; test_phase9.py 19/0/0; test_phase10.py 35/0/1 --
+nothing in src/ imports charts/ until Step 3. One test assertion was written wrong and caught by
+its own run: it expected the lowest value of [4.0, 3.0, 2.0, 1234.56] to be 1 rather than 2, and
+the corrected line spells the series out beside it. Digests:
+  6bd9de77dbed7ab25baee6689c54140f16ae45b8b25b924cf9e246a4a0c569eb  src/analytics_agent/charts/render.py
+  d62927aacb4d83f8080bb9a9895da80dcf874ca10435388f2087d8be4d8f25f5  tests/test_charts_render.py
