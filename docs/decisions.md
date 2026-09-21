@@ -4973,3 +4973,72 @@ be -- test_phase8.py 99/0/2, test_phase9.py 19/0/0, test_phase10.py 35/0/1 -- be
 them calls this tool, which is P11-O1. Digests:
   9f06a65dcd97af5ebc5587b551e0cb83419bf045a4a208ca11155fdce9ecf381  src/analytics_agent/server.py
   668b284220e0181092feb20953d705e70182ae3289697cc4102d6b203b9d62f2  tests/test_analysis_tool_docs.py
+
+## Phase 11, Step 3 - render_chart, 21/09/2026
+
+Step document: docs/steps/phase11_step3_render_chart.md.
+
+C84. THIS STEP'S DOCUMENT WAS WRITTEN AFTER THE STEP. Steps 1, 2 and 3a each had their plan and
+their predictions written before anything ran, and each recorded a prediction that turned out
+wrong -- the matplotlib version, the backend's capitalisation, the claim that an Output holds
+floats, the lowest value in a four-element list. Step 3 went from the design decision straight
+to building, and its document was assembled afterwards from the commands that had already run.
+Nothing in it is false and that is not the point: a document written afterwards cannot hold a
+prediction, and the predictions are where this method earns its cost. Recorded so the deviation
+is visible as a deviation rather than absorbed into a tidy-looking record, which is exactly what
+C61 through C76 are about.
+
+P11-D17. THE LADDER EVERY ANALYSIS CALL CLIMBS IS EXTRACTED, NOT COPIED. compute_analysis and
+render_chart share every step up to the Output: the contract gate, the registry lookup, the
+scope, the run, and the check that the result's first summary line is the method note. Each step
+has its own refusal text, so a second copy would be a second copy of six refusals. `_produce`
+holds them once and raises `_Refused` carrying what it would have returned; both tools catch it
+and return the text. P9-O6 records what two copies of one ruling do, and this is the same ruling
+six times over.
+
+P11-D18. A CHART GOES THROUGH THE GATE A TABLE GOES THROUGH, IN THE SAME WORDS. A chart is a
+claim about data, so a dataset with no confirmed contract is refused at render_chart exactly as
+at compute_analysis -- same reason code, same next_call. Tested rather than asserted in prose:
+render_chart on an ungated dataset returns NO_CONTRACT and names propose_dataset_contract.
+
+P11-D19. A CHART REFUSAL SAYS THE ANALYSIS WAS FINE. ChartRefused becomes ANALYSIS_NOT_POSSIBLE,
+and the detail line says "The numbers are not in question -- the analysis ran. This is about the
+shape a chart needs, which is not the shape this result has. Nothing was written." The next_call
+is compute_analysis for the same analysis, so a caller who wanted the answer still gets it. An
+agent told only "not possible" would doubt the data, which is the wrong lesson from a refusal
+about geometry.
+
+P11-D20. matplotlib IS IMPORTED INSIDE render_chart, NOT AT MODULE SCOPE. Twenty-two analysis
+modules and their tests import analytics_agent.analysis; none of them draws. A top-level import
+in tools.py would pull matplotlib, and through it numpy, into every one of those imports. The
+no-numpy rule is about what this engine's code imports, and the cheapest way to keep the tier
+honest is for the drawing dependency to load only when something draws.
+
+P11-D21. frequency OFFERS ONE MEASURE, BECAUSE share IS A PERCENTAGE. Measured while writing the
+chart tests, having assumed otherwise and watched two of them fail. frequency's columns are
+value, rows and share; share renders as a percentage string, which is not a magnitude, so
+is_numeric_column rejects it and only rows is plottable. A grouped bar of frequency is refused
+rather than drawn, and that is right -- two of its three columns are the same count in different
+clothes, and drawing them side by side would be one number twice. summary_stats is the
+multi-measure fixture instead, and the assumption is pinned in a test of its own so the next
+reader does not make it again.
+
+P11-D22. THE CLOSED TOOL ROSTER FIRED ON THE NEW TOOL, AS DESIGNED.
+test_tool_docs.py's `test_the_registered_tools_are_exactly_the_expected_ones` failed when
+render_chart appeared, and its own docstring says why that is the behaviour working: "Adding a
+tool is therefore two edits: the tool, and this set. That is the intended friction." Recorded
+beside C83, which is what happens when a roster is NOT closed: there the hand-typed parameter set
+used `<=` and could not fail, and six names went missing for two phases. Same file, two rosters,
+opposite outcomes, and the difference is the operator.
+
+MEASURED VALIDATION, 21/09/2026. Full suite 1699 -> 1712; thirteen added, ten on render_chart's
+behaviour and three guarding its parameter roster and its docstring. The roster guards are the
+Step 3a pair applied to the second tool, written in the step that added it rather than two phases
+later. Acceptance unchanged -- test_phase8.py 99 passed, 0 failed, 2 skipped; test_phase9.py
+19/0/0; test_phase10.py 35/0/1 -- because no acceptance script calls render_chart, which is
+P11-O1 and remains open. Digests:
+  c28f458cebc1fbed8559384481df204ff583e9f8975e7718763017b790db0874  src/analytics_agent/server.py
+  047cd5b50ca29ebd7076c8856705729a5ba655620ab25890dd1fa2a09e0e304a  src/analytics_agent/analysis/tools.py
+  5060ce7a1547d791bc85d368675387c6b17734d028f5ba5fcbcfe7b18e8a4b05  tests/test_analysis_tools.py
+  4842da5c05b6bc449abe723dde8aa564d64feb2b005238f0988935fe1fc4cb87  tests/test_analysis_tool_docs.py
+  621d19b653921144cf1d4c304f0b03061fef3cd7887491732fb94d51755aab71  tests/test_tool_docs.py

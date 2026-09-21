@@ -56,6 +56,106 @@ def _example_call(dataset_name: str) -> str:
     )
 
 
+class _Refused(Exception):
+    """A refusal already rendered, carried out of the shared path.
+
+    compute_analysis and render_chart share every step up to the Output -- the
+    gate, the lookup, the scope, the run, and the check that the result says
+    what it was computed over -- and each of those steps has its own refusal
+    text. Two copies of that ladder is two copies of one ruling, which P9-O6
+    records drifting apart, so the ladder lives once and raises what it would
+    otherwise have returned.
+    """
+
+    def __init__(self, text: str):
+        self.text = text
+        super().__init__(text)
+
+
+def _produce(con, dataset_name: str, analysis_type: str, params: dict):
+    """Gate, look up, scope, run, and check the result describes itself.
+
+    Returns `(gate, output)`. Raises `_Refused` carrying the rendered refusal,
+    which is the only shape this package produces for a caller.
+    """
+    try:
+        gate = require_contract(con, dataset_name)
+    except ContractRefused as exc:
+        raise _Refused(str(exc)) from None
+
+    # The MCP wrapper declares every parameter any analysis takes, because
+    # FastMCP builds the JSON schema from the signature and **params exposes
+    # nothing -- the agent would see a tool it cannot pass a column to. So it
+    # passes all of them and the ones nobody gave arrive as None. Dropping
+    # them here rather than there keeps server.py's rule that a tool calls one
+    # function and returns what it gets back, and lets each analysis apply its
+    # own default instead of a second copy of that default living upstream.
+    params = {k: v for k, v in params.items() if v is not None}
+
+    try:
+        analysis = get(analysis_type)
+    except UnknownAnalysis as exc:
+        raise _Refused(Refusal(
+            reason=Reason.ANALYSIS_NOT_FOUND,
+            what=str(exc),
+            why=(
+                "an analysis is looked up by name, and a name nobody "
+                "registered cannot be guessed at -- running something adjacent "
+                "would answer a question that was not asked."
+            ),
+            state=f"available: {_catalogue_text()}",
+            next_call=_example_call(dataset_name),
+        ).to_text()) from None
+
+    try:
+        scope = scope_for(con, gate)
+        output = analysis.run(con, gate, scope, **params)
+    except LostRows as exc:
+        raise _Refused(_unsound(dataset_name, str(exc))) from None
+    except ScopeError as exc:
+        raise _Refused(Refusal(
+            reason=Reason.ANALYSIS_NOT_POSSIBLE,
+            what=f"the rows {analysis_type} would run over cannot be selected.",
+            why=str(exc),
+            state=f"contract v{gate.version} for {dataset_name}",
+            next_call=f'validate_dataset(dataset_name="{dataset_name}")',
+        ).to_text()) from None
+    except UnsafeSQL as exc:
+        raise _Refused(Refusal(
+            reason=Reason.ANALYSIS_NOT_POSSIBLE,
+            what=f"{analysis_type} could not be run against {dataset_name}.",
+            why=str(exc),
+            state=f"contract v{gate.version} for {dataset_name}",
+            next_call=f'propose_dataset_contract(dataset_name="{dataset_name}")',
+        ).to_text()) from None
+    except (TypeError, ParamsInvalid) as exc:
+        raise _Refused(Refusal(
+            reason=Reason.ANALYSIS_PARAMS_INVALID,
+            what=f"{analysis_type} was called with arguments it cannot take.",
+            why=str(exc),
+            state=f"{analysis_type}: {get(analysis_type).summary}",
+            next_call=_example_call(dataset_name),
+        ).to_text()) from None
+    except ValueError as exc:
+        raise _Refused(Refusal(
+            reason=Reason.ANALYSIS_NOT_POSSIBLE,
+            what=f"{analysis_type} cannot answer that under this contract.",
+            why=str(exc),
+            state=f"contract v{gate.version} for {dataset_name}",
+            next_call=f'propose_dataset_contract(dataset_name="{dataset_name}")',
+        ).to_text()) from None
+
+    note = scope.method_note()
+    if not output.summary or output.summary[0] != note:
+        raise _Refused(_unsound(
+            dataset_name,
+            f"{analysis_type} returned a result whose first summary line is "
+            f"not the method note for the scope it was given. Nothing says "
+            f"what these numbers were computed over.",
+        ))
+    return gate, output
+
+
 def compute_analysis(
     con,
     workspace_id: str,
@@ -70,81 +170,9 @@ def compute_analysis(
     optional, which is locked decision 20.
     """
     try:
-        gate = require_contract(con, dataset_name)
-    except ContractRefused as exc:
-        return str(exc)
-
-    # The MCP wrapper declares every parameter any of the twenty-one takes,
-    # because FastMCP builds the JSON schema from the signature and
-    # **params exposes nothing -- the agent would see a tool it cannot pass
-    # a column to. So it passes all of them and the ones nobody gave arrive
-    # as None. Dropping them here rather than there keeps server.py's rule
-    # that a tool calls one function and returns what it gets back, and
-    # lets each analysis apply its own default instead of a second copy of
-    # that default living upstream.
-    params = {k: v for k, v in params.items() if v is not None}
-
-    try:
-        analysis = get(analysis_type)
-    except UnknownAnalysis as exc:
-        return Refusal(
-            reason=Reason.ANALYSIS_NOT_FOUND,
-            what=str(exc),
-            why=(
-                "an analysis is looked up by name, and a name nobody "
-                "registered cannot be guessed at -- running something adjacent "
-                "would answer a question that was not asked."
-            ),
-            state=f"available: {_catalogue_text()}",
-            next_call=_example_call(dataset_name),
-        ).to_text()
-
-    try:
-        scope = scope_for(con, gate)
-        output = analysis.run(con, gate, scope, **params)
-    except LostRows as exc:
-        return _unsound(dataset_name, str(exc))
-    except ScopeError as exc:
-        return Refusal(
-            reason=Reason.ANALYSIS_NOT_POSSIBLE,
-            what=f"the rows {analysis_type} would run over cannot be selected.",
-            why=str(exc),
-            state=f"contract v{gate.version} for {dataset_name}",
-            next_call=f'validate_dataset(dataset_name="{dataset_name}")',
-        ).to_text()
-    except UnsafeSQL as exc:
-        return Refusal(
-            reason=Reason.ANALYSIS_NOT_POSSIBLE,
-            what=f"{analysis_type} could not be run against {dataset_name}.",
-            why=str(exc),
-            state=f"contract v{gate.version} for {dataset_name}",
-            next_call=f'propose_dataset_contract(dataset_name="{dataset_name}")',
-        ).to_text()
-    except (TypeError, ParamsInvalid) as exc:
-        return Refusal(
-            reason=Reason.ANALYSIS_PARAMS_INVALID,
-            what=f"{analysis_type} was called with arguments it cannot take.",
-            why=str(exc),
-            state=f"{analysis_type}: {get(analysis_type).summary}",
-            next_call=_example_call(dataset_name),
-        ).to_text()
-    except ValueError as exc:
-        return Refusal(
-            reason=Reason.ANALYSIS_NOT_POSSIBLE,
-            what=f"{analysis_type} cannot answer that under this contract.",
-            why=str(exc),
-            state=f"contract v{gate.version} for {dataset_name}",
-            next_call=f'propose_dataset_contract(dataset_name="{dataset_name}")',
-        ).to_text()
-
-    note = scope.method_note()
-    if not output.summary or output.summary[0] != note:
-        return _unsound(
-            dataset_name,
-            f"{analysis_type} returned a result whose first summary line is "
-            f"not the method note for the scope it was given. Nothing says "
-            f"what these numbers were computed over.",
-        )
+        gate, output = _produce(con, dataset_name, analysis_type, params)
+    except _Refused as exc:
+        return exc.text
 
     result = results.write_result(
         workspace_id,
@@ -155,6 +183,68 @@ def compute_analysis(
         dataset_name=dataset_name,
     )
     return f"{gate.header()}\n\n{result.to_text()}"
+
+
+def render_chart(
+    con,
+    workspace_id: str,
+    dataset_name: str,
+    analysis_type: str,
+    chart: str,
+    x: str | None = None,
+    y: str | None = None,
+    title: str | None = None,
+    **params,
+) -> str:
+    """Run one analysis and draw it, under the same contract and the same gate.
+
+    A chart is a claim about data, so it goes through the gate a table goes
+    through -- `_produce` is the same ladder `compute_analysis` climbs, and a
+    dataset with no confirmed contract is refused here for the same reason and
+    in the same words.
+
+    Returns the contract header and the chart envelope, or a refusal. Never a
+    path on its own: Rule 4 exists because a PNG is the one artifact in this
+    engine a caller literally cannot read back.
+    """
+    # Imported here rather than at module scope so that importing the analysis
+    # package does not import matplotlib, and through it numpy. Twenty-two
+    # analysis modules and their tests import this package; none of them draws.
+    from ..charts.render import ChartRefused, render
+
+    try:
+        gate, output = _produce(con, dataset_name, analysis_type, params)
+    except _Refused as exc:
+        return exc.text
+
+    try:
+        drawn = render(
+            workspace_id,
+            kind=chart,
+            output=output,
+            label=output.label,
+            dataset_name=dataset_name,
+            x=x,
+            y=[y] if y else None,
+            title=title,
+        )
+    except ChartRefused as exc:
+        return Refusal(
+            reason=Reason.ANALYSIS_NOT_POSSIBLE,
+            what=f"{analysis_type} was computed and cannot be drawn as a {chart!r} chart.",
+            why=str(exc),
+            detail=(
+                "The numbers are not in question -- the analysis ran. This is "
+                "about the shape a chart needs, which is not the shape this "
+                "result has. Nothing was written."
+            ),
+            state=f"contract v{gate.version} for {dataset_name}",
+            next_call=(
+                f'compute_analysis(dataset_name="{dataset_name}", '
+                f'analysis_type="{analysis_type}")'
+            ),
+        ).to_text()
+    return f"{gate.header()}\n\n{drawn.to_text()}"
 
 
 def _unsound(dataset_name: str, why: str) -> str:
@@ -172,4 +262,4 @@ def _unsound(dataset_name: str, why: str) -> str:
     ).to_text()
 
 
-__all__ = ["compute_analysis"]
+__all__ = ["compute_analysis", "render_chart"]

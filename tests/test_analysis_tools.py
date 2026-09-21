@@ -189,6 +189,96 @@ def test_each_analysis_writes_under_its_own_label(con):
     assert any(n.startswith("frequency_") for n in names)
 
 
+# --- charts
+
+
+def draw(con, analysis_type="frequency", chart="bar", dataset_name="sales", **params):
+    return tools.render_chart(
+        con, WORKSPACE, dataset_name, analysis_type, chart, **params)
+
+
+def test_a_chart_carries_the_contract_header_and_the_envelope(con):
+    """Rule 4, and the gate. A chart is a claim about data, so it goes through what a table
+    goes through and says which contract it was drawn under."""
+    text = draw(con, "frequency", "bar", column="status", y="rows")
+    assert text.startswith("Under contract v1 for sales:")
+    assert "Chart written:" in text
+    assert "You cannot see this image" in text
+
+
+def test_the_png_it_names_is_really_there_and_is_a_png(con):
+    text = draw(con, "frequency", "bar", column="status", y="rows")
+    named = [ln.split("Chart written: ", 1)[1].strip()
+             for ln in text.splitlines() if ln.startswith("Chart written: ")]
+    assert len(named) == 1, text
+    path = Path(named[0])
+    assert path.exists()
+    assert path.read_bytes()[:8] == b"\x89PNG\r\n\x1a\n"
+    assert path.parent.name == "charts"
+
+
+def test_a_chart_reports_the_numbers_a_reader_cannot_see(con):
+    text = draw(con, "frequency", "bar", column="status", y="rows")
+    assert "point(s) drawn" in text
+    assert "lowest" in text and "highest" in text
+    assert "rows" in text
+
+
+def test_no_contract_refuses_a_chart_in_the_same_words_as_a_table(con):
+    text = draw(con, dataset_name="other", column="status", y="rows")
+    assert reason_of(text) is Reason.NO_CONTRACT
+    assert 'propose_dataset_contract(dataset_name="other")' in text
+
+
+def test_an_unknown_analysis_is_refused_before_anything_is_drawn(con):
+    text = draw(con, "summry_stats", "bar")
+    assert reason_of(text) is Reason.ANALYSIS_NOT_FOUND
+
+
+def test_an_unknown_chart_kind_is_refused_and_names_the_ones_that_exist(con):
+    text = draw(con, "frequency", "piechart", column="status")
+    assert reason_of(text) is Reason.ANALYSIS_NOT_POSSIBLE
+    assert "line, bar" in text
+
+
+def test_a_chart_refusal_says_the_analysis_was_fine(con):
+    """The distinction worth spending a sentence on: the numbers ran, the shape does not fit.
+    An agent told only 'not possible' would doubt the data."""
+    text = draw(con, "summary_stats", "line")
+    assert reason_of(text) is Reason.ANALYSIS_NOT_POSSIBLE
+    assert "The numbers are not in question" in text
+    assert "Nothing was written." in text
+    assert 'compute_analysis(dataset_name="sales"' in text
+
+
+def test_naming_y_resolves_the_one_measure_a_line_needs(con):
+    """The refusal above names the fix; this is the fix working."""
+    text = draw(con, "summary_stats", "line", y="mean")
+    assert reason_of(text) is None
+    assert "Chart written:" in text
+
+
+def test_a_kind_that_wants_two_measures_gets_them_without_y(con):
+    for kind in ("grouped_bar", "scatter", "heatmap", "box"):
+        text = draw(con, "summary_stats", kind)
+        assert reason_of(text) is None, f"{kind}: {text.splitlines()[0]}"
+
+
+def test_frequency_offers_one_measure_because_share_is_a_percentage(con):
+    """Measured while writing these tests, having assumed otherwise. frequency's columns are
+    value, rows and share, and share is rendered as a percentage -- a string that is not a
+    magnitude, so is_numeric_column rejects it and only rows is plottable. A grouped bar of
+    frequency is therefore refused rather than drawn, which is right: two of its three columns
+    are the same count in different clothes."""
+    text = draw(con, "frequency", "grouped_bar", column="status")
+    assert reason_of(text) is Reason.ANALYSIS_NOT_POSSIBLE
+    assert "draws two or more measures" in text
+
+    ok = draw(con, "frequency", "bar", column="status")
+    assert reason_of(ok) is None, ok.splitlines()[0]
+    assert "measure rows" in ok
+
+
 # --- the refusals
 
 

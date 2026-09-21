@@ -881,6 +881,100 @@ def compute_analysis(
 
 
 @mcp.tool(annotations=READ_ONLY)
+def render_chart(
+    dataset_name: str,
+    analysis_type: str,
+    chart: str,
+    column: str | None = None,
+    dimension: str | None = None,
+    measure: str | None = None,
+    against: str | None = None,
+    rows: str | None = None,
+    columns: str | None = None,
+    limit: int | None = None,
+    n: int | None = None,
+    bins: int | None = None,
+    threshold: float | None = None,
+    before_start: str | None = None,
+    before_end: str | None = None,
+    after_start: str | None = None,
+    after_end: str | None = None,
+    period: str | None = None,
+    baseline: str | None = None,
+    grain: str | None = None,
+    second_dimension: str | None = None,
+    method: str | None = None,
+    entity: str | None = None,
+    confidence: float | None = None,
+    alpha: float | None = None,
+    power: float | None = None,
+    x: str | None = None,
+    y: str | None = None,
+    title: str | None = None,
+    workspace_id: str | None = None,
+) -> str:
+    """Draw one analysis as a chart, under the contract in force.
+
+    Call this with the same arguments you would give compute_analysis, plus
+    chart. The analysis runs the same way and through the same gate; a dataset
+    with no confirmed contract is refused here exactly as it is there.
+
+    You cannot see the image this writes. Do not describe it from the filename
+    or from what you expected -- the reply states what was plotted, how many
+    points were drawn of how many the result held, and the lowest, highest,
+    first and last value of every measure with the group each falls at. Report
+    those numbers. If you need the whole table, call compute_analysis.
+
+    chart is one of:
+
+      line          one measure across the groups in the order they came.
+                    For calendar_coverage, trend, seasonality, period_compare.
+      bar           one measure per group. For frequency, top_n, group_compare,
+                    ranking_shift.
+      grouped_bar   two or more measures side by side per group. For cross_tab
+                    and period_compare.
+      scatter       the first measure against the second, one point per row.
+                    For correlation and bivariate.
+      histogram     one measure binned by value. For distribution.
+      box           the spread of each measure. For summary_stats and
+                    outlier_detection.
+      heatmap       every measure shaded across the groups. For cross_tab and
+                    cohort_retention.
+      waterfall     one measure stacked so each bar starts where the last
+                    ended. For mix_shift and growth_decomposition, where the
+                    parts sum to the whole.
+
+    line, bar, histogram and waterfall draw one measure. If the result holds
+    more than one, name the one you want with y rather than letting the tool
+    pick -- it will refuse and list them instead of choosing.
+
+    x names the column along the bottom and defaults to the result's first,
+    which is the group. title defaults to the analysis and the chart kind.
+
+    Empty cells are not drawn and the reply says how many were left out. A
+    value that is not a finite number is refused rather than quietly omitted,
+    because a chart missing a point it does not mention is a claim about a
+    distribution that was not measured.
+    """
+    wid = workspace_id or DEFAULT_WORKSPACE_ID
+    con = db.connect(wid)
+    try:
+        return analysis_tools.render_chart(
+            con, wid, dataset_name, analysis_type, chart,
+            x=x, y=y, title=title,
+            column=column, dimension=dimension, measure=measure,
+            against=against, rows=rows, columns=columns, limit=limit, n=n,
+            bins=bins, threshold=threshold, before_start=before_start,
+            before_end=before_end, after_start=after_start,
+            after_end=after_end, period=period, baseline=baseline, grain=grain,
+            second_dimension=second_dimension, method=method, entity=entity,
+            confidence=confidence, alpha=alpha, power=power,
+        )
+    finally:
+        con.close()
+
+
+@mcp.tool(annotations=READ_ONLY)
 def profile_dataset(
     dataset_name: str,
     missing_values: list[str] | None = None,

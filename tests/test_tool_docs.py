@@ -85,6 +85,7 @@ EXPECTED_TOOLS = {
     "run_analysis",
     "show_limits",
     "validate_dataset",
+    "render_chart",
 }
 
 

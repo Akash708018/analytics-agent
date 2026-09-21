@@ -149,3 +149,55 @@ def test_it_is_annotated_read_only(tool):
     annotations = [kw.value.id for kw in dec.keywords
                    if kw.arg == "annotations" and isinstance(kw.value, ast.Name)]
     assert annotations == ["READ_ONLY"]
+
+
+@pytest.fixture(scope="module")
+def chart_tool() -> ast.FunctionDef:
+    tree = ast.parse(SERVER.read_text())
+    found = [n for n in ast.walk(tree)
+             if isinstance(n, ast.FunctionDef) and n.name == "render_chart"]
+    if not found:
+        pytest.skip("render_chart is not registered yet; see Phase 11 Step 3")
+    return found[0]
+
+
+def test_render_chart_declares_every_parameter_an_analysis_takes(chart_tool):
+    """It runs the same analyses through the same gate, so it needs the same roster.
+    Derived from the registry for the reason C83 records: a hand-typed one goes stale."""
+    wanted = _wanted()
+    names = {a.arg for a in chart_tool.args.args}
+    missing = sorted(set(wanted) - names)
+    assert not missing, (
+        "render_chart does not declare "
+        + "; ".join(f"{p} (wanted by {', '.join(sorted(wanted[p]))})" for p in missing)
+    )
+    assert {"dataset_name", "analysis_type", "chart"} <= names
+    assert chart_tool.args.kwarg is None, "a **kwargs here would expose no schema"
+
+
+def test_render_chart_forwards_every_parameter_it_declares(chart_tool):
+    """C83 was declared-and-dropped in one tool. This is the guard on the second one,
+    written in the same step that added it rather than two phases later."""
+    call = next(
+        (n for n in ast.walk(chart_tool)
+         if isinstance(n, ast.Call) and getattr(n.func, "attr", "") == "render_chart"),
+        None,
+    )
+    assert call is not None, "render_chart does not delegate to the analysis layer"
+    forwarded = {k.arg for k in call.keywords}
+    declared = {a.arg for a in chart_tool.args.args} - {
+        "dataset_name", "analysis_type", "chart", "workspace_id",
+    }
+    dropped = sorted(declared - forwarded)
+    assert not dropped, f"declared by render_chart and never passed on: {', '.join(dropped)}"
+
+
+def test_render_chart_tells_the_agent_it_cannot_see_the_image(chart_tool):
+    """Rule 4 is the whole reason this tool returns prose. The docstring has to say so,
+    because the model reads the docstring and not the guide."""
+    doc = ast.get_docstring(chart_tool) or ""
+    assert "cannot see" in doc
+    assert "Do not describe it from the filename" in doc
+    for kind in ("line", "bar", "grouped_bar", "scatter", "histogram", "box",
+                 "heatmap", "waterfall"):
+        assert kind in doc, f"{kind} is not named in the docstring"
