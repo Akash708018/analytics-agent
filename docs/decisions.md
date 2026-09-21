@@ -5162,3 +5162,65 @@ tests/, so every figure is the baseline restated after the fact: full suite 1714
 test_phase8.py 99 passed, 0 failed, 2 skipped; test_phase9.py 19/0/0; test_phase10.py 35/0/1;
 test_phase11.py 26 passed, 0 failed, 0 skipped. Measured before the step and again before the
 commit.
+
+## Phase 12, Step 2 - the run record, 21/09/2026
+
+Step document: docs/steps/phase12_step2_run_record.md, written before the run with six
+predictions. Five held; the sixth is P12-D10.
+
+CLOSED. P12-O1, 21/09/2026. src/analytics_agent/analysis/runs.py records what each analysis and
+each chart was called with, so the reproduction appendix can render an invocation rather than
+infer one from a filename. Measured end to end before any test was written:
+`compute_analysis(dataset_name="clean_sales", analysis_type="top_n", dimension="region",
+measure="revenue", n=3)` and `render_chart(dataset_name="clean_sales",
+analysis_type="frequency", chart="line", column="region", y="rows")`, each beside its artifact
+and its method note.
+
+P12-D5. THE SIXTH MODULE THAT KEEPS ITS OWN RUNS, AND IT LOOKS LIKE THE OTHER FIVE. ensure_table,
+record, latest, history, appended and never updated, in `_agent_analysis_runs` -- the
+BOOKKEEPING_PREFIX that state.py:197 filters out of the dataset list, imported from
+profile/runs.py the way validate/runs, clean/plan, clean/ledger and clean/apply all import it.
+Deliberately unoriginal. A sixth spelling of a convention five modules share would be the thing
+this ledger keeps recording.
+
+P12-D6. ONE TABLE FOR ANALYSES AND CHARTS, WITH THE CHART COLUMNS NULLABLE. A chart run is an
+analysis run that also drew something. Two tables would need a join nobody would maintain, and
+the single row is what links a PNG to the analysis that produced it -- which the report's
+"findings with charts" section needs as much as the appendix needs the parameters. Nothing else
+in the workspace connects the two: a chart's filename carries its analysis label and a timestamp,
+and two charts of the same analysis are indistinguishable by it.
+
+P12-D7. THE PARAMETERS ARE STORED, NOT THE RENDERED CALL. `call()` builds the line at read time
+from a dict, sorted by key, so two runs of one analysis with the arguments given in different
+orders produce the same appendix line -- a test asserts that, because a reader comparing two
+reports should not see a difference that is not one. Storing the rendered string instead would
+freeze today's spelling of a call into a permanent record.
+
+P12-D8. RECORDING HAPPENS AFTER SUCCESS, SO A REFUSED CALL RECORDS NOTHING. The appendix lists
+what ran, not what was attempted: a refusal is a sentence the caller already has, and it is not
+a step in reproducing the work. Tested on all three refusal shapes -- unknown analysis, invalid
+parameters, no contract -- and the count stays at zero.
+
+P12-D9. x, y AND title ARE STORED BESIDE THE ANALYSIS PARAMETERS. They are chart arguments
+rather than analysis arguments, and they belong in the record for the same reason the others do:
+a chart drawn with y="rows" is not the same chart without it, and an appendix line that omits it
+reproduces a different image or a refusal.
+
+P12-D10. NOTHING ASSERTS WHAT A WORKSPACE CONTAINS AFTER AN ANALYSIS. The step document
+predicted at least one existing test would notice a new table being written on every analysis
+call. None did: the suite stayed at 1714 across the whole wiring and moved only when the new
+tests arrived. The prediction was wrong and the reason is worth keeping -- a new bookkeeping
+table, written by every analysis in the engine, is invisible to 1,714 tests and four acceptance
+scripts. That is fine here and it is not nothing: the same silence would greet a table written
+by mistake.
+
+MEASURED VALIDATION, 21/09/2026. Full suite 1714 -> 1732; fifteen unit tests on the record and
+the call renderer, three on the tools recording through it. One of those three failed first and
+the failure was the test's: it named a column the fixture does not have, so the call was refused
+and nothing was recorded, which is P12-D8 working. Acceptance unchanged: test_phase8.py 99
+passed, 0 failed, 2 skipped; test_phase9.py 19/0/0; test_phase10.py 35/0/1; test_phase11.py
+26/0/0. Digests:
+  815ec11b216453089f79e97ea5f54a6eb4d083cd025ebd699302fab6441f9920  src/analytics_agent/analysis/runs.py
+  872c2bf5ceb09dbc1863cf318dc635913347d8c2da8f663a09d15d9768f3fbcc  src/analytics_agent/analysis/tools.py
+  e3b4846b6195364c90403cbaec8a27d2acc4e550dc222bc56d86f688c63a5cd3  tests/test_analysis_runs.py
+  720d9ad70d88f46a7b033e127c1a79b498664fea61ae66407a3e0f78cc2b5840  tests/test_analysis_tools.py

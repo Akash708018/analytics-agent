@@ -189,6 +189,51 @@ def test_each_analysis_writes_under_its_own_label(con):
     assert any(n.startswith("frequency_") for n in names)
 
 
+# --- the run record
+
+
+def test_a_successful_analysis_records_the_call_that_produced_it(con):
+    """P12-O1. Before this, top_n_<stamp>.csv said an analysis called top_n ran at a time and
+    nothing said what it was called with."""
+    from analytics_agent.analysis import runs
+
+    # This fixture's columns are id, status, ts and amount. The first version of this test
+    # asked for dimension="region", which clean_sales has and this does not, so the call was
+    # refused and nothing was recorded -- which is the behaviour working, and was read as a
+    # failure of the record for about a minute.
+    run(con, "top_n", dimension="status", measure="amount", n=3)
+    recorded = runs.history(con, "sales")
+    assert len(recorded) == 1
+    assert recorded[0].call() == (
+        'compute_analysis(dataset_name="sales", analysis_type="top_n", '
+        'dimension="status", measure="amount", n=3)'
+    )
+    assert recorded[0].result_path and recorded[0].result_path.endswith(".csv")
+    assert recorded[0].method_note()
+
+
+def test_a_chart_records_its_kind_and_its_png(con):
+    from analytics_agent.analysis import runs
+
+    draw(con, "frequency", "bar", column="status")
+    recorded = runs.charts(con, "sales")
+    assert len(recorded) == 1
+    assert recorded[0].chart_kind == "bar"
+    assert recorded[0].chart_path.endswith(".png")
+    assert 'chart="bar"' in recorded[0].call()
+
+
+def test_a_refused_call_records_nothing(con):
+    """The appendix lists what ran, not what was attempted. A refusal is a sentence the caller
+    already has; it is not a step in reproducing the work."""
+    from analytics_agent.analysis import runs
+
+    assert reason_of(run(con, "summry_stats")) is Reason.ANALYSIS_NOT_FOUND
+    assert reason_of(run(con, "summary_stats", n=5)) is Reason.ANALYSIS_PARAMS_INVALID
+    assert reason_of(run(con, dataset_name="other")) is Reason.NO_CONTRACT
+    assert runs.count(con) == 0
+
+
 # --- charts
 
 

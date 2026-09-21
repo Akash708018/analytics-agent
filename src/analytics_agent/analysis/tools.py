@@ -35,6 +35,7 @@ from analytics_agent.util import results
 from analytics_agent.util.sql_guard import UnsafeSQL
 
 from .base import LostRows, ParamsInvalid, ScopeError, scope_for
+from . import runs
 from .registry import UnknownAnalysis, catalogue, get
 
 
@@ -75,8 +76,12 @@ class _Refused(Exception):
 def _produce(con, dataset_name: str, analysis_type: str, params: dict):
     """Gate, look up, scope, run, and check the result describes itself.
 
-    Returns `(gate, output)`. Raises `_Refused` carrying the rendered refusal,
-    which is the only shape this package produces for a caller.
+    Returns `(gate, output, params)` -- the parameters as stripped, because those are what was
+    actually passed to the analysis and what analysis/runs.py has to store for the reproduction
+    appendix to render a call rather than guess one.
+
+    Raises `_Refused` carrying the rendered refusal, which is the only shape this package
+    produces for a caller.
     """
     try:
         gate = require_contract(con, dataset_name)
@@ -153,7 +158,7 @@ def _produce(con, dataset_name: str, analysis_type: str, params: dict):
             f"not the method note for the scope it was given. Nothing says "
             f"what these numbers were computed over.",
         ))
-    return gate, output
+    return gate, output, params
 
 
 def compute_analysis(
@@ -170,7 +175,7 @@ def compute_analysis(
     optional, which is locked decision 20.
     """
     try:
-        gate, output = _produce(con, dataset_name, analysis_type, params)
+        gate, output, used = _produce(con, dataset_name, analysis_type, params)
     except _Refused as exc:
         return exc.text
 
@@ -181,6 +186,18 @@ def compute_analysis(
         rows=output.rows,
         summary=output.summary,
         dataset_name=dataset_name,
+    )
+    # Recorded after the result exists, so a refused call records nothing. P12-D3 measured what
+    # the file keeps -- its table, and nothing about the call that made it.
+    runs.record(
+        con,
+        dataset_name=dataset_name,
+        analysis_type=analysis_type,
+        params=used,
+        contract_version=getattr(gate, "version", None),
+        row_count=result.row_count,
+        result_path=str(result.path),
+        summary=output.summary,
     )
     return f"{gate.header()}\n\n{result.to_text()}"
 
@@ -213,7 +230,7 @@ def render_chart(
     from ..charts.render import ChartRefused, render
 
     try:
-        gate, output = _produce(con, dataset_name, analysis_type, params)
+        gate, output, used = _produce(con, dataset_name, analysis_type, params)
     except _Refused as exc:
         return exc.text
 
@@ -244,6 +261,23 @@ def render_chart(
                 f'analysis_type="{analysis_type}")'
             ),
         ).to_text()
+
+    # x, y and title are stored beside the analysis parameters because call() has to render an
+    # invocation somebody can retype, and a chart drawn with y="rows" is not the same chart
+    # without it.
+    drawn_with = dict(used)
+    drawn_with.update({k: v for k, v in (("x", x), ("y", y), ("title", title)) if v is not None})
+    runs.record(
+        con,
+        dataset_name=dataset_name,
+        analysis_type=analysis_type,
+        params=drawn_with,
+        contract_version=getattr(gate, "version", None),
+        row_count=drawn.drawn_count,
+        chart_kind=chart,
+        chart_path=str(drawn.path),
+        summary=output.summary,
+    )
     return f"{gate.header()}\n\n{drawn.to_text()}"
 
 
