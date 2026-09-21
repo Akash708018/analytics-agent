@@ -5776,3 +5776,32 @@ Digests:
   3c14ec623b258a76c4796dbed61f24f5dcc7810951c37cf54f882e89c8903961  src/analytics_agent/report/assemble.py
   f02fcde488ed069e585441208bbf4929db05bde716a2db0f51dcf5d018e415ab  src/analytics_agent/ingest/postgres.py
   5f65be4d73b23d803645ace5dd8baea53e280c1b69ecb465231c89ae9d97a0f5  tests/test_narrowed_load.py
+
+## Cleanup Step 7 - a column type set in an Ingest Spec reaches the loader, 21/09/2026
+
+Step document: docs/steps/cleanup_step7_spec_dtype.md.
+
+C96. A CONFIRMED SPEC'S COLUMN TYPES WERE SHOWN AND NEVER USED. ColumnSpec.dtype appears in
+IngestSpec.to_text() -- the reading the person confirms -- and IngestSpec.to_loader_kwargs()
+never passed it on, though load_csv and load_excel both take dtypes. Measured through
+server.confirm_ingest_spec: clean_sales with order_date pinned to VARCHAR loaded order_date as
+DATE. The signature guard in to_loader_kwargs exists for exactly this ("dropping it silently
+would load the file on different terms than the ones confirmed") and could not see it, because
+it checks the keys that were put in kwargs and this one never was -- a guard over the output
+cannot catch an input that never reached it. Found while writing the Track B contract, whose
+per-column type dropdown would have been a control connected to nothing. The drafter sets no
+dtype, so no existing load changes: acceptance and eval are identical.
+
+Also in this commit: src/analytics_agent/webapp/contract.py, the interface between the Track B UI
+and the engine -- dataclasses and a Backend Protocol, standard library only -- written before
+either side so the UI can be built against a fake and integrated by swapping one object. And
+pyproject's testpaths = ["tests"], so the UI's tests (which need streamlit) are never collected
+by the engine's suite; the count is unchanged by it (1781 with and without).
+
+MEASURED VALIDATION, 21/09/2026. Falsified first: 2 failed, 1 passed, the failure "assert 'DATE'
+== 'VARCHAR'". Fixed: `uv run pytest -q` 1778 -> 1781 passed. Acceptance unchanged: 99/0/2,
+19/0/0, 35/0/1, 26/0/0, 36/0/0. Eval SCORE 76/76 (100%). Tree clean. Digests:
+  c002693d969e98c2bcc15d4cbd50d4455b322bdf4281d3f6df4040fde6368051  src/analytics_agent/ingest/spec.py
+  89eb6f0b141f22178a11d63af9f0f72b78d92a604e41f833c1a2995b4912c56b  src/analytics_agent/webapp/contract.py
+  1eabf51014c71b1324c0a11716fa65b24c7f52f6a6a1ce087e3cedaf652f05d8  tests/test_ingest_spec_dtype.py
+  25c365f924cdcdd7c3b8eafe4fd899a531e0542a105ba3f527ec7a74e4175ea6  pyproject.toml

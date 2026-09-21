@@ -256,6 +256,12 @@ class IngestSpec(BaseModel):
             kwargs["na_values"] = self.na_values
         if self.footer_skip_rows:
             kwargs["footer_skip_rows"] = self.footer_skip_rows
+        # A pinned type is part of what was confirmed. It was shown by to_text() and passed to
+        # neither loader, so the file loaded as inferred (C96). Added only when a column pins
+        # one, so a spec that pins nothing yields the kwargs it always did.
+        dtypes = {c.target_name: c.dtype for c in self.columns if c.dtype}
+        if dtypes:
+            kwargs["dtypes"] = dtypes
 
         if loader is not None:
             accepted = set(inspect.signature(loader).parameters)

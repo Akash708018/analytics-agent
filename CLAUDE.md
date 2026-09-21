@@ -1,7 +1,7 @@
 # analytics-agent
 
 MCP server exposing data loading, profiling, cleaning and contract-gated analysis
-to Claude Desktop. Phases 1-13 done, then Cleanup Steps 4-6; next is Phase 14
+to Claude Desktop. Phases 1-13 done, then Cleanup Steps 4-7; next is Phase 14
 (Track B). Nothing is recorded open: P9-O4's feature half was closed by the user's
 decision on 21/09/2026 (copy-first; in-place analysis is a later scaling item).
 
@@ -15,9 +15,9 @@ Layout: `src/analytics_agent/{ingest,profile,clean,contract,validate,analysis,ch
 
 ## Verify before committing
 All six, every time. Run the suite BEFORE committing, not after (C76: two commits
-recorded a broken tree). Last measured 21/09/2026, at Cleanup Step 6:
+recorded a broken tree). Last measured 21/09/2026, at Cleanup Step 7:
 
-    uv run pytest -q                      # 1778 passed
+    uv run pytest -q                      # 1781 passed
     uv run python tests/test_phase8.py    # 99 passed, 0 failed, 2 skipped
     uv run python tests/test_phase9.py    # 19 passed, 0 failed, 0 skipped
     uv run python tests/test_phase10.py   # 35 passed, 0 failed, 1 skipped
@@ -31,7 +31,7 @@ because a suite that must be 100% cannot carry a score (P13-D1):
     uv run python eval/run_eval.py        # SCORE: 76/76 (100%), 40 questions
 
 The acceptance scripts are scripts, not pytest files -- `pytest` collects nothing
-from them, so 1778 excludes them. The three skips are each deliberate and
+from them, so 1781 excludes them. The three skips are each deliberate and
 recorded: ANALYSIS_RESULT_UNSOUND and the rendered MCP schema in phase8, the
 non-finite screen in phase10. A skip is an outstanding clause, not a passing one
 -- count them against this line, which is how C80 was found.
@@ -79,7 +79,7 @@ line carrying digests and suite totals, updating the guide's ledger row if the p
 state changed, then running all six checks and the eval above, reading them, and committing.
 
 ## Navigating the docs -- read narrowly
-`docs/decisions.md` is 5,778 lines and append-only; the build guide is 1,104. Reading
+`docs/decisions.md` is 5,807 lines and append-only; the build guide is 1,104. Reading
 either whole costs more than the work.
 
 - **Open-item register: `docs/decisions.md:4438` to end.** Read it rather than grepping

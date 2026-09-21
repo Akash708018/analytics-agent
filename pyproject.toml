@@ -30,3 +30,8 @@ build-backend = "uv_build"
 dev = [
     "pytest>=9.1.1",
 ]
+
+[tool.pytest.ini_options]
+# The engine's suite. The Track B UI keeps its own tests under ui/tests, which need streamlit
+# and run with `uv run --group ui pytest ui/tests`.
+testpaths = ["tests"]
