@@ -293,7 +293,34 @@ def test_a_chart_refusal_says_the_analysis_was_fine(con):
     assert reason_of(text) is Reason.ANALYSIS_NOT_POSSIBLE
     assert "The numbers are not in question" in text
     assert "Nothing was written." in text
-    assert 'compute_analysis(dataset_name="sales"' in text
+
+
+def test_a_refusal_that_y_would_fix_names_the_chart_call_not_the_table(con):
+    """C93. The recovery used to be compute_analysis, which succeeds and returns a table to a
+    caller who asked for a chart. It is now render_chart with y named, and it draws."""
+    text = draw(con, "summary_stats", "line")
+    step = next(ln for ln in text.splitlines() if ln.startswith("NEXT STEP: call "))
+    call = step[len("NEXT STEP: call "):]
+    assert call.startswith('render_chart(dataset_name="sales", analysis_type="summary_stats"')
+    assert 'chart="line"' in call and ", y=" in call
+    assert "works as y instead" in text
+    kwargs = dict(kv.split("=", 1) for kv in call[len("render_chart("):-1].split(", "))
+    again = draw(con, "summary_stats", "line", y=kwargs["y"].strip('"'))
+    assert reason_of(again) is None, again.splitlines()[0]
+
+
+def test_the_suggested_y_prefers_the_analysis_measure_over_the_first_offered():
+    assert tools._suggested_y(("rows", "revenue (sum)"), "revenue") == "revenue (sum)"
+    assert tools._suggested_y(("n", "mean"), None) == "n"
+    assert tools._suggested_y(("to", "rows"), "revenue") == "to"
+
+
+def test_a_refusal_no_y_can_fix_still_names_the_table(con):
+    """Too few measures for a two-measure kind has no y that fixes it, so the table stays."""
+    text = draw(con, "frequency", "grouped_bar", column="status")
+    assert reason_of(text) is Reason.ANALYSIS_NOT_POSSIBLE
+    assert 'NEXT STEP: call compute_analysis(dataset_name="sales"' in text
+    assert "works as y instead" not in text
 
 
 def test_naming_y_resolves_the_one_measure_a_line_needs(con):

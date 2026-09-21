@@ -58,7 +58,14 @@ class ChartRefused(ValueError):
 
     A ValueError so that the tool layer's existing `except ValueError` turns it into an
     ANALYSIS_NOT_POSSIBLE refusal if Step 3 wires it before giving charts their own branch.
+
+    `choices` is set only when naming one of them as y would draw the chart -- the tool layer
+    turns it into a render_chart call rather than a compute_analysis one (C93).
     """
+
+    def __init__(self, message: str, choices: Sequence[str] = ()) -> None:
+        super().__init__(message)
+        self.choices = tuple(choices)
 
 
 def charts_dir(workspace_id: str) -> Path:
@@ -279,7 +286,8 @@ def _draw(ax, kind: str, extract: Extract) -> int:
     if kind in _SINGLE and len(series) != 1:
         raise ChartRefused(
             f"a {kind} chart draws one measure and this result offers "
-            f"{len(series)}: {', '.join(s.name for s in series)}. Name one with y."
+            f"{len(series)}: {', '.join(s.name for s in series)}. Name one with y.",
+            choices=[s.name for s in series],
         )
 
     if kind == "histogram":

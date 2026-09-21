@@ -301,6 +301,9 @@ def run_behavioural(server, q: dict) -> None:
     if not check("behavioural", f"{q['id']} names a call an agent can make verbatim",
                  parsed is not None, step[:90]):
         return
+    if q.get("retry_tool"):
+        check("behavioural", f"{q['id']} recovers through {q['retry_tool']}",
+              parsed[0] == q["retry_tool"], parsed[0])
     if q.get("retry"):
         name, args = parsed
         args.setdefault("workspace_id", ws)

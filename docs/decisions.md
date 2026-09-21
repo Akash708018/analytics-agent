@@ -5640,3 +5640,56 @@ skipped, SCORE 75/75 (100%) -- correctness 14/14, behavioural 47/47, regression 
 because nothing under src/ changed. The tree was clean after every eval run. Digests:
   a45f3cc28dd3735610ffcd7252d0c486a4561ef8802d15ddb967a0ee98acf25d  eval/run_eval.py
   b61c98c95f6420c652f2a3daaca45885214e1273aa1de22c5391a62ffe7b765d  eval/gold_questions.yaml
+
+## Cleanup Step 4 - a chart refusal whose recovery draws the chart, 21/09/2026
+
+Step document: docs/steps/cleanup_step4_chart_recovery.md.
+
+Found by a pre-Phase-14 audit that checked completeness from the code rather than from this file
+or the guide: every analysis and every chart kind driven end to end through server.py. All 27
+analyses computed, build_report wrote nine sections, and 7 of 16 chart calls were refused for
+want of y -- correctly, per P11-D13 -- with a recovery that did not recover.
+
+C93. A REFUSAL'S RECOVERY SUCCEEDED AND DID NOT DO WHAT WAS ASKED, AND THE EVAL COUNTED IT.
+render_chart's single-measure refusal named `compute_analysis(...)` as its NEXT STEP. Made
+verbatim it succeeds, and returns a table to an agent that asked for a chart. B11 marked it
+"recovers in one retry" because the retry checked that the named call succeeded, not that it was
+the call that completes the request. The B09 fix (C89) made the recovery executable; nobody asked
+whether executing it finished the job. This is the P9-O11 family once more -- a check that could
+not fail for the case it was written about.
+
+CL4-D1. A CHART REFUSAL THAT Y WOULD FIX NAMES render_chart WITH Y SET. ChartRefused carries the
+measures offered as `choices`, set only by the single-measure refusal. The recovery keeps the
+analysis parameters and adds chart, x and title if given, and y: the first choice whose name
+contains the analysis's `measure` argument, else the first offered. The WHY still lists them all
+and the DETAIL says any works. P11-D13 stands: it forbids the renderer drawing a measure nobody
+named, and a y named in plain sight in a call the caller chooses to make is not that. A chart
+refusal no y can fix -- an unknown kind, too few measures for a two-measure kind, a non-finite
+value -- keeps compute_analysis as its recovery.
+
+CL4-D2. A BEHAVIOURAL QUESTION MAY NAME THE TOOL ITS RECOVERY MUST USE. `retry_tool` in
+gold_questions.yaml, checked before the retry runs; B11 carries `retry_tool: render_chart`.
+Falsified first against the unfixed tree (P13-D9): SCORE 75/76, the one failure "B11 recovers
+through render_chart (compute_analysis)". After the fix, 76/76.
+
+Also removed: src/analytics_agent/{config,server}.py.phase1.bak and contract/evidence.py.step1.bak,
+tracked since Phase 1 and referenced by nothing in src/, tests/, eval/ or docs/steps/.
+`git ls-files src | grep -v '\.py$'` now prints nothing.
+
+The roster reads 25 of 36 refusals naming a verbatim call, both before and after this step
+(measured on HEAD with the change stashed). The 26 of 37 recorded at Phase 13 Step 2 is a figure
+from then, changed by later steps and not by this one.
+
+STILL OPEN after this step: P9-O4's feature half, alone and by decision. Outside the code, the
+analytics-agent process Claude Desktop runs was started 18/09/2026, before Phases 10-13; it
+serves the old tool surface until Desktop is restarted.
+
+MEASURED VALIDATION, 21/09/2026. `uv run pytest -q`: 1759 -> 1762 passed (three tests added in
+tests/test_analysis_tools.py, one updated). Acceptance unchanged: 99/0/2, 19/0/0, 35/0/1,
+26/0/0, 36/0/0. `uv run python eval/run_eval.py`: SCORE 76/76 (100%) -- correctness 14/14,
+behavioural 48/48, regression 14/14. Tree clean after every eval run. Digests:
+  927d221db0812613e8f71d86c9ef5b2cef7881b5edba4264644575f78a30ca5d  src/analytics_agent/analysis/tools.py (341 lines)
+  32bffcfe038df562418d92e3b893c3a37f3117fd72e0fbc23aac1a05f417cf6f  src/analytics_agent/charts/render.py (451 lines)
+  ac689261ad483a1755c5e805345b60d5e9d974ac7ac734a0bc3d0897556ebc54  tests/test_analysis_tools.py
+  a68853d8c76a43d4597cc8b3401e991be0831eb71a51add571d354cc232c9f39  eval/run_eval.py
+  ab5d8fcb3a1b8f6a0f12fdefdfc90a77841dd4133f2c5f748f95b7390a3d28b0  eval/gold_questions.yaml

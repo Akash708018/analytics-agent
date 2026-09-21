@@ -263,6 +263,9 @@
   call: {tool: render_chart, args: {analysis_type: summary_stats, chart: bar}}
   reason: ANALYSIS_NOT_POSSIBLE
   retry: true
+  # The retry succeeding is not enough: compute_analysis succeeded too, and returned a
+  # table to an agent that asked for a chart (C93). The recovery must be the chart.
+  retry_tool: render_chart
   expect: ["Name one with y"]
 
 - id: B12

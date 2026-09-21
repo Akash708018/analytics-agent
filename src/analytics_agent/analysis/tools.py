@@ -260,21 +260,38 @@ def render_chart(
             title=title,
         )
     except ChartRefused as exc:
+        detail = (
+            "The numbers are not in question -- the analysis ran. This is "
+            "about the shape a chart needs, which is not the shape this "
+            "result has. Nothing was written."
+        )
+        if exc.choices:
+            # The recovery draws the chart. compute_analysis succeeded here too and handed a
+            # table to a caller who asked for a chart, so B11's retry passed against a call
+            # that did not recover (C93). Naming y in the call is not the renderer picking
+            # (P11-D13): the choice is in plain sight beside the full list, and the caller
+            # makes it by making the call.
+            pick = _suggested_y(exc.choices, used.get("measure"))
+            drawn_with = dict(used, chart=chart, y=pick)
+            drawn_with.update({k: v for k, v in (("x", x), ("title", title)) if v is not None})
+            detail += (
+                f" The call below draws {pick!r}; any of "
+                f"{', '.join(repr(c) for c in exc.choices)} works as y instead."
+            )
+            next_call = _as_call("render_chart", dataset_name, analysis_type, drawn_with)
+        else:
+            # No y fixes this shape, so the table is the recovery. The parameters the analysis
+            # was given, not just its name: without them this named a call that fails for
+            # every analysis that takes one -- a refusal whose recovery is itself refused is
+            # worse than no recovery at all. Found by gold question B09 on 21/09/2026.
+            next_call = _as_call("compute_analysis", dataset_name, analysis_type, used)
         return Refusal(
             reason=Reason.ANALYSIS_NOT_POSSIBLE,
             what=f"{analysis_type} was computed and cannot be drawn as a {chart!r} chart.",
             why=str(exc),
-            detail=(
-                "The numbers are not in question -- the analysis ran. This is "
-                "about the shape a chart needs, which is not the shape this "
-                "result has. Nothing was written."
-            ),
+            detail=detail,
             state=f"contract v{gate.version} for {dataset_name}",
-            # The parameters the analysis was given, not just its name. Without them this
-            # named a call that fails for every analysis that takes one -- frequency without
-            # its column is refused, and a refusal whose recovery is itself refused is worse
-            # than no recovery at all. Found by gold question B09 on 21/09/2026.
-            next_call=_as_call("compute_analysis", dataset_name, analysis_type, used),
+            next_call=next_call,
         ).to_text()
 
     # x, y and title are stored beside the analysis parameters because call() has to render an
@@ -294,6 +311,16 @@ def render_chart(
         summary=output.summary,
     )
     return f"{gate.header()}\n\n{drawn.to_text()}"
+
+
+def _suggested_y(choices: tuple[str, ...], measure: str | None) -> str:
+    """The measure a recovery names as y: the first carrying the analysis's own measure in its
+    name -- trend's 'revenue (sum)' over its 'rows' -- else the first offered."""
+    if measure:
+        for choice in choices:
+            if measure in choice:
+                return choice
+    return choices[0]
 
 
 def _unsound(dataset_name: str, why: str) -> str:
