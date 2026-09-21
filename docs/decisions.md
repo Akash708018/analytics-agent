@@ -5963,3 +5963,39 @@ the full runs; docs/contracts unchanged. real_backend.py 450 lines. Digests:
   b0fa6dde6d1745ba958ed1c1b7588c9fdfaccacbfe0f3740d92bb58d43e550ad  src/analytics_agent/webapp/real_backend.py
   1b4b699d1efb997fd2fcbde9103e06ed26f1d0265be1637b483102e34f5f3e19  tests/test_real_backend.py
   ebd01f119865168a84c02d5876f7bc98a7daa5a0e967d8040b72008209a33a7f  ui/components.py
+
+## Phase 14, Step 4 - the agent loop, 22/09/2026
+
+Step document: docs/steps/phase14_step4_agent_loop.md.
+
+P14-D22. THE MODEL GETS TWELVE TOOLS, NO WORKSPACE, AND NOTHING THAT NEEDS CONSENT. Reading and
+analysis only; nothing that takes a filesystem path, runs SQL against a configured database, or
+changes what a person must agree to on a screen. workspace_id is stripped from every schema and
+overwritten on every call; a tool outside the list is refused in the engine's refusal shape.
+Both are falsified in the suite.
+
+P14-D23. TWO PROVIDERS, NO SDKS, MODELS MEASURED NOT RECALLED. Gemini generateContent and Groq's
+OpenAI-compatible endpoint, each one JSON POST over urllib; Gemini's model content echoed back
+verbatim. With no GEMINI_MODEL / GROQ_MODEL set, the model is chosen from the provider's own
+list -- my knowledge of model names predates this code. Retryable failures (429, 5xx, timeout)
+fail over in ANALYTICS_LLM order; fatal ones are reported. Schemas converted to the OpenAPI subset
+(anyOf-null to nullable; default, title, additionalProperties dropped); a tool with no
+parameters left omits them for Gemini.
+
+P14-D24. A TEST REACHED THE NETWORK, AND NOW NONE CAN. A key written by load_env in one test
+outlived it (delenv on an absent variable undoes nothing) and a later test called Gemini for
+real. The env test runs on a private environment and tests/conftest.py refuses urllib network
+access for the whole suite -- proven by a test that tried and was stopped.
+
+OUTSTANDING, NOT CLOSED: THE LIVE RUN. No key exists on this machine yet; nothing in this step
+has been shown against a real model. scripts/agent_live.py is the clause, and it stays open until
+it runs with a key and its output is recorded. P14-O1 remains open.
+
+MEASURED VALIDATION, 22/09/2026. `uv run pytest -q`: 1803 -> 1821 passed. Acceptance unchanged:
+99/0/2, 19/0/0, 35/0/1, 26/0/0, 36/0/0. Eval SCORE 76/76 (100%). UI tests 32 passed. 0 ws_
+directories after the runs. Digests:
+  ae6bd2da528995fae6142cbf5bc0b98de7fe6b051aac48e5d610c3b1871f23fa  src/analytics_agent/webapp/llm.py
+  dde6610b91a93dfd7e9f2fcc51744f5afa2da86143cc893c17f9f96710de8f52  src/analytics_agent/webapp/agent.py
+  96a3ce565bf36cd0f7f262ab9ef6d8b2d33909c41876ea3f87c6f80b351a5eee  tests/test_agent.py
+  4473284668381e48d45e3a05b15b4f949df0585867214a87724d6c2b10df0205  tests/conftest.py
+  756228f73d9009431328bc649ce3e8c15c91ee15107e1b8aec565df98baa2dba  scripts/agent_live.py

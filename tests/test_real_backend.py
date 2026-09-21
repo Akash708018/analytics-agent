@@ -200,9 +200,12 @@ def test_merely_looking_creates_no_workspace(be):
     assert not (WORKSPACE_ROOT / wid).exists()
 
 
-def test_chat_says_it_is_not_connected_yet(be, ws):
+def test_chat_with_no_model_configured_says_how_to_configure_one(be, ws, monkeypatch):
+    """Providers stubbed to none: offline whatever .env holds (P14-D24)."""
+    from analytics_agent.webapp import agent
+    monkeypatch.setattr(agent, "configured", lambda: [])
     turn = be.chat(ws, [], "hello")
-    assert turn.error and "Step 4" in turn.error
+    assert turn.error and "GEMINI_API_KEY" in turn.error
 
 
 def test_both_refusal_shapes_convert():

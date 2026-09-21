@@ -394,10 +394,13 @@ class RealBackend:
     # --- chat, files, reset --------------------------------------------------------------
 
     def chat(self, workspace_id: str, history: list[dict], message: str) -> ChatTurn:
+        """One turn of the agent loop (webapp/agent.py). The workspace lock is taken per tool
+        call, not for the turn, so the model's thinking time never blocks the sidebar."""
         validate_workspace_id(workspace_id)
-        return ChatTurn(reply="", error=(
-            "The assistant is not connected yet -- the model loop is Phase 14 Step 4. Loading, "
-            "reading and contracts work now; analyses will run from here once it lands."))
+        from . import agent
+        return agent.answer(workspace_id, history, message,
+                            lock=lambda: self._workspace(workspace_id),
+                            list_artifacts=lambda: self.list_artifacts(workspace_id))
 
     def list_artifacts(self, workspace_id: str) -> list[Artifact]:
         with self._workspace(workspace_id):
