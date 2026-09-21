@@ -5726,3 +5726,53 @@ every run; docs/contracts holds clean_sales.yaml only, as before. Digests:
   5018589a94159fba1451cc38881b386028896a5800019213a095b91318ced5ea  tests/test_contract_tools.py
 
 STILL OPEN after this step: P9-O4's feature half, awaiting the user's choice of design.
+
+## Cleanup Step 6 - a narrowed load says it is narrowed; P9-O4 closed by decision, 21/09/2026
+
+Step document: docs/steps/cleanup_step6_narrowed_load.md.
+
+C95. A TABLE CUT TO FIT THE COPY LIMIT WAS ANALYSED AND REPORTED AS THE WHOLE TABLE. Measured on
+Olist: geolocation (1,000,163 rows) loaded with limit=1000, contracted, analysed and reported.
+No tool output and no line of the report said it was a subset. The report read "1,000 of 1,000
+row(s) analysed" and "1 distinct value(s) of geolocation_state" -- a LIMIT with no ORDER BY took
+the first thousand rows Postgres returned, all in Sao Paulo, so the report said every location
+in Brazil was in one state. where and limit had been written to _agent_datasets.notes since
+Phase 2 Step 7 and nothing read them. This is the family this file keeps recording, in its data
+form: a fact recorded beside the thing it qualifies and never joined to it. The size gate's own
+NEXT STEP -- "narrow it with where=... or limit=..." -- led straight into it.
+
+CL6-D1. THE DISCLOSURE IS ONE SENTENCE FROM ONE PLACE, CARRIED BY THE GATE. postgres.load_table
+records source_rows beside where and limit. db.DatasetRecord.narrowing() turns a load record into
+"Loaded as a subset: <n> of <total> rows of <source>, copied with <filters>", adding, when a
+limit applied, that the rows are whichever came first and not a random sample. None for a
+limit the table never reached, an unfiltered load, and every non-Postgres load. Gate.narrowed
+puts it first in Gate.caveats, which all 27 analyses already copy into their summaries, so it
+reaches compute_analysis, render_chart and the report's findings with no analysis edited. The
+report's Caveats and exclusions section leads with it, contract or not; get_workflow_state lists
+it. A record from before source_rows says the source size was not recorded. Twelve tests in
+tests/test_narrowed_load.py, falsified first: 12 failed on the unfixed tree. The first attempt
+at falsifying errored instead -- the fixture's contract lacked an analysis window and a frozen
+dataclass was assigned to -- and an error proves nothing about the feature, so both were fixed
+and the run repeated before anything in src/ changed.
+
+P9-O4's FEATURE HALF IS CLOSED BY DECISION, 21/09/2026, the user's. Analysis stays copy-first.
+The copy limit (750,000 rows on this machine; SIZE_GATES scales it with RAM) is enough for this
+project, and in-place analysis of larger tables is a scaling item for later, with its design
+recorded under Cleanup Step 1 (Binding from the attached catalog, read-only refusals from clean/
+and validate/, workspace re-attach). Evaluated before accepting: the decision is sound only if a
+table narrowed to fit is never reported as the whole table, which it was until C95. In Olist only
+geolocation exceeds the limit; the next largest, order_items, holds 112,650 rows (measured
+from pg_stat_user_tables).
+
+STILL OPEN after this step: nothing.
+
+MEASURED VALIDATION, 21/09/2026. `uv run pytest -q`: 1766 -> 1778 passed. Acceptance unchanged:
+99/0/2, 19/0/0, 35/0/1, 26/0/0, 36/0/0. Eval SCORE 76/76 (100%). The Olist probe re-run: the
+sentence "Loaded as a subset: 1,000 of 1,000,163 rows of olist:public.geolocation, copied with
+limit=1000" appears in get_workflow_state, compute_analysis and the report file. Tree clean.
+Digests:
+  a8f4dcb2a64839bf638df4ed49974ba54349aa70ecacdbed860e5a71a76186cd  src/analytics_agent/util/db.py
+  bf3b75a18a200d3e77759d0b51a8e9dcecd58cb9b2c59300e9698bf02f5831aa  src/analytics_agent/state.py
+  3c14ec623b258a76c4796dbed61f24f5dcc7810951c37cf54f882e89c8903961  src/analytics_agent/report/assemble.py
+  f02fcde488ed069e585441208bbf4929db05bde716a2db0f51dcf5d018e415ab  src/analytics_agent/ingest/postgres.py
+  5f65be4d73b23d803645ace5dd8baea53e280c1b69ecb465231c89ae9d97a0f5  tests/test_narrowed_load.py

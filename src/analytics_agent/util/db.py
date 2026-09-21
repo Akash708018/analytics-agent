@@ -21,6 +21,7 @@ later would be inventing it.
 from __future__ import annotations
 
 import datetime as _dt
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -46,6 +47,11 @@ CREATE TABLE IF NOT EXISTS {METADATA_TABLE} (
 """
 
 
+# postgres.load_table writes notes="where=<sql or ->, limit=<n or ->, source_rows=<n>". Greedy
+# on the where clause, which is free SQL; source_rows is absent from records written before C95.
+_NARROWING_RE = re.compile(r"^where=(.*), limit=(-|\d+)(?:, source_rows=(\d+))?$", re.S)
+
+
 @dataclass(frozen=True)
 class DatasetRecord:
     dataset_name: str
@@ -55,6 +61,40 @@ class DatasetRecord:
     column_count: int
     loaded_at: _dt.datetime
     notes: str = ""
+
+    def narrowing(self) -> str | None:
+        """One sentence when this load holds part of its source, None when it holds all of it.
+
+        Only the Postgres loader narrows -- where and limit -- and it records both, with the
+        source's row count, in `notes`. They were recorded and read by nothing, so a table cut
+        to fit the copy limit was analysed and reported as the whole table (C95). The where
+        clause is free SQL and may hold a comma, so the pattern anchors on the fields after it.
+        A record written before source_rows existed still discloses, and says what it lacks.
+        """
+        if self.source_type != "postgres":
+            return None
+        m = _NARROWING_RE.match(self.notes or "")
+        if m is None:
+            return None
+        where, limit, source_rows = m.group(1), m.group(2), m.group(3)
+        where = None if where == "-" else where
+        limit = None if limit == "-" else int(limit)
+        total = int(source_rows) if source_rows else None
+        if where is None and (limit is None or (total is not None and limit >= total)):
+            return None
+        filters = ", ".join(f for f in (where and f"where={where}", limit and f"limit={limit}")
+                            if f)
+        if total is not None:
+            held = f"{self.row_count:,} of {total:,} rows"
+        else:
+            held = f"{self.row_count:,} rows (the source table's size was not recorded)"
+        text = (f"Loaded as a subset: {held} of {self.source_detail}, copied with {filters}. "
+                f"Every figure describes those rows, not the whole table.")
+        if limit is not None:
+            text += (" A limit keeps whichever rows the database returned first -- not a "
+                     "random sample -- so shares and distinct counts can be far from the "
+                     "table's.")
+        return text
 
     def age_phrase(self, now: _dt.datetime | None = None) -> str:
         """Plain-language age, so a stale dataset reads as stale.

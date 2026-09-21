@@ -29,6 +29,7 @@ from ..analysis import runs as analysis_runs
 from ..clean import ledger
 from ..contract import store
 from ..profile import runs as profile_runs
+from ..util import db
 from ..validate import runs as validation_runs
 
 REPORTS_DIRNAME = "reports"
@@ -198,19 +199,23 @@ def _method_notes(runs_) -> tuple[list[str], bool]:
     return (lines, False)
 
 
-def _caveats(stored) -> tuple[list[str], bool]:
+def _caveats(stored, narrowed: str | None = None) -> tuple[list[str], bool]:
+    # A subset leads, contract or not: every caveat below qualifies numbers about the table,
+    # and this one says the table is not the one the question was about (C95).
+    lead = ["**Loaded as a subset**", f"- {narrowed}", ""] if narrowed else []
     if stored is None:
-        return (["No contract, so no exclusions were declared and none were applied."], True)
+        return (lead + ["No contract, so no exclusions were declared and none were applied."],
+                not lead)
     c = stored.contract
     caveats = list(getattr(c, "caveats", []) or [])
     exclusions = [getattr(e, "rule", str(e)) for e in (getattr(c, "known_exclusions", []) or [])]
     excluded = list(getattr(c, "excluded_columns", []) or [])
     missing = list(getattr(c, "missing_values", []) or [])
     if not (caveats or exclusions or excluded or missing):
-        return (["The contract declares no caveats, no known exclusions, no excluded columns "
+        return (lead + ["The contract declares no caveats, no known exclusions, no excluded columns "
                  "and no missing-value markers. That is a claim, not an absence: somebody "
-                 "confirmed a contract that says none apply."], True)
-    lines: list[str] = []
+                 "confirmed a contract that says none apply."], not lead)
+    lines: list[str] = list(lead)
     if caveats:
         lines += ["**Caveats**"] + _bullets(caveats) + [""]
     if exclusions:
@@ -309,7 +314,8 @@ def assemble(
     v_body, v_empty = _validation(validation)
     f_body, f_empty, key = _findings(runs_)
     m_body, m_empty = _method_notes(runs_)
-    x_body, x_empty = _caveats(stored)
+    record = db.get_dataset(con, dataset_name)
+    x_body, x_empty = _caveats(stored, record.narrowing() if record else None)
     a_body, a_empty = _appendix(runs_)
 
     bodies = [q_body, d_body, p_body, c_body, v_body, f_body, m_body, x_body, a_body]

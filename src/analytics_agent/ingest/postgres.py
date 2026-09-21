@@ -328,7 +328,8 @@ def load_table(
         source_detail=f"{alias}:{schema}.{table}",
         row_count=rows,
         column_count=cols,
-        notes=f"where={where or '-'}, limit={limit or '-'}",
+        # source_rows lets DatasetRecord.narrowing() say "1,000 of 1,000,163" (C95).
+        notes=f"where={where or '-'}, limit={limit or '-'}, source_rows={n}",
     )
 
     return LoadResult(

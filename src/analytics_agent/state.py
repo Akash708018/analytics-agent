@@ -60,6 +60,7 @@ class Gate:
     version: int
     drift: DriftVerdict
     key: KeyVerdict | None = None
+    narrowed: str | None = None
 
     @property
     def caveats(self) -> list[str]:
@@ -70,8 +71,12 @@ class Gate:
         then the caveats a person wrote into the contract, which are about the
         data itself. A report that prints numbers without these is a report
         that has quietly dropped the reasons they might be wrong.
+
+        Before both, a load that holds part of its source (C95): every other
+        caveat qualifies numbers about the table, and this one says the table
+        is not the one the question was about.
         """
-        out = []
+        out = [self.narrowed] if self.narrowed else []
         drift_caveat = self.drift.caveat()
         if drift_caveat:
             out.append(drift_caveat)
@@ -174,11 +179,13 @@ def require_contract(con, dataset_name: str) -> Gate:
     if key_verdict is not None and not key_verdict.holds:
         raise ContractRefused(key_verdict.refusal().to_text())
 
+    record = db.get_dataset(con, dataset_name)
     return Gate(
         contract=live.contract,
         version=live.version,
         drift=drift,
         key=key_verdict,
+        narrowed=record.narrowing() if record else None,
     )
 
 
@@ -249,6 +256,8 @@ def dataset_states(con) -> list[DatasetState]:
                 "This table was not created by a loader, so nothing is known "
                 "about where it came from."
             )
+        elif record.narrowing():
+            state.notes.append(record.narrowing())
 
         live = current(con, name)
         state.contract = live
