@@ -45,7 +45,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..util.sql_guard import quote_identifier
-from .base import NO_MEMBER, LostRows, ParamsInvalid, number
+from .base import NO_MEMBER, RECONCILE_TOLERANCE, LostRows, ParamsInvalid, number
 from .declared import require_dimension, require_measure
 from .registry import Output, register
 from .temporal import (
@@ -65,7 +65,7 @@ NAMED = 12
 # three terms sum to the change with a residual of 7.11e-15 on ten rows.
 # Scaled to the size of the change, because an absolute epsilon is wrong at
 # both ends of the range.
-TOLERANCE = 1e-9
+TOLERANCE = RECONCILE_TOLERANCE  # base.py owns it; growth_decomposition reads it too
 
 
 @register(

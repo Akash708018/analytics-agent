@@ -29,7 +29,7 @@ from ..util.sql_guard import bind_predicate, negate, quote_identifier
 from .declared import adds_across_groups
 
 __all__ = ["Scope", "ScopeError", "LostRows", "ParamsInvalid", "number", "label", "window_clause",
-           "scope_for", "ShareBasis", "share_basis", "NO_MEMBER"]
+           "scope_for", "ShareBasis", "share_basis", "NO_MEMBER", "RECONCILE_TOLERANCE"]
 
 
 # What a NULL in a dimension is called, wherever one is shown. It is a member like
@@ -40,6 +40,16 @@ __all__ = ["Scope", "ScopeError", "LostRows", "ParamsInvalid", "number", "label"
 # for a null group wins: this one, because "(no region)" says which column was empty
 # and "(no group)" does not. Callers format it with the dimension name.
 NO_MEMBER = "(no {dimension})"
+
+
+# The residual a decomposition may carry and still be called one. Exact equality is right when
+# the measure is DECIMAL or an integer and wrong the moment it is DOUBLE: measured 21/09/2026,
+# sum(revenue) over a 500-row CSV fixture is 1377896.8399999999, and a decomposition of it that
+# reconciles to the last bit does not exist. growth_decomposition compared exactly and refused
+# every float measure with a message printing both sides at four decimal places, so the two
+# numbers it showed as unequal were identical on the page. Relative, because the absolute size
+# of an acceptable residual depends on the size of the change.
+RECONCILE_TOLERANCE = 1e-9
 
 
 # Four decimal places, thousands separated, trailing zeros dropped. Measured in

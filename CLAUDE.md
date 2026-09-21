@@ -1,10 +1,9 @@
 # analytics-agent
 
 MCP server exposing data loading, profiling, cleaning and contract-gated analysis
-to Claude Desktop. Phases 1-10 done. Phase 11 (charts) is in progress: Steps 1-3
-done -- matplotlib ground facts, `charts/render.py` with the eight kinds, and
-`render_chart` registered in server.py (P11-D1 to D22). Open: P11-O1, no
-acceptance script calls a Tier 3-7 analysis or a chart through the MCP tool.
+to Claude Desktop. Phases 1-11 done. Phase 12 (report) and 13 (eval harness) are
+unstarted. Nothing is recorded open except P9-O4's feature half, scoped as a
+design question.
 
 ## Stack
 Python >= 3.12 via `uv` -- run everything through `uv run`, never `pip install`.
@@ -15,16 +14,17 @@ Layout: `src/analytics_agent/{ingest,profile,clean,contract,validate,analysis,ch
 27 analyses across 7 tiers. An analysis's shape: `analysis/{registry,base,declared,stats}.py`.
 
 ## Verify before committing
-All four, every time. Run the suite BEFORE committing, not after (C76: two commits
+All five, every time. Run the suite BEFORE committing, not after (C76: two commits
 recorded a broken tree). Last measured 21/09/2026, after the open-item cleanup:
 
-    uv run pytest -q                      # 1712 passed
+    uv run pytest -q                      # 1714 passed
     uv run python tests/test_phase8.py    # 99 passed, 0 failed, 2 skipped
     uv run python tests/test_phase9.py    # 19 passed, 0 failed, 0 skipped
     uv run python tests/test_phase10.py   # 35 passed, 0 failed, 1 skipped
+    uv run python tests/test_phase11.py   # 26 passed, 0 failed, 0 skipped
 
 The acceptance scripts are scripts, not pytest files -- `pytest` collects nothing
-from them, so 1712 excludes them. The three skips are each deliberate and
+from them, so 1714 excludes them. The three skips are each deliberate and
 recorded: ANALYSIS_RESULT_UNSOUND and the rendered MCP schema in phase8, the
 non-finite screen in phase10. A skip is an outstanding clause, not a passing one
 -- count them against this line, which is how C80 was found.

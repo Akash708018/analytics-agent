@@ -100,6 +100,51 @@ def at(out, member):
     return next(row for row in out.rows if row[0] == member)
 
 
+DRIFT = """SELECT * FROM (VALUES
+  (1, TIMESTAMP '2017-02-10 10:00:00', 'north', 0.1::DOUBLE),
+  (2, TIMESTAMP '2017-02-14 10:00:00', 'south', 0.2::DOUBLE),
+  (3, TIMESTAMP '2017-03-05 11:00:00', 'north', 0.3::DOUBLE),
+  (4, TIMESTAMP '2017-03-20 11:00:00', 'south', 0.4::DOUBLE)
+) v(id, ts, region, amount)"""
+
+
+def test_a_double_measure_reconciles_despite_float_drift():
+    """The bug this file could not see, because every value above is a DECIMAL literal.
+
+    Found by tests/test_phase11.py on 21/09/2026: the reconciliation compared
+    `sum(contributions) != change` exactly, which is right for a DECIMAL or integer measure
+    and wrong for every DOUBLE one. On a 500-row CSV fixture sum(revenue) came to
+    1377896.8399999999 and the analysis refused with a message printing both sides through
+    number(), which rounds to four places -- so it showed two identical numbers and called
+    them unequal. mix_shift already compared a residual against a tolerance; this is the same
+    ruling, now in base.py where both read it.
+
+    0.1 + 0.2 is the canonical float that is not 0.3, which is why these values.
+    """
+    c = duckdb.connect(":memory:")
+    try:
+        c.execute(f"CREATE TABLE sales AS {DRIFT}")
+        gate = FakeGate(FakeContract())
+        out = run(c, gate, scope_for(c, gate), "growth_decomposition",
+                  measure="amount", dimension="region",
+                  baseline="2017-02", period="2017-03")
+        assert out.rows, "a DOUBLE measure produced no decomposition"
+        assert {r[0] for r in out.rows} == {"north", "south"}
+    finally:
+        c.close()
+
+
+def test_the_reconciliation_tolerance_is_the_one_base_owns():
+    """One ruling, one place. mix_shift and growth_decomposition both check a residual against
+    a relative tolerance, and a second copy of that number is how two copies of one ruling
+    drift apart -- which is P9-O6, and which this bug is a late instance of."""
+    from analytics_agent.analysis import mix_shift
+    from analytics_agent.analysis.base import RECONCILE_TOLERANCE
+
+    assert mix_shift.TOLERANCE is RECONCILE_TOLERANCE
+    assert 0 < RECONCILE_TOLERANCE < 1e-6
+
+
 def test_the_members_are_ordered_by_how_far_they_moved(con):
     assert [r[0] for r in split(con).rows] == [
         "north", "south", "west", "(no region)"]

@@ -5042,3 +5042,68 @@ P11-O1 and remains open. Digests:
   5060ce7a1547d791bc85d368675387c6b17734d028f5ba5fcbcfe7b18e8a4b05  tests/test_analysis_tools.py
   4842da5c05b6bc449abe723dde8aa564d64feb2b005238f0988935fe1fc4cb87  tests/test_analysis_tool_docs.py
   621d19b653921144cf1d4c304f0b03061fef3cd7887491732fb94d51755aab71  tests/test_tool_docs.py
+
+## Phase 11, Step 4 - the acceptance script, 21/09/2026
+
+Step document: docs/steps/phase11_step4_acceptance.md, written before the run with ten numbered
+predictions. Two were wrong and both are recorded below as wrong.
+
+CLOSED. P11-O1, 21/09/2026. tests/test_phase11.py calls server.compute_analysis for all nine
+parameters C83 named -- against, period, baseline, entity, second_dimension, method, confidence,
+alpha and power -- each on an analysis that requires it, and server.render_chart for all eight
+chart kinds. Before c1826b2 every row of that table returned ANALYSIS_PARAMS_INVALID. It runs on
+the clean_sales CSV fixture rather than Olist, so unlike test_phase9.py and test_phase10.py it
+needs no Postgres and is portable. 26 passed, 0 failed, 0 skipped.
+
+C85. A REFUSAL PRINTED TWO IDENTICAL NUMBERS AND CALLED THEM UNEQUAL, AND IT MEANT
+growth_decomposition COULD NOT RUN ON A FLOAT MEASURE. The new acceptance clause failed on its
+first run -- prediction 4, which said it would pass. Not with the parameter error the clause was
+built to catch, but with ANALYSIS_RESULT_UNSOUND, and underneath it a LostRows reading: "the 5
+member(s) of region contribute -1,539.88 against a change of -1,539.88 ... Parts that do not add
+to the whole are not a decomposition of it." The two numbers are the same on the page. The check
+was `sum(contributions.values(), zero) != change`, exact equality, with both sides rendered
+through number(), which rounds to four places. Exact equality is right for a DECIMAL or integer
+measure and wrong for every DOUBLE one: measured, sum(revenue) over the 500-row fixture is
+1377896.8399999999. So growth_decomposition refused every float measure, and said so in a
+sentence that refuted itself.
+
+Nothing caught it because tests/test_growth_decomposition.py's fixture writes its amounts as
+`20.00`, which DuckDB reads as DECIMAL. The analysis was exercised only on exact arithmetic for
+two phases. Olist's payment_value is DECIMAL too, which is why Phase 9 and Phase 10 acceptance
+never saw it either.
+
+P11-D23. THE RECONCILIATION TOLERANCE LIVES IN base.py AND BOTH DECOMPOSITIONS READ IT.
+mix_shift already compared a residual against `TOLERANCE * max(1.0, abs(change))` with
+TOLERANCE = 1e-9 local to that module, and printed the residual in scientific notation so a
+reader could see the gap. growth_decomposition compared exactly. One ruling, two
+implementations, and only one of them right -- P9-O6's shape, found a third time. base.py now
+owns RECONCILE_TOLERANCE, mix_shift reads it, and growth_decomposition compares a residual and
+names it. A test asserts `mix_shift.TOLERANCE is RECONCILE_TOLERANCE`, so a second copy fails
+rather than drifts.
+
+P11-D24. THE ACCEPTANCE RUNS ON THE CSV FIXTURE, NOT OLIST. clean_sales declares three measures
+with three different aggregates and three dimensions, which reaches every tier, and it loads
+from disk. test_phase9.py and test_phase10.py both skip wholesale when Postgres is absent; this
+one does not, so the surface C83 broke is checked on any machine that can run the suite. The
+fixture being DOUBLE where Olist is DECIMAL is not a compromise -- it is why C85 was found.
+
+P11-D25. THE FORWARDING CLAUSE NAMES THE PARAMETER, NOT THE ANALYSIS. Each row reads "against
+reach correlation", "power and alpha reach sample_adequacy". A failure therefore says which
+argument did not arrive rather than which analysis broke, which is the distinction C83 turned on:
+the analysis was fine and the wrapper dropped the argument.
+
+P11-D26. TWO PREDICTIONS WERE WRONG AND THE CHEAP ONE WAS THE HEDGE. Prediction 4 said
+growth_decomposition would pass; it failed, and that failure is C85. Prediction 9 hedged that at
+least one of the eight chart kinds would be wrong; all eight rendered. The hedge cost nothing and
+found nothing, and the specific prediction found a bug that had survived two phases -- which is
+the argument for predicting a value rather than a range.
+
+MEASURED VALIDATION, 21/09/2026. Full suite 1712 -> 1714; the two added pin a DOUBLE measure
+reconciling and the tolerance being shared. Acceptance is now four scripts, not three:
+test_phase8.py 99 passed, 0 failed, 2 skipped; test_phase9.py 19/0/0; test_phase10.py 35/0/1;
+test_phase11.py 26 passed, 0 failed, 0 skipped. Digests:
+  6de4309a64ac331cb6b6d65c7569d59aab5afcfc80049ab5c9e099807b38fe61  src/analytics_agent/analysis/base.py
+  36f3728645300ae10f84e38a2189ae923e0aee9f8f7d5efa9069f60c8c75c118  src/analytics_agent/analysis/mix_shift.py
+  d451ac622453f0922e1fed37b232a20a0f039486ca6cdc4e2a52dc526fd47c32  src/analytics_agent/analysis/growth_decomposition.py
+  17ef7bb62a6e5a15e87293fd36f1506ada3b65382414b28a04f100a14b8926f2  tests/test_growth_decomposition.py
+  03daf6a771409ca8093720ea12d267de024d0aa649f4f30de8722303a1738481  tests/test_phase11.py

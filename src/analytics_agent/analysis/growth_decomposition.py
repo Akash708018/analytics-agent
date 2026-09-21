@@ -43,7 +43,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..util.sql_guard import quote_identifier
-from .base import NO_MEMBER, LostRows, ParamsInvalid, number
+from .base import NO_MEMBER, RECONCILE_TOLERANCE, LostRows, ParamsInvalid, number
 from .declared import ADDITIVE_AGGS, AGG_SQL, agg_of, require_dimension, require_measure
 from .registry import Output, register
 from .temporal import (
@@ -209,13 +209,21 @@ def growth_decomposition(con, gate, scope, measure: str, dimension: str,
         - (slot[0] if slot[0] is not None else zero)
         for member, slot in members.items()
     }
-    if sum(contributions.values(), zero) != change:
+    # Compared against a tolerance rather than exactly, and the difference is not cosmetic:
+    # exact equality holds for a DECIMAL or integer measure and fails for every DOUBLE one, so
+    # this refused any float measure outright. It also printed both sides through number(),
+    # which rounds to four places, so the refusal showed two identical numbers and called them
+    # unequal. mix_shift already compared this way; this is the same ruling, now in one place.
+    total = sum(contributions.values(), zero)
+    residual = abs(float(total) - float(change))
+    if residual > RECONCILE_TOLERANCE * max(1.0, abs(float(change))):
         raise LostRows(
             f"growth_decomposition does not reconcile: the "
             f"{len(contributions)} member(s) of {dimension} contribute "
-            f"{number(sum(contributions.values(), zero))} against a change of "
-            f"{number(change)} between {baseline} and {period}. Parts that do "
-            f"not add to the whole are not a decomposition of it."
+            f"{float(total):+.6f} against a change of {float(change):+.6f} "
+            f"between {baseline} and {period}, a residual of {residual:.3e} "
+            f"beyond the tolerance for floating point. Parts that do not add "
+            f"to the whole are not a decomposition of it."
         )
 
     order = sorted(contributions, key=lambda k: (-abs(contributions[k]), k))
