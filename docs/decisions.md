@@ -5573,3 +5573,21 @@ Failure Mode Register ids (F7, F9, F11, F12, F14, F15). The refusal roster is un
 assertion on it names a substring that is still there. Digests:
   eval/run_eval.py, eval/gold_questions.yaml and src/analytics_agent/analysis/tools.py as
   printed in the commit.
+
+C90. C86 FOR THE THIRD TIME, AND THE THIRD FIX IS THE FIRST ONE IN THE RIGHT PLACE.
+confirm_dataset_contract exports a YAML copy to docs/contracts/, outside the workspace. C86
+taught tests/test_phase12.py to restore what it found. P13-O2 found eval/run_eval.py doing the
+same by hand and replaced both restores with a redirect of store.EXPORT_DIR -- but put it in
+main(). A probe written minutes later imported run_eval and called mount() directly, walked
+straight past main(), and wrote three files into docs/contracts/, which git add -A then swept
+into de6009c.
+
+The redirect now lives in mount(), which is what actually confirms the contracts. Each fix was
+correct for the path it had seen and placed one level too far out for the paths it had not: on
+the script, then on the entry point, and finally on the function that does the thing. The rule
+this suggests is not "be careful" -- it is that a side effect is fenced where it happens, not
+where the current caller happens to enter, because the next caller enters somewhere else. Three
+occurrences is where a pattern stops being bad luck.
+
+MEASURED, 21/09/2026: importing run_eval and calling mount(server) directly leaves
+docs/contracts/ holding clean_sales.yaml alone, unmodified. Eval SCORE 67/67 unchanged.

@@ -115,6 +115,13 @@ def mount(server) -> bool:
     caveat case has something to catch; and merged_multiheader through the Excel path with its
     date column cleaned, so the questions are not all about one loader.
     """
+    # The redirect lives here rather than in main(), and the reason is C90: it was in main()
+    # and a probe that imported this module and called mount() directly walked straight past it,
+    # writing three files into docs/contracts/. Anything that confirms a contract has to be
+    # covered, and mount() is what confirms them.
+    from analytics_agent.contract import store
+    store.EXPORT_DIR = workspace.workspace_dir(WITH_CONTRACT) / "contracts"
+
     csv = FIXTURES / "clean_sales.csv"
     xlsx = FIXTURES / "merged_multiheader.xlsx"
     if not csv.exists():
@@ -520,8 +527,6 @@ def main() -> int:
         print(f"server.py did not import: {type(exc).__name__}: {exc}")
         return 1
 
-    from analytics_agent.contract import store
-    store.EXPORT_DIR = workspace.workspace_dir(WITH_CONTRACT) / "contracts"
     try:
         if not mount(server):
             print()

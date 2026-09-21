@@ -5,8 +5,8 @@
 # edit here changes nothing and will be overwritten. To change the contract,
 # call propose_dataset_contract with the correction and confirm the result.
 dataset_name: clean_sales
-version: 1
-confirmed_at: '2026-09-21T14:09:14.636903'
+version: 2
+confirmed_at: '2026-09-08T17:43:19.678872'
 fingerprint: facdb163024e
 grain: one row = one order
 primary_key:
@@ -14,20 +14,20 @@ primary_key:
 date_column: order_date
 analysis_window:
   start: '2024-01-01'
-  end: '2024-12-31'
+  end: '2024-12-30'
 measures:
-- name: revenue
-  agg: sum
-  unit: null
-  definition: units x unit_price, gross of tax
 - name: units
   agg: sum
   unit: null
-  definition: items on the order
+  definition: items ordered on this line
 - name: unit_price
   agg: none
   unit: null
-  definition: price of one item; summing it means nothing
+  definition: price per item in INR, excludes tax
+- name: revenue
+  agg: sum
+  unit: null
+  definition: units x unit_price, INCLUDES tax
 dimensions:
 - region
 - product
