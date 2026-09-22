@@ -166,14 +166,16 @@ def test_an_excluded_dimension_is_refused(con):
     assert "never to read it" in str(e.value)
 
 
-def test_too_many_groups_are_refused_with_the_count(con):
+def test_more_groups_than_a_table_holds_are_still_ranked(con):
+    """This test pinned a refusal above 49 groups until Cleanup Step 14 (RF-O8): pareto's answer
+    is a count to a threshold, and the retail run's 500 SKUs were refused for a table it does not
+    need. The ranking goes to the result file, which pages."""
     con.execute("CREATE TABLE wide AS SELECT range AS id, "
                 "('g' || range) AS region, range::DECIMAL(18,2) + 1 AS amount "
                 "FROM range(60)")
-    with pytest.raises(ValueError) as e:
-        out_for(con, gate(dataset_name="wide"), "pareto")
-    assert "60 group(s)" in str(e.value)
-    assert "top_n" in str(e.value)
+    out = out_for(con, gate(dataset_name="wide"), "pareto")
+    assert len(out.rows) == 60
+    assert "across all 60 group(s)" in " ".join(out.summary)
 
 
 def test_an_empty_scope_charts_nothing_and_says_why(con):

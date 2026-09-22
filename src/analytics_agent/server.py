@@ -756,6 +756,8 @@ def compute_analysis(
     second_dimension: str | None = None,
     method: str | None = None,
     entity: str | None = None,
+    event: str | None = None,
+    groups: list[str] | None = None,
     confidence: float | None = None,
     alpha: float | None = None,
     power: float | None = None,
@@ -779,9 +781,10 @@ def compute_analysis(
       frequency       column, limit
       cross_tab       rows, columns, and optionally measure
       top_n           dimension, measure, n; period and grain optional
-      group_compare   dimension, measure
+      group_compare   dimension, measure; groups optional
       pareto          dimension, measure, threshold; period and grain optional
-      concentration   dimension, measure; period and grain optional. With
+      concentration   dimension, measure; period and grain optional. No group
+                      cap for these two: the answer is a count or a few cuts. With
                       period ("2025-11", or "2025-Q4" with grain="quarter"),
                       these three rank only that period's rows -- which
                       orders drive a month.
@@ -804,7 +807,8 @@ def compute_analysis(
                       level across the calendar, with every
                       admissible split reported and the splits a gap
                       could explain excluded rather than caveated.
-      outlier_detection  measure. Unusual values by three methods at
+      outlier_detection  measure; dimension optional, for fences within
+                      each group. Unusual values by three methods at
                       once -- Tukey's fence, the z-score and the
                       median absolute deviation -- with their bounds
                       and the masking that makes the z-score miss.
@@ -836,6 +840,9 @@ def compute_analysis(
                       which hold none -- a period with no rows cannot
                       appear in a GROUP BY, so a trend drawn over this
                       column crosses absent periods without saying so.
+      groups=[...]    on group_compare, hypothesis_test, effect_size,
+                      confidence_interval, sample_adequacy: keep only
+                      those members of dimension, e.g. Store and Online.
       hypothesis_test  dimension, and either measure or second_dimension,
                       plus method (auto, parametric or rank). Whether the
                       groups differ by more than sampling alone would
@@ -864,7 +871,8 @@ def compute_analysis(
                       cohort's size beside its label. Warns and points at
                       repeat_behaviour when too few return for the shape
                       to mean anything.
-      repeat_behaviour  entity. How many people appear once and how many
+      repeat_behaviour  entity; event optional (e.g. order_id, so a person's
+                      events are orders, not rows). How many people appear once and how many
                       come back, how often and how long they take. Both
                       refuse an entity that is distinct per row, which
                       describes events rather than people.
@@ -889,6 +897,7 @@ def compute_analysis(
             before_end=before_end, after_start=after_start,
             after_end=after_end, period=period, baseline=baseline, grain=grain,
             second_dimension=second_dimension, method=method, entity=entity,
+            event=event, groups=groups,
             confidence=confidence, alpha=alpha, power=power,
         )
     finally:
@@ -920,6 +929,8 @@ def render_chart(
     second_dimension: str | None = None,
     method: str | None = None,
     entity: str | None = None,
+    event: str | None = None,
+    groups: list[str] | None = None,
     confidence: float | None = None,
     alpha: float | None = None,
     power: float | None = None,
@@ -986,6 +997,7 @@ def render_chart(
             before_end=before_end, after_start=after_start,
             after_end=after_end, period=period, baseline=baseline, grain=grain,
             second_dimension=second_dimension, method=method, entity=entity,
+            event=event, groups=groups,
             confidence=confidence, alpha=alpha, power=power,
         )
     finally:

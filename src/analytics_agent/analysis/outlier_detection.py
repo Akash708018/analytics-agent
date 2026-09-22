@@ -37,8 +37,9 @@ from __future__ import annotations
 from typing import Any
 
 from ..util.sql_guard import quote_identifier
-from .base import LostRows, number
-from .declared import require_measure
+from .base import LostRows, TooManyGroups, label, number
+from .declared import require_dimension, require_measure
+from .stats import MAX_GROUPS
 from .registry import Output, register
 
 __all__ = ["outlier_detection"]
@@ -76,17 +77,22 @@ def _bound(value: float) -> str:
     summary="Unusual values in one declared measure by three methods at once "
             "-- Tukey's fence, the z-score and the median absolute deviation "
             "-- with their bounds, their disagreement, and the masking that "
-            "makes the z-score flag fewer than the others.",
+            "makes the z-score flag fewer than the others; with dimension, "
+            "within each of its groups.",
 )
-def outlier_detection(con, gate, scope, measure: str, **params) -> Output:
+def outlier_detection(con, gate, scope, measure: str, dimension: str | None = None,
+                      **params) -> Output:
     if params:
         raise TypeError(
-            f"outlier_detection takes measure; got {', '.join(sorted(params))}."
+            f"outlier_detection takes measure and dimension; got {', '.join(sorted(params))}."
         )
 
     contract = gate.contract
     # agg is not consulted (P9-D41): every statistic here is over raw values.
     require_measure(contract, measure)
+    if dimension is not None:
+        require_dimension(contract, dimension)
+        return _within(con, gate, scope, measure, dimension)
 
     table = quote_identifier(scope.dataset_name)
     x = quote_identifier(measure)
@@ -227,3 +233,77 @@ def outlier_detection(con, gate, scope, measure: str, **params) -> Output:
     )
     return Output(headers=headers, rows=rows, summary=summary,
                   label="outlier_detection")
+
+
+def _within(con, gate, scope, measure: str, dimension: str) -> Output:
+    """The three methods' bounds within each group of `dimension` (Cleanup Step 14, G1).
+
+    One fence across groups that differ in scale flags the dear group's ordinary values: the retail
+    run's global Tukey fence flagged 32,467 unit prices, mostly Electronics against Grocery, while
+    the 25 planted ones sat inside their own category's spread. Within a group the question is the
+    one a person means -- unusual for what it is. A group under MIN_ROWS values gets no bounds.
+    """
+    table = quote_identifier(scope.dataset_name)
+    x, d = quote_identifier(measure), quote_identifier(dimension)
+    base = f"SELECT {d} AS g, {x} AS v FROM {table} WHERE {scope.where} AND {x} IS NOT NULL"
+    n_groups = con.execute(f"SELECT count(DISTINCT g) + max(CASE WHEN g IS NULL THEN 1 ELSE 0 END) "
+                           f"FROM ({base})").fetchone()[0] or 0
+    if n_groups > MAX_GROUPS:
+        raise TooManyGroups(
+            f"outlier_detection within {dimension} would be {n_groups} group(s), against a cap of "
+            f"{MAX_GROUPS}. top_n on {dimension} says which of its groups matter.",
+            dimension, measure)
+    rows_sql = (
+        f"WITH s AS ({base}), "
+        f"st AS (SELECT g, count(*) AS n, quantile_cont(v, 0.25) AS q1, "
+        f"quantile_cont(v, 0.75) AS q3, avg(v) AS m, stddev_samp(v) AS sd, median(v) AS med "
+        f"FROM s GROUP BY g), "
+        f"md AS (SELECT s.g, median(abs(s.v - st.med)) AS mad FROM s JOIN st "
+        f"ON s.g IS NOT DISTINCT FROM st.g GROUP BY s.g), "
+        f"b AS (SELECT st.*, md.mad, st.q1 - {IQR_FENCE} * (st.q3 - st.q1) AS tlo, "
+        f"st.q3 + {IQR_FENCE} * (st.q3 - st.q1) AS thi FROM st JOIN md "
+        f"ON st.g IS NOT DISTINCT FROM md.g) "
+        f"SELECT b.g, b.n, b.tlo, b.thi, "
+        f"count(*) FILTER (WHERE s.v < b.tlo OR s.v > b.thi), "
+        f"count(*) FILTER (WHERE b.sd > 0 AND abs(s.v - b.m) > {DEVIATIONS} * b.sd), "
+        f"count(*) FILTER (WHERE b.mad > 0 AND abs(s.v - b.med) > "
+        f"{DEVIATIONS} * {MAD_TO_SIGMA} * b.mad) "
+        f"FROM s JOIN b ON s.g IS NOT DISTINCT FROM b.g "
+        f"GROUP BY b.g, b.n, b.tlo, b.thi ORDER BY b.g NULLS LAST"
+    )
+    fetched = con.execute(rows_sql).fetchall()
+    held = sum(r[1] for r in fetched)
+    missing = scope.analysed - held
+    headers = ["group", "values", "Tukey lower", "Tukey upper", "Tukey flagged",
+               "z-score flagged", "MAD flagged"]
+    rows: list[list[Any]] = []
+    totals = [0, 0, 0]
+    for g, n, tlo, thi, tk, z, md in fetched:
+        if n < MIN_ROWS:
+            rows.append([label(g), number(n), "", "", "", "", ""])
+            continue
+        totals = [totals[0] + tk, totals[1] + z, totals[2] + md]
+        rows.append([label(g), number(n), _bound(float(tlo)), _bound(float(thi)),
+                     number(tk), number(z), number(md)])
+    q1, q3 = con.execute(f"SELECT quantile_cont(v, 0.25), quantile_cont(v, 0.75) FROM ({base})"
+                         ).fetchone()
+    global_tukey = 0
+    if q1 is not None:
+        iqr = float(q3) - float(q1)
+        global_tukey = con.execute(
+            f"SELECT count(*) FROM ({base}) WHERE v < ? OR v > ?",
+            [float(q1) - IQR_FENCE * iqr, float(q3) + IQR_FENCE * iqr]).fetchone()[0]
+    summary = [scope.method_note(), *gate.caveats]
+    summary.append(
+        f"{held:,} of {scope.analysed:,} analysed row(s) hold a {measure}, in {len(fetched)} "
+        f"group(s) of {dimension}; {missing:,} do not. A group of fewer than {MIN_ROWS} values "
+        f"gets no bounds.")
+    summary.append(
+        f"Flagged within {dimension}: Tukey's fence {totals[0]:,}, z-score {totals[1]:,}, median "
+        f"absolute deviation {totals[2]:,}. One Tukey fence across all groups at once flags "
+        f"{global_tukey:,} -- the difference is the spread between groups, which a single fence "
+        f"reads as unusual values.")
+    summary.append(
+        f"Nothing above is removed and nothing is recommended for removal. A flagged row is "
+        f"unusual for its own {dimension}, which is a question about that row and not a verdict.")
+    return Output(headers=headers, rows=rows, summary=summary, label="outlier_detection")

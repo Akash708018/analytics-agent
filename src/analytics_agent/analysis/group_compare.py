@@ -35,6 +35,7 @@ ALL = "(all)"
     summary="One declared measure summarised per group of a declared "
             "dimension, with an (all) row computed from the rows and a share "
             "column when the declared aggregate adds across groups.",
+    selects=True,
 )
 def group_compare(con, gate, scope, dimension: str, measure: str, **params) -> Output:
     if params:

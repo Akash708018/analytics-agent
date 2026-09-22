@@ -477,17 +477,15 @@ def _next_call(text):
 def test_a_group_cap_names_top_n_not_a_new_contract(wide):
     """Live, 15:03: WHY said 'top_n on order_id says which of its groups matter' and NEXT STEP
     said propose_dataset_contract, and the assistant spent its last round on the refusal."""
-    text = run(wide, "concentration", dataset_name="wide", dimension="shop", measure="amount")
+    # concentration until Cleanup Step 14 removed its cap; group_compare still has one.
+    text = run(wide, "group_compare", dataset_name="wide", dimension="shop", measure="amount")
     assert reason_of(text) is Reason.ANALYSIS_NOT_POSSIBLE
     assert _next_call(text) == ('compute_analysis(dataset_name="wide", analysis_type="top_n", '
                                 'dimension="shop", measure="amount")')
 
 
-def test_the_named_top_n_keeps_the_period_and_succeeds_verbatim(wide):
-    text = run(wide, "concentration", dataset_name="wide", dimension="shop", measure="amount",
-               period="2024-06")
-    call = _next_call(text)
-    assert 'period="2024-06"' in call and 'analysis_type="top_n"' in call
-    again = run(wide, "top_n", dataset_name="wide", dimension="shop", measure="amount",
-                period="2024-06")
+def test_the_named_top_n_succeeds_verbatim(wide):
+    text = run(wide, "group_compare", dataset_name="wide", dimension="shop", measure="amount")
+    assert 'analysis_type="top_n"' in _next_call(text)
+    again = run(wide, "top_n", dataset_name="wide", dimension="shop", measure="amount")
     assert reason_of(again) is None, again.splitlines()[:3]

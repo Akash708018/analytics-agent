@@ -21,7 +21,7 @@ NULL. The predicate has to decide; the count has to refuse to.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from decimal import Decimal
 from typing import Any
 
@@ -226,6 +226,9 @@ class Scope:
     rule_unknown: int = 0
     skipped_columns: list[str] = field(default_factory=list)
     window_text: str = ""
+    #: Rows of groups the caller did not choose (groups=[...], Cleanup Step 14), and which ones.
+    unselected: int = 0
+    selection_text: str = ""
 
     def __post_init__(self):
         """Four numbers that sum to the row count, refused if they do not.
@@ -236,12 +239,14 @@ class Scope:
         arranged against, and it would arrive as arithmetic rather than as an
         error.
         """
-        total = self.excluded + self.outside_window + self.no_date + self.analysed
+        total = (self.excluded + self.outside_window + self.no_date + self.unselected
+                 + self.analysed)
         if total != self.rows:
             raise ScopeError(
                 f"the scope of {self.dataset_name} loses rows: "
                 f"{self.excluded} excluded + {self.outside_window} outside the "
-                f"window + {self.no_date} undated + {self.analysed} analysed = "
+                f"window + {self.no_date} undated + {self.unselected} unselected + "
+                f"{self.analysed} analysed = "
                 f"{total}, against {self.rows} row(s) in the table."
             )
         if self.rule_unknown > self.analysed + self.outside_window + self.no_date:
@@ -273,6 +278,8 @@ class Scope:
             parts.append(
                 f"{self.no_date:,} undated and so not placed in the window."
             )
+        if self.unselected:
+            parts.append(f"{self.unselected:,} outside the groups {self.selection_text}.")
         if self.rule_unknown:
             parts.append(
                 f"{self.rule_unknown:,} kept although an exclusion rule could "
@@ -351,3 +358,36 @@ def scope_for(con, gate) -> Scope:
         skipped_columns=list(contract.excluded_columns),
         window_text=window_text,
     )
+
+
+def select_groups(con, gate, scope: Scope, dimension: str | None, groups) -> Scope:
+    """The scope holding only the named members of `dimension` (Cleanup Step 14, H1 and H6).
+
+    Store against Online is a question with two groups; channel has three, so hypothesis_test ran
+    ANOVA and sample_adequacy refused. Members are compared as text, so a numeric dimension is named
+    the way it prints. A member with no row in scope is refused naming those that exist -- a typo
+    that silently selected nothing would test the other groups and look like an answer.
+    """
+    from .declared import require_dimension
+
+    if not dimension:
+        raise ParamsInvalid("groups names members of a dimension; pass dimension= as well.")
+    require_dimension(gate.contract, dimension)
+    wanted = [str(g) for g in groups]
+    if not wanted:
+        raise ParamsInvalid("groups is empty; name the members to keep, or leave it out.")
+    table, d = quote_identifier(scope.dataset_name), quote_identifier(dimension)
+    present = sorted(r[0] for r in con.execute(
+        f"SELECT DISTINCT CAST({d} AS VARCHAR) FROM {table} WHERE {scope.where} "
+        f"AND {d} IS NOT NULL").fetchall())
+    unknown = [g for g in wanted if g not in present]
+    if unknown:
+        raise ParamsInvalid(
+            f"no row in scope has {dimension} {', '.join(repr(u) for u in unknown)}. Its members "
+            f"are: {', '.join(present)}.")
+    listed = ", ".join("'" + g.replace("'", "''") + "'" for g in wanted)
+    where = f"({scope.where}) AND CAST({d} AS VARCHAR) IN ({listed})"
+    kept = con.execute(f"SELECT count(*) FROM {table} WHERE {where}").fetchone()[0]
+    return replace(scope, where=where, analysed=kept,
+                   unselected=scope.unselected + scope.analysed - kept,
+                   selection_text=f"{', '.join(wanted)} of {dimension}")

@@ -87,6 +87,7 @@ def _shown_pair(dimension: str, second: str) -> str:
             "naming the test it ran, the assumption it checked, and what the result means "
             "in words. Welch's t for two groups, one-way ANOVA for more, chi-square for two "
             "dimensions, Mann-Whitney on request or when a group has no variance.",
+    selects=True,
 )
 def hypothesis_test(con, gate, scope, dimension: str, measure: str | None = None,
                     second_dimension: str | None = None, method: str = "auto",

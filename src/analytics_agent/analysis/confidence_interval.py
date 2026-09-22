@@ -59,6 +59,7 @@ def _shown(key: str, dimension: str, measure: str | None = None) -> str:
     summary="The range a mean or a share is consistent with, given how many rows produced it. "
             "The t interval for a measure, Wilson for a share, both named, with the width "
             "stated so a reader can see what the scope could and could not resolve.",
+    selects=True,
 )
 def confidence_interval(con, gate, scope, dimension: str | None = None,
                         measure: str | None = None, confidence: float = 0.95,

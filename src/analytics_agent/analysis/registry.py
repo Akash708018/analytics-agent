@@ -69,19 +69,21 @@ class Analysis:
     #: Takes `period` (and `grain`), applied to the scope before the analysis runs, so the
     #: analysis describes the rows it was handed (Cleanup Step 9).
     narrows: bool = False
+    #: Takes `groups` -- members of its `dimension` to keep -- applied to the scope likewise.
+    selects: bool = False
 
 
 REGISTRY: dict[str, Analysis] = {}
 
 
-def register(name: str, tier: int, summary: str, narrows: bool = False):
+def register(name: str, tier: int, summary: str, narrows: bool = False, selects: bool = False):
     """Decorator. The name is the `analysis_type` a caller asks for."""
 
     def wrap(fn: Callable[..., Output]) -> Callable[..., Output]:
         if name in REGISTRY:
             raise ValueError(f"{name!r} is registered twice.")
         REGISTRY[name] = Analysis(name=name, tier=tier, run=fn, summary=summary,
-                                  narrows=narrows)
+                                  narrows=narrows, selects=selects)
         return fn
 
     return wrap
@@ -117,13 +119,17 @@ def narrowed(con, gate, scope, analysis: Analysis, params: dict):
     method note described a scope the tool layer had not built (Cleanup Step 9, 4.1). The
     narrowing belongs where the scope is made, which is here and in tools._produce.
     """
-    if not analysis.narrows:
-        return scope, params
-    from .temporal import period_narrowing  # temporal imports this module's neighbours
-
     rest = dict(params)
-    period, grain = rest.pop("period", None), rest.pop("grain", None)
-    return period_narrowing(con, gate, scope, analysis.name, period, grain), rest
+    if analysis.narrows:
+        from .temporal import period_narrowing  # temporal imports this module's neighbours
+
+        period, grain = rest.pop("period", None), rest.pop("grain", None)
+        scope = period_narrowing(con, gate, scope, analysis.name, period, grain)
+    if analysis.selects and rest.get("groups") is not None:
+        from .base import select_groups
+
+        scope = select_groups(con, gate, scope, rest.get("dimension"), rest.pop("groups"))
+    return scope, rest
 
 
 def run(con, gate, scope, analysis_type: str, **params) -> Output:

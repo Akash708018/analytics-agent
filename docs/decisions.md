@@ -6533,3 +6533,40 @@ Digests (sha256, lines):
   8eb76eeb2bff9c7cee00ff99b7a98526a23427ee04eab496112495c2ef508c97  220  src/analytics_agent/validate/tools.py
   24a32eba7b0a54cd1acf5c37726ee6e7d4239e3a44c600035c0db34c94e400ed  1219  src/analytics_agent/server.py
   12664311b3f3dbb228a902de936540109da922b3764058bf6b40163925790f2f  88  tests/test_validate_expectations.py
+
+## Cleanup Step 14 - an event key, no needless cap, fences within groups, chosen groups, 22/09/2026
+
+Step document: docs/steps/cleanup_step14_analysis_options.md. Closes RF-O6, RF-O8, and the G1 and
+H1/H6 findings.
+
+CL14-D1. REPEAT_BEHAVIOUR TAKES AN EVENT KEY. CLOSES RF-O6. event=order_id: a person's events are
+distinct orders, dated by their earliest row; rows with no event counted apart. The median gap
+between consecutive events is reported beside the first-to-second one. Retail: 82.096%, busiest 633.
+
+CL14-D2. PARETO AND CONCENTRATION HAVE NO GROUP CAP. CLOSES RF-O8. The cap keeps a per-group table
+inside the display limit; these answers are a count to a threshold and a few cuts. concentration
+adds cuts at 1/5/10% of the groups from 100 groups, and prints an index below 100 with two decimals.
+Retail: 180 of 500 SKUs; top 1% (348) 12.56%, HHI 1.35.
+
+CL14-D3. OUTLIER_DETECTION TAKES A DIMENSION. G1. The three methods' bounds within each group, one
+pass, capped by TooManyGroups; the reply sets the within-group count beside the global Tukey count
+and names the difference as between-group spread.
+
+CL14-D4. GROUPS=[...] CHOOSES MEMBERS OF A DIMENSION. H1, H6. On group_compare, hypothesis_test,
+effect_size, confidence_interval and sample_adequacy (registered selects=True); applied to the scope
+in registry.narrowed as period is, counted by a new Scope.unselected (the four-bucket invariant is
+now five). A member with no rows is refused naming those that exist.
+
+MEASURED VALIDATION, 22/09/2026. `uv run pytest -q`: 1917 -> 1925 passed (8 in
+tests/test_analysis_options.py; one test_pareto test inverted, two test_analysis_tools tests
+repointed). Acceptance unchanged: 99/0/2, 19/0/0, 35/0/1, 26/0/0, 36/0/0. Eval 76/76. UI 37.
+Digests (sha256, lines):
+  a4c0e10790b3bdaa1eae8746da688a68f6729dbcf658d59a05497ee67498d6e7  228  src/analytics_agent/analysis/repeat_behaviour.py
+  41e3e90774a6c6de153fd0e10033b050a3f1f649d8e60ec714c45b980464dfe9  212  src/analytics_agent/analysis/pareto.py
+  754d935f70f8a80134c7683003402fd7df51af51bb3c98730e52947169ed3514  309  src/analytics_agent/analysis/outlier_detection.py
+  2e5cc8c51b4c6718e913d54280579d9575032e5b42eb16a112df51fdc0b6ccc2  393  src/analytics_agent/analysis/base.py
+  ffbe4a21721cd72bcfea6600c507554cea8a1f36f1314b7c47ada5341492dabd  139  src/analytics_agent/analysis/registry.py
+  878ee9fa5043d03bbb44669fcfe98f838b22cd9375b260cde6d039b97933852c  359  src/analytics_agent/analysis/tools.py
+  d341c69a9ea1e3be03d9d4d7a15efbc83289c7a3e43f2f9fb824420db19dc088  1231  src/analytics_agent/server.py
+  378c52433ec5bd2c9df116064ef21db9b66ecc8094abe0a878833a4f56cc844e  271  src/analytics_agent/webapp/agent.py
+  02fdccd82ae226611d1c6d6f2b592dff018d04b7ce411512db4c0c6c71e1b978  131  tests/test_analysis_options.py

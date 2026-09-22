@@ -87,6 +87,8 @@ def _roster() -> str:
                  if n not in ("con", "gate", "scope") and prm.kind is not prm.VAR_KEYWORD]
         if a.narrows:
             names += ["period", "grain"]
+        if a.selects:
+            names += ["groups"]
         lines.append(f"{a.name}({', '.join(names)})")
     return "; ".join(lines)
 

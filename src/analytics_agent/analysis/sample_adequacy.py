@@ -59,6 +59,7 @@ def _shown(key: str, dimension: str, measure: str | None = None) -> str:
     summary="How large a difference the rows in scope could have detected, in standard "
             "deviations and in the measure's own units, with the rows that would be needed "
             "for smaller ones. Never observed power, which restates the p-value.",
+    selects=True,
 )
 def sample_adequacy(con, gate, scope, dimension: str, measure: str,
                     power: float = 0.8, alpha: float = 0.05, **params) -> Output:

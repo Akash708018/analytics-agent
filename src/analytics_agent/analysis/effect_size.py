@@ -73,6 +73,7 @@ def _shown_pair(dimension: str, second: str) -> str:
             "between two groups, eta squared across more, Cramer's V between two dimensions. "
             "Named, banded by Cohen's conventions, and stated as a convention rather than a "
             "verdict.",
+    selects=True,
 )
 def effect_size(con, gate, scope, dimension: str, measure: str | None = None,
                 second_dimension: str | None = None, **params) -> Output:

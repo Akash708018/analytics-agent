@@ -33,12 +33,15 @@ BUCKETS = ((1, "once"), (2, "twice"), (3, "three times"), (5, "four or five time
             "take to return. The reframe for data where a retention grid would be mostly "
             "empty. Refuses a key that is distinct per row, which describes events, not people.",
 )
-def repeat_behaviour(con, gate, scope, entity: str, **params) -> Output:
+def repeat_behaviour(con, gate, scope, entity: str, event: str | None = None,
+                     **params) -> Output:
     if params:
         raise TypeError(
-            f"repeat_behaviour takes entity; got {', '.join(sorted(params))}."
+            f"repeat_behaviour takes entity and event; got {', '.join(sorted(params))}."
         )
     require_dimension(gate.contract, entity)
+    if event is not None:
+        _require_declared(gate.contract, event)
     date_column = getattr(gate.contract, "date_column", None)
     if not date_column:
         raise ValueError(
@@ -55,6 +58,11 @@ def repeat_behaviour(con, gate, scope, entity: str, **params) -> Output:
     key = quote_identifier(entity)
     dt = quote_identifier(date_column)
     usable = f"{scope.where} AND {key} IS NOT NULL AND {dt} IS NOT NULL"
+    # With an event key (Cleanup Step 14, RF-O6), a person's events are the distinct values of
+    # that column -- an order -- and not the rows: the retail run counted a two-line order as a
+    # return. Rows with no event are counted apart, as rows with no person are.
+    ev = quote_identifier(event) if event else None
+    counted = f"count(DISTINCT {ev})" if ev else "count(*)"
 
     events, distinct_keys = con.execute(
         f"SELECT count(*), count(DISTINCT {key}) FROM {table} WHERE {usable}"
@@ -73,14 +81,24 @@ def repeat_behaviour(con, gate, scope, entity: str, **params) -> Output:
         f"       count(*) FILTER (WHERE {key} IS NOT NULL AND {dt} IS NULL) "
         f"FROM {table} WHERE {scope.where}"
     ).fetchall()[0]
+    no_event = 0
+    if ev:
+        no_event = con.execute(
+            f"SELECT count(*) FROM {table} WHERE {usable} AND {ev} IS NULL").fetchone()[0]
     if events + no_entity + no_date != scope.analysed:
         raise LostRows(
             f"repeat_behaviour lost rows: {events:,} usable, {no_entity:,} with no {entity}, "
             f"{no_date:,} with no {date_column}, against {scope.analysed:,} in scope."
         )
 
+    rows_usable = events
+    if ev:
+        usable = f"{usable} AND {ev} IS NOT NULL"
+        events = con.execute(
+            f"SELECT count(*) FROM (SELECT DISTINCT {key}, {ev} FROM {table} WHERE {usable})"
+        ).fetchone()[0]
     counts = con.execute(
-        f"SELECT n, count(*) FROM (SELECT {key} AS k, count(*) AS n FROM {table} "
+        f"SELECT n, count(*) FROM (SELECT {key} AS k, {counted} AS n FROM {table} "
         f"WHERE {usable} GROUP BY 1) GROUP BY 1 ORDER BY 1"
     ).fetchall()
     people = sum(c for _, c in counts)
@@ -113,26 +131,34 @@ def repeat_behaviour(con, gate, scope, entity: str, **params) -> Output:
         raise LostRows(
             f"repeat_behaviour lost people: {placed:,} in buckets against {people:,} counted."
         )
-    for name, count in ((NO_ENTITY, no_entity), (NO_DATE, no_date)):
+    for name, count in ((NO_ENTITY, no_entity), (NO_DATE, no_date),
+                        (f"(no {event})", no_event)):
         if count:
             rows.append([name, None, None, number(count)])
 
     rate = repeaters / people if people else 0.0
+    what = (f"{events:,} distinct {event} event(s) in {rows_usable - no_event:,} row(s)" if ev
+            else f"{events:,} event(s)")
     summary.append(
-        f"{people:,} distinct {entity} value(s) across {events:,} event(s). {repeaters:,} came "
+        f"{people:,} distinct {entity} value(s) across {what}. {repeaters:,} came "
         f"back at least once — a repeat rate of {rate:.3%}."
     )
     summary.append(
         f"The busiest {entity} accounts for {max(n for n, _ in counts):,} event(s); the median "
         f"is {_median_of(counts):,}."
     )
-    gap = _first_gap(con, table, key, dt, usable)
+    gap = _first_gap(con, table, key, dt, usable, ev)
     if gap is not None:
         summary.append(
             f"Among those who returned, the median gap between a first event and a second is "
             f"{gap:,} day(s). That is the interval a retention grid would be resolving, and it "
             f"is why the period a grid is cut into matters more than the grid does."
         )
+    between = _consecutive_gap(con, table, key, dt, usable, ev)
+    if between is not None:
+        summary.append(
+            f"The median gap between consecutive {event or 'row'} events is {between:,} day(s), "
+            f"across every return, not only the first.")
     summary.append(
         f"{no_entity:,} row(s) have no {entity} and {no_date:,} have no {date_column}; both are "
         f"shown above so the event counts add back to the {scope.analysed:,} in scope. People "
@@ -160,13 +186,42 @@ def _median_of(counts: list[tuple[int, int]]) -> int:
     return counts[-1][0] if counts else 0
 
 
-def _first_gap(con, table: str, key: str, dt: str, usable: str) -> int | None:
+def _require_declared(contract, column: str) -> None:
+    """An event key is read, so the contract must name it -- as a dimension or a measure."""
+    named = set(getattr(contract, "dimensions", []) or []) | {
+        m.name for m in getattr(contract, "measures", []) or []}
+    if column not in named:
+        raise ValueError(
+            f"{column!r} is not declared in the contract of {contract.dataset_name}, so it cannot "
+            f"be the event key. Declare it (as a dimension) and confirm the contract.")
+
+
+def _events(table: str, key: str, dt: str, usable: str, ev: str | None) -> str:
+    """One row per event: a row itself, or with an event key its earliest row."""
+    if ev:
+        return (f"SELECT {key} AS k, min({dt}) AS d FROM {table} WHERE {usable} "
+                f"GROUP BY {key}, {ev}")
+    return f"SELECT {key} AS k, {dt} AS d FROM {table} WHERE {usable}"
+
+
+def _consecutive_gap(con, table: str, key: str, dt: str, usable: str,
+                     ev: str | None) -> int | None:
+    """Median days between each event and the person's previous one (Cleanup Step 14)."""
+    row = con.execute(
+        f"WITH e AS ({_events(table, key, dt, usable, ev)}), "
+        f"g AS (SELECT date_diff('day', lag(d) OVER (PARTITION BY k ORDER BY d), d) AS gap "
+        f"FROM e) SELECT median(gap) FROM g WHERE gap IS NOT NULL"
+    ).fetchone()
+    return None if row[0] is None else int(row[0])
+
+
+def _first_gap(con, table: str, key: str, dt: str, usable: str,
+               ev: str | None = None) -> int | None:
     """Median days between a person's first event and their second."""
     row = con.execute(
         f"WITH ordered AS ("
-        f"  SELECT {key} AS k, {dt} AS d, "
-        f"         row_number() OVER (PARTITION BY {key} ORDER BY {dt}) AS seq "
-        f"  FROM {table} WHERE {usable}) "
+        f"  SELECT k, d, row_number() OVER (PARTITION BY k ORDER BY d) AS seq "
+        f"  FROM ({_events(table, key, dt, usable, ev)})) "
         f"SELECT median(date_diff('day', a.d, b.d)) FROM ordered a JOIN ordered b "
         f"ON a.k = b.k AND a.seq = 1 AND b.seq = 2"
     ).fetchall()[0]

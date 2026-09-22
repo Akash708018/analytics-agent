@@ -148,12 +148,12 @@ def _produce(con, dataset_name: str, analysis_type: str, params: dict):
             next_call=f'propose_dataset_contract(dataset_name="{dataset_name}")',
         ).to_text()) from None
     except TooManyGroups as exc:
-        # The WHY names top_n; so does the NEXT STEP (Cleanup Step 11, CL10-O1). A period and
-        # grain the caller gave travel with it, so the ranking is of the same rows.
+        # The WHY names top_n; so does the NEXT STEP (Cleanup Step 11, CL10-O1). It carried a
+        # period until Step 14 removed the cap from pareto and concentration, the only capped
+        # analyses that took one.
         if exc.measure:
-            kept = {k: params[k] for k in ("period", "grain") if k in params}
             recovery = _as_call("compute_analysis", dataset_name, "top_n",
-                                {"dimension": exc.dimension, "measure": exc.measure, **kept})
+                                {"dimension": exc.dimension, "measure": exc.measure})
         else:
             recovery = (f'compute_analysis(dataset_name="{dataset_name}", '
                         f'analysis_type="frequency", column="{exc.dimension}")')
