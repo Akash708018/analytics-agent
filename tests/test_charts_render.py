@@ -317,3 +317,39 @@ def test_a_rollup_column_that_is_the_only_series_is_drawn():
 def test_the_named_measure_draws_a_bar_through_render(ws):
     chart = render(ws, kind="bar", output=TREND, label="trend", measure="order_value", now=T1)
     assert chart.series_names == ["order_value (sum)"]
+
+
+# --- every x keeps its slot (Cleanup Step 9) --------------------------------------------------
+#
+# The 12:17 grouped bar had no July: _draw kept only x positions where every series had a
+# value, so an absent period vanished and June sat beside August.
+
+GAPPED = out(headers=["period", "a", "b"],
+             rows=[["06", "1", "2"], ["07", None, None], ["08", "3", None]])
+
+
+def _ticks(kind, output, y=None):
+    from analytics_agent.charts import render as r
+    fig, ax = plt.subplots()
+    try:
+        drawn = r._draw(ax, kind, r.series_from_output(output, y=y))
+        return [t.get_text() for t in ax.get_xticklabels()], drawn
+    finally:
+        plt.close(fig)
+
+
+@pytest.mark.parametrize("kind", ["bar", "line"])
+def test_an_empty_period_keeps_its_slot_on_the_axis(kind):
+    ticks, drawn = _ticks(kind, GAPPED, y=["a"])
+    assert ticks == ["06", "07", "08"] and drawn == 2
+
+
+def test_a_grouped_bar_keeps_the_empty_slot_and_draws_the_values_it_has():
+    ticks, drawn = _ticks("grouped_bar", GAPPED)
+    assert ticks == ["06", "07", "08"]
+    assert drawn == 3, "06 has two values and 08 one; 07 none"
+
+
+def test_the_empty_slot_is_named(ws):
+    chart = render(ws, kind="grouped_bar", output=GAPPED, label="gapped", now=T1)
+    assert any("07" in n and "empty slot" in n for n in chart.notes)

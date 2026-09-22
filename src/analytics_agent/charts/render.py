@@ -380,21 +380,40 @@ def _draw(ax, kind: str, extract: Extract) -> int:
 
     # The remaining kinds share an x of category positions, because P11-D5 measured matplotlib
     # keeping the order it is given and ranked_totals hands groups back biggest first.
-    kept = [(i, lab) for i, lab in enumerate(extract.x)
-            if all(s.values[i] is not None for s in series)]
-    if not kept:
+    #
+    # Every label keeps its slot (Cleanup Step 9). Positions used to be only the x where every
+    # series had a value, so an absent month vanished from the axis and a chart of a gapped
+    # calendar showed June beside August -- the evenly spaced line the trend analysis exists to
+    # warn against. Now a slot with no value is drawn empty. Waterfall alone keeps the filter: a
+    # running total cannot step over a missing part and still mean what it says.
+    if kind == "waterfall":
+        kept = [(i, lab) for i, lab in enumerate(extract.x)
+                if all(s.values[i] is not None for s in series)]
+    else:
+        kept = list(enumerate(extract.x))
+    if not any(s.values[i] is not None for s in series for i, _ in kept):
         raise ChartRefused(
-            "no row holds a value for every measure drawn, so there is nothing to place."
+            "no row holds a value for the measures drawn, so there is nothing to place."
         )
     at = _positions(len(kept))
     labels = [lab for _, lab in kept]
 
+    def present(s: Series) -> tuple[list[float], list[float]]:
+        pairs = [(p, s.values[i]) for p, (i, _) in zip(at, kept) if s.values[i] is not None]
+        return [a for a, _ in pairs], [v for _, v in pairs]
+
+    drawn = 0
     if kind == "line":
+        # P11-D4: a None in plot() is a gap, so the line stops at the empty slot rather than
+        # bridging it.
         ax.plot(at, [series[0].values[i] for i, _ in kept], marker="o")
         ax.set_ylabel(series[0].name)
+        drawn = len(series[0].present)
     elif kind == "bar":
-        ax.bar(at, [series[0].values[i] for i, _ in kept])
+        xs, ys = present(series[0])
+        ax.bar(xs, ys)
         ax.set_ylabel(series[0].name)
+        drawn = len(ys)
     elif kind == "waterfall":
         values = [series[0].values[i] for i, _ in kept]
         bottoms: list[float] = []
@@ -404,6 +423,7 @@ def _draw(ax, kind: str, extract: Extract) -> int:
             running += v
         ax.bar(at, values, bottom=bottoms)
         ax.set_ylabel(f"{series[0].name} (cumulative)")
+        drawn = len(kept)
     elif kind == "grouped_bar":
         if len(series) < 2:
             raise ChartRefused(
@@ -413,8 +433,9 @@ def _draw(ax, kind: str, extract: Extract) -> int:
         width = 0.8 / len(series)
         start = -0.4 + width / 2
         for j, s in enumerate(series):
-            ax.bar([p + start + j * width for p in at],
-                   [s.values[i] for i, _ in kept], width=width, label=s.name)
+            xs, ys = present(s)
+            ax.bar([p + start + j * width for p in xs], ys, width=width, label=s.name)
+            drawn += len(ys)
         ax.legend()
     else:  # pragma: no cover -- render() checks the name before this is reached
         raise ChartRefused(f"{kind!r} is not a chart this engine draws.")
@@ -422,7 +443,13 @@ def _draw(ax, kind: str, extract: Extract) -> int:
     ax.set_xticks(at)
     ax.set_xticklabels(labels, rotation=45 if any(len(s) > 4 for s in labels) else 0,
                        ha="right" if any(len(s) > 4 for s in labels) else "center")
-    return len(kept) * len(series)
+    return drawn
+
+
+def empty_slots(extract: Extract) -> list[str]:
+    """Labels where no series drawn has a value: slots a line, bar or grouped bar keeps empty."""
+    return [lab for i, lab in enumerate(extract.x)
+            if all(s.values[i] is None for s in extract.series)]
 
 
 def render(
@@ -485,7 +512,10 @@ def render(
         key_values=_key_values(extract),
         dataset_name=dataset_name,
         summary=list(getattr(output, "summary", []) or []),
-        notes=extract.dropped,
+        notes=extract.dropped + (
+            [f"{', '.join(empty_slots(extract))} hold(s) no value in any series and "
+             f"stay on the axis as an empty slot, not a zero."]
+            if kind in ("line", "bar", "grouped_bar") and empty_slots(extract) else []),
     )
 
 

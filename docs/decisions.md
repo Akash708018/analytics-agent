@@ -6228,3 +6228,74 @@ Digests, final tree (sha256, lines):
   5ddbeb4061c26cc81a4e4221f56e6231e626c7d4b25b027fbb20bec1db06c197  342  src/analytics_agent/analysis/tools.py
   e99c11add4e9320534dfbc70617cfd3c91fdb3703df57da17df9d9833b1b7771  1210  src/analytics_agent/server.py
   003ade48054722ae104dceac2326a71d7d6b94fc4aa52dd3846ca232baa028de  69  tests/test_duplicate_facts.py
+
+## Cleanup Step 9 - which orders drive a month; a chart that keeps its gap; the assistant's rules, 22/09/2026
+
+Step document: docs/steps/cleanup_step9_period_charts_prompt.md. Found by grading the Ask screen's
+12:21 answer on ws_0b4a3e60bfd6: it failed deduplication (and invented a Cleaning screen), the
+chart (none drawn; JSON handed over instead) and the peak (deferred to a whole-year call). One
+prediction failed (4.1, C101); the live assistant check could not be measured (CL9-O1).
+
+CL9-D1. THREE ANALYSES TAKE ONE NAMED PERIOD, APPLIED WHERE THE SCOPE IS BUILT. top_n,
+concentration and pareto register with narrows=True, and registry.narrowed() -- called from
+registry.run and tools._produce, the two places a scope is handed to an analysis -- takes period
+and grain off the parameters and narrows the scope first. temporal.narrow_to_period looks the
+label up in the generated calendar (P9-D12): a label outside it is refused naming the range, one
+inside it with no rows narrows to 0 rows. The four buckets still sum to the table: dated rows of
+other periods move to outside_window, undated analysed rows to no_date, and the method note reads
+"outside the month 2025-11 (within 2025-01-01 to 2025-12-30)". grain without period is refused.
+Measured on the run's rows: November 56 of 604 rows; ORD-00551 96,049, 37.7% of the raw
+254,506.43 (39.0% of the deduplicated 246,412.22, by SQL). Still 27 analyses.
+
+CL9-D2. A LINE, BAR OR GROUPED BAR KEEPS EVERY X SLOT. _draw placed only the x where every series
+had a value, so the 12:17 chart of a gapped calendar put June beside August -- the evenly spaced
+picture trend exists to warn against, and the assistant promised the person the opposite. Every
+label is now on the axis; values are drawn where present (a line breaks at None, P11-D4); a slot
+empty in every series is named in the notes as "an empty slot, not a zero". A grouped bar now
+draws a member's bar even where another member has none, and drawn counts the values drawn.
+Waterfall keeps the old filter: a running total cannot step over a missing part.
+
+CL9-D3. THE ASSISTANT'S RULES NAME ONLY REAL SCREENS AND FORBID HANDING OVER CALLS. agent.SCREENS
+holds the web app's screens and a test holds it equal to ui/app.py's st.Page titles; SYSTEM names
+exactly those and says cleaning and databases have none. New rules: never give the person a tool
+call, JSON or parameters; run what the question needs while rounds remain (render_chart for a
+chart, top_n with period= for "what drives this month"); give a cause for a gap, peak or change
+only if a tool reply states it; when copies are reported and cleaning was asked for, answer on the
+data as it is, labelled, and say cleaning is not in the web app. Rules are text a model may
+ignore -- the 12:21 answer ignored an explicit engine note -- so what these tests pin is that the
+rules exist and agree with the app, not that a model obeys them.
+
+C101. I NARROWED THE SCOPE INSIDE THE ANALYSIS, AND THE TOOL LAYER REFUSED EVERY RESULT. First
+version: top_n, concentration and pareto each called the narrowing on the scope they were given.
+All seven unit tests passed, through registry.run. Through server.compute_analysis every call was
+ANALYSIS_RESULT_UNSOUND: _produce checks the first summary line against the method note of the
+scope it built, and the analysis had described a different one. The check was right and my
+layering wrong -- a scope is made in one place and an analysis describes what it is handed. The
+same lesson as C83: a test that does not go through the tool layer does not test the tool.
+
+C102. A RULE I DID NOT WRITE CONTRADICTED ONE I DID, AND ONLY PRINTING THE PROMPT SHOWED IT. The
+Phase 14 rule listed "approve cleaning" among what the person does on a screen, naming the Upload
+& read and Contract screens, while P14-O2 records that cleaning has none. Present since Step 4 and
+a plausible source of the invented "Cleaning screen". Removed; a test pins its absence.
+
+CL9-O1 IS OPEN. THE WEB ASSISTANT'S CONVERSATION OUTGROWS GROQ'S LIMIT, AND THIS STEP'S LIVE CHECK
+IS UNMEASURED. Two live runs of the graded question: Gemini 503 ("high demand") both times; Groq
+413, tokens per minute 8,000, requested 8,003 then 8,451. This step's rules added ~260 tokens
+(SYSTEM 1,090 -> 2,118 characters); run_analysis's catalogue reply is 7,431 characters (~1,850
+tokens) and four tool replies at up to RESULT_CHARS=8,000 characters each put Groq out of reach on
+its own. Closing it means a shorter catalogue for the model or a per-provider budget, measured
+against a real run -- and then the rule checks of CL9-D3 run against a real answer.
+
+MEASURED VALIDATION, 22/09/2026. `uv run pytest -q`: 1867 -> 1884 passed (7 test_frequency, 4
+test_charts_render, 5 test_agent, 1 test_analysis_tools). Acceptance unchanged: 99/0/2, 19/0/0,
+35/0/1, 26/0/0, 36/0/0. `uv run python eval/run_eval.py`: SCORE 76/76 (100%). `uv run --group ui
+pytest ui/tests`: 37 passed. Max line in src/ 105.
+Digests, final tree (sha256, lines):
+  8974102ef15e925fdec9a317594c412bddaadfb3b27cdc804db6415bc7b9c8ce  292  src/analytics_agent/analysis/temporal.py
+  5cbc398e9a2c8d3765d64970264d114b8c7f051eb5782563dd45497c3ce024d4  133  src/analytics_agent/analysis/registry.py
+  32c6dd497ec121dba46b6121ffd0bb0041aa841e95828961321d0222d93a1c39  342  src/analytics_agent/analysis/tools.py
+  685fb01dd957265ca7754916805db76ffa11a947331faa22414e2828dcb37b0a  209  src/analytics_agent/analysis/frequency.py
+  83e745e54285450396a770c4dea5ae67eb1a78723900a6390adb87fb2a854a34  204  src/analytics_agent/analysis/pareto.py
+  adc462ce5a8a3ebd4ad2aa5680d61a6f92581bb51a756f4d93082e11779b09af  525  src/analytics_agent/charts/render.py
+  c0a5723639e28fd47a1b42edf69eba188e0fda9717ea8a8d595111cc55cf0111  197  src/analytics_agent/webapp/agent.py
+  9fefccd63f2b219e68f30a347beb81dc428a683cb99d1fb9ab94029cd7bca027  1213  src/analytics_agent/server.py

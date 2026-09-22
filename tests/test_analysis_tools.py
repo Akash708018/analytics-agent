@@ -443,3 +443,13 @@ def test_a_trend_bar_draws_the_measure_it_was_given(con):
     text = draw(con, "trend", "bar", measure="amount")
     assert reason_of(text) is None, text.splitlines()[:3]
     assert "measure amount (sum)" in text
+
+
+def test_a_period_reaches_the_analysis_through_the_tool_layer(con):
+    """Cleanup Step 9, 4.1: narrowed inside top_n, every result was refused as
+    ANALYSIS_RESULT_UNSOUND -- its method note described a scope _produce never built. The unit
+    tests went through registry.run and could not see it."""
+    text = run(con, "top_n", dimension="status", measure="amount", period="2024-06")
+    assert reason_of(text) is None, text.splitlines()[:3]
+    assert "outside the month 2024-06" in text
+    assert 'period="2024-06"' in text or "2024-06" in text

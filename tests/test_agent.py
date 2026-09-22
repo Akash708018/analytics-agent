@@ -553,3 +553,33 @@ def test_the_screen_note_reaches_the_model_through_the_loop(contracted):
     _answer(be, ws, p)
     to_model = p.seen[0][1]
     assert "[Note for the assistant]" in to_model and "Upload & read screen" in to_model
+
+
+# --- the rules the graded answer of 22/09/2026 12:21 broke (Cleanup Step 9) -------------------
+
+def test_the_screens_the_rules_name_are_the_screens_the_app_has():
+    """It sent the person to a Cleaning screen that does not exist."""
+    import re
+    from pathlib import Path
+    app = (Path(__file__).resolve().parents[1] / "ui" / "app.py").read_text()
+    assert list(agent.SCREENS) == re.findall(r'st\.Page\([^)]*title="([^"]+)"', app)
+    assert all(name in agent.SYSTEM for name in agent.SCREENS)
+
+
+def test_the_rules_forbid_handing_the_person_a_tool_call():
+    assert "never give the person a tool call" in agent.SYSTEM.lower()
+
+
+def test_the_rules_say_to_run_what_the_question_needs_rather_than_suggest_it():
+    text = agent.SYSTEM.lower()
+    assert "run it yourself" in text and "render_chart" in text and "period=" in text
+
+
+def test_the_rules_forbid_a_cause_no_result_states():
+    assert "cause" in agent.SYSTEM.lower()
+
+
+def test_no_rule_lists_cleaning_among_what_a_screen_does():
+    """The old rule read 'approve cleaning ... tell them where: the Upload & read screen, the
+    Contract screen', beside the rule that cleaning has no screen."""
+    assert "approve cleaning" not in agent.SYSTEM

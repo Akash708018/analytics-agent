@@ -66,18 +66,22 @@ class Analysis:
     tier: int
     run: Callable[..., Output]
     summary: str
+    #: Takes `period` (and `grain`), applied to the scope before the analysis runs, so the
+    #: analysis describes the rows it was handed (Cleanup Step 9).
+    narrows: bool = False
 
 
 REGISTRY: dict[str, Analysis] = {}
 
 
-def register(name: str, tier: int, summary: str):
+def register(name: str, tier: int, summary: str, narrows: bool = False):
     """Decorator. The name is the `analysis_type` a caller asks for."""
 
     def wrap(fn: Callable[..., Output]) -> Callable[..., Output]:
         if name in REGISTRY:
             raise ValueError(f"{name!r} is registered twice.")
-        REGISTRY[name] = Analysis(name=name, tier=tier, run=fn, summary=summary)
+        REGISTRY[name] = Analysis(name=name, tier=tier, run=fn, summary=summary,
+                                  narrows=narrows)
         return fn
 
     return wrap
@@ -104,6 +108,26 @@ def get(analysis_type: str) -> Analysis:
         raise UnknownAnalysis(analysis_type, [a.name for a in REGISTRY.values()]) from None
 
 
+def narrowed(con, gate, scope, analysis: Analysis, params: dict):
+    """The scope and parameters an analysis actually runs with.
+
+    For an analysis registered with narrows=True, `period` and `grain` are taken off the
+    parameters and applied to the scope here, before it runs. They were first applied inside
+    each analysis, and the tool layer refused every such result as ANALYSIS_RESULT_UNSOUND: its
+    method note described a scope the tool layer had not built (Cleanup Step 9, 4.1). The
+    narrowing belongs where the scope is made, which is here and in tools._produce.
+    """
+    if not analysis.narrows:
+        return scope, params
+    from .temporal import period_narrowing  # temporal imports this module's neighbours
+
+    rest = dict(params)
+    period, grain = rest.pop("period", None), rest.pop("grain", None)
+    return period_narrowing(con, gate, scope, analysis.name, period, grain), rest
+
+
 def run(con, gate, scope, analysis_type: str, **params) -> Output:
     """Look the analysis up and run it against a scope somebody else built."""
-    return get(analysis_type).run(con, gate, scope, **params)
+    analysis = get(analysis_type)
+    scope, params = narrowed(con, gate, scope, analysis, params)
+    return analysis.run(con, gate, scope, **params)

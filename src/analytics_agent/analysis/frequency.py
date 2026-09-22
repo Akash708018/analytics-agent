@@ -123,14 +123,16 @@ def frequency(con, gate, scope, column: str, limit: int = DEFAULT_LIMIT, **param
     "top_n",
     tier=1,
     summary="The largest groups of a declared dimension by a declared measure, "
-            "with the number tied at the cut stated.",
+            "with the number tied at the cut stated; with period, within one named "
+            "period of the date column.",
+    narrows=True,
 )
 def top_n(con, gate, scope, dimension: str, measure: str,
           n: int = 10, **params) -> Output:
     """The `n` biggest values of `dimension`, ranked by `measure`."""
     if params:
         raise TypeError(
-            f"top_n takes dimension, measure and n; got "
+            f"top_n takes dimension, measure, n, period and grain; got "
             f"{', '.join(sorted(params))}."
         )
     if n < 1:

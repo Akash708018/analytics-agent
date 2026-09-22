@@ -28,7 +28,7 @@ The rulings carried here, all measured in Step 1 and listed in decisions.md:
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import NamedTuple
 
 from ..util.sql_guard import quote_identifier
@@ -42,6 +42,7 @@ __all__ = [
     "calendar_for",
     "edges",
     "longest_run",
+    "narrow_to_period",
     "per_period_sql",
     "require_date_column",
 ]
@@ -219,3 +220,73 @@ def edges(con, cal: Calendar, table: str, col: str, where: str) -> Edges:
         f"{tests} FROM e"
     ).fetchall()[0]
     return Edges(*row)
+
+
+# Labels shown when a period outside the calendar is refused.
+NAMED_RANGE = 12
+
+
+def narrow_to_period(con, gate, scope, period: str, grain: str = DEFAULT_GRAIN):
+    """The same scope, holding only the rows of one named period.
+
+    Cleanup Step 9: "which orders drive the 2025-11 total?" had no answer, because top_n,
+    concentration and pareto rank over the contract's whole scope and the scope is the
+    contract's. The period is looked up in the generated calendar, as period_compare looks its
+    periods up (P9-D12): a label the calendar lacks is refused naming the range, and a label it
+    has with no rows narrows to nothing, which the caller reports.
+
+    The four buckets still sum to the table (Scope.__post_init__): dated rows of other periods
+    move to outside_window, and undated analysed rows -- which no period can hold -- to no_date.
+    method_note then says "outside the month 2025-11".
+    """
+    date_column = require_date_column(gate.contract)
+    cal = calendar_for(gate, scope, date_column, grain)
+    table = quote_identifier(scope.dataset_name)
+    col = quote_identifier(date_column)
+    periods = con.execute(per_period_sql(
+        cal, table, col, scope.where, inner=["count(*) AS n"],
+        outer=["strftime(s.period, '%Y-%m-%d %H:%M:%S')", "coalesce(d.n, 0)"],
+    )).fetchall()
+    found = next((r for r in periods if r[0] == period), None)
+    if found is None:
+        labels = [r[0] for r in periods]
+        span = f"{labels[0]} to {labels[-1]}" if labels else "none -- no row in scope is dated"
+        raise ParamsInvalid(
+            f"period {period!r} is not a {cal.key} of this calendar, which runs {span}"
+            + (f" ({len(labels):,} {cal.key}s)" if len(labels) > NAMED_RANGE else "")
+            + f". A {cal.key} is labelled as trend labels it; grain sets which labels exist."
+        )
+    in_period = (
+        f"({scope.where}) AND date_trunc('{cal.key}', {col}) = TIMESTAMP '{found[1]}'"
+    )
+    undated = con.execute(
+        f"SELECT count(*) FROM {table} WHERE ({scope.where}) AND {col} IS NULL"
+    ).fetchone()[0]
+    held = found[2]
+    where_text = f"the {cal.key} {period}"
+    if scope.window_text:
+        where_text += f" (within {scope.window_text})"
+    return replace(
+        scope,
+        where=in_period,
+        outside_window=scope.outside_window + scope.analysed - held - undated,
+        no_date=scope.no_date + undated,
+        analysed=held,
+        window_text=where_text,
+    )
+
+
+def period_narrowing(con, gate, scope, name: str, period, grain):
+    """The scope an analysis registered with narrows=True runs over.
+
+    One place for the parameter rule three analyses share: grain names which labels a period
+    may take, so a grain with no period is a call that asks for nothing.
+    """
+    if period is None:
+        if grain is not None:
+            raise ParamsInvalid(
+                f"{name} got grain={grain!r} and no period. grain says what a period label "
+                f"means; name one with period=, e.g. period=\"2025-11\"."
+            )
+        return scope
+    return narrow_to_period(con, gate, scope, str(period), grain or DEFAULT_GRAIN)

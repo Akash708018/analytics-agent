@@ -36,7 +36,7 @@ from analytics_agent.util.sql_guard import UnsafeSQL
 
 from .base import LostRows, ParamsInvalid, ScopeError, scope_for
 from . import runs
-from .registry import UnknownAnalysis, catalogue, get
+from .registry import UnknownAnalysis, catalogue, get, narrowed
 
 
 def _catalogue_text() -> str:
@@ -127,8 +127,8 @@ def _produce(con, dataset_name: str, analysis_type: str, params: dict):
         ).to_text()) from None
 
     try:
-        scope = scope_for(con, gate)
-        output = analysis.run(con, gate, scope, **params)
+        scope, run_params = narrowed(con, gate, scope_for(con, gate), analysis, params)
+        output = analysis.run(con, gate, scope, **run_params)
     except LostRows as exc:
         raise _Refused(_unsound(dataset_name, str(exc))) from None
     except ScopeError as exc:

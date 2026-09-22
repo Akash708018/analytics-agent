@@ -772,10 +772,13 @@ def compute_analysis(
       distribution    measure, bins
       frequency       column, limit
       cross_tab       rows, columns, and optionally measure
-      top_n           dimension, measure, n
+      top_n           dimension, measure, n; period and grain optional
       group_compare   dimension, measure
-      pareto          dimension, measure, threshold
-      concentration   dimension, measure
+      pareto          dimension, measure, threshold; period and grain optional
+      concentration   dimension, measure; period and grain optional. With
+                      period ("2025-11", or "2025-Q4" with grain="quarter"),
+                      these three rank only that period's rows -- which
+                      orders drive a month.
       ranking_shift   dimension, measure, and four ISO dates:
                       before_start, before_end, after_start, after_end
       trend           measure, and grain as below; dimension optional.

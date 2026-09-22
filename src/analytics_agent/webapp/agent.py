@@ -29,6 +29,9 @@ ALLOWED: tuple[str, ...] = (
 )
 
 MAX_ROUNDS = 8
+#: The web app's screens, in ui/app.py's order -- a test holds the two equal. The graded answer
+#: of 22/09/2026 12:21 sent the person to a "Cleaning screen" that does not exist (Cleanup Step 9).
+SCREENS: tuple[str, ...] = ("Journey", "Upload & read", "Contract", "Ask", "Files")
 RESULT_CHARS = 8_000     # what the model reads of one tool reply
 HISTORY_MESSAGES = 12
 
@@ -39,15 +42,29 @@ Rules you do not break:
 - Every number you state comes from a tool reply in this conversation. Never estimate, recall or \
 round a figure into something the tool did not say.
 - No analysis runs without a confirmed Dataset Contract. If a tool refuses, read its NEXT STEP. \
-If the step is something only the person can do (load a file, confirm a contract, approve \
-cleaning), tell them where: the Upload & read screen, the Contract screen. You cannot do those.
+If the step is something only the person can do (load a file, confirm a contract), tell them \
+where: the Upload & read screen, the Contract screen. You cannot do those.
 - Start with get_workflow_state or list_datasets if you do not know what is loaded.
 - Charts appear to the person automatically under your answer. You cannot see them: describe a \
 chart only from the numbers its reply gives.
 - Carry every caveat a result prints -- a subset warning, a gap, excluded rows -- into your answer.
 - Add no unit or currency the contract does not state: a measure defined as "units x unit_price" \
 is a number, not dollars.
-- Answer in plain language, briefly, and name the analysis you ran."""
+- The app's screens are exactly: {screens}, and the sidebar's Reset. Name no other. Cleaning \
+and databases have no screen: say so plainly rather than inventing one.
+- Never give the person a tool call, JSON or parameters to run -- they cannot call tools. If the \
+question needs an analysis you have, run it yourself; if it needs a step you do not have, say \
+what cannot be done here and why.
+- Do the work the question asks for while you have rounds left, rather than suggesting it as a \
+next step: a chart asked for is drawn with render_chart; "which items drive this month" is \
+top_n (or concentration) with period= set to that period, e.g. period="2025-11".
+- Give a cause for a gap, a peak or a change only if a tool reply states it. An empty period \
+says no rows were loaded for it, not why.
+- If the question asks for cleaned or deduplicated data and a reply says rows are copies, \
+answer on the data as it is, say plainly that the figures include those rows, and that \
+cleaning is not available in the web app.
+- Answer in plain language, briefly, and name the analysis you ran.""".format(
+    screens=", ".join(SCREENS))
 
 
 @functools.lru_cache(maxsize=1)
@@ -177,4 +194,4 @@ def _turn(provider: Provider, workspace_id: str, history: list[dict], message: s
         f"listed below; ask again more narrowly.")
 
 
-__all__ = ["ALLOWED", "MAX_ROUNDS", "SYSTEM", "answer", "run_tool", "tool_specs"]
+__all__ = ["ALLOWED", "MAX_ROUNDS", "SCREENS", "SYSTEM", "answer", "run_tool", "tool_specs"]

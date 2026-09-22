@@ -82,13 +82,14 @@ def _ranked_with_shares(con, gate, scope, dimension: str, measure: str):
     tier=2,
     summary="How few groups of a declared dimension carry most of a declared "
             "measure: each group's share, the running share, and the smallest "
-            "set reaching a threshold.",
+            "set reaching a threshold; with period, within one named period.",
+    narrows=True,
 )
 def pareto(con, gate, scope, dimension: str, measure: str,
            threshold: float = DEFAULT_THRESHOLD, **params) -> Output:
     if params:
         raise TypeError(
-            f"pareto takes dimension, measure and threshold; got "
+            f"pareto takes dimension, measure, threshold, period and grain; got "
             f"{', '.join(sorted(params))}."
         )
     if not 0 < threshold <= 100:
@@ -149,12 +150,14 @@ def pareto(con, gate, scope, dimension: str, measure: str,
     tier=2,
     summary="How much of a declared measure the largest groups of a declared "
             "dimension hold, at fixed cuts, with the Herfindahl-Hirschman "
-            "Index and the effective number of groups.",
+            "Index and the effective number of groups; with period, within one "
+            "named period.",
+    narrows=True,
 )
 def concentration(con, gate, scope, dimension: str, measure: str, **params) -> Output:
     if params:
         raise TypeError(
-            f"concentration takes dimension and measure; got "
+            f"concentration takes dimension, measure, period and grain; got "
             f"{', '.join(sorted(params))}."
         )
 
