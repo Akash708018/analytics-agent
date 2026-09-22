@@ -6421,3 +6421,41 @@ guide's two mentions (Tier 8's heading, the section) were renumbered in the same
 
 Build guide after the edit: 1,163 lines (from 1,104), sha256
 532433bcc96cdec8dd2c98fa85e1ef7f54a3f9bcbd4c6d3b6613d13092f2df47.
+
+## Retail fixture run - 53 graded cases against the engine, 22/09/2026
+
+Step document: docs/steps/retail_fixture_run.md. The user's fixture (224,955 lines x 42 columns,
+seed 20260922) and answer key, run through server.py after the key's own cleaning convention (dedup
+224,955 -> 224,835; rating nulls '', NA, n/a, -). The key was spot-checked by SQL first and held on
+six figures. Nothing in src/ changed; this records a measurement.
+
+RF-D1. RESULT: PASS 25, PARTIAL 9, FAIL 8, GAP 11. Every figure the engine is built to compute --
+sums, shares, trends, seasonality, decompositions, rankings, correlations, eta squared, mix shift,
+changepoint, chi-square, cohort grids -- matched the key, most to the paisa. The failures are not
+arithmetic: they are units the contract cannot state.
+
+RF-D2. THE FAILURES HAVE ONE MAIN CAUSE. `none` was designed to stop a meaningless total, and it
+does (C1, C3). It does not stop a mean, and for an order-level, rep-level or ratio column the mean is
+the wrong answer the key names (C2 71,692.20, C5 25.79%, J2, J3), and line-level tests repeat an
+order's rating (H1-H5). The fix is a measure grain -- aggregate per distinct order_id or rep_id
+before anything else -- and a ratio declaration, not another refusal.
+
+RF-O1 IS OPEN. Measure grain and ratio declarations (RF-1; C2, C5, J2, J3, H1-H5).
+RF-O2 IS OPEN. Size gates are 2.5 GiB and say "2.5 GB"; the key's 2.60 GB file is allowed (L2); the
+warning names no threshold (L1).
+RF-O3 IS OPEN. period_compare and growth_decomposition report calendar days as "days of data" and do
+not name empty months inside a compared period (E3).
+RF-O4 IS OPEN. The loader's default NA tokens null `-` and `NA` without a count in the reply (A5).
+RF-O5 IS OPEN. Cleaning recommends converting a zero-padded fixed-width code to BIGINT as lossless
+(A2).
+RF-O6 IS OPEN. repeat_behaviour counts rows as events; no event key (I2).
+RF-O7 IS OPEN. No range or cross-column validation rules (B1-B3).
+RF-O8 IS OPEN. pareto and concentration refuse above 49 groups though their answer is a few numbers
+(D3, D4).
+Smaller, recorded in the step document: one aggregate per measure (G3), no two-of-three group
+selection (H1, H6), no within-group outliers (G1), no currency-number detection (A3), no boolean rate
+column (C6), no attrition or tenure (J1, J4).
+
+MEASURED VALIDATION, 22/09/2026. Baseline `uv run pytest -q` 1899 passed before the run; src/
+unchanged. Six key figures equal by SQL. Size-gate files built per the key (308,952,771 and
+2,595,199,347 bytes) and deleted after; SIZE_GATES.csv_refuse_bytes 2,684,354,560.
