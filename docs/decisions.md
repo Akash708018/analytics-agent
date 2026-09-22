@@ -6611,3 +6611,42 @@ Digests (sha256, lines):
   ed981c7e4159a9af0725575fdcad66304bcecdbbad4620d58cd52d2f5642e75c  199  src/analytics_agent/analysis/driver_analysis.py
   1b8e3dd9040a6ecb2d3e7fa42b947bc393b8c08029c75ac31a4ab107afa93374  126  tests/test_measure_model.py
   4165dff360dab39bf13d9385ca71c975d22ff0e6b7ab56e145adc1a4a2895217  55  tests/test_measure_model_facts.py
+
+## Cleanup Step 16 - the retail fixture's 53 cases, re-run, 22/09/2026
+
+Step document: docs/steps/cleanup_step16_retail_rerun.md. PASS 46, PARTIAL 3, FAIL 0, GAP 4, from
+PASS 25, PARTIAL 9, FAIL 8, GAP 11 before Steps 12-15. RF-O1 to RF-O8 are closed.
+
+CL16-D1. COMING BACK IS A SECOND MOMENT, NOT A SECOND ROW. The re-run's first pass accepted
+cohort_retention keyed on order_id and reported 59,948 of 150,000 orders "came back": the lines of
+one order share its timestamp, and the refusal only caught a key distinct per row. cohort_retention's
+repeat rate counts a person with rows at two distinct moments, and both it and repeat_behaviour
+refuse a key none of whose values spans two moments -- it names an event. Retail: order_id refused;
+the customer rate 82.096%, the key's.
+
+CL16-D2. "MEMBERS MOVED AGAINST EACH OTHER" IS A STATEMENT ABOUT DIRECTIONS. growth_decomposition
+printed it when gross movement exceeded the net change -- two float sums compared exactly, whose last
+bits follow the order DuckDB's threads add in -- and the retail re-run said it on one run and not
+the next with every category rising. It is now said when some member rose and some fell. A fixed
+three-row fixture could not reproduce the flip; its test guards the rule rather than falsifying it.
+
+Also: the duplicate-row sample in a cleaning proposal is ordered, so a proposal reads the same twice.
+
+RF-O9 IS OPEN. A unit-level value derived from its rows -- "the order had any return" is max(is_returned)
+per order, which varies across the order's lines and so cannot be declared per order (H5's share).
+Belongs with Phase 15's derived columns.
+RF-O10 IS OPEN. The profile does not say that blanks in several columns coincide with one value of
+another (courier, delivery_date and web_session_seconds are blank exactly on the 67,417 Store rows,
+A5).
+Not open, out of scope by the build guide: regression and forecasting (J3's within-department
+slope, K1-K3), Phase 16; a date difference as a measure (J4), Phase 15.
+
+MEASURED VALIDATION, 22/09/2026. `uv run pytest -q`: 1943 -> 1947 passed (4 in
+tests/test_analysis_options.py). Acceptance unchanged: 99/0/2, 19/0/0, 35/0/1, 26/0/0, 36/0/0. Eval
+76/76. UI 37. Three runs of all 53 cases; the third on this tree, graded in the step document.
+Digests (sha256, lines):
+  e277288e525dd261b384684fc9b816afc53d78e25011302b38634e7bf2b13402  184  src/analytics_agent/analysis/cohort_retention.py
+  41bfb74b1865aceaaf7cf82752f76658a391c52c044f17d1ccd8b69673159e6e  244  src/analytics_agent/analysis/repeat_behaviour.py
+  ec936b9ded4ef2c2d964693668790ffe85457e901941caa62a3b081fac267a62  325  src/analytics_agent/analysis/growth_decomposition.py
+  53971418b29d2726113cf175cbbf5fbbb51bb90003b1fa9102f72724f0f85454  329  src/analytics_agent/clean/sql.py
+  eae0c5fff7d88605d747a4e7e521b909bc8c978706a6db6a01245e5fb5941fa9  174  tests/test_analysis_options.py

@@ -259,9 +259,11 @@ def drop_duplicate_rows(*, source: str, target: str) -> Rendering:
             f"(SELECT {expression} FROM {src})) FROM {src}"
         ),
         sample_sql=(
-            f"SELECT to_json(d)::VARCHAR FROM (SELECT *, count(*) AS "
+            # Ordered, so a proposal reads the same twice (Cleanup Step 16: the re-run's two
+            # plans showed different sample rows for one table).
+            f"SELECT to_json(d)::VARCHAR AS j FROM (SELECT *, count(*) AS "
             f"duplicate_count FROM {src} GROUP BY ALL HAVING count(*) > 1) d "
-            f"LIMIT {SAMPLE_LIMIT}"
+            f"ORDER BY j LIMIT {SAMPLE_LIMIT}"
         ),
     )
 

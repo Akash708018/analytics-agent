@@ -76,6 +76,22 @@ def repeat_behaviour(con, gate, scope, entity: str, event: str | None = None,
             f"behaviour. Name the column that identifies a person across their events."
         )
 
+
+    spans = con.execute(
+        f"SELECT count(*) FROM (SELECT {key} FROM {table} WHERE {usable} GROUP BY 1 "
+        f"HAVING count(DISTINCT {dt}) > 1)").fetchone()[0]
+    if events and not spans:
+        # Cleanup Step 16, 2.1: an order id repeats across its lines but every line carries the
+        # order's one timestamp, so it passes the one-per-row check and describes events anyway --
+        # the re-run reported 59,948 of 150,000 orders "came back".
+        raise ValueError(
+            f"repeat_behaviour cannot use {entity!r}: none of its {distinct_keys:,} value(s) "
+            f"appears at more than one moment -- every row of a value shares one {date_column}, "
+            f"so it names an "
+            f"event (an order of several lines), not someone who came back. Name the column that "
+            f"identifies a person across their events."
+        )
+
     no_entity, no_date = con.execute(
         f"SELECT count(*) FILTER (WHERE {key} IS NULL), "
         f"       count(*) FILTER (WHERE {key} IS NOT NULL AND {dt} IS NULL) "

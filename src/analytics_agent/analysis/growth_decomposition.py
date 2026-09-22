@@ -271,7 +271,11 @@ def growth_decomposition(con, gate, scope, measure: str, dimension: str,
             f"stand: {number(gross)} of movement cancelled out, which a "
             f"headline of nought is exactly what hides."
         )
-    elif gross > abs(change):
+    elif rose and fell:
+        # Directions, not magnitudes (Cleanup Step 16, 2.2): members moved against each other
+        # exactly when some rose and some fell. `gross > abs(change)` compared two float sums whose
+        # last bits depend on the order DuckDB's threads add them in, and the retail re-run said
+        # this on one run and not the next with all five categories rising.
         summary.append(
             "Gross movement exceeds the net change, so members moved against "
             "each other and a share above 100% or below zero is a member that "

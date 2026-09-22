@@ -129,3 +129,46 @@ def test_two_of_three_groups_can_be_tested(con):
 def test_a_group_that_has_no_rows_is_refused_naming_those_that_do(con):
     with pytest.raises(ParamsInvalid, match="Market, Online, Store"):
         go(con, "hypothesis_test", dimension="chan", measure="rating", groups=["Stor"])
+
+
+# --- a key that never spans two moments names events (Cleanup Step 16, 2.1) ----------------------
+# The re-run's I1x: cohort_retention keyed on order_id reported "Repeat rate 39.965%: 59,948 of
+# 150,000 came back" -- the lines of one order, counted as returns.
+
+def test_a_cohort_key_that_never_spans_two_moments_is_refused(con):
+    with pytest.raises(ValueError, match="one moment"):
+        go(con, "cohort_retention", entity="order_id", period="month")
+
+
+def test_two_lines_at_one_moment_are_not_coming_back(con):
+    text = " ".join(go(con, "cohort_retention", entity="who", period="month").summary)
+    assert "1 of 3 came back" in text, text
+
+
+def test_repeat_behaviour_refuses_a_key_that_never_spans_two_moments(con):
+    with pytest.raises(ValueError, match="one moment"):
+        go(con, "repeat_behaviour", entity="order_id")
+
+
+# --- members moved against each other, or did not (Cleanup Step 16, 2.2) -------------------------
+# The re-run's E4 said "Gross movement exceeds the net change, so members moved against each other"
+# on one run and not the next, with all five categories rising: a float sum compared exactly.
+
+@pytest.fixture()
+def floats(con):
+    con.execute("CREATE OR REPLACE TABLE t AS SELECT * FROM (VALUES "
+                "('p', 'o', TIMESTAMP '2024-01-10', 's', 'x', 'Store', 0.0::DOUBLE, 1), "
+                "('p', 'o', TIMESTAMP '2024-01-10', 's', 'y', 'Store', 0.0::DOUBLE, 1), "
+                "('p', 'o', TIMESTAMP '2024-01-10', 's', 'z', 'Store', 0.0::DOUBLE, 1), "
+                "('p', 'o', TIMESTAMP '2024-02-10', 's', 'x', 'Store', 0.3::DOUBLE, 1), "
+                "('p', 'o', TIMESTAMP '2024-02-10', 's', 'y', 'Store', 0.2::DOUBLE, 1), "
+                "('p', 'o', TIMESTAMP '2024-02-10', 's', 'z', 'Store', 0.1::DOUBLE, 1)"
+                ") v(who, order_id, ts, shop, cat, chan, amount, rating)")
+    return con
+
+
+def test_members_that_all_rose_did_not_move_against_each_other(floats):
+    out = go(floats, "growth_decomposition", measure="amount", dimension="cat",
+             period="2024-02", baseline="2024-01")
+    assert "3 rose, 0 fell" in " ".join(out.summary)
+    assert "moved against each other" not in " ".join(out.summary)
