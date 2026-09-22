@@ -100,7 +100,7 @@ def mix_shift(con, gate, scope, measure: str, dimension: str, period: str,
     date_column = require_date_column(contract)
     cal = calendar_for(gate, scope, date_column, grain)
     key = cal.key
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     col = quote_identifier(date_column)
     dim = quote_identifier(dimension)
     val = quote_identifier(measure)

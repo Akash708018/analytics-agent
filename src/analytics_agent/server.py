@@ -596,6 +596,9 @@ def propose_dataset_contract(
     foreign_keys: list[dict] | None = None,
     domains: dict[str, list[str]] | None = None,
     expectations: list[dict] | None = None,
+    measure_columns: dict[str, str] | None = None,
+    measure_per: dict[str, list[str]] | None = None,
+    ratios: dict[str, dict] | None = None,
     workspace_id: str | None = None,
 ) -> str:
     """Draft a Dataset Contract for a loaded dataset. Stores nothing.
@@ -630,6 +633,16 @@ def propose_dataset_contract(
                                                   every row must satisfy it;
                                                   validate_dataset counts those
                                                   that do not
+      measure_per={"order_shipping_fee": ["order_id"]}  a value repeated on every
+                                                  line of an order is one value
+                                                  per order; statistics over it
+                                                  are taken over orders
+      measure_columns={"returned_rate": "is_returned"}  a measure reading another
+                                                  column (a true/false column
+                                                  reads as 0/1, so mean = rate)
+      ratios={"gross_margin_pct": {"numerator": ["line_revenue", "-line_cost"],
+              "denominator": ["line_revenue"], "scale": 100}}  a ratio of sums,
+                                                  never a mean of ratios
 
     The contract that comes back with nothing unresolved is the one to confirm.
     Deleting an entry from `unresolved` does not work: the blank it was
@@ -646,6 +659,7 @@ def propose_dataset_contract(
             analysis_window_end=analysis_window_end,
             known_exclusions=known_exclusions, caveats=caveats,
             foreign_keys=foreign_keys, domains=domains, expectations=expectations,
+            measure_columns=measure_columns, measure_per=measure_per, ratios=ratios,
         )
     finally:
         con.close()

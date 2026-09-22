@@ -83,7 +83,7 @@ def ranked_totals(con, scope, dimension: str, total_sql: str,
     from ..util.sql_guard import quote_identifier
 
     dim = quote_identifier(dimension)
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     where = scope.where if extra is None else f"({scope.where}) AND ({extra})"
     return con.execute(
         f"SELECT {dim}, {total_sql}, count(*) FROM {table} WHERE {where} "

@@ -20,7 +20,7 @@ from typing import Any
 
 from ..util.formatting import MAX_ROWS
 from ..util.sql_guard import quote_identifier
-from .base import LostRows, ParamsInvalid, number
+from .base import LostRows, ParamsInvalid, number, relation_types
 from .declared import agg_of, column_types, is_integer, is_numeric, require_measure
 from .registry import Output, register
 
@@ -50,14 +50,14 @@ def distribution(con, gate, scope, measure: str, bins: int = DEFAULT_BINS, **par
     m = require_measure(contract, measure)
     agg = agg_of(m)
 
-    dtype = column_types(con, scope.dataset_name).get(measure, "")
+    dtype = relation_types(con, scope).get(measure, "")
     if not is_numeric(dtype):
         raise ValueError(
             f"{measure!r} has type {dtype}, not numeric, so there is nothing to "
             f"bin. profile_column describes any column without a contract."
         )
 
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     col = quote_identifier(measure)
     v = col if is_integer(dtype) else f"CAST({col} AS DOUBLE)"
 

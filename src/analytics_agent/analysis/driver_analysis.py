@@ -39,7 +39,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..util.sql_guard import quote_identifier
-from .base import NO_MEMBER, LostRows, ParamsInvalid, number
+from .base import NO_MEMBER, LostRows, ParamsInvalid, number, relation_types
 from .declared import require_measure
 from .registry import Output, register
 
@@ -72,6 +72,11 @@ def driver_analysis(con, gate, scope, measure: str, **params) -> Output:
     # the contract has a view on.
     require_measure(contract, measure)
     dimensions = list(getattr(contract, "dimensions", []) or [])
+    if scope.unit_text:
+        # A per-unit measure (Cleanup Step 15): only dimensions constant within its unit are in the
+        # relation; the rest are named in the scope's own sentence.
+        present = set(relation_types(con, scope))
+        dimensions = [d for d in dimensions if d in present]
     if not dimensions:
         raise ParamsInvalid(
             f"{contract.dataset_name} declares no dimensions, so there is "
@@ -79,7 +84,7 @@ def driver_analysis(con, gate, scope, measure: str, **params) -> Output:
             f"dimensions set is what fixes that."
         )
 
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     y = quote_identifier(measure)
     headers = ["dimension", "groups", "rows", "share of variance",
                "chance share", "excess", "one-row groups"]

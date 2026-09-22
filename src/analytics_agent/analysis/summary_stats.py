@@ -41,7 +41,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..util.sql_guard import quote_identifier
-from .base import number
+from .base import number, relation_types, unit_scope
 from .declared import AGG_SQL, agg_of, column_types, is_numeric
 from .registry import Output, register
 
@@ -61,8 +61,8 @@ def summary_stats(con, gate, scope, **params) -> Output:
         )
 
     contract = gate.contract
-    table = quote_identifier(scope.dataset_name)
-    types = column_types(con, scope.dataset_name)
+    table = scope.source
+    types = relation_types(con, scope)
     excluded = set(contract.excluded_columns)
 
     headers = ["measure", "agg", "unit", "n", "nulls", "total",
@@ -70,10 +70,18 @@ def summary_stats(con, gate, scope, **params) -> Output:
     rows: list[list[Any]] = []
     undeclared_reason: list[str] = []
 
+    per_unit: list[str] = []
     for measure in contract.measures:
         col = quote_identifier(measure.name)
         agg = agg_of(measure)
         unit = getattr(measure, "unit", None) or ""
+        # A measure declared per a unit is summarised over its units, each once (Cleanup Step 15):
+        # a rep's salary averaged over lines weighs the rep by how much they sold.
+        table, where = scope.source, scope.where
+        if getattr(measure, "per", None):
+            units = unit_scope(con, gate, scope, [measure], [])
+            table, where = units.source, units.where
+            per_unit.append(units.unit_text)
 
         if measure.name in excluded:
             undeclared_reason.append(
@@ -81,12 +89,12 @@ def summary_stats(con, gate, scope, **params) -> Output:
             )
             continue
 
-        numeric = is_numeric(types.get(measure.name, ""))
+        numeric = is_numeric(types.get(measure.name, "")) and agg != "ratio"
         stats = ["", "", "", "", ""] if not numeric else None
 
         if agg is None:
             counts = con.execute(
-                f"SELECT count(*), count({col}) FROM {table} WHERE {scope.where}"
+                f"SELECT count(*), count({col}) FROM {table} WHERE {where}"
             ).fetchall()[0]
             rows.append([measure.name, "(not declared)", unit,
                          number(counts[1]), number(counts[0] - counts[1]),
@@ -111,16 +119,18 @@ def summary_stats(con, gate, scope, **params) -> Output:
                 f"SELECT count(*), count({col}), {total_sql}, min({col}), "
                 f"max({col}), avg({col}), quantile_cont(CAST({col} AS DOUBLE), 0.5), "
                 f"stddev({col}) "
-                f"FROM {table} WHERE {scope.where}"
+                f"FROM {table} WHERE {where}"
             ).fetchall()[0]
         else:
             # A measure on a non-numeric column: the counts and the extremes
             # are true, an average is not. Reported rather than refused,
             # because a date measure with agg=min is a legitimate thing to
             # declare and the blank cells say which parts do not apply.
+            # A ratio of sums has a total and no per-row extremes (Cleanup Step 15).
+            extremes = "NULL, NULL" if agg == "ratio" else f"min({col}), max({col})"
             row = con.execute(
-                f"SELECT count(*), count({col}), {total_sql}, min({col}), "
-                f"max({col}), NULL, NULL, NULL FROM {table} WHERE {scope.where}"
+                f"SELECT count(*), count({col}), {total_sql}, {extremes}, "
+                f"NULL, NULL, NULL FROM {table} WHERE {where}"
             ).fetchall()[0]
 
         total = "not additive" if agg == "none" else number(row[2])
@@ -133,6 +143,7 @@ def summary_stats(con, gate, scope, **params) -> Output:
 
     summary = [scope.method_note()]
     summary += list(gate.caveats)
+    summary += per_unit
     if undeclared_reason:
         summary += undeclared_reason
 

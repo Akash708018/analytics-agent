@@ -99,7 +99,7 @@ def trend(con, gate, scope, measure: str, grain: str = DEFAULT_GRAIN,
     cal = calendar_for(gate, scope, date_column, grain)
     key = cal.key
 
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     col = quote_identifier(date_column)
     value = AGG_SQL[agg].format(col=quote_identifier(measure))
 

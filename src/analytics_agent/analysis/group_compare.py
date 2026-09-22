@@ -20,7 +20,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..util.sql_guard import quote_identifier
-from .base import LostRows, TooManyGroups, label, number, share_basis
+from .base import LostRows, TooManyGroups, label, number, share_basis, relation_types
 from .declared import AGG_SQL, agg_of, column_types, is_numeric
 from .declared import require_dimension, require_measure
 from .registry import Output, register
@@ -56,10 +56,10 @@ def group_compare(con, gate, scope, dimension: str, measure: str, **params) -> O
             f"cannot compute. Known: {', '.join(sorted(AGG_SQL))}, none."
         )
 
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     dim = quote_identifier(dimension)
     col = quote_identifier(measure)
-    numeric = is_numeric(column_types(con, scope.dataset_name).get(measure, ""))
+    numeric = is_numeric(relation_types(con, scope).get(measure, ""))
 
     totalled = agg is not None and agg != "none"
     headers = [dimension] + STAT_HEADERS[:2]

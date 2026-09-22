@@ -298,6 +298,65 @@ def _grain_key_notes(con, dataset_name: str, grain: str, ev: DatasetEvidence) ->
     ]
 
 
+def _refuse_measure(dataset_name: str, what: str, why: str) -> ContractRefused:
+    return ContractRefused(Refusal(
+        reason=Reason.CONTRACT_INVALID, what=what, why=why,
+        next_call=f'propose_dataset_contract(dataset_name="{dataset_name}", ...)',
+    ).to_text())
+
+
+def _measure(name, agg, definition, column, per, ratio) -> Measure:
+    """One measure from the answers about it (Cleanup Step 15): an alias, a unit, a ratio."""
+    extra: dict = {}
+    if column:
+        extra["column"] = column
+    if per:
+        extra["per"] = [per] if isinstance(per, str) else list(per)
+    if ratio:
+        agg = agg or "ratio"
+        extra.update(numerator=list(ratio.get("numerator") or []),
+                     denominator=list(ratio.get("denominator") or []),
+                     scale=float(ratio.get("scale", 1.0)))
+    try:
+        return Measure(name=name, agg=agg, definition=definition, **extra)
+    except ValueError as exc:
+        raise ContractRefused(Refusal(
+            reason=Reason.CONTRACT_INVALID, what=f"measure {name!r} is not usable as stated.",
+            why=str(exc).split("\n")[-1] if "\n" in str(exc) else str(exc),
+            next_call="propose_dataset_contract(dataset_name=..., ...)",
+        ).to_text()) from None
+
+
+def _verify_measure_columns(con, dataset_name: str, ev: DatasetEvidence, m: Measure) -> None:
+    """Every column the measure reads exists; a `per` measure is one value per unit.
+
+    The second is arithmetic, like a stated key's verification: a salary declared per rep_id that
+    varies within a rep is not rep-level, and every per-rep statistic over it would pick one value
+    of several without saying so. NULLs are not a second value -- a unit with a value and a blank
+    has one value.
+    """
+    known = {c.name for c in ev.columns}
+    missing = [c for c in m.columns_read() if c not in known]
+    if missing:
+        raise _refuse_measure(
+            dataset_name, f"measure {m.name!r} reads {', '.join(missing)}, which "
+            f"{dataset_name} does not have.",
+            f"columns present: {', '.join(sorted(known))}.")
+    if not m.per:
+        return
+    per = ", ".join(f'"{c}"' for c in m.per)
+    varying = con.execute(
+        f'SELECT count(*) FROM (SELECT {per} FROM "{dataset_name}" GROUP BY {per} '
+        f'HAVING count(DISTINCT "{m.source}") > 1)').fetchone()[0]
+    if varying:
+        units = " + ".join(m.per)
+        raise _refuse_measure(
+            dataset_name, f"{m.name} varies within {units}: {varying:,} {units} unit(s) hold more "
+            f"than one value of it.",
+            f"a measure declared per {units} is one value per {units}, and every statistic over it "
+            f"is taken over those units. Declare the unit it is constant within, or no unit.")
+
+
 def _bound_expectations(con, dataset_name: str, expectations) -> list[Expectation]:
     """Each rule bound against the table as BOOLEAN, or the proposal refused naming it.
 
@@ -431,6 +490,9 @@ def propose_contract(
     analysis_window: tuple[date, date] | None = None,
     known_exclusions: list[Exclusion] | None = None,
     expectations: list[Expectation] | None = None,
+    measure_columns: dict[str, str] | None = None,
+    measure_per: dict[str, list[str]] | None = None,
+    ratios: dict[str, dict] | None = None,
     caveats: list[str] | None = None,
     foreign_keys: list[ForeignKey] | None = None,
     domains: dict[str, list[str]] | None = None,
@@ -533,7 +595,9 @@ def propose_contract(
     for name in measure_names:
         definition = definitions.get(name, "").strip()
         agg = aggs.get(name)
-        m = Measure(name=name, agg=agg, definition=definition)
+        m = _measure(name, agg, definition, (measure_columns or {}).get(name),
+                     (measure_per or {}).get(name), (ratios or {}).get(name))
+        _verify_measure_columns(con, dataset_name, ev, m)
         built.append(m)
         if not definition:
             unresolved.append(m.definition_path)

@@ -205,6 +205,9 @@ def propose(
     foreign_keys: list[dict] | None = None,
     domains: dict[str, list[str]] | None = None,
     expectations: list[dict] | None = None,
+    measure_columns: dict[str, str] | None = None,
+    measure_per: dict[str, list[str]] | None = None,
+    ratios: dict[str, dict] | None = None,
 ) -> str:
     """Draft a contract and render it. Stores nothing."""
     try:
@@ -226,6 +229,7 @@ def propose(
             analysis_window=window,
             known_exclusions=exclusions,
             expectations=rules,
+            measure_columns=measure_columns, measure_per=measure_per, ratios=ratios,
             caveats=caveats,
             foreign_keys=keys,
             domains=domains,

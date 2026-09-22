@@ -19,7 +19,7 @@ from __future__ import annotations
 import math
 from typing import Any
 
-from .base import NO_MEMBER, LostRows, TooManyGroups, label, number
+from .base import NO_MEMBER, LostRows, TooManyGroups, label, number, relation_types
 from .declared import column_types, is_numeric, require_dimension, require_measure
 from .inferential import detectable_effect, group_stats, rows_for_effect
 from .registry import Output, register
@@ -79,7 +79,7 @@ def sample_adequacy(con, gate, scope, dimension: str, measure: str,
     require_dimension(gate.contract, dimension)
     m = require_measure(gate.contract, measure)
     unit = getattr(m, "unit", None) or ""
-    if not is_numeric(column_types(con, scope.dataset_name).get(measure, "")):
+    if not is_numeric(relation_types(con, scope).get(measure, "")):
         raise ValueError(f"sample_adequacy needs a numeric measure; {measure!r} is not one.")
 
     summary = [scope.method_note(), *gate.caveats]
@@ -171,7 +171,7 @@ def _excluded(con, scope, dimension: str, measure: str) -> dict[str, int]:
     from ..util.sql_guard import quote_identifier
     from .inferential import FINITE
 
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     dim, col = quote_identifier(dimension), quote_identifier(measure)
     no_group, no_value, not_finite = con.execute(
         f"SELECT count(*) FILTER (WHERE {dim} IS NULL), "

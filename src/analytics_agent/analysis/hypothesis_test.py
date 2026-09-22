@@ -30,7 +30,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..util.sql_guard import quote_identifier
-from .base import NO_MEMBER, LostRows, TooManyGroups, label, number
+from .base import NO_MEMBER, LostRows, TooManyGroups, label, number, relation_types
 from .declared import column_types, is_numeric, require_dimension, require_measure
 from .inferential import (FINITE, GroupStats, chi_square, eta_squared, group_stats,
                           hedges_g, kruskal_wallis,
@@ -125,7 +125,7 @@ def _difference(con, gate, scope, dimension: str, measure: str, method: str,
     """One measure across the groups of one dimension."""
     m = require_measure(gate.contract, measure)
     unit = getattr(m, "unit", None) or ""
-    if not is_numeric(column_types(con, scope.dataset_name).get(measure, "")):
+    if not is_numeric(relation_types(con, scope).get(measure, "")):
         raise ValueError(
             f"hypothesis_test compares a numeric measure; {measure!r} is not one. "
             f"cross_tab or a second dimension is how two categorical columns are compared."
@@ -240,7 +240,7 @@ def _independence(con, gate, scope, dimension: str, second: str, method: str,
             f"diagonal and the answer meaningless."
         )
 
-    table_name = quote_identifier(scope.dataset_name)
+    table_name = scope.source
     a, b = quote_identifier(dimension), quote_identifier(second)
     cells = con.execute(
         f"SELECT {a}, {b}, count(*) FROM {table_name} WHERE {scope.where} "
@@ -311,7 +311,7 @@ def _independence(con, gate, scope, dimension: str, second: str, method: str,
 
 def _excluded(con, scope, dimension: str, measure: str) -> dict[str, int]:
     """Rows in scope that no group holds, split by which column is missing."""
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     dim, col = quote_identifier(dimension), quote_identifier(measure)
     no_group, no_value, not_finite = con.execute(
         f"SELECT count(*) FILTER (WHERE {dim} IS NULL), "

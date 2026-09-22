@@ -106,7 +106,7 @@ def calendar_for(gate, scope, date_column: str, grain: str) -> Calendar:
         )
     step, label_sql = GRAINS[key]
 
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     col = quote_identifier(date_column)
     window = getattr(gate.contract, "analysis_window", None)
     if window is not None:
@@ -243,7 +243,7 @@ def narrow_to_period(con, gate, scope, period: str, grain: str = DEFAULT_GRAIN):
     """
     date_column = require_date_column(gate.contract)
     cal = calendar_for(gate, scope, date_column, grain)
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     col = quote_identifier(date_column)
     periods = con.execute(per_period_sql(
         cal, table, col, scope.where, inner=["count(*) AS n"],

@@ -64,7 +64,7 @@ def cohort_retention(con, gate, scope, entity: str, period: str = "month",
         return Output(headers=["cohort", "size"], rows=[], label="cohort_retention",
                       summary=summary + ["No rows are in scope, so no cohort has formed."])
 
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     key = quote_identifier(entity)
     dt = quote_identifier(date_column)
     usable = f"{scope.where} AND {key} IS NOT NULL AND {dt} IS NOT NULL"

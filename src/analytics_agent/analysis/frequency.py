@@ -78,7 +78,7 @@ def frequency(con, gate, scope, column: str, limit: int = DEFAULT_LIMIT, **param
     contract = gate.contract
     require_dimension(contract, column)
     col = quote_identifier(column)
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
 
     grouped = con.execute(
         f"SELECT {col}, count(*) FROM {table} WHERE {scope.where} "
@@ -159,7 +159,7 @@ def top_n(con, gate, scope, dimension: str, measure: str,
 
     dim = quote_identifier(dimension)
     total_sql = AGG_SQL[agg].format(col=quote_identifier(measure))
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
 
     # P8-D4: the tiebreak is on the group name, so the same data gives the same
     # answer twice. It does not make the answer the only correct one, which is

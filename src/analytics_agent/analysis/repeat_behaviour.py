@@ -54,7 +54,7 @@ def repeat_behaviour(con, gate, scope, entity: str, event: str | None = None,
         return Output(headers=["how often", "people"], rows=[], label="repeat_behaviour",
                       summary=summary + ["No rows are in scope, so nobody has returned yet."])
 
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     key = quote_identifier(entity)
     dt = quote_identifier(date_column)
     usable = f"{scope.where} AND {key} IS NOT NULL AND {dt} IS NOT NULL"

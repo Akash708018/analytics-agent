@@ -129,7 +129,44 @@ def narrowed(con, gate, scope, analysis: Analysis, params: dict):
         from .base import select_groups
 
         scope = select_groups(con, gate, scope, rest.get("dimension"), rest.pop("groups"))
+    scope = _per_unit(con, gate, scope, analysis, rest)
     return scope, rest
+
+
+#: Analyses that read a measure's value row by row, where a ratio of sums has no value.
+ROW_VALUE_ANALYSES = frozenset({
+    "distribution", "correlation", "bivariate", "outlier_detection", "hypothesis_test",
+    "effect_size", "confidence_interval", "sample_adequacy", "driver_analysis", "mix_shift",
+})
+#: Analyses that place rows on the contract's calendar.
+DATED_TIERS = (3, 5, 7)
+#: The parameters that name a column an analysis reads, beside its measures.
+COLUMN_PARAMS = ("dimension", "second_dimension", "rows", "columns", "column", "entity", "event")
+
+
+def _per_unit(con, gate, scope, analysis: Analysis, params: dict):
+    """A call on a per-unit measure runs over one row per unit; a ratio is refused where a row
+    value is needed (Cleanup Step 15). Both by name, before the analysis runs."""
+    declared = {m.name: m for m in getattr(gate.contract, "measures", None) or []}
+    named = [declared[params[k]] for k in ("measure", "against")
+             if isinstance(params.get(k), str) and params[k] in declared]
+    for m in named:
+        if getattr(m, "agg", None) == "ratio" and analysis.name in ROW_VALUE_ANALYSES:
+            raise ValueError(
+                f"{m.name} is a ratio of sums: it has a value for a set of rows and none for a "
+                f"row, and {analysis.name} reads row values. trend, group_compare, top_n and "
+                f"summary_stats compute it; the per-row ratio, if the table has one, is its own "
+                f"measure.")
+    if not any(getattr(m, "per", None) for m in named):
+        return scope
+    from .base import unit_scope
+
+    optional = []
+    if analysis.name == "driver_analysis":
+        optional = [d for d in getattr(gate.contract, "dimensions", [])]
+    return unit_scope(con, gate, scope, named,
+                      [params[k] for k in COLUMN_PARAMS if isinstance(params.get(k), str)],
+                      date=analysis.tier in DATED_TIERS, optional=optional)
 
 
 def run(con, gate, scope, analysis_type: str, **params) -> Output:

@@ -229,6 +229,17 @@ class Scope:
     #: Rows of groups the caller did not choose (groups=[...], Cleanup Step 14), and which ones.
     unselected: int = 0
     selection_text: str = ""
+    #: The relation analyses read, when it is not the table itself (Cleanup Step 15): the table
+    #: with its derived measures -- a true/false read as 0/1, an alias, a ratio's parts -- or,
+    #: for a measure declared per a unit, one row per unit. "" means the table.
+    relation: str = ""
+    #: For a per-unit scope: what one row is, said before the counts that describe it.
+    unit_text: str = ""
+
+    @property
+    def source(self) -> str:
+        """What an analysis selects FROM: the relation, or the table by its quoted name."""
+        return self.relation or quote_identifier(self.dataset_name)
 
     def __post_init__(self):
         """Four numbers that sum to the row count, refused if they do not.
@@ -263,7 +274,7 @@ class Scope:
         the intent, so a scope that dropped rows unexpectedly says so here
         before anybody reads the result.
         """
-        parts = [
+        parts = ([self.unit_text] if self.unit_text else []) + [
             f"{self.analysed:,} of {self.rows:,} row(s) analysed."
         ]
         if self.excluded:
@@ -357,7 +368,60 @@ def scope_for(con, gate) -> Scope:
         rule_unknown=counts[5],
         skipped_columns=list(contract.excluded_columns),
         window_text=window_text,
+        relation=measure_relation(con, contract),
     )
+
+
+def measure_relation(con, contract) -> str:
+    """The table with its derived measures as columns, or "" when it has none (Cleanup Step 15).
+
+    One place turns declarations into columns, so no analysis has to know them: a true/false
+    measure is CAST to INTEGER (DuckDB has no avg over BOOLEAN -- tests/test_measure_model_facts.py);
+    an aliased measure is its source column under its own name; a ratio is STRUCT(n, d), its scale
+    in n, which AGG_SQL['ratio'] sums apart and divides. Aliased as the table, so every clause the
+    scope was built with still binds.
+    """
+    from .declared import column_types
+
+    name = contract.dataset_name
+    table = quote_identifier(name)
+    types = column_types(con, name)
+    replaces: list[str] = []
+    extras: list[str] = []
+    for m in getattr(contract, "measures", None) or []:
+        agg = getattr(m, "agg", None)
+        column = getattr(m, "column", None)
+        if agg == "ratio":
+            def summed(terms):
+                return " + ".join(
+                    ("-" if t.startswith("-") else "") + quote_identifier(t.lstrip("-"))
+                    for t in terms)
+            scale = float(getattr(m, "scale", 1.0))
+            extras.append(
+                f"struct_pack(n := {scale!r} * ({summed(m.numerator)}), "
+                f"d := CAST({summed(m.denominator)} AS DOUBLE)) AS {quote_identifier(m.name)}")
+        elif column and column != m.name:
+            src = quote_identifier(column)
+            if types.get(column, "").upper() == "BOOLEAN":
+                src = f"CAST({src} AS INTEGER)"
+            extras.append(f"{src} AS {quote_identifier(m.name)}")
+        elif types.get(m.name, "").upper() == "BOOLEAN":
+            q = quote_identifier(m.name)
+            replaces.append(f"CAST({q} AS INTEGER) AS {q}")
+    if not replaces and not extras:
+        return ""
+    select = "*" + (f" REPLACE ({', '.join(replaces)})" if replaces else "")
+    select += "".join(f", {e}" for e in extras)
+    return f"(SELECT {select} FROM {table}) AS {table}"
+
+
+def relation_types(con, scope: Scope) -> dict[str, str]:
+    """Column types as an analysis sees them -- through the relation, not the table."""
+    from .declared import column_types
+
+    if not scope.relation:
+        return column_types(con, scope.dataset_name)
+    return {r[0]: r[1] for r in con.execute(f"DESCRIBE SELECT * FROM {scope.source}").fetchall()}
 
 
 def select_groups(con, gate, scope: Scope, dimension: str | None, groups) -> Scope:
@@ -376,7 +440,7 @@ def select_groups(con, gate, scope: Scope, dimension: str | None, groups) -> Sco
     wanted = [str(g) for g in groups]
     if not wanted:
         raise ParamsInvalid("groups is empty; name the members to keep, or leave it out.")
-    table, d = quote_identifier(scope.dataset_name), quote_identifier(dimension)
+    table, d = scope.source, quote_identifier(dimension)
     present = sorted(r[0] for r in con.execute(
         f"SELECT DISTINCT CAST({d} AS VARCHAR) FROM {table} WHERE {scope.where} "
         f"AND {d} IS NOT NULL").fetchall())
@@ -391,3 +455,62 @@ def select_groups(con, gate, scope: Scope, dimension: str | None, groups) -> Sco
     return replace(scope, where=where, analysed=kept,
                    unselected=scope.unselected + scope.analysed - kept,
                    selection_text=f"{', '.join(wanted)} of {dimension}")
+
+
+def unit_scope(con, gate, scope: Scope, measures, columns, *, date: bool = False,
+               optional=()) -> Scope:
+    """The scope with one row per unit of the measures' `per` (Cleanup Step 15, RF-O1).
+
+    A fee repeated on every line of an order is one value per order; summed over lines it counts
+    each order once per line, and a rep's salary averaged over lines weighs a rep by how much they
+    sold -- the retail key's 71,692.20 against 72,026.67. So the analysis reads the relation
+    reduced to SELECT DISTINCT per, the measures and the columns the call names. If one of those
+    varies within a unit the call is refused naming it: counting one rep in several categories is
+    the same trap in another form. `optional` columns are kept where constant and left out, named,
+    where not; `date` asks for the contract's date column, which must be constant (an order has
+    one date; a rep has many).
+    """
+    per = list(measures[0].per)
+    for m in measures[1:]:
+        if list(getattr(m, "per", []) or []) != per:
+            raise ValueError(
+                f"{measures[0].name} is one value per {' + '.join(per) or 'row'} and {m.name} per "
+                f"{' + '.join(getattr(m, 'per', []) or []) or 'row'}; values at two grains cannot "
+                f"be paired row by row.")
+    unit = " + ".join(per)
+    date_col = getattr(gate.contract, "date_column", None)
+    needed = [c for c in dict.fromkeys(columns) if c and c not in per]
+    if date and date_col and date_col not in needed and date_col not in per:
+        needed.append(date_col)
+    source, where = scope.source, scope.where
+
+    def varies(col: str) -> int:
+        keys = ", ".join(quote_identifier(c) for c in per)
+        return con.execute(
+            f"SELECT count(*) FROM (SELECT {keys} FROM {source} WHERE {where} GROUP BY {keys} "
+            f"HAVING count(DISTINCT {quote_identifier(col)}) > 1)").fetchone()[0]
+
+    for col in needed + [m.name for m in measures]:
+        n = varies(col)
+        if n:
+            if col == date_col and date:
+                raise ValueError(
+                    f"{measures[0].name} is one value per {unit}, and {col} varies within {unit} "
+                    f"({n:,} unit(s)), so it has no single date to put on a calendar.")
+            raise ValueError(
+                f"{col} varies within {unit}: {n:,} {unit} unit(s) hold more than one {col}, so "
+                f"grouping {measures[0].name} by it would count one {unit} in several groups. "
+                f"Use a column constant within {unit}, or a measure at the row's own grain.")
+    kept_optional = [c for c in optional if c not in per and c not in needed and not varies(c)]
+    dropped = [c for c in optional if c not in per and c not in needed and c not in kept_optional]
+    cols = ", ".join(quote_identifier(c) for c in
+                     [*per, *needed, *kept_optional, *(m.name for m in measures)])
+    relation = (f"(SELECT DISTINCT {cols} FROM {source} WHERE {where}) "
+                f"AS {quote_identifier(scope.dataset_name)}")
+    units = con.execute(f"SELECT count(*) FROM {relation}").fetchone()[0]
+    text = (f"{', '.join(m.name for m in measures)} is one value per {unit}: {units:,} {unit} "
+            f"unit(s) from {scope.analysed:,} analysed row(s).")
+    if dropped:
+        text += f" {', '.join(dropped)} vary within {unit} and are left out."
+    return replace(scope, where="true", rows=units, excluded=0, outside_window=0, no_date=0,
+                   unselected=0, analysed=units, rule_unknown=0, relation=relation, unit_text=text)

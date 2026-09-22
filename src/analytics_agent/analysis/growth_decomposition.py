@@ -112,7 +112,7 @@ def growth_decomposition(con, gate, scope, measure: str, dimension: str,
     cal = calendar_for(gate, scope, date_column, grain)
     key = cal.key
 
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     col = quote_identifier(date_column)
     dim = quote_identifier(dimension)
     value = AGG_SQL[agg].format(col=quote_identifier(measure))

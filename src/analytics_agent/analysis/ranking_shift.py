@@ -165,7 +165,7 @@ def ranking_shift(con, gate, scope, dimension: str, measure: str,
         f"count(*) FILTER (WHERE {clauses['after']}), "
         f"count(*) FILTER (WHERE NOT ({clauses['before']}) "
         f"AND NOT ({clauses['after']})) "
-        f"FROM {quote_identifier(scope.dataset_name)} "
+        f"FROM {scope.source} "
         f"WHERE {scope.where}"
     ).fetchall()[0]
 

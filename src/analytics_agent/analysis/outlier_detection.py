@@ -94,7 +94,7 @@ def outlier_detection(con, gate, scope, measure: str, dimension: str | None = No
         require_dimension(contract, dimension)
         return _within(con, gate, scope, measure, dimension)
 
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     x = quote_identifier(measure)
     headers = ["method", "lower bound", "upper bound", "flagged",
                "share of rows"]
@@ -243,7 +243,7 @@ def _within(con, gate, scope, measure: str, dimension: str) -> Output:
     the 25 planted ones sat inside their own category's spread. Within a group the question is the
     one a person means -- unusual for what it is. A group under MIN_ROWS values gets no bounds.
     """
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     x, d = quote_identifier(measure), quote_identifier(dimension)
     base = f"SELECT {d} AS g, {x} AS v FROM {table} WHERE {scope.where} AND {x} IS NOT NULL"
     n_groups = con.execute(f"SELECT count(DISTINCT g) + max(CASE WHEN g IS NULL THEN 1 ELSE 0 END) "

@@ -6570,3 +6570,44 @@ Digests (sha256, lines):
   d341c69a9ea1e3be03d9d4d7a15efbc83289c7a3e43f2f9fb824420db19dc088  1231  src/analytics_agent/server.py
   378c52433ec5bd2c9df116064ef21db9b66ecc8094abe0a878833a4f56cc844e  271  src/analytics_agent/webapp/agent.py
   02fdccd82ae226611d1c6d6f2b592dff018d04b7ce411512db4c0c6c71e1b978  131  tests/test_analysis_options.py
+
+## Cleanup Step 15 - the measure model: per a unit, a ratio of sums, a measure over another column, 22/09/2026
+
+Step document: docs/steps/cleanup_step15_measure_model.md. Closes RF-O1 and the G3, C6 and J1
+findings.
+
+CL15-D1. A MEASURE CAN BELONG TO A COARSER UNIT. CLOSES RF-O1. Measure.per names the columns whose
+value it is; every statistic over it is taken over the units, one row each (base.unit_scope, applied
+in registry.narrowed beside period and groups, and by summary_stats per measure). A column the call
+needs that varies within the unit is refused by name -- counting one rep in several categories is
+the trap in another form. At proposal a per measure is verified constant within its unit, as a
+stated key is verified. Retail: C1 6,271,191; C2 72,026.67; H1 t 177.48; H2 F 1,515.59; H5 3.8283;
+J2 and J3 at rep level -- the key's figures.
+
+CL15-D2. A RATIO OF SUMS IS A MEASURE. agg 'ratio' with signed numerator and denominator column lists
+and a scale. The scope's relation exposes it as STRUCT(n, d); AGG_SQL['ratio'] sums the parts apart
+and divides, so a ratio works wherever an aggregate does -- totals, groups, trends -- and analyses
+that read row values refuse it by name (registry.ROW_VALUE_ANALYSES). Retail C5: 18.3983%.
+
+CL15-D3. THE SCOPE READS A RELATION. base.measure_relation turns declarations into columns once: a
+BOOLEAN measure CAST to INTEGER (DuckDB has no avg over BOOLEAN), an aliased measure (Measure.column)
+under its own name, a ratio's parts. Scope.source replaces quote_identifier(scope.dataset_name) at 46
+sites; relation_types replaces column_types for what an analysis sees. So one column can be two
+measures -- units summed, units_per_line averaged (G3) -- and a flag can be a rate (C6).
+
+CL15-D4. A NAME THAT IS NOT A COLUMN MAY NOT LOOK LIKE ONE. An aliased or ratio measure named like a
+table column is refused at confirmation; every column a measure reads must exist.
+
+MEASURED VALIDATION, 22/09/2026. `uv run pytest -q`: 1925 -> 1943 passed (7 in
+tests/test_measure_model_facts.py, 11 in tests/test_measure_model.py). Acceptance unchanged: 99/0/2,
+19/0/0, 35/0/1, 26/0/0, 36/0/0. Eval 76/76. UI 37. Live figures in the step document.
+Digests (sha256, lines):
+  16ddf48e786520f2857fd63c0e58479e0824e990d7d65c64247421b0a8d82e47  762  src/analytics_agent/contract/dataset_contract.py
+  a369e67f3384db20a99b4c19e2da9901705763945a7386447d4f0ad056921c19  679  src/analytics_agent/contract/propose.py
+  ff126ea6893b573749b0a30ec3ab7ac51469fa328a0bc482bfe411c5477774aa  516  src/analytics_agent/analysis/base.py
+  ab78bc5c1177840456cbd8ee36427ca60107df37c548857e2c4f51bbbd1a62be  176  src/analytics_agent/analysis/registry.py
+  c613e420d5182331523fb8d3c15cd39af17466edcc17337bdb7cfabb7be2e343  174  src/analytics_agent/analysis/declared.py
+  46a78b85ae6935fa79b34bd45b54b6804677febb0a5c769bec5f0efd80b7eaf0  175  src/analytics_agent/analysis/summary_stats.py
+  ed981c7e4159a9af0725575fdcad66304bcecdbbad4620d58cd52d2f5642e75c  199  src/analytics_agent/analysis/driver_analysis.py
+  1b8e3dd9040a6ecb2d3e7fa42b947bc393b8c08029c75ac31a4ab107afa93374  126  tests/test_measure_model.py
+  4165dff360dab39bf13d9385ca71c975d22ff0e6b7ab56e145adc1a4a2895217  55  tests/test_measure_model_facts.py

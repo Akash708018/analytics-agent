@@ -94,7 +94,7 @@ def group_stats(con, scope, dimension: str, measure: str) -> list[GroupStats]:
     (P10-D30), and that NULL is left as None rather than coalesced, because only the caller knows
     whether its branch can proceed without it.
     """
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     dim = quote_identifier(dimension)
     col = quote_identifier(measure)
     rows = con.execute(
@@ -168,7 +168,7 @@ def mann_whitney(con, scope, dimension: str, measure: str,
 
     Needs no variance, which is why this is the branch a one-row group can still take (P10-D30).
     """
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     dim = quote_identifier(dimension)
     col = quote_identifier(measure)
     where = (f"{scope.where} AND {dim} IS NOT NULL AND {col} IS NOT NULL "
@@ -259,7 +259,7 @@ def kruskal_wallis(con, scope, dimension: str, measure: str) -> TestResult:
 
     Needs no variance, which is what makes it the rank branch's answer to a one-row group.
     """
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     dim = quote_identifier(dimension)
     col = quote_identifier(measure)
     where = (f"{scope.where} AND {dim} IS NOT NULL AND {col} IS NOT NULL "

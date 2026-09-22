@@ -90,7 +90,7 @@ def bivariate(con, gate, scope, measure: str, against: str,
             f"{MAX_BINS} the table is the data rather than a summary of it."
         )
 
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     x = quote_identifier(measure)
     y = quote_identifier(against)
     headers = ["bin", f"{measure} from", f"{measure} to", "rows",
