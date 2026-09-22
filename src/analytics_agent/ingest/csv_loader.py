@@ -71,6 +71,9 @@ class LoadResult:
     gate_verdict: str = "OK"
     gate_message: str = ""
     coercion_failures: dict[str, int] = field(default_factory=dict)
+    #: Per column, per token: values read as NULL because they matched a missing-value token.
+    #: Blank fields are not listed -- every reader makes them null (Cleanup Step 12, RF-O4).
+    null_tokens: dict[str, dict[str, int]] = field(default_factory=dict)
 
     @property
     def coercion_total(self) -> int:
@@ -83,6 +86,16 @@ class LoadResult:
         ]
         if self.gate_message:
             lines.append(f"NOTE: {self.gate_message}")
+        if self.null_tokens:
+            total = sum(n for per in self.null_tokens.values() for n in per.values())
+            said = "; ".join(
+                f"{col} (" + ", ".join(f"{tok!r} {n:,}" for tok, n in sorted(
+                    per.items(), key=lambda kv: (-kv[1], kv[0]))) + ")"
+                for col, per in self.null_tokens.items())
+            lines.append(
+                f"NOTE: {total:,} value(s) matched a missing-value token and were read as NULL: "
+                f"{said}. A token is data until someone says it means absent -- reload with "
+                f"na_values=[] to keep them as text, or na_values=[...] to choose which.")
         if self.coercion_failures:
             worst = ", ".join(
                 f"{c} ({n:,})"
@@ -276,8 +289,6 @@ def load_csv(
     # rejects nullstr=[] outright: "requires a non-empty list of possible null
     # strings". Omitting the option is what an empty list has to mean.
     opts = [f"sample_size={sample_size}"]
-    if nulls:
-        opts.append(f"nullstr={nulls!r}")
     if delimiter:
         opts.append(f"delim='{delimiter}'")
     if names:
@@ -289,6 +300,11 @@ def load_csv(
         if header_rows > 1:
             opts.append(f"skip={header_rows}")
 
+    # The same read with every value as text and no token nulled: what the tokens were, counted
+    # after the load (RF-O4). Built before nullstr joins the options, so it cannot drift from them.
+    text_read = f'read_csv({_sql_path(path)}, {", ".join(opts + ["all_varchar=true"])})'
+    if nulls:
+        opts.append(f"nullstr={nulls!r}")
     read_expr = f'read_csv({_sql_path(path)}, {", ".join(opts)})'
 
     coercion: dict[str, int] = {}
@@ -338,6 +354,10 @@ def load_csv(
         ).fetchall()
     ]
 
+    null_tokens = _count_null_tokens(
+        con, text_read, [c for c, _t in columns], [t for t in nulls if t != ""],
+        footer_skip_rows, path)
+
     db.register_dataset(
         con,
         dataset_name=dataset_name,
@@ -359,7 +379,32 @@ def load_csv(
         gate_verdict=gate.verdict.value,
         gate_message=gate.message,
         coercion_failures=coercion,
+        null_tokens=null_tokens,
     )
+
+
+def _count_null_tokens(con, text_read: str, columns: list[str], tokens: list[str],
+                       footer_skip_rows: int, path: Path) -> dict[str, dict[str, int]]:
+    """How many values each missing-value token turned into NULL, per column.
+
+    One more pass over the file, read as text with no token nulled. The load itself cannot say:
+    after it, a nulled 'NA' and an empty field are the same NULL. The retail run lost 8,069 'NA'
+    and 5,353 '-' from rating this way with nothing in the reply (Cleanup Step 12, RF-O4).
+    """
+    if not tokens or not columns:
+        return {}
+    select = f"SELECT * FROM {text_read}"
+    if footer_skip_rows:
+        select = _apply_footer_skip(con, select, text_read, footer_skip_rows, path)
+    pairs = [(c, t) for c in columns for t in tokens]
+    exprs = ", ".join(
+        f"count(*) FILTER (WHERE {_q(c)} = '{t.replace(chr(39), chr(39) * 2)}')" for c, t in pairs)
+    row = con.execute(f"SELECT {exprs} FROM ({select})").fetchone()
+    out: dict[str, dict[str, int]] = {}
+    for (c, t), n in zip(pairs, row):
+        if n:
+            out.setdefault(c, {})[t] = n
+    return out
 
 
 def _apply_footer_skip(

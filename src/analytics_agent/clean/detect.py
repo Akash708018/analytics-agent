@@ -84,6 +84,10 @@ def proposed_type(con, table: str, column: str) -> str | None:
     total = _non_null(con, table, column)
     if total == 0:
         return None
+    # A value with a zero before another digit is a code: '000435' becomes 435, and SKUs that
+    # were six characters stop being what anybody wrote. Retail C003 offered exactly that as
+    # discarding nothing and recommended it (Cleanup Step 12, RF-O5).
+    padded = _scalar(con, f"SELECT count(*) FROM {t} WHERE regexp_matches({c}, '^[+-]?0[0-9]')")
 
     def share(to_type: str) -> float:
         n = _scalar(
@@ -103,7 +107,7 @@ def proposed_type(con, table: str, column: str) -> str | None:
         if odd == 0:
             return "BOOLEAN"
 
-    if share("DOUBLE") >= CONVERT_MIN_SHARE:
+    if not padded and share("DOUBLE") >= CONVERT_MIN_SHARE:
         rounded = _scalar(
             con,
             f"SELECT count(*) FROM {t} WHERE TRY_CAST({c} AS DOUBLE) IS NOT NULL "
@@ -123,6 +127,29 @@ def proposed_type(con, table: str, column: str) -> str | None:
         return "TIMESTAMP" if with_time else "DATE"
 
     return None
+
+
+def currency_type(con, table: str, column: str) -> str | None:
+    """The number type a column of currency text reads as, or None (Cleanup Step 12, A3).
+
+    Offered only where the plain cast fails and most values parse once the currency sign, the
+    thousands separators and spaces are removed -- and at least one value holds such a character,
+    so a column of plain numbers is never routed here.
+    """
+    t, c = sql.ident(table), sql.ident(column)
+    total = _non_null(con, table, column)
+    if total == 0:
+        return None
+    stripped = f"regexp_replace({c}, '{sql.CURRENCY_CHARS}', '', 'g')"
+    marked = _scalar(con, f"SELECT count(*) FROM {t} WHERE regexp_matches({c}, '[₹$€£¥,]')")
+    parsed = _scalar(con, f"SELECT count(*) FROM {t} WHERE {c} IS NOT NULL "
+                          f"AND TRY_CAST({stripped} AS DOUBLE) IS NOT NULL")
+    if not marked or parsed / total < CONVERT_MIN_SHARE:
+        return None
+    lost = _scalar(con, f"SELECT count(*) FROM {t} WHERE TRY_CAST({stripped} AS DOUBLE) IS NOT NULL "
+                        f"AND (TRY_CAST({stripped} AS DECIMAL(18,2)) IS NULL OR "
+                        f"TRY_CAST({stripped} AS DECIMAL(18,2)) <> TRY_CAST({stripped} AS DOUBLE))")
+    return "DECIMAL(18,2)" if lost == 0 else "DOUBLE"
 
 
 def _fits_two_places(con, table: str, column: str) -> bool:
@@ -214,6 +241,18 @@ def detect(
                 f"read {column} as {to_type}",
                 column,
             )
+        else:
+            money = currency_type(con, source, column)
+            if money:
+                add(
+                    ActionKind.CONVERT_TYPE,
+                    sql.convert_type(source=source, target=target, column=column,
+                                     to_type=money, missing_tokens=missing_tokens,
+                                     strip_currency=True),
+                    f"read {column} as {money}, removing the currency sign and thousands "
+                    f"separators first (currency text)",
+                    column,
+                )
 
         if missing_tokens:
             words = sql.token_list(missing_tokens)

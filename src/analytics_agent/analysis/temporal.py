@@ -42,6 +42,8 @@ __all__ = [
     "calendar_for",
     "edges",
     "longest_run",
+    "empty_months",
+    "months_sentence",
     "narrow_to_period",
     "per_period_sql",
     "require_date_column",
@@ -290,3 +292,47 @@ def period_narrowing(con, gate, scope, name: str, period, grain):
             )
         return scope
     return narrow_to_period(con, gate, scope, str(period), grain or DEFAULT_GRAIN)
+
+
+def empty_months(con, cal, table: str, col: str, where: str, label: str):
+    """The months inside one quarter or year of the calendar that hold no rows, and how many
+    months it has -- or None at a grain with no months inside it.
+
+    Cleanup Step 12, RF-O3: period_compare set retail's 2024 against 2025 and said "366 days of
+    data" for a year whose September held nothing. A day inside a month holding no sale is normal
+    and is not named; a month inside a year holding none is how a feed outage shows. Months outside
+    the declared window are not counted as empty.
+    """
+    if cal.key not in ("quarter", "year"):
+        return None
+    starts = con.execute(per_period_sql(
+        cal, table, col, where, inner=["count(*) AS n"],
+        outer=["strftime(s.period, '%Y-%m-%d %H:%M:%S')"],
+    )).fetchall()
+    start = next((r[1] for r in starts if r[0] == label), None)
+    if start is None:
+        return None
+    lo, hi = f"TIMESTAMP '{start}'", f"(TIMESTAMP '{start}' + {cal.step})"
+    if cal.windowed:
+        lo = f"greatest({lo}, CAST(DATE '{cal.start}' AS TIMESTAMP))"
+        hi = f"least({hi}, CAST(DATE '{cal.end}' AS TIMESTAMP) + INTERVAL 1 DAY)"
+    months = con.execute(
+        f"SELECT strftime(x.g, '%Y-%m'), EXISTS (SELECT 1 FROM {table} WHERE {where} "
+        f"AND {col} >= x.g AND {col} < x.g + INTERVAL 1 MONTH) "
+        f"FROM generate_series(date_trunc('month', {lo}), {hi} - INTERVAL 1 DAY, "
+        f"INTERVAL 1 MONTH) x(g) ORDER BY x.g"
+    ).fetchall()
+    return [m for m, held in months if not held], len(months)
+
+
+def months_sentence(label: str, found, additive: bool) -> str:
+    """One sentence naming a compared period's empty months, or ''."""
+    if not found or not found[0]:
+        return ""
+    missing, total = found
+    named = ", ".join(missing[:12]) + (f", and {len(missing) - 12:,} more" if len(missing) > 12 else "")
+    return (
+        f"{label} holds no rows in {named} ({total - len(missing)} of its {total} months hold "
+        f"rows)" + (", so its total reads low for the missing months alone and the change "
+                    "mixes the business with the gap." if additive else ".")
+    )

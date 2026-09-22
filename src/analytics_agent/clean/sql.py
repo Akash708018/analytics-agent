@@ -107,9 +107,14 @@ def _replace_one(target: str, source: str, column: str, expression: str) -> str:
     )
 
 
+#: What a number written for people carries that a number does not: currency signs, thousands
+#: separators, spaces. Removed before the cast when a conversion is offered as currency text.
+CURRENCY_CHARS = "[₹$€£¥,\\s]"
+
+
 def convert_type(
     *, source: str, target: str, column: str, to_type: str,
-    missing_tokens: list[str],
+    missing_tokens: list[str], strip_currency: bool = False,
 ) -> Rendering:
     """Read a text column as `to_type`.
 
@@ -120,7 +125,11 @@ def convert_type(
     destroys the only record that a price was withheld rather than missing.
     """
     col = ident(column)
-    expression = f"TRY_CAST({col} AS {to_type})"
+    # Currency text (Cleanup Step 12, A3): '₹10,846.00' is a number once the sign and the
+    # separator are gone, and the statement shown for approval says so in its own SQL.
+    source_value = (f"regexp_replace({col}, '{CURRENCY_CHARS}', '', 'g')"
+                    if strip_currency else col)
+    expression = f"TRY_CAST({source_value} AS {to_type})"
     undeclared = (
         f"{col} IS NOT NULL AND {expression} IS NULL"
         + (

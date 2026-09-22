@@ -37,6 +37,8 @@ from .temporal import (
     DEFAULT_GRAIN,
     calendar_for,
     edges,
+    empty_months,
+    months_sentence,
     per_period_sql,
     require_date_column,
 )
@@ -191,11 +193,16 @@ def period_compare(con, gate, scope, measure: str, period: str, baseline: str,
                      f"{number(base_v)} is not a ratio anybody can read.")
         summary.append(line)
 
+        for lab in (baseline, period):
+            said = months_sentence(lab, empty_months(con, cal, table, col, scope.where, lab),
+                                   agg in ADDITIVE)
+            if said:
+                summary.append(said)
         if agg in ADDITIVE and base_row[3] != per_row[3]:
             summary.append(
-                f"{baseline} covers {base_row[3]:,} days and {period} covers "
-                f"{per_row[3]:,}, so this {agg} sets {base_row[3]:,} days of "
-                f"data against {per_row[3]:,}. The lengths alone differ by "
+                f"{baseline} covers {base_row[3]:,} calendar days and {period} covers "
+                f"{per_row[3]:,}, so this {agg} sets {base_row[3]:,} calendar days "
+                f"against {per_row[3]:,}. The lengths alone differ by "
                 f"{(per_row[3] - base_row[3]) / base_row[3] * 100:+.1f}%, "
                 f"before anything in the business moved."
             )

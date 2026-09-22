@@ -166,6 +166,17 @@ class TypeReading:
     best: str | None = None
     ratio: float = 0.0
     examples: list[str] = field(default_factory=list)
+    #: Values with a zero before another digit -- what a number would drop (Cleanup Step 12).
+    leading_zeros: int = 0
+    #: Values that parse as a number only once currency signs, thousands separators and spaces go.
+    currency_text: int = 0
+
+    @property
+    def is_currency_text(self) -> bool:
+        """Numbers written for people: '₹10,846.00'. Named when the plain cast would not be."""
+        plain = self.best is not None and self.ratio >= TYPE_MISMATCH_SHARE
+        return (not plain and self.considered > 0
+                and self.currency_text / self.considered >= TYPE_MISMATCH_SHARE)
 
     @property
     def is_total(self) -> bool:
@@ -174,22 +185,34 @@ class TypeReading:
 
     @property
     def is_worth_naming(self) -> bool:
-        return self.best is not None and self.ratio >= TYPE_MISMATCH_SHARE
+        return (self.best is not None and self.ratio >= TYPE_MISMATCH_SHARE) or self.is_currency_text
+
+    def _zeros(self) -> str:
+        if self.leading_zeros and self.best in ("BIGINT", "DOUBLE"):
+            return (f", but {self.leading_zeros:,} have leading zeros a number would drop -- "
+                    f"a code, not a quantity")
+        return ""
 
     def sentence(self) -> str:
+        if self.is_currency_text:
+            return (
+                f"{self.currency_text / self.considered * 100:.1f}% of its {self.considered:,} "
+                f"values read as numbers once the currency sign and thousands separators are "
+                f"removed"
+            )
         if self.best is None:
             return ""
         if self.is_total:
             return (
                 f"every one of its {self.considered:,} values parses as "
-                f"{self.best}"
+                f"{self.best}{self._zeros()}"
             )
         failed = self.considered - round(self.ratio * self.considered)
         shown = ", ".join(repr(e) for e in self.examples)
         tail = f"; {shown} did not" if shown else ""
         return (
             f"{self.ratio * 100:.1f}% of its {self.considered:,} values parse "
-            f"as {self.best}, {failed:,} did not{tail}"
+            f"as {self.best}, {failed:,} did not{tail}{self._zeros()}"
         )
 
 
@@ -416,9 +439,17 @@ class TableProfile:
                 + "."
             )
 
+        money = [c for c in self.columns
+                 if c.type_reading is not None and c.type_reading.is_currency_text]
+        if money:
+            out.append(
+                f"{len(money)} text column(s) hold numbers written with a currency sign or "
+                f"thousands separator: " + ", ".join(c.name for c in money)
+                + ". Nothing was converted; a cleaning plan offers the conversion.")
         misread = [
             c for c in self.columns
             if c.type_reading is not None and c.type_reading.is_worth_naming
+            and not c.type_reading.is_currency_text
         ]
         if misread:
             total = [c for c in misread if c.type_reading.is_total]
@@ -427,7 +458,9 @@ class TableProfile:
                 out.append(
                     f"{len(total)} text column(s) hold nothing but values of "
                     f"another type: "
-                    + ", ".join(f"{c.name} -> {c.type_reading.best}" for c in total)
+                    + ", ".join(f"{c.name} -> {c.type_reading.best}"
+                                + (" (zero-padded: a code)" if c.type_reading.leading_zeros else "")
+                                for c in total)
                     + ". Nothing was converted."
                 )
             if partial:
@@ -561,6 +594,12 @@ def _cast_exprs(name: str, listed: str) -> list[str]:
         out.append(
             f"count(*) FILTER (WHERE {keep} AND {_cast_ok(col, sql_type)})"
         )
+    # Two counts a cast cannot see (Cleanup Step 12): the zeros a number drops, and numbers
+    # written with a currency sign or thousands separator.
+    out.append(f"count(*) FILTER (WHERE {keep} AND regexp_matches({col}, '^[+-]?0[0-9]'))")
+    out.append(
+        f"count(*) FILTER (WHERE {keep} AND regexp_matches({col}, '[₹$€£¥,]') AND "
+        f"TRY_CAST(regexp_replace({col}, '[₹$€£¥,\\s]', '', 'g') AS DOUBLE) IS NOT NULL)")
     return out
 
 
@@ -733,8 +772,8 @@ def profile_table(
             mean=mean, stddev=sd, q1=q1, median=med, q3=q3
         )
 
-    # Per text column: blank, token, considered, then one count per candidate.
-    stride = 2 + 1 + len(CAST_CANDIDATES)
+    # Per text column: blank, token, considered, one count per candidate, leading zeros, currency.
+    stride = 2 + 1 + len(CAST_CANDIDATES) + 2
     offset = 5 * len(numeric)
     blanks: dict[str, int] = {}
     tokens: dict[str, int] = {}
@@ -742,7 +781,11 @@ def profile_table(
     for i, c in enumerate(text):
         base = offset + stride * i
         blanks[c.name], tokens[c.name] = values[base: base + 2]
-        readings[c.name] = _read_types(list(values[base + 2: base + stride]))
+        reading = _read_types(list(values[base + 2: base + stride - 2]))
+        zeros, money = values[base + stride - 2: base + stride]
+        readings[c.name] = TypeReading(
+            considered=reading.considered, ratios=reading.ratios, best=reading.best,
+            ratio=reading.ratio, leading_zeros=zeros, currency_text=money)
 
     notes: list[str] = []
     flagged = [c.name for c in text if tokens.get(c.name)]
@@ -759,6 +802,7 @@ def profile_table(
     named = [
         c.name for c in text
         if readings[c.name].is_worth_naming and not readings[c.name].is_total
+        and not readings[c.name].is_currency_text
     ]
     for name in named[:breakdown_cap]:
         reading = readings[name]
@@ -768,6 +812,8 @@ def profile_table(
             best=reading.best,
             ratio=reading.ratio,
             examples=_cast_examples(con, dataset_name, name, listed, reading.best),
+            leading_zeros=reading.leading_zeros,
+            currency_text=reading.currency_text,
         )
 
     outliers = _outlier_counts(con, dataset_name, numeric, summaries)

@@ -270,7 +270,9 @@ def check_file(path: Path | str, source_type: str | None = None) -> GateResult:
             verdict=Verdict.WARN,
             size_bytes=size,
             message=(
-                f"{path.name} is {human_bytes(size)}. Loading will work and "
+                f"{path.name} is {human_bytes(size)}, over the "
+                f"{human_bytes(g.csv_warn_bytes)} warning threshold (files over "
+                f"{human_bytes(g.csv_refuse_bytes)} are refused). Loading will work and "
                 f"the preview will be fast, but profiling and analysis will "
                 f"take noticeably longer than on a small file."
             ),

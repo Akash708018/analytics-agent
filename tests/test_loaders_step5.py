@@ -435,3 +435,25 @@ def test_the_spec_bridge_no_longer_refuses_na_values_or_footer_skip():
     )
     kwargs = csv_spec.to_loader_kwargs(load_csv)
     assert kwargs["footer_skip_rows"] == 1
+
+
+# --- the tokens read as NULL are said (Cleanup Step 12, RF-O4) ----------------------------------
+
+def test_the_load_reply_names_each_token_it_read_as_null(con, tmp_path):
+    """Retail: rating's 8,069 'NA' and 5,353 '-' became NULL and the reply said nothing."""
+    from analytics_agent.ingest.csv_loader import load_csv
+    p = tmp_path / "tokens.csv"
+    p.write_text("id,rating,city\n1,4,Pune\n2,NA,Pune\n3,-,-\n4,n/a,Pune\n5,,Pune\n6,-,Pune\n")
+    r = load_csv(con, p, "tokens")
+    assert r.null_tokens == {"rating": {"-": 2, "NA": 1}, "city": {"-": 1}}
+    text = r.summary()
+    assert "rating ('-' 2, 'NA' 1)" in text and "city ('-' 1)" in text
+    assert "na_values=[]" in text
+
+
+def test_no_token_means_no_note(con, tmp_path):
+    from analytics_agent.ingest.csv_loader import load_csv
+    p = tmp_path / "clean.csv"
+    p.write_text("id,rating\n1,4\n2,\n")
+    r = load_csv(con, p, "clean_tokens")
+    assert r.null_tokens == {} and "read as NULL" not in r.summary()

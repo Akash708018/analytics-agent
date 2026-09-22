@@ -214,7 +214,7 @@ def test_the_unknown_member_is_a_member_and_is_named_as_one(con):
 
 def test_the_two_periods_differ_in_length_and_every_share_carries_it(con):
     text = " ".join(split(con).summary)
-    assert "28 days of data against 31" in text
+    assert "28 calendar days against 31" in text
     assert "+10.7% of length" in text
 
 
@@ -246,3 +246,12 @@ def test_the_method_note_is_the_first_summary_line(con):
 def test_the_catalogue_reports_name_tier_and_a_sentence(con):
     entry = next(c for c in catalogue() if c[0] == "growth_decomposition")
     assert entry[1] == 3 and "sum" in entry[2]
+
+
+def test_an_empty_month_inside_a_compared_year_is_named_here_too(con):
+    """Cleanup Step 12, RF-O3."""
+    con.execute("CREATE OR REPLACE TABLE sales AS SELECT i AS id, "
+                "TIMESTAMP '2023-01-15' + INTERVAL (i) MONTH AS ts, 'north' AS region, "
+                "10.00 AS amount FROM range(24) t(i) WHERE i <> 20")
+    text = " ".join(split(con, baseline="2023", period="2024", grain="year").summary)
+    assert "2024 holds no rows in 2024-09" in text

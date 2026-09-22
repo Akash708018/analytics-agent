@@ -6459,3 +6459,49 @@ column (C6), no attrition or tenure (J1, J4).
 MEASURED VALIDATION, 22/09/2026. Baseline `uv run pytest -q` 1899 passed before the run; src/
 unchanged. Six key figures equal by SQL. Size-gate files built per the key (308,952,771 and
 2,595,199,347 bytes) and deleted after; SIZE_GATES.csv_refuse_bytes 2,684,354,560.
+
+## Cleanup Step 12 - the retail run's quick fixes, 22/09/2026
+
+Step document: docs/steps/cleanup_step12_retail_quick_fixes.md. Closes RF-O2, RF-O3, RF-O4, RF-O5 and
+the A3 finding.
+
+CL12-D1. FILE SIZES ARE DECIMAL, AS THE MACHINE REPORTS THEM. CLOSES RF-O2. SIZE_GATES from 10^6 and
+10^9 bytes (halving on small machines kept) and human_bytes in 1,000s, because macOS Finder and ls
+report decimal: the retail file of 2,595,199,347 bytes is 2.6 GB there and was called "2.4 GB" here.
+RAM stays GiB. A warning names the threshold it crossed and the refuse limit.
+
+CL12-D2. THE LOAD REPLY NAMES WHAT IT READ AS NULL. CLOSES RF-O4. Per column and token, counted in
+one extra pass over the file read as text with nothing nulled -- after the load a nulled 'NA' and an
+empty field are the same NULL, so only the file can say. Blank is not listed. The defaults are
+unchanged; they are said. Retail: rating ('NA' 8,069, '-' 5,353).
+
+CL12-D3. A ZERO-PADDED CODE IS NOT OFFERED AS A NUMBER. CLOSES RF-O5. proposed_type proposes no
+numeric type where a value has a zero before another digit; the profile says "N have leading zeros
+a number would drop -- a code, not a quantity" and marks the column "zero-padded: a code".
+
+CL12-D4. CURRENCY TEXT IS READ, BY APPROVAL. A3. A text column that parses as a number once
+[₹$€£¥,] and spaces are removed (90%, and at least one value carrying such a character) is named by
+the profile and offered as CONVERT_TYPE whose SQL does the removal (regexp_replace inside TRY_CAST),
+DECIMAL(18,2) where it fits.
+
+CL12-D5. EMPTY MONTHS INSIDE A COMPARED QUARTER OR YEAR ARE NAMED; DAYS ARE CALENDAR DAYS. CLOSES
+RF-O3. temporal.empty_months, used by period_compare and growth_decomposition. Only months inside a
+quarter or a year: a day with no sale inside a month is normal and naming it would be noise. Months
+outside the declared window are not called empty. "days of data" was never a count of data.
+
+MEASURED VALIDATION, 22/09/2026. `uv run pytest -q`: 1899 -> 1912 passed (4 test_sizegate_units, 2
+test_loaders_step5, 2 test_cleaning_detect, 2 test_table_profile, 2 test_period_compare, 1
+test_growth_decomposition). Acceptance unchanged: 99/0/2, 19/0/0, 35/0/1, 26/0/0, 36/0/0. Eval 76/76.
+UI 37. Live on the retail fixture: L2 refused at 2.6 GB, A5 named, A2 not offered, A3 offered, E3
+names 2024-09.
+Digests (sha256, lines):
+  194ee1c095f14504419cdb4b037c2993d634c89401d70bdbc672cc1061e8db7a  349  src/analytics_agent/config.py
+  1a5fa92bf917f2879db20c881a74d5970be0cc77b58da914ecc9d26260c5420b  289  src/analytics_agent/ingest/sizegate.py
+  08927c4daa9b6b8a5f1bc9c973843e848991729e2294bb67c38d0d1d7acdcc27  504  src/analytics_agent/ingest/csv_loader.py
+  e517482cfd96b9b9ce8178a4484fb8e130a1e7a531f7173475def804fc08ee44  309  src/analytics_agent/clean/detect.py
+  51a3dce8a9d253b82f8f4c47611ef041e820314114e3bd3e3e0a3cc2f1902871  327  src/analytics_agent/clean/sql.py
+  f6cbe8760a2d68498f89cb19277f1d0e108101f090ccfdb9d1298ab3046a5218  893  src/analytics_agent/profile/table_profile.py
+  979f05f2573f1ffc015b02f29d7843e361fe8ced5321e677b28d732e1dc0d648  338  src/analytics_agent/analysis/temporal.py
+  7df7ec9c2af3022947359d35f0c7bc1d898e8116bf09a852910d6d552cd41b6b  230  src/analytics_agent/analysis/period_compare.py
+  5f32174de660bc352e25f14454829ca5f9e09e6607617b7a538301f7d9859860  321  src/analytics_agent/analysis/growth_decomposition.py
+  e1a1d36b5e4d57e3b648155f62f88c7b00adec434a7629215f84ebc813281080  44  tests/test_sizegate_units.py
