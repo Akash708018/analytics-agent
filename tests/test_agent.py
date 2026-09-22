@@ -396,15 +396,17 @@ def test_a_503_is_retried_with_backoff_then_reported(monkeypatch):
 
 
 def test_groq_gets_json_schema_nullables_and_gemini_keeps_openapi():
-    """P14-D27: Groq refused gpt-oss's `question: null` because `nullable` is not JSON Schema."""
-    ra = next(s for s in agent.tool_specs() if s.name == "run_analysis")
-    assert ra.parameters["properties"]["question"] == {"type": "string", "nullable": True}
-    js = llm.to_json_schema(ra.parameters)
-    assert js["properties"]["question"] == {"type": ["string", "null"]}
+    """P14-D27: Groq refused gpt-oss's `question: null` because `nullable` is not JSON Schema.
+    run_analysis carried that argument and left the allowlist in Cleanup Step 10; compute_analysis's
+    `dimension` is the same shape, a string that may be null."""
+    ca = next(s for s in agent.tool_specs() if s.name == "compute_analysis")
+    assert ca.parameters["properties"]["dimension"] == {"type": "string", "nullable": True}
+    js = llm.to_json_schema(ca.parameters)
+    assert js["properties"]["dimension"] == {"type": ["string", "null"]}
     assert js["properties"]["dataset_name"] == {"type": "string"}
     q = llm.Groq()
-    session = q.start("s", [], "m", [ra])
-    sent = session._tools[0]["function"]["parameters"]["properties"]["question"]
+    session = q.start("s", [], "m", [ca])
+    sent = session._tools[0]["function"]["parameters"]["properties"]["dimension"]
     assert sent == {"type": ["string", "null"]}
 
 
@@ -583,3 +585,73 @@ def test_no_rule_lists_cleaning_among_what_a_screen_does():
     """The old rule read 'approve cleaning ... tell them where: the Upload & read screen, the
     Contract screen', beside the rule that cleaning has no screen."""
     assert "approve cleaning" not in agent.SYSTEM
+
+
+# --- the request fits the providers (Cleanup Step 10, CL9-O1) ---------------------------------
+#
+# Groq refused every graded question with 413: 8,000 tokens a minute, and the twelve tool specs
+# alone were 19,616 characters (~4,900 tokens) before a word of the conversation.
+
+SPEC_BUDGET = 8_000
+
+
+def _spec_chars() -> int:
+    import json
+    return sum(len(s.description) + len(json.dumps(s.parameters)) for s in agent.tool_specs())
+
+
+def test_the_tool_specs_fit_their_budget():
+    assert _spec_chars() <= SPEC_BUDGET, _spec_chars()
+
+
+def test_the_analysis_roster_is_derived_from_the_registry():
+    from analytics_agent.analysis.registry import REGISTRY
+    desc = next(s.description for s in agent.tool_specs() if s.name == "compute_analysis")
+    for name in REGISTRY:
+        assert f"{name}(" in desc, name
+    assert "top_n(dimension, measure, n, period, grain)" in desc
+
+
+def test_run_analysis_is_not_offered_to_the_model():
+    """compute_analysis passes the same gate; run_analysis's reply was 7,431 characters of a
+    catalogue the roster above already carries."""
+    assert "run_analysis" not in agent.ALLOWED
+
+
+def test_a_reply_naming_run_analysis_says_compute_analysis_does_the_same():
+    text = agent._with_screen_notes('NEXT STEP: call run_analysis(dataset_name="x", ...)')
+    assert "run_analysis: not one of your tools" in text and "compute_analysis" in text
+
+
+# --- the live run of Cleanup Step 10: a malformed generation, and a false "nothing changed" ---
+
+PARSE_FAILED = ('{"error":{"message":"Parsing failed. The model generated output that could not be '
+                'parsed. Please adjust your prompt. See \'failed_generation\' for more details.",'
+                '"type":"invalid_request_error","failed_generation":"{\\"name\\": ..."}}')
+
+
+def test_a_generation_groq_could_not_parse_is_classified():
+    assert llm._classify("groq", 400, PARSE_FAILED).kind == "generation_failed"
+
+
+def test_groq_retries_a_generation_it_could_not_parse(monkeypatch):
+    """Seen live: six tool calls made, a chart drawn, then 400 'Parsing failed' ended the turn."""
+    q = llm.Groq()
+    monkeypatch.setattr(q, "model", lambda: "m")
+    replies = iter([llm._classify("groq", 400, PARSE_FAILED),
+                    {"choices": [{"message": {"role": "assistant", "content": "November."}}]}])
+
+    def post(body):
+        r = next(replies)
+        if isinstance(r, Exception):
+            raise r
+        return r
+    monkeypatch.setattr(q, "post", post)
+    assert q.start("sys", [], "q", []).step().text == "November."
+
+
+def test_a_failed_turn_does_not_say_nothing_changed_when_a_file_was_written():
+    """The same run wrote a chart before failing; the message said nothing had changed."""
+    text = agent._failed(["groq: could not parse"], written=1)
+    assert "Nothing in your workspace changed" not in text and "Files" in text
+    assert "Nothing in your workspace changed" in agent._failed(["x"], written=0)

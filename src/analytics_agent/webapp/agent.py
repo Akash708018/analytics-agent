@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import asyncio
 import functools
+import inspect
 import re
 from collections.abc import Callable
 from contextlib import AbstractContextManager
@@ -22,8 +23,11 @@ from .llm import Call, Provider, ProviderError, ToolSpec, configured, convert_sc
 #: Reading and analysis only. Excluded on purpose: tools taking a filesystem path (the server's
 #: disk, on a public host), SQL against configured databases, and every step a person must agree
 #: to on a screen -- loading, confirming, cleaning, resetting (Step 4 decision 1).
+#: run_analysis is left out too (Cleanup Step 10): compute_analysis passes the same gate and
+#: carries the same caveats, and run_analysis's reply was 7,431 characters of a catalogue the
+#: roster below already carries.
 ALLOWED: tuple[str, ...] = (
-    "list_datasets", "describe_dataset", "get_workflow_state", "run_analysis",
+    "list_datasets", "describe_dataset", "get_workflow_state",
     "compute_analysis", "render_chart", "read_result_file", "profile_dataset", "profile_column",
     "validate_dataset", "get_cleaning_ledger", "build_report",
 )
@@ -67,14 +71,56 @@ cleaning is not available in the web app.
     screens=", ".join(SCREENS))
 
 
+def _roster() -> str:
+    """Every analysis with the parameters its function takes, read from the registry.
+
+    Replaces, for the model, compute_analysis's hand-written 7,051-character table: derived, it
+    cannot name a parameter the code lacks, and it is a sixth of the size (Cleanup Step 10).
+    """
+    from analytics_agent.analysis.registry import REGISTRY
+
+    lines = []
+    for a in sorted(REGISTRY.values(), key=lambda a: (a.tier, a.name)):
+        names = [n for n, prm in inspect.signature(a.run).parameters.items()
+                 if n not in ("con", "gate", "scope") and prm.kind is not prm.VAR_KEYWORD]
+        if a.narrows:
+            names += ["period", "grain"]
+        lines.append(f"{a.name}({', '.join(names)})")
+    return "; ".join(lines)
+
+
+#: What the model is told beyond each docstring's first paragraph, for the two tools whose full
+#: docstrings are most of the request. Claude Desktop still reads the full docstrings.
+_EXTRA = {
+    "compute_analysis": lambda: (
+        "analysis_type and its parameters: " + _roster() + ". measure and dimension must be "
+        "declared in the contract. grain is day, week, month, quarter or year (default month); "
+        'period names one, e.g. "2025-11" or "2025-Q4" with grain="quarter".'),
+    "render_chart": lambda: (
+        "Same analysis parameters as compute_analysis, plus chart: line, bar, grouped_bar, "
+        "scatter, histogram, box, heatmap or waterfall. line, bar, histogram and waterfall draw "
+        "one measure: the measure passed is drawn; otherwise name it with y. grouped_bar draws "
+        "several, e.g. trend with a dimension."),
+}
+
+
+def _compact(name: str, doc: str) -> str:
+    first = doc.strip().split("\n\n", 1)[0]
+    extra = _EXTRA.get(name)
+    return " ".join(first.split()) + (f" {extra()}" if extra else "")
+
+
 @functools.lru_cache(maxsize=1)
 def tool_specs() -> tuple[ToolSpec, ...]:
-    """The allowlisted tools, their schemas converted and workspace_id removed."""
+    """The allowlisted tools, their schemas converted and workspace_id removed, each described by
+    its docstring's first paragraph (Cleanup Step 10: the full docstrings were 19,616 characters
+    with the schemas, and Groq's limit is 8,000 tokens a minute for the whole conversation)."""
     tools = {t.name: t for t in asyncio.run(server.mcp.list_tools())}
     missing = [n for n in ALLOWED if n not in tools]
     if missing:
         raise RuntimeError(f"allowlisted tools not registered: {missing}")
-    return tuple(ToolSpec(n, tools[n].description or "", convert_schema(tools[n].parameters))
+    return tuple(ToolSpec(n, _compact(n, tools[n].description or ""),
+                          convert_schema(tools[n].parameters))
                  for n in ALLOWED)
 
 
@@ -109,6 +155,10 @@ SCREEN_FOR: dict[str, str] = {
     "query_source": "no screen -- databases are not connected to the web app",
     "describe_source": "no screen -- databases are not connected to the web app",
 }
+#: Tools left out of the allowlist whose work another allowlisted tool does.
+INSTEAD: dict[str, str] = {
+    "run_analysis": "call compute_analysis directly -- it checks the same contract and computes.",
+}
 _NAMED_CALL = re.compile(r"\b([a-z_]+)\(")
 
 
@@ -116,11 +166,14 @@ def _with_screen_notes(text: str) -> str:
     """A tool reply whose NEXT STEP names a tool the assistant lacks, with a note saying where the
     person does it. Seen live: gpt-oss copied "NEXT STEP: call propose_dataset_contract(...)" into
     a tool call Groq refused, failing the turn (P14-D33)."""
-    named = [n for n in dict.fromkeys(_NAMED_CALL.findall(text)) if n in SCREEN_FOR]
-    if not named:
+    found = list(dict.fromkeys(_NAMED_CALL.findall(text)))
+    named = [n for n in found if n in SCREEN_FOR]
+    instead = [n for n in found if n in INSTEAD]
+    if not named and not instead:
         return text
-    notes = "\n".join(f"- {n}: not one of your tools; the person does it on {SCREEN_FOR[n]}."
-                       for n in named)
+    notes = "\n".join(
+        [f"- {n}: not one of your tools; the person does it on {SCREEN_FOR[n]}." for n in named]
+        + [f"- {n}: not one of your tools; {INSTEAD[n]}" for n in instead])
     return f"{text}\n\n[Note for the assistant]\n{notes}"
 
 
@@ -143,6 +196,7 @@ def answer(workspace_id: str, history: list[dict], message: str, *,
             "the repository root and restart the app."))
     failures: list[str] = []
     calls: list[ToolCall] = []
+    at_start = {a.path for a in list_artifacts()}
     for provider in providers:
         # A spent daily quota is per model: Gemini tries its next model before the next
         # provider (P14-D32). Bounded by the ladder's length.
@@ -161,16 +215,26 @@ def answer(workspace_id: str, history: list[dict], message: str, *,
                 if exc.retryable:
                     break
                 # Every failure, not the last (P14-D25), each as one readable sentence.
-                return ChatTurn(reply="", tool_calls=calls, error=_failed(failures))
+                return ChatTurn(reply="", tool_calls=calls,
+                                error=_failed(failures, _written(list_artifacts, at_start)))
             new = [a for a in list_artifacts() if a.path not in before]
             return ChatTurn(reply=text, tool_calls=calls, artifacts=new)
-    return ChatTurn(reply="", tool_calls=calls, error=_failed(failures))
+    return ChatTurn(reply="", tool_calls=calls,
+                    error=_failed(failures, _written(list_artifacts, at_start)))
 
 
-def _failed(failures: list[str]) -> str:
+def _written(list_artifacts: Callable[[], list[Artifact]], at_start: set) -> int:
+    return len([a for a in list_artifacts() if a.path not in at_start])
+
+
+def _failed(failures: list[str], written: int = 0) -> str:
+    """Seen live (Cleanup Step 10): a turn drew a chart, then failed, and this said nothing had
+    changed. A result or chart written before the failure stays in Files (P14-D28)."""
+    after = (f"{written:,} file(s) written before the failure are in Files; nothing else "
+             f"changed." if written else "Nothing in your workspace changed.")
     return ("The assistant could not answer this time.\n\n"
             + "\n".join(f"- {f}" for f in failures)
-            + "\n\nNothing in your workspace changed. Try again shortly.")
+            + f"\n\n{after} Try again shortly.")
 
 
 def _turn(provider: Provider, workspace_id: str, history: list[dict], message: str,

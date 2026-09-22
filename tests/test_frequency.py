@@ -303,3 +303,15 @@ def test_concentration_and_pareto_take_a_period(con):
     for kind in ("concentration", "pareto"):
         got = out_for(con, gate(), kind, dimension="region", measure="amount", period="2024-03")
         assert "outside the month 2024-03" in got.summary[0], kind
+
+
+def test_top_n_states_what_the_rows_shown_hold_together(con):
+    """Cleanup Step 10, live: the assistant said the top five orders held '~56%' of November;
+    the five shares summed to 53.1%. A sum the reply states is a sum nobody has to do."""
+    got = out_for(con, gate(), "top_n", dimension="region", measure="amount", n=2)
+    assert "The 2 shown hold 67.7% of it together." in " ".join(got.summary), got.summary
+
+
+def test_top_n_showing_every_group_says_nothing_about_together(con):
+    got = out_for(con, gate(), "top_n", dimension="region", measure="amount", n=10)
+    assert "together" not in " ".join(got.summary)

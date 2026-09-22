@@ -6299,3 +6299,58 @@ Digests, final tree (sha256, lines):
   adc462ce5a8a3ebd4ad2aa5680d61a6f92581bb51a756f4d93082e11779b09af  525  src/analytics_agent/charts/render.py
   c0a5723639e28fd47a1b42edf69eba188e0fda9717ea8a8d595111cc55cf0111  197  src/analytics_agent/webapp/agent.py
   9fefccd63f2b219e68f30a347beb81dc428a683cb99d1fb9ab94029cd7bca027  1213  src/analytics_agent/server.py
+
+## Cleanup Step 10 - the web assistant's request fits the providers, 22/09/2026
+
+Step document: docs/steps/cleanup_step10_request_size.md. Reported by the user: every Ask-screen
+question failed, Groq with 413 (8,039 of 8,000 tokens a minute), Gemini with a timeout.
+
+CL10-D1. THE MODEL READS COMPACT TOOL DESCRIPTIONS; CLAUDE DESKTOP KEEPS THE FULL ONES. The twelve
+allowlisted tools' docstrings and schemas were 19,616 characters (~4,900 tokens) on every request.
+webapp/agent.tool_specs now sends each docstring's first paragraph; compute_analysis and
+render_chart add a roster read from the registry -- each analysis_type with the parameters its
+function takes, period and grain added where narrows=True -- so it cannot drift from the code as
+the hand-written 7,051-character table could, plus one line on grains or on chart kinds and y.
+6,229 characters. The MCP tools are unchanged.
+
+CL10-D2. RUN_ANALYSIS LEAVES THE WEB ALLOWLIST. Its reply was 7,431 characters, almost all the
+catalogue the roster now carries, and compute_analysis passes the same gate with the same
+caveats. A reply naming run_analysis( -- get_workflow_state's NEXT STEP does -- gains a note that
+compute_analysis does the same check (agent.INSTEAD, beside SCREEN_FOR). The graded question's
+four-call conversation measured 15,165 characters (~3,800 tokens), from ~33,000. CL9-O1's size
+half is closed: no 413 in either live run after the change.
+
+CL10-D3. GROQ'S FAILED_GENERATION IS RETRIED, AND A FAILED TURN SAYS WHAT IT WROTE. Seen live: six
+tool calls, a chart drawn, then 400 "Parsing failed ... failed_generation" ended the turn, and the
+message said nothing had changed. It is now kind="generation_failed", retried inside the same
+three attempts as tool_use_failed with a note asking for words or valid JSON; and the failure
+counts files written since the turn began and says they are in Files.
+
+CL10-D4. TOP_N STATES WHAT ITS ROWS HOLD TOGETHER. The live answer said the top five November
+orders held "~56%"; the five shares sum to 53.1%. Rule one already forbids stating a number no
+reply gave, and the model broke it anyway, so the reply now gives the number: "The 5 shown hold
+53.1% of it together." -- only when fewer than all groups are shown.
+
+CL10-O1 IS OPEN. A REFUSAL WHOSE WHY AND NEXT STEP DISAGREE. concentration over more than 49
+groups: WHY "top_n on order_id says which of its groups matter", NEXT STEP
+propose_dataset_contract, because tools._produce maps every ValueError to that call. The model
+read the WHY this time. The fix is a refusal kind for "too many groups" whose NEXT STEP is the
+top_n call -- a tools.py change with eval consequences (B-questions execute NEXT STEPs).
+
+CL10-O2 IS OPEN. GEMINI TIMES OUT AT 60 SECONDS AND WHY IS UNMEASURED. Three TimeoutErrors today,
+one before and two after the request shrank; the other Gemini failures were a 503 and a spent
+daily quota. Whether it is the model's latency, the ladder's lower rungs or the network was not
+measured, so TIMEOUT_S was not changed.
+
+The live answer of 5.2 met the graded question's checks except the invented share: chart drawn
+with July an empty slot, November 254,506.43 (raw, labelled), ORD-00551 96,049 at 37.7%, the
+copies stated and cleaning said to be unavailable, no screen invented, no call handed over. One
+sample of a nondeterministic model.
+
+MEASURED VALIDATION, 22/09/2026. `uv run pytest -q`: 1884 -> 1893 passed (7 in test_agent, 2 in
+test_frequency). Acceptance unchanged: 99/0/2, 19/0/0, 35/0/1, 26/0/0, 36/0/0. `uv run python
+eval/run_eval.py`: SCORE 76/76 (100%). `uv run --group ui pytest ui/tests`: 37 passed.
+Digests, final tree (sha256, lines):
+  3648dfc1eb82dac1ff80574b410d10fc39dde5dd027095ca7209b891026a52a3  261  src/analytics_agent/webapp/agent.py
+  c6d5b1dc37b1ce97f57acddca6db6be31ed11d1fd6055e99319b7f0eded2fccf  537  src/analytics_agent/webapp/llm.py
+  b17b9044e3364e28d2fdff33d909dd063720ae3233dad83c3b30be66024fa9b2  214  src/analytics_agent/analysis/frequency.py

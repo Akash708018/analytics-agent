@@ -1,11 +1,11 @@
 # analytics-agent
 
 MCP server exposing data loading, profiling, cleaning and contract-gated analysis
-to Claude Desktop. Phases 1-13 done, then Cleanup Steps 4-9; Phase 14
+to Claude Desktop. Phases 1-13 done, then Cleanup Steps 4-10; Phase 14
 (Track B) in progress, Steps 1-4 done (UI in ui/, on the fake backend or the engine with
 ANALYTICS_UI_BACKEND=real;
 `uv run --group ui streamlit run ui/app.py`; its 37 tests: `uv run --group ui pytest ui/tests`). Open: P14-O1 (abandoned web workspaces never expire), P14-O2 (cleaning has no
-web screen), CL9-O1 (the web assistant's conversation outgrows Groq's 8,000 TPM). The agent's live check:
+web screen), CL10-O1 (a refusal whose WHY and NEXT STEP disagree), CL10-O2 (Gemini timeouts, cause unmeasured). The agent's live check:
 `uv run python scripts/agent_live.py` (needs keys in the gitignored .env). Otherwise nothing: P9-O4's feature half was closed by the user's
 decision on 21/09/2026 (copy-first; in-place analysis is a later scaling item).
 
@@ -19,9 +19,9 @@ Layout: `src/analytics_agent/{ingest,profile,clean,contract,validate,analysis,ch
 
 ## Verify before committing
 All six, every time. Run the suite BEFORE committing, not after (C76: two commits
-recorded a broken tree). Last measured 22/09/2026, at Cleanup Step 9:
+recorded a broken tree). Last measured 22/09/2026, at Cleanup Step 10:
 
-    uv run pytest -q                      # 1884 passed
+    uv run pytest -q                      # 1893 passed
     uv run python tests/test_phase8.py    # 99 passed, 0 failed, 2 skipped
     uv run python tests/test_phase9.py    # 19 passed, 0 failed, 0 skipped
     uv run python tests/test_phase10.py   # 35 passed, 0 failed, 1 skipped
@@ -35,7 +35,7 @@ because a suite that must be 100% cannot carry a score (P13-D1):
     uv run python eval/run_eval.py        # SCORE: 76/76 (100%), 40 questions
 
 The acceptance scripts are scripts, not pytest files -- `pytest` collects nothing
-from them, so 1884 excludes them. The three skips are each deliberate and
+from them, so 1893 excludes them. The three skips are each deliberate and
 recorded: ANALYSIS_RESULT_UNSOUND and the rendered MCP schema in phase8, the
 non-finite screen in phase10. A skip is an outstanding clause, not a passing one
 -- count them against this line, which is how C80 was found.

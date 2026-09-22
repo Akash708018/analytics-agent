@@ -222,6 +222,12 @@ def _classify(provider: str, code: int, body: str) -> ProviderError:
         return ProviderError(provider, f"HTTP 429: {body[:500]}", True, kind="daily_quota",
                              model=model, summary=f"the free daily quota"
                              f"{' for ' + model if model else ''} is used up")
+    if code == 400 and "failed_generation" in body:
+        # Groq could not parse the model's own output -- a malformed tool call. A fresh sample
+        # usually parses; the session retries (Cleanup Step 10, seen live).
+        return ProviderError(provider, f"HTTP 400: {body[:500]}", False,
+                             kind="generation_failed",
+                             summary="the model's reply could not be parsed")
     if code == 400 and "tool_use_failed" in body:
         return ProviderError(provider, f"HTTP 400: {body[:500]}", False, kind="tool_use_failed",
                              summary=f"refused the model's tool call ({first})")
@@ -435,6 +441,11 @@ class GroqSession:
                                      "tool_choice": "auto"})
                 break
             except ProviderError as exc:
+                if exc.kind == "generation_failed":
+                    self._messages.append({"role": "user", "content": (
+                        "[system] Your last reply could not be parsed. Answer the person in "
+                        "plain words, or call one tool with valid JSON arguments.")})
+                    continue
                 if exc.kind != "tool_use_failed":
                     raise
                 # Groq refuses a call to a tool it was not given and returns no message; the
@@ -446,8 +457,9 @@ class GroqSession:
                     f"call it. Answer the person in words; if a step is theirs to do, say which "
                     f"screen does it.")})
         else:
-            raise ProviderError("groq", "the model kept calling tools it does not have", False,
-                                summary="the model kept calling tools it does not have")
+            raise ProviderError("groq", "three replies in a row were refused", False,
+                                summary="three replies in a row were refused (a tool it does "
+                                        "not have, or output that could not be parsed)")
         try:
             message = data["choices"][0]["message"]
         except (KeyError, IndexError):

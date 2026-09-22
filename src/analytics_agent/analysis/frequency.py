@@ -200,6 +200,11 @@ def top_n(con, gate, scope, dimension: str, measure: str,
             f"Share is of {number(basis.denominator)}, the {agg} of {measure} "
             f"across all {len(grouped):,} group(s)."
         )
+        if shown < len(grouped):
+            # Stated, so no reader adds the column up themselves -- the live assistant of
+            # Cleanup Step 10 did, and reported 56% for five shares summing to 53.1%.
+            held = sum(g[1] for g in grouped[:shown] if g[1] is not None)
+            summary.append(f"The {shown} shown hold {basis.share(held)} of it together.")
         if agg == "count" and basis.denominator != scope.analysed:
             summary.append(
                 f"count({measure}) skips rows where {measure} is null, so that "
