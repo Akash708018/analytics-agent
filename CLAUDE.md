@@ -2,7 +2,7 @@
 
 MCP server exposing data loading, profiling, cleaning and contract-gated analysis
 to Claude Desktop. Phases 1-13 done, then Cleanup Steps 4-11; Phase 14
-(Track B) in progress, Steps 1-4 done (UI in ui/, on the fake backend or the engine with
+(Track B) in progress, Steps 1-4 done; Phase 15 (web cleaning + helper columns) planned, not started (UI in ui/, on the fake backend or the engine with
 ANALYTICS_UI_BACKEND=real;
 `uv run --group ui streamlit run ui/app.py`; its 37 tests: `uv run --group ui pytest ui/tests`). Open: P14-O1 (abandoned web workspaces never expire), P14-O2 (cleaning has no
 web screen), CL10-O2 (Gemini timeouts, cause unmeasured). The agent's live check:
@@ -83,7 +83,7 @@ line carrying digests and suite totals, updating the guide's ledger row if the p
 state changed, then running all six checks and the eval above, reading them, and committing.
 
 ## Navigating the docs -- read narrowly
-`docs/decisions.md` is 6,138 lines and append-only; the build guide is 1,104. Reading
+`docs/decisions.md` is ~6,400 lines and append-only; the build guide is 1,163. Reading
 either whole costs more than the work.
 
 - **Open-item register: `docs/decisions.md:4438` to end.** Read it rather than grepping
@@ -93,7 +93,7 @@ either whole costs more than the work.
   current state; the guide's phase ledger row summarises it.
 - Decisions are `P<phase>-D<n>.`, open items `P<phase>-O<n> IS OPEN.`, corrections `C<n>.`
   Grep the identifier and read the surrounding lines; do not open the file.
-- Build guide: tier lists at lines 589-627, phase ledger table at ~1005-1013.
+- Build guide: tier lists at lines 590-628, Phase 15 at 994, phase ledger table at ~1059-1076.
 - Prefer one command that answers a question over several that circle it. If the
   question is what a file contains, open the file.
 

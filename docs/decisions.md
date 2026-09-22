@@ -6392,3 +6392,32 @@ Digests, final tree (sha256, lines):
   e9dae56bafb36b346331eace40168ce50d2a0b4c6c56737256b1f8bfb7c68738  552  src/analytics_agent/webapp/llm.py
   6309072b73a345fcec23f70a7306b2c5b7cefe50fa3a7b424e540abd9ef38437  353  src/analytics_agent/analysis/base.py
   e968316b4b7cf70c7554448e90b532d686bdb9b9c08c6e8afc7fa7b685fef6ff  359  src/analytics_agent/analysis/tools.py
+
+## Phase 15 planned - cleaning in the web app, and helper columns, 22/09/2026
+
+The user's decision, after the bunty_babli runs of Cleanup Steps 8-11: the web app gets cleaning,
+and analysis gets helper columns. Written into the build guide as Phase 15, section 11, with a ledger
+row (Not started) and changelog entry 8. Nothing in src/ changed.
+
+P15-D1. THE CLEAN SCREEN IS A FRONT DOOR ON PHASE 6, AND THE ASSISTANT STAYS READ-ONLY. Proposal,
+approval by id, all-or-nothing apply, before-tables, ledger and staleness refusal already exist and
+are tested. The screen adds propose/apply to the web backend, marks lossy actions, states a required
+order before the click, and after an apply sends the person to confirm a new contract version. The
+assistant learns the screen exists and may name an action id; it never applies one, and no subset is
+auto-approved. Closes P14-O2 when built.
+
+P15-D2. A HELPER COLUMN IS AN APPROVED DERIVATION, FROM A FIXED MENU. DERIVE_COLUMN is a cleaning
+action a person proposes -- never detected, like EXCLUDE_COLUMN -- applied through the same gate and
+ledgered with its SQL. Menu: a date part; bands of a measure at stated edges; product, ratio or
+difference of two numeric columns; a flag against a stated value; a combination of two dimensions.
+Not free SQL: P8-D7 measured caller text reading /etc/passwd through read_csv, and sql_guard checks
+boolean predicates only. Free expressions are a later phase, Claude Desktop only, after sql_guard can
+check a value expression. A new column is ADDITIVE drift; it is usable only once declared in the
+contract with a definition.
+
+P15-D3. OPTIONAL EXTRAS BECOME PHASE 16. Forecasting (Tier 8), multi-dataset joins and scheduled
+runs were Phase 15, out of scope until the build was done; the decided work goes before them. The
+guide's two mentions (Tier 8's heading, the section) were renumbered in the same edit.
+
+Build guide after the edit: 1,163 lines (from 1,104), sha256
+532433bcc96cdec8dd2c98fa85e1ef7f54a3f9bcbd4c6d3b6613d13092f2df47.

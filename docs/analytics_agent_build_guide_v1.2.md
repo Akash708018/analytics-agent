@@ -17,6 +17,7 @@
 | 5 | Cleaning must use `CREATE OR REPLACE TABLE ... AS SELECT`, never in-place `UPDATE`. | Accepted | Phase 6 |
 | 6 | DuckDB extension install needs internet on first run. | Accepted | Phase 0 |
 | 7 | New tool `reset_workspace`. FMR extended to F15. | — | 8, 16 |
+| 8 | Phase 15 added, 22/09/2026: cleaning in the web app and helper columns (`DERIVE_COLUMN`, a fixed menu). Optional extras renumbered to Phase 16. | Planned | 9, 11, 12 |
 
 **v1.1 — hardening pass.** Streaming ingest and size gate; `header_rows` as list; no bare file paths; instructional gate refusals; session-scoped DuckDB; pipe-delimited returns; Failure Mode Register added.
 
@@ -624,7 +625,7 @@ Every result states the test used, the assumption checked, and a plain-English i
 
 If repeat rate \< 5%, `cohort_retention` warns and recommends `repeat_behaviour` — the reframe you made on Olist at \~3%.
 
-### **Tier 8 — Forecasting (Phase 15, optional)**
+### **Tier 8 — Forecasting (Phase 16, optional)**
 
 Port SARIMAX/Prophet from Mandi. Out of scope for the main build.
 
@@ -990,9 +991,66 @@ Only after Phase 13 passes.
 
 ---
 
-### **Phase 15 — Optional extras**
+### **Phase 15 — Cleaning in the web app, and helper columns (3–4 days)**
 
-Forecasting, multi-dataset joins, scheduled runs. Out of scope until 0–14 are done.
+Only after Phase 14's UI steps. Decided 22/09/2026, from the graded bunty_babli runs (Cleanup Steps
+8–11): every web answer had to carry "the figures include the 4 copied rows", because the browser
+cannot clean (P14-O2), and questions like "category by month" or "order-size band by channel" had
+no answer, because an analysis groups only by declared columns and month is not one.
+
+**Part A — a Clean screen.** The engine side exists and is tested (Phase 6): proposal with exact
+counts, approval by id, all-or-nothing apply, `_agent_history_<name>_vN` before-tables, the ledger,
+staleness refusal. This part is a front door.
+
+1. Backend: `propose_cleaning` and `apply_cleaning` on the web backend protocol, the real backend and
+   the fake one.
+2. A **Clean** screen between Upload & read and Contract: each action with its counts, its SQL and
+   its sample; a lossy action (one that discards rows or values not declared missing) marked as such;
+   a required order stated before the click, not only refused after it (convert after normalising).
+3. After an apply: rows before and after, the ledger, and -- when a contract exists -- a pointer to
+   the Contract screen to confirm a new version, because the row count moved. That is where a key
+   the duplicates blocked (`primary_key=["order_id"]`) becomes statable.
+4. The assistant stays read-only. It learns the screen exists (its screen list, the
+   `SCREEN_FOR` notes) and can point to an action by id; it never applies one. A person approves
+   every action -- no auto-approved "safe" subset.
+
+**Part B — helper columns, as an approved derivation.**
+
+5. A new cleaning action, `DERIVE_COLUMN`, proposed by a person (never detected, like
+   `EXCLUDE_COLUMN`) and applied through the same gate: a CTAS rebuild, a history table, a ledger
+   row carrying its SQL. The proposal shows the new column's definition in words, its SQL, how many
+   rows get a value, how many come out null, and a sample.
+6. **A fixed menu, not free SQL.** P8-D7 measured caller text reading `/etc/passwd` through
+   `read_csv`, and `util/sql_guard.py` checks boolean predicates only. The menu, each kind writing
+   its own definition sentence:
+   - date part of the date column: month, quarter, year, weekday;
+   - bands of a measure at stated edges (`order_value` at 1,000 and 5,000);
+   - arithmetic on two numeric columns: product, ratio, difference (a ratio's zero denominator is
+     null, and counted);
+   - a flag: a column compared with a stated value;
+   - a combination of two dimensions.
+   Free-form expressions are for a later phase, Claude Desktop only, and only once `sql_guard` can
+   check a value expression.
+7. A new column is ADDITIVE drift, so the contract in force keeps working. The column is declared on
+   the Contract screen as a dimension or a measure with a one-line definition, and only then can an
+   analysis group by it or sum it -- the rule that every number traces to something a person signed.
+8. Not duplicated: a month for a trend (`grain`), one month's top orders (`period`), bins of a measure
+   (`distribution`, `bivariate`), outlier flags (`outlier_detection`) and weekday patterns
+   (`seasonality`) already exist. A helper column is for grouping and measuring with them.
+
+**Watch:** every clean and every derivation keeps a before-table, and abandoned web workspaces never
+expire (P14-O1). Measure workspace sizes before public hosting.
+
+**Done-When:** in the browser only, on `test_orders.csv`: drop the 4 exact copies (604 → 600),
+confirm v2 with `primary_key=["order_id"]`, derive `order_month` from `order_date`, declare it, and
+ask for order_value by category and month -- every figure matching SQL on the deduplicated rows, and
+November 246,412.22 with no copies caveat. The ledger holds both actions with their SQL.
+
+---
+
+### **Phase 16 — Optional extras**
+
+Forecasting, multi-dataset joins, scheduled runs. Out of scope until 0–15 are done.
 
 ---
 
@@ -1015,6 +1073,7 @@ Forecasting, multi-dataset joins, scheduled runs. Out of scope until 0–14 are 
 | 12 | Report | ☑ Done | 21/09/2026 | Step 1: what each of the nine mandatory sections can be built from, measured rather than assumed. P12-D1 to D4. Five sections read records that already exist per dataset -- the cleaning ledger (which stores the SQL it ran), validation runs, profile runs and the stored contract -- so they are a formatting job. The question asked is stored nowhere and is an argument. A written result keeps its table and loses everything else: write_result puts headers and rows on disk and the summary only in the returned object, and no parameters at all, so nothing says which call produced a result file. ensure_table appears in five modules and the analysis tier is the one that records nothing. P12-O1 open: the reproduction appendix cannot be written from what exists, and recording analysis and chart runs the way the other five tiers record theirs is the answer that does not require trusting the agent's account of what it ran. Nothing in src/ changed. Step 2: analysis/runs.py, the sixth module to keep its own runs, recording what each analysis and chart was called with so call() renders an invocation rather than inferring one from a filename. One table with nullable chart columns, which is also the only thing linking a PNG to the analysis that drew it. Recorded after success, so a refused call records nothing. P12-D5 to D10, P12-O1 closed. Suite 1714 -> 1732. Step 3: report/assemble.py, the nine mandatory sections in Markdown, each from a record another phase wrote and none of them recomputed. A section with no record still appears and says why, and which were empty is carried on the Report rather than left to be counted. P12-D11 to D15. Suite 1732 -> 1748. Step 4: build_report registered, refusing only a dataset that is not loaded -- one with no contract is reported rather than refused, because 'no grain was agreed' is the finding (P12-D16). P12-D16 to D19. Suite 1748 -> 1759. Step 5: the Done-When. tests/test_phase12.py runs the whole pipeline on merged_multiheader.xlsx in one process -- ingest spec across a two-row merged header, profile, the one cleaning action the data needed (order_date is VARCHAR and the contract cannot be confirmed without it), contract, validation, seven analyses, a chart and the report. 36 passed, 0 failed, 0 skipped; the document is 8,748 bytes with all nine sections present and none empty. Everything below the load goes through server.py, because C83. P12-D20 to D23. |
 | 13 | Eval harness | ☑ Done | 21/09/2026 | Step 1: the harness and the mechanism of all three suites, with 14 gold questions proving the format carries them -- filling to the guide's 30-40 is Step 2. SCORE 27/28 (96%): correctness 5/5, behavioural 18/19, regression 4/4 with one check per named Failure Mode Register id (F11, F12, F14, F15), all passing first run. P13-D1 to D4. The eval reports a score and exits zero on a wrong answer, because a suite that must be 100% cannot carry a number. Behavioural is measured without an agent, by executing the refusal's own NEXT STEP. Step 2 closed both: P13-O1, the prose moved from ten refusals into `detail` and the roster reads 26 of 37 (70%), the eleven remaining being the `(..., extra=...)` form and placeholders the caller must fill, both correct; P13-O2, the scripts point store.EXPORT_DIR at their own workspace rather than restoring docs/contracts by hand, which is shorter than the shared helper the item asked for. SCORE 31/31 (100%). P13-D5 with C87. Step 3 filled the set to 32 questions across three tables and both loaders -- 14 correctness, 12 behavioural, 6 regression over six FMR ids (F7, F9, F11, F12, F14, F15) -- including the guide's own caveat case, a month removed so calendar_coverage has a gap to name. SCORE 67/67 (100%). P13-D6, D7 with C88 and C89: a gold question accused the product of a defect it does not have, and a refusal named a recovery that was itself refused. Step 4: regression for the rest of the Failure Mode Register -- fourteen of fifteen ids, F2 left out because it is Track B with two or more users and not built. Every new check falsified before it was trusted (P13-D9), which caught one that could not fail (C91). 40 questions, SCORE 75/75 (100%). |
 | 14 | Track B | ◐ In progress | 22/09/2026 | Step 1: ground facts, tests/test_track_b_facts.py, 6 tests over 7 facts. Same-process handles share a file; a read-only attach beside an open handle raises; a second process is locked out until the first closes; two workspaces on two threads are isolated; a second writer to one table is refused at its write and only it aborts (prediction was the commit -- wrong); each HTTP client has its own stable session id. Decides: serialise per workspace, one process, Track B ids never 'local'. P14-D1 to D8. Suite 1781 -> 1787. Step 2: the Streamlit UI on the fake backend -- sunset theme, the Journey written in ink on parchment, Upload & read, Contract, Ask, Files; 25 UI tests in ui/tests. DOMPurify drops a whole style block holding a tag-like '<' (C97: I first called it a race). P14-D9 to D13. Step 3: webapp/real_backend.py, the UI on the engine in-process under a per-workspace lock; unresolved contract fields reach the form blank (the engine holds a guessed grain); web exports stay in the workspace; the workspace id lives in the URL so a reload keeps it; looking creates nothing. P14-D17 to D21; P14-O1 open (abandoned workspaces never expire). Suite 1787 -> 1803. Step 4: the agent loop -- Gemini with Groq failover, no SDKs, models chosen from each provider's own list; twelve allowlisted read/analysis tools, workspace injected and never the model's; the suite now refuses network access after a leaked test key reached Gemini. Live run done: Gemini answered through four tool calls and every figure matched SQL; it surfaced C98 (the (all) roll-up drawn as a bar), fixed, plus model discovery, User-Agent, schema-dialect and rate-limit fixes. P14-D22 to D28, C98. Suite 1803 -> 1832. |
+| 15 | Web cleaning \+ helper columns | ☐ Not started |  | Planned 22/09/2026 from the bunty_babli runs: a Clean screen on the Phase 6 engine (closes P14-O2), then `DERIVE_COLUMN` from a fixed menu, declared in the contract. Section 11, Phase 15. |
 
 `☐ Not started` / `◐ In progress` / `☑ Done`
 
