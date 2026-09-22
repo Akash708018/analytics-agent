@@ -6505,3 +6505,31 @@ Digests (sha256, lines):
   7df7ec9c2af3022947359d35f0c7bc1d898e8116bf09a852910d6d552cd41b6b  230  src/analytics_agent/analysis/period_compare.py
   5f32174de660bc352e25f14454829ca5f9e09e6607617b7a538301f7d9859860  321  src/analytics_agent/analysis/growth_decomposition.py
   e1a1d36b5e4d57e3b648155f62f88c7b00adec434a7629215f84ebc813281080  44  tests/test_sizegate_units.py
+
+## Cleanup Step 13 - rules every row must satisfy, 22/09/2026
+
+Step document: docs/steps/cleanup_step13_validation_rules.md. Closes RF-O7.
+
+CL13-D1. A CONTRACT DECLARES EXPECTATIONS; VALIDATION COUNTS THEM. DatasetContract.expectations:
+[{rule, reason}], proposed with expectations=[...]. The rule is caller SQL, so it goes through
+util/sql_guard -- one statement, no subquery, bound as BOOLEAN -- at PROPOSAL, so a typo or a
+subquery is refused before a contract is stored (an exclusion is bound only when an analysis reads
+it). validate_dataset adds one check per rule after the domains: failed where false, not_checked
+where NULL (P7-D4), evidence the failing rows' primary-key values. Nothing is blocked: a finding is
+settled by a person (P7-D12). Retail: B1 8, B2 13 (with the mixed delivery_date parsed in the rule),
+B3 37 across 23 reps, B4 0 -- the key's four.
+
+Found and flagged, not changed: validate/rules.py defines reference_checks and domain_checks twice.
+
+MEASURED VALIDATION, 22/09/2026. `uv run pytest -q`: 1912 -> 1917 passed (5 in
+tests/test_validate_expectations.py; test_validate_tools.py's stand-in gained expectations).
+Acceptance unchanged: 99/0/2, 19/0/0, 35/0/1, 26/0/0, 36/0/0. Eval 76/76. UI 37.
+Digests (sha256, lines):
+  2d6824469e3a965b0553bb2c2d6f1d76c374e1c15ce684624b1cbcc49a641d65  706  src/analytics_agent/contract/dataset_contract.py
+  40d83d174972e8a185d36b32ea9a9419a84e4fb64a14c6fe23de4b024378980a  615  src/analytics_agent/contract/propose.py
+  cd56e307b58701f13efce70cdcbe8903c764c1b139be9ec61380f2600f957785  377  src/analytics_agent/contract/tools.py
+  07da3b20356d2f0d4d560ffff15c3d5af59737041f99f0b72794e0dc06df341c  422  src/analytics_agent/contract/store.py
+  2860121294fde6d3125853fcaad5c4bf060d5826adbea87704d0eeeb41b7b772  904  src/analytics_agent/validate/rules.py
+  8eb76eeb2bff9c7cee00ff99b7a98526a23427ee04eab496112495c2ef508c97  220  src/analytics_agent/validate/tools.py
+  24a32eba7b0a54cd1acf5c37726ee6e7d4239e3a44c600035c0db34c94e400ed  1219  src/analytics_agent/server.py
+  12664311b3f3dbb228a902de936540109da922b3764058bf6b40163925790f2f  88  tests/test_validate_expectations.py

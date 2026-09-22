@@ -24,6 +24,7 @@ from analytics_agent.contract import ContractRefused, store
 from analytics_agent.contract.dataset_contract import (
     DatasetContract,
     Exclusion,
+    Expectation,
     ForeignKey,
     contract_from_json,
 )
@@ -71,6 +72,25 @@ def _parse_window(
                 ),
             ).to_text()
         ) from exc
+
+
+def _parse_expectations(raw: list[dict] | None) -> list[Expectation]:
+    """The tool's list-of-objects as Expectations, refusing a bad shape (Cleanup Step 13)."""
+    out: list[Expectation] = []
+    for i, item in enumerate(raw or []):
+        try:
+            if not isinstance(item, dict):
+                raise ValueError("it is not an object")
+            out.append(Expectation(rule=item.get("rule", ""), reason=item.get("reason", "")))
+        except Exception as exc:
+            raise ContractRefused(Refusal(
+                reason=Reason.CONTRACT_INVALID,
+                what=f"expectation {i + 1} is not usable: {exc}",
+                why="each expectation is a rule every row must satisfy, and the reason it must.",
+                next_call=('propose_dataset_contract(..., expectations=[{"rule": "units > 0", '
+                           '"reason": "a line sells at least one item"}])'),
+            ).to_text()) from None
+    return out
 
 
 def _parse_exclusions(raw: list[dict] | None) -> list[Exclusion]:
@@ -184,11 +204,13 @@ def propose(
     caveats: list[str] | None = None,
     foreign_keys: list[dict] | None = None,
     domains: dict[str, list[str]] | None = None,
+    expectations: list[dict] | None = None,
 ) -> str:
     """Draft a contract and render it. Stores nothing."""
     try:
         window = _parse_window(analysis_window_start, analysis_window_end)
         exclusions = _parse_exclusions(known_exclusions)
+        rules = _parse_expectations(expectations)
         keys = _parse_foreign_keys(foreign_keys)
         record = db.get_dataset(con, dataset_name)
         proposal = propose_contract(
@@ -203,6 +225,7 @@ def propose(
             aggregations=aggregations,
             analysis_window=window,
             known_exclusions=exclusions,
+            expectations=rules,
             caveats=caveats,
             foreign_keys=keys,
             domains=domains,

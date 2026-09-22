@@ -595,6 +595,7 @@ def propose_dataset_contract(
     caveats: list[str] | None = None,
     foreign_keys: list[dict] | None = None,
     domains: dict[str, list[str]] | None = None,
+    expectations: list[dict] | None = None,
     workspace_id: str | None = None,
 ) -> str:
     """Draft a Dataset Contract for a loaded dataset. Stores nothing.
@@ -624,6 +625,11 @@ def propose_dataset_contract(
       analysis_window_end="2024-09-30"            both ends or neither
       known_exclusions=[{"rule": "status = 'cancelled'",
                          "reason": "not real revenue"}]
+      expectations=[{"rule": "units > 0",
+                     "reason": "a line sells at least one item"}]
+                                                  every row must satisfy it;
+                                                  validate_dataset counts those
+                                                  that do not
 
     The contract that comes back with nothing unresolved is the one to confirm.
     Deleting an entry from `unresolved` does not work: the blank it was
@@ -639,7 +645,7 @@ def propose_dataset_contract(
             analysis_window_start=analysis_window_start,
             analysis_window_end=analysis_window_end,
             known_exclusions=known_exclusions, caveats=caveats,
-            foreign_keys=foreign_keys, domains=domains,
+            foreign_keys=foreign_keys, domains=domains, expectations=expectations,
         )
     finally:
         con.close()

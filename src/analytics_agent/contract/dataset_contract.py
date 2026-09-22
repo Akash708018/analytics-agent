@@ -141,6 +141,29 @@ class Exclusion(BaseModel):
         return v
 
 
+class Expectation(BaseModel):
+    """A statement every row must make true -- Great Expectations' word for it.
+
+    Cleanup Step 13 (RF-O7): the retail run's negative quantities, deliveries before the order and
+    sales after a rep's exit passed validation, because no check could state them. The rule is SQL
+    text a person wrote, so it goes through util/sql_guard like an exclusion rule; validation
+    counts the rows where it is false, and leaves apart the rows where it is NULL.
+    """
+
+    rule: str
+    reason: str
+
+    @field_validator("rule", "reason")
+    @classmethod
+    def _not_blank(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError(
+                "an expectation needs both a rule and a reason. A rule with no reason is a "
+                "failure count nobody can act on."
+            )
+        return v
+
+
 class ForeignKey(BaseModel):
     """A column that must point at a row of another dataset.
 
@@ -285,6 +308,7 @@ class DatasetContract(BaseModel):
     measures: list[Measure] = Field(default_factory=list)
     dimensions: list[str] = Field(default_factory=list)
     known_exclusions: list[Exclusion] = Field(default_factory=list)
+    expectations: list[Expectation] = Field(default_factory=list)
     caveats: list[str] = Field(default_factory=list)
 
     missing_values: list[str] | None = Field(
@@ -546,6 +570,9 @@ class DatasetContract(BaseModel):
             for e in self.known_exclusions:
                 count = f" ({e.row_count:,} rows)" if e.row_count is not None else ""
                 lines.append(f"  - {e.rule}{count} -- {e.reason}")
+        if self.expectations:
+            lines += ["", "Rules every row must satisfy:"]
+            lines += [f"  - {x.rule} -- {x.reason}" for x in self.expectations]
         if self.caveats:
             lines += ["", "Caveats:"] + [f"  - {c}" for c in self.caveats]
         return "\n".join(lines)
@@ -619,6 +646,7 @@ class DatasetContract(BaseModel):
                 {"rule": e.rule, "reason": e.reason, "row_count": e.row_count}
                 for e in self.known_exclusions
             ],
+            "expectations": [{"rule": x.rule, "reason": x.reason} for x in self.expectations],
             "caveats": list(self.caveats),
             "foreign_keys": [
                 {

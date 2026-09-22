@@ -55,6 +55,7 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 
 from analytics_agent.contract import ContractRefused
+from analytics_agent.contract.refusals import Reason, Refusal
 from analytics_agent.contract.compatibility import (
     KeyVerdict,
     binding_for,
@@ -66,6 +67,7 @@ from analytics_agent.contract.dataset_contract import (
     AnalysisWindow,
     DatasetContract,
     Exclusion,
+    Expectation,
     ForeignKey,
     Measure,
 )
@@ -296,6 +298,31 @@ def _grain_key_notes(con, dataset_name: str, grain: str, ev: DatasetEvidence) ->
     ]
 
 
+def _bound_expectations(con, dataset_name: str, expectations) -> list[Expectation]:
+    """Each rule bound against the table as BOOLEAN, or the proposal refused naming it.
+
+    An exclusion rule is bound when an analysis first reads it; a rule meant to hold for every row
+    is bound here, so a column typo or a subquery is refused before it reaches a stored contract
+    that validation would then report as NOT RUN forever (Cleanup Step 13).
+    """
+    from analytics_agent.util.sql_guard import UnsafeSQL, bind_predicate
+
+    out = list(expectations or [])
+    for i, x in enumerate(out, 1):
+        try:
+            bind_predicate(con, dataset_name, x.rule)
+        except UnsafeSQL as exc:
+            raise ContractRefused(Refusal(
+                reason=Reason.CONTRACT_INVALID,
+                what=f"expectation {i} ({x.rule!r}) cannot be checked against {dataset_name}.",
+                why=str(exc),
+                detail="A rule is the text after WHERE, about this table's own columns.",
+                next_call=(f'propose_dataset_contract(dataset_name="{dataset_name}", '
+                           f'expectations=[...])'),
+            ).to_text()) from None
+    return out
+
+
 def _resolve_date_column(
     stated: str | None, ev: DatasetEvidence
 ) -> tuple[str | None, bool, list[str]]:
@@ -403,6 +430,7 @@ def propose_contract(
     aggregations: dict[str, str] | None = None,
     analysis_window: tuple[date, date] | None = None,
     known_exclusions: list[Exclusion] | None = None,
+    expectations: list[Expectation] | None = None,
     caveats: list[str] | None = None,
     foreign_keys: list[ForeignKey] | None = None,
     domains: dict[str, list[str]] | None = None,
@@ -561,6 +589,7 @@ def propose_contract(
         measures=built,
         dimensions=dimension_names,
         known_exclusions=list(known_exclusions or []),
+        expectations=_bound_expectations(con, dataset_name, expectations),
         caveats=list(caveats or []),
         # Neither is asked about and neither goes in `unresolved`. dbt does not
         # nag you for a relationships test; empty is a default, not a gap, and
