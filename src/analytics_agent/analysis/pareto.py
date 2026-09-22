@@ -28,7 +28,7 @@ from decimal import Decimal
 from typing import Any
 
 from ..util.sql_guard import quote_identifier
-from .base import ParamsInvalid, label, number, share_basis
+from .base import ParamsInvalid, TooManyGroups, label, number, share_basis
 from .declared import AGG_SQL, agg_of, require_dimension, require_measure
 from .registry import Output, register
 from .stats import MAX_GROUPS, ranked_totals
@@ -62,10 +62,10 @@ def _ranked_with_shares(con, gate, scope, dimension: str, measure: str):
     grouped = ranked_totals(con, scope, dimension, total_sql)
 
     if len(grouped) > MAX_GROUPS:
-        raise ValueError(
+        raise TooManyGroups(
             f"{dimension} has {len(grouped)} group(s), NULL counted as a "
             f"group, against a cap of {MAX_GROUPS}. top_n on {dimension} says "
-            f"which of its groups matter."
+            f"which of its groups matter.", dimension, measure
         )
 
     basis = share_basis(agg, [g[1] for g in grouped])

@@ -19,7 +19,7 @@ from __future__ import annotations
 import math
 from typing import Any
 
-from .base import NO_MEMBER, LostRows, label, number
+from .base import NO_MEMBER, LostRows, TooManyGroups, label, number
 from .declared import column_types, is_numeric, require_dimension, require_measure
 from .inferential import detectable_effect, group_stats, rows_for_effect
 from .registry import Output, register
@@ -88,9 +88,10 @@ def sample_adequacy(con, gate, scope, dimension: str, measure: str,
 
     groups = group_stats(con, scope, dimension, measure)
     if len(groups) > MAX_GROUPS:
-        raise ValueError(
+        raise TooManyGroups(
             f"sample_adequacy of {measure} by {dimension} would be {len(groups)} group(s) "
-            f"against a cap of {MAX_GROUPS}."
+            f"against a cap of {MAX_GROUPS}. top_n on {dimension} says which of its groups "
+            f"matter.", dimension, measure
         )
 
     excluded = _excluded(con, scope, dimension, measure)

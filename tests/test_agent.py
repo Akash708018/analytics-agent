@@ -44,8 +44,11 @@ class Scripted:
         self.tools = tools
         outer = self
 
+        outer.finals = []
+
         class S:
-            def step(self_inner):
+            def step(self_inner, final=False):
+                outer.finals.append(final)
                 if outer.fail:
                     raise outer.fail
                 return outer.replies.pop(0)
@@ -168,7 +171,9 @@ def test_the_loop_stops_after_the_round_limit(contracted):
     p = Scripted([Reply(calls=[Call(str(i), "list_datasets", {})])
                   for i in range(agent.MAX_ROUNDS + 2)])
     turn = _answer(be, ws, p)
-    assert len(turn.tool_calls) == agent.MAX_ROUNDS
+    # Cleanup Step 11: the last round offers no tools, so at most MAX_ROUNDS - 1 run; a model
+    # that still answers with calls and no text gets the stop message.
+    assert len(turn.tool_calls) == agent.MAX_ROUNDS - 1
     assert f"stopped after {agent.MAX_ROUNDS} rounds" in turn.reply
 
 
@@ -420,10 +425,10 @@ def test_only_the_successful_attempts_artifacts_come_back(contracted):
             session = super().start(system, history, message, tools)
             outer, step = self, session.step
 
-            def failing_step():
+            def failing_step(final=False):
                 if not outer.replies:
                     raise ProviderError("gemini", "HTTP 429", retryable=True)
-                return step()
+                return step(final)
             session.step = failing_step
             return session
     first = DrawsThenFails([Reply(calls=[Call("1", "render_chart", {
@@ -655,3 +660,51 @@ def test_a_failed_turn_does_not_say_nothing_changed_when_a_file_was_written():
     text = agent._failed(["groq: could not parse"], written=1)
     assert "Nothing in your workspace changed" not in text and "Files" in text
     assert "Nothing in your workspace changed" in agent._failed(["x"], written=0)
+
+
+# --- the last round answers (Cleanup Step 11) ---------------------------------------------------
+#
+# Live, 15:03: seven rounds fetched every figure the answer needed, the eighth was spent on a
+# refusal, and the turn returned "I stopped after 8 rounds" with none of it.
+
+def test_the_last_round_is_asked_for_an_answer_and_its_text_is_kept(contracted):
+    be, ws = contracted
+    rounds = [Reply(calls=[Call(str(i), "list_datasets", {})]) for i in range(agent.MAX_ROUNDS - 1)]
+    rounds.append(Reply(text="November, driven by one order.",
+                        calls=[Call("x", "list_datasets", {})]))
+    p = Scripted(rounds)
+    turn = _answer(be, ws, p)
+    assert p.finals == [False] * (agent.MAX_ROUNDS - 1) + [True]
+    assert turn.reply == "November, driven by one order."
+    assert len(turn.tool_calls) == agent.MAX_ROUNDS - 1, "the final round's calls are not run"
+
+
+def test_gemini_is_told_to_call_nothing_on_the_final_round(monkeypatch):
+    g = llm.Gemini()
+    monkeypatch.setattr(g, "model", lambda: "m")
+    bodies = []
+    monkeypatch.setattr(g, "post", lambda body, model: bodies.append(
+        __import__("copy").deepcopy(body)) or {"candidates": [{"content": {
+            "role": "model", "parts": [{"text": "done"}]}}]})
+    s = g.start("sys", [], "q", list(agent.tool_specs())[:1])
+    s.step()
+    s.step(final=True)
+    assert bodies[0]["toolConfig"]["functionCallingConfig"]["mode"] == "AUTO"
+    assert bodies[1]["toolConfig"]["functionCallingConfig"]["mode"] == "NONE"
+    assert "last round" in str(bodies[1]["contents"][-1])
+
+
+def test_groq_is_told_to_call_nothing_on_the_final_round(monkeypatch):
+    q = llm.Groq()
+    monkeypatch.setattr(q, "model", lambda: "m")
+    bodies = []
+    monkeypatch.setattr(q, "post", lambda body: bodies.append(
+        __import__("copy").deepcopy(body)) or {
+        "choices": [{"message": {"role": "assistant", "content": "done"}}]})
+    q.start("sys", [], "q", list(agent.tool_specs())[:1]).step(final=True)
+    assert bodies[0]["tool_choice"] == "none"
+    assert "last round" in bodies[0]["messages"][-1]["content"]
+
+
+def test_the_rules_say_not_to_re_check_a_ready_dataset():
+    assert "profile, describe or validate only when" in agent.SYSTEM

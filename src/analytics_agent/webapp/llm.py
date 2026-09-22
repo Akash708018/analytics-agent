@@ -74,8 +74,14 @@ class Reply:
     calls: list[Call] = field(default_factory=list)
 
 
+#: Sent with a session's final step (Cleanup Step 11): the loop keeps its round limit, and the last
+#: round is an answer rather than one more call.
+LAST_ROUND = ("[system] This is your last round: no tool can be called. Answer the person now, in "
+              "words, from the tool replies above.")
+
+
 class Session(Protocol):
-    def step(self) -> Reply: ...
+    def step(self, final: bool = False) -> Reply: ...
     def add_results(self, results: list[tuple[Call, str]]) -> None: ...
 
 
@@ -294,7 +300,14 @@ class GeminiSession:
             "toolConfig": {"functionCallingConfig": {"mode": "AUTO"}},
         }
 
-    def step(self) -> Reply:
+    def step(self, final: bool = False) -> Reply:
+        if final:
+            self._body["toolConfig"] = {"functionCallingConfig": {"mode": "NONE"}}
+            last = self._body["contents"][-1]
+            if last.get("role") == "user":
+                last["parts"].append({"text": LAST_ROUND})
+            else:
+                self._body["contents"].append({"role": "user", "parts": [{"text": LAST_ROUND}]})
         data = self._p.post(self._body, self._model)
         candidates = data.get("candidates") or []
         if not candidates or "content" not in candidates[0]:
@@ -434,11 +447,13 @@ class GroqSession:
             "name": t.name, "description": t.description,
             "parameters": to_json_schema(t.parameters)}} for t in tools]
 
-    def step(self) -> Reply:
+    def step(self, final: bool = False) -> Reply:
+        if final:
+            self._messages.append({"role": "user", "content": LAST_ROUND})
         for _ in range(3):
             try:
                 data = self._p.post({"messages": self._messages, "tools": self._tools,
-                                     "tool_choice": "auto"})
+                                     "tool_choice": "none" if final else "auto"})
                 break
             except ProviderError as exc:
                 if exc.kind == "generation_failed":

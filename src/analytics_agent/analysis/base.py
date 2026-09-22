@@ -154,6 +154,20 @@ class ScopeError(ValueError):
     """The contract describes rows that cannot be selected."""
 
 
+class TooManyGroups(ValueError):
+    """More groups than a per-group table can show: the answer is top_n on the same columns.
+
+    Cleanup Step 11 (CL10-O1): six sites wrote "top_n on {dimension} says which of its groups
+    matter" into a plain ValueError, and the tool layer answered every ValueError with
+    propose_dataset_contract -- a WHY and a NEXT STEP naming different calls. Carrying the
+    columns lets the tool layer name the call the sentence names.
+    """
+
+    def __init__(self, message: str, dimension: str, measure: str | None = None):
+        super().__init__(message)
+        self.dimension, self.measure = dimension, measure
+
+
 class ParamsInvalid(ValueError):
     """The caller's arguments are wrong, as opposed to the contract's answer.
 

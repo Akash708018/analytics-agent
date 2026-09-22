@@ -48,7 +48,9 @@ round a figure into something the tool did not say.
 - No analysis runs without a confirmed Dataset Contract. If a tool refuses, read its NEXT STEP. \
 If the step is something only the person can do (load a file, confirm a contract), tell them \
 where: the Upload & read screen, the Contract screen. You cannot do those.
-- Start with get_workflow_state or list_datasets if you do not know what is loaded.
+- Start with get_workflow_state or list_datasets if you do not know what is loaded. When it says a \
+contract is ready, go straight to the analyses the question needs: profile, describe or validate \
+only when the question asks about the data's quality or shape.
 - Charts appear to the person automatically under your answer. You cannot see them: describe a \
 chart only from the numbers its reply gives.
 - Carry every caveat a result prints -- a subset warning, a gap, excluded rows -- into your answer.
@@ -240,10 +242,16 @@ def _failed(failures: list[str], written: int = 0) -> str:
 def _turn(provider: Provider, workspace_id: str, history: list[dict], message: str,
           lock: Callable[[], AbstractContextManager], calls: list[ToolCall]) -> str:
     session = provider.start(SYSTEM, history[-HISTORY_MESSAGES:], message, list(tool_specs()))
-    for _ in range(MAX_ROUNDS):
-        reply = session.step()
-        if not reply.calls:
+    for i in range(MAX_ROUNDS):
+        # The last round offers no tools, so what was fetched is answered rather than dropped
+        # (Cleanup Step 11: seven rounds held every figure, the eighth was a call, and the turn
+        # returned only the stop message).
+        final = i == MAX_ROUNDS - 1
+        reply = session.step(final=final)
+        if not reply.calls or (final and reply.text):
             return reply.text
+        if final:
+            break
         results = []
         for call in reply.calls:
             with lock():  # one tool at a time holds the workspace; the model's thinking does not

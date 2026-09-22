@@ -30,7 +30,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..util.sql_guard import quote_identifier
-from .base import NO_MEMBER, LostRows, label, number
+from .base import NO_MEMBER, LostRows, TooManyGroups, label, number
 from .declared import column_types, is_numeric, require_dimension, require_measure
 from .inferential import (FINITE, GroupStats, chi_square, eta_squared, group_stats,
                           hedges_g, kruskal_wallis,
@@ -132,10 +132,10 @@ def _difference(con, gate, scope, dimension: str, measure: str, method: str,
 
     groups = group_stats(con, scope, dimension, measure)
     if len(groups) > MAX_GROUPS:
-        raise ValueError(
+        raise TooManyGroups(
             f"hypothesis_test of {measure} by {dimension} would be {len(groups)} group(s) "
             f"against a cap of {MAX_GROUPS}. top_n on {dimension} says which of its groups "
-            f"matter."
+            f"matter.", dimension, measure
         )
 
     excluded = _excluded(con, scope, dimension, measure)

@@ -20,7 +20,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..util.sql_guard import quote_identifier
-from .base import LostRows, label, number, share_basis
+from .base import LostRows, TooManyGroups, label, number, share_basis
 from .declared import AGG_SQL, agg_of, column_types, is_numeric
 from .declared import require_dimension, require_measure
 from .registry import Output, register
@@ -82,11 +82,11 @@ def group_compare(con, gate, scope, dimension: str, measure: str, **params) -> O
         f"WHERE {scope.where})"
     ).fetchall()[0][0]
     if n_groups > MAX_GROUPS:
-        raise ValueError(
+        raise TooManyGroups(
             f"group_compare of {measure} by {dimension} would be {n_groups} "
             f"group(s), NULL counted as a group, against a cap of "
             f"{MAX_GROUPS} so that the {ALL} row fits the table limit. "
-            f"top_n on {dimension} says which of its groups matter."
+            f"top_n on {dimension} says which of its groups matter.", dimension, measure
         )
 
     exprs = stat_exprs(col, numeric)

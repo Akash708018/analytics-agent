@@ -6354,3 +6354,41 @@ Digests, final tree (sha256, lines):
   3648dfc1eb82dac1ff80574b410d10fc39dde5dd027095ca7209b891026a52a3  261  src/analytics_agent/webapp/agent.py
   c6d5b1dc37b1ce97f57acddca6db6be31ed11d1fd6055e99319b7f0eded2fccf  537  src/analytics_agent/webapp/llm.py
   b17b9044e3364e28d2fdff33d909dd063720ae3233dad83c3b30be66024fa9b2  214  src/analytics_agent/analysis/frequency.py
+
+## Cleanup Step 11 - a turn that runs out of rounds still answers, 22/09/2026
+
+Step document: docs/steps/cleanup_step11_final_round.md. Reported by the user at 15:03: "I stopped
+after 8 rounds of tool calls without a final answer", with every figure the answer needed already
+fetched by round seven.
+
+CL11-D1. THE LAST ROUND OFFERS NO TOOLS. Session.step(final=True) on round MAX_ROUNDS: Gemini's
+functionCallingConfig mode NONE, Groq's tool_choice "none", and llm.LAST_ROUND telling the model
+to answer from the replies above. A final reply's text is the answer even if it still carries
+calls, which are not run. The stop message remains for a final reply with no text. So at most
+MAX_ROUNDS - 1 tools run, and a turn that fetched its figures cannot end with none of them.
+
+CL11-D2. A GROUP CAP NAMES TOP_N, AS ITS WHY ALWAYS DID. CLOSES CL10-O1. base.TooManyGroups
+carries the dimension and measure from the six cap sites (pareto/concentration, group_compare,
+ranking_shift, hypothesis_test, sample_adequacy); tools._produce names compute_analysis(top_n,
+same dimension and measure, and period and grain if given), or frequency(column) when there is no
+measure. Measured live: the assistant took that call on the next round. The recovery executes
+verbatim (tested), per P13-D3.
+
+CL11-D3. A READY DATASET IS NOT RE-CHECKED UNASKED. The 15:03 turn spent three of eight rounds on
+describe, validate and profile under a contract the state called ready. SYSTEM now says to go
+straight to the analyses the question needs, and to profile, describe or validate only when the
+question asks about the data's quality or shape. The live run after it called none of the three.
+
+STILL OPEN: CL10-O2 (Gemini timeouts, cause unmeasured), P14-O1, P14-O2. The live answer's one
+lapse -- a correct subtraction no reply stated -- is the same failure CL10-D4 answered for one
+case; rule one is the only guard on the rest.
+
+MEASURED VALIDATION, 22/09/2026. `uv run pytest -q`: 1893 -> 1899 passed (4 in test_agent, 2 in
+test_analysis_tools; one test_agent test updated to MAX_ROUNDS - 1). Acceptance unchanged:
+99/0/2, 19/0/0, 35/0/1, 26/0/0, 36/0/0. `uv run python eval/run_eval.py`: SCORE 76/76 (100%). `uv
+run --group ui pytest ui/tests`: 37 passed.
+Digests, final tree (sha256, lines):
+  60fc34bb9879f7bfb9e95ff3c9fe2b3657b5016913491fadea05ad67b645d474  269  src/analytics_agent/webapp/agent.py
+  e9dae56bafb36b346331eace40168ce50d2a0b4c6c56737256b1f8bfb7c68738  552  src/analytics_agent/webapp/llm.py
+  6309072b73a345fcec23f70a7306b2c5b7cefe50fa3a7b424e540abd9ef38437  353  src/analytics_agent/analysis/base.py
+  e968316b4b7cf70c7554448e90b532d686bdb9b9c08c6e8afc7fa7b685fef6ff  359  src/analytics_agent/analysis/tools.py

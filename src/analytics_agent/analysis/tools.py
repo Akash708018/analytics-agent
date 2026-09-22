@@ -34,7 +34,7 @@ from analytics_agent.state import require_contract
 from analytics_agent.util import results
 from analytics_agent.util.sql_guard import UnsafeSQL
 
-from .base import LostRows, ParamsInvalid, ScopeError, scope_for
+from .base import LostRows, ParamsInvalid, ScopeError, TooManyGroups, scope_for
 from . import runs
 from .registry import UnknownAnalysis, catalogue, get, narrowed
 
@@ -146,6 +146,23 @@ def _produce(con, dataset_name: str, analysis_type: str, params: dict):
             why=str(exc),
             state=f"contract v{gate.version} for {dataset_name}",
             next_call=f'propose_dataset_contract(dataset_name="{dataset_name}")',
+        ).to_text()) from None
+    except TooManyGroups as exc:
+        # The WHY names top_n; so does the NEXT STEP (Cleanup Step 11, CL10-O1). A period and
+        # grain the caller gave travel with it, so the ranking is of the same rows.
+        if exc.measure:
+            kept = {k: params[k] for k in ("period", "grain") if k in params}
+            recovery = _as_call("compute_analysis", dataset_name, "top_n",
+                                {"dimension": exc.dimension, "measure": exc.measure, **kept})
+        else:
+            recovery = (f'compute_analysis(dataset_name="{dataset_name}", '
+                        f'analysis_type="frequency", column="{exc.dimension}")')
+        raise _Refused(Refusal(
+            reason=Reason.ANALYSIS_NOT_POSSIBLE,
+            what=f"{analysis_type} cannot show every group of {exc.dimension}.",
+            why=str(exc),
+            state=f"contract v{gate.version} for {dataset_name}",
+            next_call=recovery,
         ).to_text()) from None
     except (TypeError, ParamsInvalid) as exc:
         raise _Refused(Refusal(

@@ -31,7 +31,7 @@ from datetime import date
 from typing import Any
 
 from ..util.sql_guard import quote_identifier
-from .base import ParamsInvalid, label, number, window_clause
+from .base import ParamsInvalid, TooManyGroups, label, number, window_clause
 from .declared import AGG_SQL, agg_of, require_dimension, require_measure
 from .registry import Output, register
 from .stats import MAX_GROUPS, ranked_totals
@@ -125,10 +125,10 @@ def ranking_shift(con, gate, scope, dimension: str, measure: str,
 
     groups = {label(g[0]) for side in ranked.values() for g in side}
     if len(groups) > MAX_GROUPS:
-        raise ValueError(
+        raise TooManyGroups(
             f"{dimension} has {len(groups)} group(s) across the two periods, "
             f"NULL counted as a group, against a cap of {MAX_GROUPS}. top_n on "
-            f"{dimension} says which of its groups matter."
+            f"{dimension} says which of its groups matter.", dimension, measure
         )
 
     positions: dict[str, dict[str, Any]] = {}

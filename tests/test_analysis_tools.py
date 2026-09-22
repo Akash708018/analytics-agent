@@ -453,3 +453,41 @@ def test_a_period_reaches_the_analysis_through_the_tool_layer(con):
     assert reason_of(text) is None, text.splitlines()[:3]
     assert "outside the month 2024-06" in text
     assert 'period="2024-06"' in text or "2024-06" in text
+
+
+# --- a group cap names the call its WHY names (Cleanup Step 11, CL10-O1) ----------------------
+
+WIDE = ("SELECT i AS id, 'shop' || lpad(i::VARCHAR, 2, '0') AS shop, "
+        "TIMESTAMP '2024-06-01' + INTERVAL (i % 28) DAY AS ts, (i + 1)::DECIMAL(18,2) AS amount "
+        "FROM range(60) t(i)")
+
+
+@pytest.fixture()
+def wide(con):
+    con.execute(f"CREATE TABLE wide AS {WIDE}")
+    GATES["wide"] = _gate(dataset_name="wide", dimensions=["shop"], known_exclusions=[])
+    return con
+
+
+def _next_call(text):
+    return next(ln for ln in text.splitlines()
+                if ln.startswith("NEXT STEP: call "))[len("NEXT STEP: call "):]
+
+
+def test_a_group_cap_names_top_n_not_a_new_contract(wide):
+    """Live, 15:03: WHY said 'top_n on order_id says which of its groups matter' and NEXT STEP
+    said propose_dataset_contract, and the assistant spent its last round on the refusal."""
+    text = run(wide, "concentration", dataset_name="wide", dimension="shop", measure="amount")
+    assert reason_of(text) is Reason.ANALYSIS_NOT_POSSIBLE
+    assert _next_call(text) == ('compute_analysis(dataset_name="wide", analysis_type="top_n", '
+                                'dimension="shop", measure="amount")')
+
+
+def test_the_named_top_n_keeps_the_period_and_succeeds_verbatim(wide):
+    text = run(wide, "concentration", dataset_name="wide", dimension="shop", measure="amount",
+               period="2024-06")
+    call = _next_call(text)
+    assert 'period="2024-06"' in call and 'analysis_type="top_n"' in call
+    again = run(wide, "top_n", dataset_name="wide", dimension="shop", measure="amount",
+                period="2024-06")
+    assert reason_of(again) is None, again.splitlines()[:3]
