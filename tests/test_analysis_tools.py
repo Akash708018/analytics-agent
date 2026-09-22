@@ -436,3 +436,10 @@ def test_every_refusal_names_a_call_the_agent_can_make(con):
         text = run(con, **kwargs)
         line = next(l for l in text.splitlines() if l.startswith("NEXT STEP:"))
         assert "(" in line and ")" in line
+
+
+def test_a_trend_bar_draws_the_measure_it_was_given(con):
+    """Cleanup Step 8, from the bunty_babli run: this refused and spent the agent's last step."""
+    text = draw(con, "trend", "bar", measure="amount")
+    assert reason_of(text) is None, text.splitlines()[:3]
+    assert "measure amount (sum)" in text

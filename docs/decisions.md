@@ -6136,3 +6136,95 @@ re-drafted with no answers, and showed "Still needed: Grain; ..." beneath "confi
 confirmed draft is now kept. Falsified: dropping it fails the one-click test.
 
 MEASURED VALIDATION, 22/09/2026. UI tests 35 -> 37; engine 1839.
+
+## Cleanup Step 8 - what the bunty_babli run found, 22/09/2026
+
+Step document: docs/steps/cleanup_step8_run_findings.md. Found by the user's graded Ask-screen
+run: every figure matched SQL over the RAW table, the question asked for the deduplicated one,
+there was no month x channel, and the chart spent the agent's last step. Three predictions were
+wrong and are recorded there (the cost of the copy count, every new test failing, and a question
+the replay found contradicting its own notes).
+
+CL8-D1. A KEYLESS CONTRACT STAYS LEGAL, AND ITS EXACT COPIES ARE SAID ON EVERY RESULT. Keyless is
+by design ("a coarser grain than one row", Phase 4), so the gate does not refuse it; with nothing
+to verify it had nothing to say, and bunty_babli's 604 rows -- 4 of them copies of another --
+went through as "604 of 604 row(s) analysed". state.Gate now carries `copies` and the live row
+count, counted only when the contract states no key (a key that holds rules copies out; one that
+fails is refused by name), and caveats() says how many, that every count and total includes
+them, and names propose_cleaning_plan. Silent at zero. contract/compatibility.exact_copies is the
+one count, used by the gate and the proposal both (P7-D6's reason: two copies of one decision
+eventually disagree).
+
+CL8-D2. THE COPY COUNT IS A HASH SCREEN, THEN AN EXACT COUNT ONLY WHEN THE SCREEN FINDS ANY.
+Measured on 5M x 8, best of three: SELECT DISTINCT * 0.213s, count(DISTINCT hash(cols)) 0.119s,
+against summary_stats shape 0.162s, trend shape 0.058s, verify_key 0.084s. The plan's fallback --
+proposal time only, if slower than the analysis it gates -- tripped at 0.213s. 0.119s is inside
+the 0.077-0.179s Phase 7 accepted for verify_key, which the gate already pays for every keyed
+contract. A hash collision can only overstate the screen, never hide a copy; the exact count
+settles it, and the caveat quotes the exact count. DISTINCT and hash() both treat NULLs as equal
+(tests/test_duplicate_facts.py), so rows matching through a NULL are copies.
+
+CL8-D3. WITH NO KEY FOUND, THE PROPOSAL SAYS HOW NEAR THE NEAREST CAME. Phase 4's "two duplicates
+says the data is dirty" was only ever produced for a key somebody stated. Now the nearest
+identifier-shaped column's KeyVerdict sentence is a note, then the exact copies, then whether
+removing them would leave that column unique -- if so naming the cleaning step and
+primary_key=[...], if not saying what is left is a grain question. broken_sales, whose repeats
+are not copies (P7-D12), is told nothing about copies. The grain question names the nearest
+column rather than saying there is no candidate. Counts only: which column is the key stays the
+person's.
+
+CL8-D4. A STATED GRAIN THAT NAMES COLUMNS IS CHECKED WHEN NO KEY IS STATED. The v1 contract read
+grain "grain: [order_id]", primary_key []: a key put where nothing reads it. Whole words of the
+grain that are column names are verified together as one key and the verdict becomes a note with
+the primary_key=[...] that makes the check stick. A note, not a refusal: the sentence is the
+person's, and a grain mentioning a column is not always claiming a key.
+
+CL8-D5. TREND TAKES A DIMENSION; IT IS STILL 27 ANALYSES. The run asked for order_value by month
+split by channel and nothing took a period and a dimension together (cross_tab's are both
+declared dimensions; growth_decomposition and mix_shift split two named periods; scope is the
+contract's). trend(dimension=...) returns period, one column per member of a declared dimension
+(from dated rows -- an undated row lands in no period), (all) computed from rows and not from
+cells (a mean is not the mean of its members), rows. A member with no rows in a period is blank,
+never zero. Capped at MAX_COLS - 3 members, with label collisions refused, as cross_tab does.
+Cells use FILTER (WHERE d IS NOT DISTINCT FROM ?), cross_tab's bound-value selector, inside
+per_period_sql's calendar. Each member's two endpoints are stated; no fit.
+
+CL8-D6. A CHART HONOURS WHAT THE CALLER ALREADY CHOSE; P11-D13 STANDS. With y unset: a roll-up
+COLUMN, (all) or (total), is not drawn beside the columns it totals (C98, for columns), unless it
+is the only series; and when the analysis was given `measure`, the one column that IS it
+(`measure` or `measure (...)`, whole name, not substring -- units is not units_returned) is drawn,
+and with none, `rows` is left out, because a row count is not the measure asked about. Each is
+said in the chart's notes. Nothing nobody named is drawn, and a result still offering several
+refuses as before -- B11 (summary_stats, no measure) is unchanged. render_chart(trend, bar,
+measure="order_value") now draws order_value (sum).
+
+C100. I WROTE A NOTE AND LEFT A QUESTION DENYING IT. CL8-D3's first version added "Nearest to a
+key: order_id ..." to the notes and left the grain question reading "there is not even a
+candidate to correct", three lines below. No unit test read both; the live replay, printing both,
+showed it. The claim-and-the-thing-it-describes pattern of C61-C76, inside one proposal. The
+question now names the nearest column; a test asserts the two cannot disagree.
+
+NOT CHANGED, AND STILL OPEN: P14-O2. The web assistant still cannot clean, so "deduplicated" is
+unanswerable from the browser. What changed is that it can no longer be unanswerable silently:
+the copies caveat is on every result it reads, and SCREEN_FOR already tells it cleaning has no
+screen. Also observed, not caused here: workspace ws_f1704c182539, the run's own, was emptied at
+11:59 by workspace.reset during this step; the suite's tests use fresh random ids, the UI's Reset
+needs a checkbox and a click, and who reset it was not established. The table was recovered from
+a copy taken at the start of the session.
+
+MEASURED VALIDATION, 22/09/2026. `uv run pytest -q`: 1839 -> 1867 passed (4 in
+tests/test_duplicate_facts.py, 24 across test_propose, test_state_gate, test_trend,
+test_charts_render, test_analysis_tools). Acceptance unchanged: 99/0/2, 19/0/0, 35/0/1, 26/0/0,
+36/0/0. `uv run python eval/run_eval.py`: SCORE 76/76 (100%). `uv run --group ui pytest ui/tests`:
+37 passed. Live replay through server.py on the run's own rows: v1 raw 2025-11 254,506.43 with the
+copies caveat, split Online 180,180.82 / Store 74,325.61; cleaned 604 -> 600; v2 key holds;
+2025-11 246,412.22, July blank, Online 332 / Store 268 -- the user's key. Max line in src/ 105.
+Digests, final tree (sha256, lines):
+  246a197767690e6eca2d0c6b7444dd373ae41b1ddc65e4d116f233bfc79d6e77  550  src/analytics_agent/contract/compatibility.py
+  097b85d027c09ce14f0d1130176364f86482c47cd81748a6203edf5b2f4f2a1c  586  src/analytics_agent/contract/propose.py
+  566cc0a3ac79bde82fe8a754b226c8b524aa8e2667681e58ae4fd981c5b36f96  413  src/analytics_agent/state.py
+  0f18fdee9548990b0cf4e04b671691f48f3d59bb773604a4a1e483035405a26f  283  src/analytics_agent/analysis/trend.py
+  e90184af3b3da02df30b1e8b6cda857500364021c5506155bda972931c4b457e  495  src/analytics_agent/charts/render.py
+  5ddbeb4061c26cc81a4e4221f56e6231e626c7d4b25b027fbb20bec1db06c197  342  src/analytics_agent/analysis/tools.py
+  e99c11add4e9320534dfbc70617cfd3c91fdb3703df57da17df9d9833b1b7771  1210  src/analytics_agent/server.py
+  003ade48054722ae104dceac2326a71d7d6b94fc4aa52dd3846ca232baa028de  69  tests/test_duplicate_facts.py

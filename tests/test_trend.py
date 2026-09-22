@@ -187,3 +187,59 @@ def test_the_method_note_is_the_first_summary_line(con):
 def test_the_catalogue_reports_name_tier_and_a_sentence(con):
     entry = next(c for c in catalogue() if c[0] == "trend")
     assert entry[1] == 3 and "gap" in entry[2]
+
+
+# --------------------------------------------------------------------------
+# split by a declared dimension (Cleanup Step 8)
+#
+# The bunty_babli run asked for order_value by month split by channel, and no analysis took a
+# period and a dimension together. GAPS by region: north in September and December, south in
+# October and January, November empty, and west only on the undated row.
+
+def by_region(con):
+    return trended(con, dimension="region")
+
+
+def test_a_split_has_one_column_per_member_then_all_then_rows(con):
+    assert by_region(con).headers == ["period", "north", "south", "(all)", "rows"], (
+        "west is on the undated row only, so it can land in no period and has no column; the "
+        "undated sentence already says where that row went."
+    )
+
+
+def test_a_member_with_no_rows_in_a_period_is_blank_not_zero(con):
+    got = {r[0]: r[1:] for r in by_region(con).rows}
+    assert got["2016-09"] == ["10.00", "", "10.00", "1"]
+    assert got["2016-10"] == ["", "50.00", "50.00", "2"]
+
+
+def test_a_period_with_no_rows_at_all_is_still_a_row(con):
+    got = {r[0]: r[1:] for r in by_region(con).rows}
+    assert got["2016-11"] == ["", "", "", "0"]
+    assert "2016-11" in " ".join(by_region(con).summary)
+
+
+def test_the_all_column_is_the_unsplit_trend(con):
+    split = {r[0]: r[3] for r in by_region(con).rows}
+    whole = {r[0]: r[1] for r in trended(con).rows}
+    assert split == whole
+
+
+def test_the_split_says_what_a_blank_cell_means_and_names_each_members_endpoints(con):
+    text = " ".join(by_region(con).summary)
+    assert "not zero" in text
+    assert "north: from 10.00 in 2016-09 to 40.00 in 2016-12" in text
+    assert "south: from 50.00 in 2016-10 to 50.00 in 2017-01" in text
+
+
+def test_an_undeclared_dimension_is_refused_by_name(con):
+    with pytest.raises(ValueError, match="not a declared dimension"):
+        trended(con, dimension="unit_price")
+
+
+def test_a_split_wider_than_the_table_limit_is_refused(con):
+    con.execute("CREATE OR REPLACE TABLE sales AS SELECT i AS id, "
+                "TIMESTAMP '2016-09-01' + INTERVAL (i) DAY AS ts, 'r' || i AS region, "
+                "1.0 AS amount, 1.0 AS unit_price FROM range(60) t(i)")
+    with pytest.raises(ValueError, match="capped at"):
+        trended(con, dimension="region")

@@ -505,11 +505,46 @@ def verify_key(con, dataset_name: str, columns: list[str]) -> KeyVerdict:
     )
 
 
+def exact_copies(con, dataset_name: str) -> int:
+    """How many rows of a table are exact copies of another row -- the rows a DISTINCT would drop.
+
+    The one double-counting question left when a contract states no key: with nothing to verify,
+    four rows copied whole went through the gate of the bunty_babli run as 604 of 604 analysed.
+
+    Screened by a hash of every column, then counted exactly only when the screen finds
+    something. Measured on 5M rows x 8 columns (Cleanup Step 8): SELECT DISTINCT * 0.213s, the
+    hash screen 0.119s -- the range Phase 7 accepted for verify_key (0.077-0.179s). A collision
+    can only make the screen report copies that are not there, never hide one, and the exact
+    count settles it. DISTINCT and hash() both treat two NULLs as equal
+    (tests/test_duplicate_facts.py), so rows that match through a NULL are copies.
+    """
+    columns = [
+        r[0] for r in con.execute(
+            """SELECT column_name FROM information_schema.columns
+               WHERE table_schema='main' AND table_name=? ORDER BY ordinal_position""",
+            [dataset_name],
+        ).fetchall()
+    ]
+    if not columns:
+        return 0
+    table = _q(dataset_name)
+    hashed = ", ".join(_q(c) for c in columns)
+    screened = con.execute(
+        f"SELECT count(*) - count(DISTINCT hash({hashed})) FROM {table}"
+    ).fetchone()[0]
+    if not screened:
+        return 0
+    return con.execute(
+        f"SELECT count(*) - (SELECT count(*) FROM (SELECT DISTINCT * FROM {table})) FROM {table}"
+    ).fetchone()[0]
+
+
 __all__ = [
     "Drift",
     "DriftVerdict",
     "KeyVerdict",
     "binding_for",
     "classify_drift",
+    "exact_copies",
     "verify_key",
 ]

@@ -50,6 +50,7 @@ of thing that gets confirmed without being read".
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from datetime import date, datetime
 
@@ -57,6 +58,7 @@ from analytics_agent.contract import ContractRefused
 from analytics_agent.contract.compatibility import (
     KeyVerdict,
     binding_for,
+    exact_copies,
     verify_key,
 )
 from analytics_agent.contract.dataset_contract import (
@@ -181,9 +183,12 @@ def _resolve_key(
     stated: list[str] | None,
     ev: DatasetEvidence,
     roles: dict[str, str],
-) -> tuple[list[str], KeyVerdict | None, list[str]]:
+) -> tuple[list[str], KeyVerdict | None, list[str], KeyVerdict | None]:
     """
     The primary key: verified when stated, taken from evidence when not.
+
+    The fourth element is the nearest identifier when no key was found, so the grain question
+    can name it rather than deny it exists (Cleanup Step 8).
 
     A stated key that does not hold is refused HERE, at proposal time, rather
     than being written into a contract that fails at the gate three steps
@@ -195,7 +200,7 @@ def _resolve_key(
         if not verdict.holds:
             raise ContractRefused(verdict.refusal().to_text())
         notes.append(f"Key as stated: {verdict.sentence()}")
-        return list(stated), verdict, notes
+        return list(stated), verdict, notes, None
 
     usable = ev.usable_keys()
     if not usable:
@@ -205,7 +210,8 @@ def _resolve_key(
             "key of three or more columns, which is not searched for. State "
             "it with primary_key=[...] and it will be checked."
         )
-        return [], None, notes
+        nearest, nearest_notes = _nearest_key_notes(con, dataset_name, ev, roles)
+        return [], None, notes + nearest_notes, nearest
 
     ranked = _rank_candidates(usable, roles)
     best = ranked[0]
@@ -217,7 +223,77 @@ def _resolve_key(
             f"the rows that happen to be here; state primary_key=[...] to use "
             f"one of them instead."
         )
-    return list(best.columns), None, notes
+    return list(best.columns), None, notes, None
+
+
+def _nearest_key_notes(con, dataset_name: str, ev: DatasetEvidence,
+                       roles: dict[str, str]) -> tuple[KeyVerdict | None, list[str]]:
+    """With no key found, how near the nearest identifier came, and whether copies explain it.
+
+    Phase 4: "400 duplicates across 20 values says the grain is wrong; two duplicates says the
+    data is dirty." That sentence was only ever produced for a key somebody STATED. With none
+    found, the proposal said nothing identifies a row, and the bunty_babli run confirmed a
+    keyless contract over 604 rows whose order_id held 600 values -- four rows copied whole.
+    Counts only: which column is meant to be the key is still the person's to say.
+    """
+    notes: list[str] = []
+    verdicts = [verify_key(con, dataset_name, [c.name]) for c in ev.columns
+                if roles.get(c.name) == "identifier"]
+    nearest = min(verdicts, key=lambda v: v.duplicate_rows + sum(v.null_counts.values()),
+                  default=None)
+    if nearest is not None:
+        notes.append(f"Nearest to a key: {nearest.sentence()}")
+
+    copies = exact_copies(con, dataset_name)
+    if not copies:
+        return nearest, notes
+    sentence = f"{copies:,} row(s) of {dataset_name} are exact copies of another row"
+    if nearest is not None:
+        col = nearest.columns[0]
+        rows, distinct, nulls = con.execute(
+            f'SELECT count(*), count(DISTINCT "{col}"), count(*) FILTER (WHERE "{col}" IS NULL) '
+            f'FROM (SELECT DISTINCT * FROM "{dataset_name}")'
+        ).fetchone()
+        if rows == distinct and not nulls:
+            sentence += (
+                f". Removing them would leave {col} unique: "
+                f'propose_cleaning_plan(dataset_name="{dataset_name}") offers that, and '
+                f'primary_key=["{col}"] afterwards has every analysis check it.'
+            )
+        else:
+            sentence += (
+                f"; removing them would still leave {col} repeating, so what is left is a "
+                f"question about the grain, not about copies."
+            )
+    else:
+        sentence += (
+            f'. propose_cleaning_plan(dataset_name="{dataset_name}") offers removing them.'
+        )
+    notes.append(sentence)
+    return nearest, notes
+
+
+_WORD_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
+
+
+def _grain_key_notes(con, dataset_name: str, grain: str, ev: DatasetEvidence) -> list[str]:
+    """A stated grain that names columns, under a contract that names no key.
+
+    The bunty_babli contract: grain "grain: [order_id]", primary_key []. The person meant a key
+    and put it where nothing reads it. The grain stays their sentence; the named columns are
+    checked as a key, which is arithmetic, and the note says how to make the check stick.
+    """
+    known = [c.name for c in ev.columns]
+    words = set(_WORD_RE.findall(grain))
+    named = [c for c in known if c in words]
+    if not named:
+        return []
+    verdict = verify_key(con, dataset_name, named)
+    listed = ", ".join(f'"{c}"' for c in named)
+    return [
+        f"The grain names {' and '.join(named)}, but no primary key is stated, so nothing "
+        f"checks it: {verdict.sentence()} primary_key=[{listed}] has every analysis check it."
+    ]
 
 
 def _resolve_date_column(
@@ -352,7 +428,7 @@ def propose_contract(
     unresolved: list[str] = []
     questions: list[str] = []
 
-    key, key_verdict, key_notes = _resolve_key(
+    key, key_verdict, key_notes, nearest = _resolve_key(
         con, dataset_name, primary_key, ev, roles
     )
     notes += key_notes
@@ -370,6 +446,8 @@ def propose_contract(
     # ---- grain: derived, and still unresolved
     if grain is not None and grain.strip():
         final_grain = grain.strip()
+        if not key:
+            notes += _grain_key_notes(con, dataset_name, final_grain, ev)
     else:
         final_grain = _grain_sentence(key)
         unresolved.append("grain")
@@ -378,6 +456,14 @@ def propose_contract(
                 f"Is '{final_grain}' what one row MEANS, in your words? The "
                 f"column names are all the data can offer; what the row "
                 f"represents is yours."
+            )
+        elif nearest is not None:
+            questions.append(
+                f"What is one row of this table? Nothing in the data identifies "
+                f"a row uniquely; the nearest is {nearest.label}, which repeats "
+                f"in {nearest.duplicate_rows:,} row(s) -- see what the data "
+                f"showed. If {nearest.label} is meant to be the key, state "
+                f"primary_key=[...] once the repeats are dealt with."
             )
         else:
             questions.append(

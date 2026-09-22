@@ -778,9 +778,11 @@ def compute_analysis(
       concentration   dimension, measure
       ranking_shift   dimension, measure, and four ISO dates:
                       before_start, before_end, after_start, after_end
-      trend           measure, and grain as below. One measure per
-                      period, with the periods holding no rows blank
-                      rather than zero and the gaps named.
+      trend           measure, and grain as below; dimension optional.
+                      One measure per period, with the periods holding
+                      no rows blank rather than zero and the gaps named.
+                      With dimension, one column per member of that
+                      declared dimension, then (all) and rows.
       seasonality     measure, and grain as below except year. One
                       measure folded onto the positions of its cycle,
                       each position's mean over the periods that hold
@@ -935,8 +937,8 @@ def render_chart(
                     For calendar_coverage, trend, seasonality, period_compare.
       bar           one measure per group. For frequency, top_n, group_compare,
                     ranking_shift.
-      grouped_bar   two or more measures side by side per group. For cross_tab
-                    and period_compare.
+      grouped_bar   two or more measures side by side per group. For cross_tab,
+                    period_compare, and trend with a dimension.
       scatter       the first measure against the second, one point per row.
                     For correlation and bivariate.
       histogram     one measure binned by value. For distribution.
@@ -950,7 +952,10 @@ def render_chart(
 
     line, bar, histogram and waterfall draw one measure. If the result holds
     more than one, name the one you want with y rather than letting the tool
-    pick -- it will refuse and list them instead of choosing.
+    pick -- it will refuse and list them instead of choosing. Two things you
+    already chose are honoured without y: the measure you passed is drawn
+    when one column is that measure (rows is then left beside the chart),
+    and a (all) or (total) column is not drawn beside the columns it totals.
 
     x names the column along the bottom and defaults to the result's first,
     which is the group. title defaults to the analysis and the chart kind.

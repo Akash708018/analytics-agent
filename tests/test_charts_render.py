@@ -263,3 +263,57 @@ def test_an_rollup_that_is_the_only_row_is_the_answer_and_is_drawn():
     """confidence_interval with no dimension returns one row, (all): it is the result."""
     ex = series_from_output(out(rows=[["(all)", "12.5"]], headers=["group", "mean"]))
     assert ex.x == ["(all)"] and ex.dropped == []
+
+
+# --- defaults the caller already chose (Cleanup Step 8) --------------------------------------
+
+TREND = out(headers=["period", "order_value (sum)", "rows"],
+            rows=[["2025-01", "163,606.39", "52"], ["2025-02", "110,565.31", "50"]])
+SPLIT = out(headers=["period", "Online", "Store", "(all)", "rows"],
+            rows=[["2025-01", "90.00", "73.61", "163.61", "52"],
+                  ["2025-02", "60.00", "50.57", "110.57", "50"]])
+
+
+def test_the_measure_the_caller_named_is_the_one_drawn():
+    """bunty_babli: render_chart(trend, bar, measure="order_value") refused, offering
+    'order_value (sum)' and 'rows'. P11-D13 forbids picking a measure nobody named; this one
+    was named."""
+    got = series_from_output(TREND, measure="order_value")
+    assert [s.name for s in got.series] == ["order_value (sum)"]
+    assert any("rows" in n for n in got.dropped)
+
+
+def test_with_no_measure_named_nothing_is_chosen():
+    assert [s.name for s in series_from_output(TREND).series] == ["order_value (sum)", "rows"]
+
+
+def test_a_measure_named_is_matched_whole_not_as_a_substring():
+    got = series_from_output(out(headers=["period", "units_returned (sum)", "rows"],
+                                 rows=[["a", "1", "2"]]), measure="units")
+    assert [s.name for s in got.series] == ["units_returned (sum)"], (
+        "units is not units_returned; with no column carrying it, rows is still left out "
+        "because the caller asked about a measure and rows is not one."
+    )
+
+
+def test_a_rollup_column_is_not_drawn_beside_the_members_it_totals():
+    """C98 for columns: (all) beside Online and Store is their sum and dwarfs them."""
+    got = series_from_output(SPLIT, measure="order_value")
+    assert [s.name for s in got.series] == ["Online", "Store"]
+    assert any("(all)" in n for n in got.dropped)
+
+
+def test_a_total_column_is_left_out_even_with_no_measure_named():
+    got = series_from_output(out(headers=["region", "Online", "Store", "(total)"],
+                                 rows=[["north", "1", "2", "3"]]))
+    assert [s.name for s in got.series] == ["Online", "Store"]
+
+
+def test_a_rollup_column_that_is_the_only_series_is_drawn():
+    got = series_from_output(out(headers=["region", "(total)"], rows=[["north", "3"]]))
+    assert [s.name for s in got.series] == ["(total)"]
+
+
+def test_the_named_measure_draws_a_bar_through_render(ws):
+    chart = render(ws, kind="bar", output=TREND, label="trend", measure="order_value", now=T1)
+    assert chart.series_names == ["order_value (sum)"]

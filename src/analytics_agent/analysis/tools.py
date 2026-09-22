@@ -258,6 +258,7 @@ def render_chart(
             x=x,
             y=[y] if y else None,
             title=title,
+            measure=used.get("measure"),
         )
     except ChartRefused as exc:
         detail = (
