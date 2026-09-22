@@ -6570,3 +6570,42 @@ Digests (sha256, lines):
   d341c69a9ea1e3be03d9d4d7a15efbc83289c7a3e43f2f9fb824420db19dc088  1231  src/analytics_agent/server.py
   378c52433ec5bd2c9df116064ef21db9b66ecc8094abe0a878833a4f56cc844e  271  src/analytics_agent/webapp/agent.py
   02fdccd82ae226611d1c6d6f2b592dff018d04b7ce411512db4c0c6c71e1b978  131  tests/test_analysis_options.py
+
+## Cleanup Step 14a - one definition each of reference_checks and domain_checks, 22/09/2026
+
+Step document: docs/steps/cleanup_step14a_duplicate_checks.md. Closes the finding Cleanup Step 13
+recorded and left: "validate/rules.py defines reference_checks and domain_checks twice."
+
+C103. TWO DRAFTS OF THE SAME TWO CHECKS SHIPPED IN ONE COMMIT, AND ONLY THE SECOND EVER RAN.
+50bf16f (Phase 7 Step 12, 08/09/2026) is the only commit that changes how often either `def`
+appears: 0 at its parent, 2 at it, for both names. They arrived in one hunk after row_count_check,
+the dead pair first. The section that commit added to this file describes the second pair. It
+quotes that pair's NOT RUN wording ("the contract is not wrong; the workspace is thin", "rather
+than constrain any"), and it names the far-side column check that only the second pair makes. So
+the first pair was an earlier draft left above its rewrite instead of being replaced by it. That
+part is inference: the history shows both arriving together, not how the file was edited. Nothing
+caught it before Step 13 read the file. A module keeps the last binding of a name, and a name
+inside a function body is looked up only when the function runs. So the first pair's three calls
+to `_table_columns`, which is defined nowhere and never was, imported cleanly and would have raised
+NameError only if something called them. The tests call the checks by name and take `[0]`. None of
+them names a check id, so no test could tell the two pairs apart. A file that imports and passes
+its tests can still hold a whole second version of a function. The parser lists the definitions
+in one line; the tests cannot.
+
+CL14a-D1. ONE DEFINITION EACH, WITH THE DEAD DOCSTRINGS' EXTRA SENTENCES CARRIED OVER. The dead pair
+and the blank lines after it (rules.py:475-644, 170 lines) are deleted. Three passages the live
+docstrings lacked move in. NOT IN's zero rows "reports a clean pass over a table full of orphans",
+a fact pinned by tests/test_duckdb_validation_facts.py:50. Counting orphans and nulls together
+"produces a number nobody can act on". Absence and an outside value are findings "with different
+fixes". The dead domain docstring's pointer to the reference check was not carried, since the live
+paragraph states the reason itself. With docstrings removed, the syntax trees of the live
+definitions are identical before and after (`ast.dump`, HEAD against the tree).
+
+Found and flagged, not changed: no test names the check ids `reference.integrity[i]` or
+`value.domain[col]`, so renaming either would pass the suite. C73, which CLAUDE.md cites, and C74
+are recorded nowhere in docs/.
+
+MEASURED VALIDATION, 22/09/2026. `uv run pytest -q`: 1925 -> 1925 passed. Acceptance unchanged:
+99/0/2, 19/0/0, 35/0/1, 26/0/0, 36/0/0. Eval 76/76. UI 37.
+Digests (sha256, lines):
+  26d9e3abd57f9caf2f2f732cea7cf64ada78c14e81d8fd2cbdd44a02c9efe41d  737  src/analytics_agent/validate/rules.py

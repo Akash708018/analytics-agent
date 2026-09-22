@@ -1,7 +1,7 @@
 # analytics-agent
 
 MCP server exposing data loading, profiling, cleaning and contract-gated analysis
-to Claude Desktop. Phases 1-13 done, then Cleanup Steps 4-14; Phase 14
+to Claude Desktop. Phases 1-13 done, then Cleanup Steps 4-14a; Phase 14
 (Track B) in progress, Steps 1-4 done; Phase 15 (web cleaning + helper columns) planned, not started (UI in ui/, on the fake backend or the engine with
 ANALYTICS_UI_BACKEND=real;
 `uv run --group ui streamlit run ui/app.py`; its 37 tests: `uv run --group ui pytest ui/tests`). Open: P14-O1 (abandoned web workspaces never expire), P14-O2 (cleaning has no
@@ -19,7 +19,7 @@ Layout: `src/analytics_agent/{ingest,profile,clean,contract,validate,analysis,ch
 
 ## Verify before committing
 All six, every time. Run the suite BEFORE committing, not after (C76: two commits
-recorded a broken tree). Last measured 22/09/2026, at Cleanup Step 14:
+recorded a broken tree). Last measured 22/09/2026, at Cleanup Step 14a:
 
     uv run pytest -q                      # 1925 passed
     uv run python tests/test_phase8.py    # 99 passed, 0 failed, 2 skipped
