@@ -31,6 +31,8 @@ predecessor; this does not.
 
 from __future__ import annotations
 
+from analytics_agent.util import db
+
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -124,7 +126,8 @@ def ensure_table(con) -> None:
     anything should not carry an empty table, and every read path here calls
     this first anyway.
     """
-    con.execute(
+    db.create_if_missing(
+        con,
         f"""
         CREATE TABLE IF NOT EXISTS {VALIDATION_TABLE} (
             dataset_name     VARCHAR NOT NULL,

@@ -402,7 +402,7 @@ def _user_tables(con) -> list[str]:
     ]
 
 
-def column_stats(con, dataset_name: str) -> list[ColumnEvidence]:
+def column_stats(con, dataset_name: str, only: str | None = None) -> list[ColumnEvidence]:
     """
     Every column's counts in ONE pass over the table.
 
@@ -418,6 +418,10 @@ def column_stats(con, dataset_name: str) -> list[ColumnEvidence]:
            ORDER BY ordinal_position""",
         [dataset_name],
     ).fetchall()
+    # One column's counts for a caller that shows one column: count(DISTINCT) over every other
+    # column was most of profile_column's cost on wide, high-cardinality tables (Step 13).
+    if only is not None and any(name == only for name, _t, _p in cols):
+        cols = [c for c in cols if c[0] == only]
     if not cols:
         raise ContractRefused(
             Refusal(

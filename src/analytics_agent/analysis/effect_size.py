@@ -154,6 +154,15 @@ def _difference(con, gate, scope, dimension: str, measure: str, summary: list[st
         )
         return Output(headers=headers, rows=rows, summary=summary, label="effect_size")
 
+    try:
+        if len(groups) == 2:
+            hedges_g(groups[0], groups[1])
+        else:
+            eta_squared(groups)
+    except ZeroDivisionError as exc:
+        summary.append(f"No effect size: {exc}. The group means are in the table above.")
+        return Output(headers=headers, rows=rows, summary=summary, label="effect_size")
+
     if len(groups) == 2:
         g = hedges_g(groups[0], groups[1])
         raw = groups[0].mean - groups[1].mean

@@ -39,6 +39,8 @@ of an unchanged document is a history nobody reads.
 
 from __future__ import annotations
 
+from analytics_agent.util import db
+
 import json
 from dataclasses import dataclass
 from datetime import datetime
@@ -153,7 +155,8 @@ def _ensure_table(con) -> None:
     know that contracts exist. The cost is one CREATE TABLE IF NOT EXISTS per
     call, which DuckDB answers from its catalog.
     """
-    con.execute(
+    db.create_if_missing(
+        con,
         f"""
         CREATE TABLE IF NOT EXISTS {CONTRACT_TABLE} (
             dataset_name  VARCHAR   NOT NULL,

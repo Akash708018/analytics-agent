@@ -131,7 +131,7 @@ def connect(workspace_id: str = DEFAULT_WORKSPACE_ID) -> duckdb.DuckDBPyConnecti
     validate_workspace_id(workspace_id)
     path = workspace.duckdb_path(workspace_id)
     con = duckdb.connect(str(path))
-    con.execute(_SCHEMA)
+    create_if_missing(con, _SCHEMA)
     return con
 
 
@@ -226,6 +226,26 @@ def unregister_dataset(con: duckdb.DuckDBPyConnection, dataset_name: str) -> boo
     existed = get_dataset(con, dataset_name) is not None
     con.execute(f"DELETE FROM {METADATA_TABLE} WHERE dataset_name = ?", [dataset_name])
     return existed
+
+
+def create_if_missing(con, ddl: str) -> None:
+    """Run a CREATE TABLE IF NOT EXISTS that another connection may be running at the same time.
+
+    Two connections creating the same table at once conflict in DuckDB's catalog
+    ("Catalog write-write conflict on create", a TransactionException) -- the loser is not told
+    the table exists. Found by the cross-domain benchmark's concurrency phase (Step 13: D4):
+    threads analysing different datasets of one workspace, each first to create a log table.
+    The loser retries, and IF NOT EXISTS then finds it.
+    """
+    import time as _time
+    for attempt in range(6):
+        try:
+            con.execute(ddl)
+            return
+        except duckdb.TransactionException:
+            if attempt == 5:
+                raise
+            _time.sleep(0.01 * (attempt + 1))
 
 
 def user_tables(con: duckdb.DuckDBPyConnection) -> list[str]:

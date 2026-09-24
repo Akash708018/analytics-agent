@@ -171,6 +171,13 @@ def distribution(con, gate, scope, measure: str, bins: int = DEFAULT_BINS, **par
                 f"value(s) wide rather than a fraction that would leave some "
                 f"bins empty by construction."
             )
+        if integer and k * width != span:
+            # The equal-width description held for every bin but the last (Step 13 benchmark).
+            summary.append(
+                f"The last bin is narrower: {span - (k - 1) * width} value(s) wide against "
+                f"{width} for the others, because {span} value(s) do not divide into "
+                f"{width}-wide bins."
+            )
 
     q = [number(x) for x in quantiles]
     summary.append(

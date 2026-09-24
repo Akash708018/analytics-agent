@@ -252,18 +252,23 @@ def drop_duplicate_rows(*, source: str, target: str) -> Rendering:
     Step 3 catching a gap in Step 4 without anybody looking for it.
     """
     src = ident(source)
-    expression = "DISTINCT *"
+    # The rebuild keeps each row's first occurrence IN FILE ORDER. SELECT DISTINCT stores the
+    # rows in whatever order its parallel hash left them -- four orders in 20 rebuilds of one
+    # file, and a DOUBLE sum over them came out 19 different ways (3,032,008,136.98 against
+    # ...136.9801 in two identical benchmark runs: Step 13, J, D14). One order, one sum. The
+    # counts are taken from the same grouped projection: GROUP BY ALL keeps one row per
+    # distinct row, NULLs matching as DISTINCT matches them (measured before the change).
+    expression = "*, min(rowid) AS __aa_first_row"
+    grouped = f"(SELECT {expression} FROM {src} GROUP BY ALL)"
     return Rendering(
         expression=expression,
-        statement=_rebuild(target, source, expression),
-        affected_sql=(
-            f"SELECT count(*) - (SELECT count(*) FROM "
-            f"(SELECT {expression} FROM {src})) FROM {src}"
+        statement=(
+            f"CREATE OR REPLACE TABLE {ident(target)} AS\n"
+            f"SELECT * EXCLUDE (__aa_first_row) FROM {grouped}\n"
+            f"ORDER BY __aa_first_row"
         ),
-        lost_sql=(
-            f"SELECT count(*) - (SELECT count(*) FROM "
-            f"(SELECT {expression} FROM {src})) FROM {src}"
-        ),
+        affected_sql=f"SELECT count(*) - (SELECT count(*) FROM {grouped}) FROM {src}",
+        lost_sql=f"SELECT count(*) - (SELECT count(*) FROM {grouped}) FROM {src}",
         sample_sql=(
             f"SELECT to_json(d)::VARCHAR FROM (SELECT *, count(*) AS "
             f"duplicate_count FROM {src} GROUP BY ALL HAVING count(*) > 1) d "

@@ -31,6 +31,8 @@ from __future__ import annotations
 import inspect
 import re
 
+import duckdb
+
 from analytics_agent.contract import ContractRefused
 from analytics_agent.contract.refusals import Reason, Refusal
 from analytics_agent.state import require_contract
@@ -72,8 +74,10 @@ _PLACEHOLDER = {"grain": "month",
                 "before_end": "YYYY-MM-DD", "after_start": "YYYY-MM-DD", "after_end": "YYYY-MM-DD"}
 
 
-def _params_refusal(analysis_type: str, dataset_name: str, exc: Exception, gate) -> Refusal:
+def _params_refusal(analysis_type: str, dataset_name: str, exc: Exception, gate,
+                    given: dict | None = None) -> Refusal:
     """A wrong argument set, in the engine's words, with a call that names declared columns."""
+    given = given or {}
     text = str(exc)
     measures = [m.name for m in gate.contract.measures]
     dims = list(gate.contract.dimensions)
@@ -100,7 +104,8 @@ def _params_refusal(analysis_type: str, dataset_name: str, exc: Exception, gate)
             reason=Reason.ANALYSIS_PARAMS_INVALID,
             what=f"{analysis_type} was called without {', '.join(names)}.",
             why=why, state=declared,
-            next_call=_filled_call(dataset_name, analysis_type, names, measures, dims))
+            next_call=_filled_call(dataset_name, analysis_type, names, measures, dims,
+                                   keep=given))
     if unexpected:
         why = (f"{analysis_type} does not take {unexpected.group(1)}. "
                f"{get(analysis_type).summary}")
@@ -121,14 +126,25 @@ def _params_refusal(analysis_type: str, dataset_name: str, exc: Exception, gate)
 
 
 def _filled_call(dataset_name: str, analysis_type: str, names: list[str], measures: list[str],
-                 dims: list[str]) -> str:
+                 dims: list[str], keep: dict | None = None) -> str:
     """compute_analysis for this analysis with `names` filled: declared columns for columns, a
-    format for a date, the name of what is wanted otherwise."""
-    pool = {"measure": iter(measures), "dimension": iter(dims)}
-    args = []
+    format for a date, the name of what is wanted otherwise. `keep` is what the caller already
+    gave: it stays in the call, and a column it names is not offered again (Step 13: a missing
+    `against` was filled with the measure itself, and the given measure was dropped)."""
+    keep = keep or {}
+    used = {v for v in keep.values() if isinstance(v, str)}
+    pool = {"measure": iter([m for m in measures if m not in used]),
+            "dimension": iter([d for d in dims if d not in used])}
+    from .runs import _literal
+    args = [f"{k}={_literal(v)}" for k, v in keep.items()]
     for n in names:
         kind = "measure" if n in _MEASURE_ARGS else "dimension" if n in _DIMENSION_ARGS else None
         value = next(pool[kind], None) if kind else _PLACEHOLDER.get(n)
+        if kind and value is None:
+            # the contract declares too few: correlation with one measure has nothing to put in
+            # `against`, and `against="..."` was a template no agent could run (Step 13)
+            return (f'propose_dataset_contract(dataset_name="{dataset_name}") -- {analysis_type} '
+                    f"needs another declared {kind} for {n}")
         args.append(f'{n}="{value or "..."}"')
     return (f'compute_analysis(dataset_name="{dataset_name}", '
             f'analysis_type="{analysis_type}"' + "".join(f", {a}" for a in args) + ")")
@@ -256,7 +272,28 @@ def _produce(con, dataset_name: str, analysis_type: str, params: dict):
             next_call=f'propose_dataset_contract(dataset_name="{dataset_name}")',
         ).to_text()) from None
     except (TypeError, ParamsInvalid) as exc:
-        raise _Refused(_params_refusal(analysis_type, dataset_name, exc, gate).to_text()) from None
+        raise _Refused(_params_refusal(analysis_type, dataset_name, exc, gate,
+                                       params).to_text()) from None
+    except (duckdb.BinderException, duckdb.ConversionException,
+            duckdb.OutOfRangeException) as exc:
+        # The engine could not compute on the values it was given -- a text measure averaged,
+        # an overflow. It escaped compute_analysis as a raw exception (Step 13: D1, D5); it is a
+        # refusal that names the engine's words and the measure's type.
+        cols = dict(con.execute(
+            "SELECT column_name, data_type FROM information_schema.columns "
+            "WHERE table_name = ?", [dataset_name]).fetchall())
+        named = [f"{params[k]} is {cols[params[k]]}" for k in ("measure", "against", "dimension")
+                 if params.get(k) in cols]
+        raise _Refused(Refusal(
+            reason=Reason.ANALYSIS_NOT_POSSIBLE,
+            what=f"{analysis_type} could not be computed on these values.",
+            why=(f"the engine said: {str(exc).splitlines()[0]}"
+                 + (f" ({'; '.join(named)})" if named else "")
+                 + ". A measure held as text cannot be averaged or summed; "
+                   "propose_cleaning_plan offers the conversion."),
+            state=f"contract v{gate.version} for {dataset_name}",
+            next_call=f'propose_cleaning_plan(dataset_name="{dataset_name}")',
+        ).to_text()) from None
     except ValueError as exc:
         raise _Refused(Refusal(
             reason=Reason.ANALYSIS_NOT_POSSIBLE,

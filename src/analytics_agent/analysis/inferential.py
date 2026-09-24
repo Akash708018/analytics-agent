@@ -127,7 +127,10 @@ def welch(a: GroupStats, b: GroupStats) -> TestResult:
     p = 2.0 * float(t_dist.sf(abs(t), df))
     return TestResult(
         name="Welch's unequal-variance t-test (two-sided)",
-        statistic=t, p=p, df=f"{df:.4g}",
+        # "2e+06" read as notation, not as a count of degrees of freedom (Step 13 benchmark);
+        # below 1,000 the four significant figures stay (1.471, not 1.5: the regression's
+        # control caught the one-decimal form losing them)
+        statistic=t, p=p, df=f"{df:,.1f}" if df >= 1000 else f"{df:.4g}",
         note="Welch rather than Student: the groups are not assumed to share a variance.",
     )
 
@@ -180,7 +183,7 @@ def mann_whitney(con, scope, dimension: str, measure: str,
         [first],
     ).fetchall()[0]
     tie_term, total = con.execute(
-        f"SELECT coalesce(sum(c * c * c - c), 0), sum(c) FROM ("
+        f"SELECT coalesce(sum(c::HUGEINT * c * c - c), 0), sum(c) FROM ("
         f"  SELECT count(*) AS c FROM {table} WHERE {where} GROUP BY {col})"
     ).fetchall()[0]
 
@@ -270,7 +273,7 @@ def kruskal_wallis(con, scope, dimension: str, measure: str) -> TestResult:
         f"SELECT g, sum(r_min + (tie - 1) / 2.0), count(*) FROM ranked GROUP BY 1 ORDER BY 1"
     ).fetchall()
     tie_term, total = con.execute(
-        f"SELECT coalesce(sum(c * c * c - c), 0), sum(c) FROM ("
+        f"SELECT coalesce(sum(c::HUGEINT * c * c - c), 0), sum(c) FROM ("
         f"  SELECT count(*) AS c FROM {table} WHERE {where} GROUP BY {col})"
     ).fetchall()[0]
 
