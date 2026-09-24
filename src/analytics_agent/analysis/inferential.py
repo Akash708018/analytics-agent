@@ -180,7 +180,7 @@ def mann_whitney(con, scope, dimension: str, measure: str,
         [first],
     ).fetchall()[0]
     tie_term, total = con.execute(
-        f"SELECT coalesce(sum(c * c * c - c), 0), sum(c) FROM ("
+        f"SELECT coalesce(sum(c::HUGEINT * c * c - c), 0), sum(c) FROM ("
         f"  SELECT count(*) AS c FROM {table} WHERE {where} GROUP BY {col})"
     ).fetchall()[0]
 
@@ -270,7 +270,7 @@ def kruskal_wallis(con, scope, dimension: str, measure: str) -> TestResult:
         f"SELECT g, sum(r_min + (tie - 1) / 2.0), count(*) FROM ranked GROUP BY 1 ORDER BY 1"
     ).fetchall()
     tie_term, total = con.execute(
-        f"SELECT coalesce(sum(c * c * c - c), 0), sum(c) FROM ("
+        f"SELECT coalesce(sum(c::HUGEINT * c * c - c), 0), sum(c) FROM ("
         f"  SELECT count(*) AS c FROM {table} WHERE {where} GROUP BY {col})"
     ).fetchall()[0]
 

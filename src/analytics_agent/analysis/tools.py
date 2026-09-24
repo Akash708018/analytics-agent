@@ -31,6 +31,8 @@ from __future__ import annotations
 import inspect
 import re
 
+import duckdb
+
 from analytics_agent.contract import ContractRefused
 from analytics_agent.contract.refusals import Reason, Refusal
 from analytics_agent.state import require_contract
@@ -257,6 +259,26 @@ def _produce(con, dataset_name: str, analysis_type: str, params: dict):
         ).to_text()) from None
     except (TypeError, ParamsInvalid) as exc:
         raise _Refused(_params_refusal(analysis_type, dataset_name, exc, gate).to_text()) from None
+    except (duckdb.BinderException, duckdb.ConversionException,
+            duckdb.OutOfRangeException) as exc:
+        # The engine could not compute on the values it was given -- a text measure averaged,
+        # an overflow. It escaped compute_analysis as a raw exception (Step 13: D1, D5); it is a
+        # refusal that names the engine's words and the measure's type.
+        cols = dict(con.execute(
+            "SELECT column_name, data_type FROM information_schema.columns "
+            "WHERE table_name = ?", [dataset_name]).fetchall())
+        named = [f"{params[k]} is {cols[params[k]]}" for k in ("measure", "against", "dimension")
+                 if params.get(k) in cols]
+        raise _Refused(Refusal(
+            reason=Reason.ANALYSIS_NOT_POSSIBLE,
+            what=f"{analysis_type} could not be computed on these values.",
+            why=(f"the engine said: {str(exc).splitlines()[0]}"
+                 + (f" ({'; '.join(named)})" if named else "")
+                 + ". A measure held as text cannot be averaged or summed; "
+                   "propose_cleaning_plan offers the conversion."),
+            state=f"contract v{gate.version} for {dataset_name}",
+            next_call=f'propose_cleaning_plan(dataset_name="{dataset_name}")',
+        ).to_text()) from None
     except ValueError as exc:
         raise _Refused(Refusal(
             reason=Reason.ANALYSIS_NOT_POSSIBLE,

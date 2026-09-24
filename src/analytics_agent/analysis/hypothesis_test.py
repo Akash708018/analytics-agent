@@ -167,8 +167,17 @@ def _difference(con, gate, scope, dimension: str, measure: str, method: str,
         return Output(headers=headers, rows=rows, summary=summary, label="hypothesis_test")
 
     forced = [g for g in groups if g.variance is None]
-    result, effect, effect_name = _run_difference(con, scope, dimension, measure,
-                                                  groups, method, forced)
+    try:
+        result, effect, effect_name = _run_difference(con, scope, dimension, measure,
+                                                      groups, method, forced)
+    except ZeroDivisionError as exc:
+        # inferential raises these on purpose, each naming why a statistic does not exist
+        # (both groups constant, every value tied). They escaped as exceptions (Step 13: D2).
+        summary.append(
+            f"No test: {exc}. The group means are in the table above; a difference between "
+            f"values that do not vary is not a question sampling can answer."
+        )
+        return Output(headers=headers, rows=rows, summary=summary, label="hypothesis_test")
 
     summary.append(
         f"Test: {result.name}. Statistic {number(result.statistic)}, df {result.df}, "

@@ -22,6 +22,8 @@ as the appendix needs the parameters.
 
 from __future__ import annotations
 
+from analytics_agent.util import db
+
 import json
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -100,7 +102,8 @@ def ensure_table(con) -> None:
     that has never run an analysis should not carry an empty table, and every read path here
     calls this first anyway.
     """
-    con.execute(
+    db.create_if_missing(
+        con,
         f"""
         CREATE TABLE IF NOT EXISTS {ANALYSIS_TABLE} (
             dataset_name     VARCHAR NOT NULL,

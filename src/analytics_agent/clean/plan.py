@@ -36,6 +36,8 @@ a model that can build DIFFERENT SQL from the one that gets shown.
 
 from __future__ import annotations
 
+from analytics_agent.util import db
+
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -225,7 +227,8 @@ def ensure_table(con) -> None:
     and all. So the writable connection creates it before the proposal is
     stored, never during the reading half.
     """
-    con.execute(
+    db.create_if_missing(
+        con,
         f"""
         CREATE TABLE IF NOT EXISTS {PLAN_TABLE} (
             plan_id        VARCHAR NOT NULL,

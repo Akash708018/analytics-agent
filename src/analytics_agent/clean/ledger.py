@@ -31,6 +31,8 @@ where a count stops being checkable.
 
 from __future__ import annotations
 
+from analytics_agent.util import db
+
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -89,7 +91,8 @@ def ensure_table(con) -> None:
     never from the read-only proposal path -- a read-only ATTACH refuses CREATE
     by statement type, IF NOT EXISTS included. Step 1 measured that.
     """
-    con.execute(
+    db.create_if_missing(
+        con,
         f"""
         CREATE TABLE IF NOT EXISTS {LEDGER_TABLE} (
             applied_at     TIMESTAMP NOT NULL,

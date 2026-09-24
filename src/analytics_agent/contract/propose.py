@@ -67,7 +67,13 @@ from analytics_agent.contract.dataset_contract import (
     ForeignKey,
     Measure,
 )
-from analytics_agent.contract.evidence import DatasetEvidence, gather, suggest_role
+from analytics_agent.contract.evidence import (
+    DatasetEvidence, _is_numeric, gather, suggest_role,
+)
+from analytics_agent.contract.refusals import Reason, Refusal
+
+#: Aggregates that need numbers. min and max order text too, and count/count_distinct count it.
+NUMERIC_AGGS = ("sum", "mean", "median")
 
 # There is no default aggregation, deliberately. See Measure.agg: every
 # production semantic layer requires it (LookML `type:`, Cube `type`,
@@ -416,9 +422,25 @@ def propose_contract(
     definitions = dict(measure_definitions or {})
     aggs = dict(aggregations or {})
     built: list[Measure] = []
+    types = {c.name: c.dtype for c in ev.columns}
     for name in measure_names:
         definition = definitions.get(name, "").strip()
         agg = aggs.get(name)
+        # A text column cannot be summed or averaged: the contract confirmed, and every analysis
+        # over it then raised DuckDB's "sum(VARCHAR)" (Step 13: D3 -- an all-null column and one
+        # holding 'inf' strings both load as VARCHAR). Refused here, where the fix is named.
+        if (agg in NUMERIC_AGGS and name in types
+                and not _is_numeric(types[name])):
+            raise ContractRefused(Refusal(
+                reason=Reason.CONTRACT_INVALID,
+                what=f"{name} is declared a measure with agg='{agg}', but it holds "
+                     f"{types[name]}, not numbers.",
+                why=f"{agg} needs numbers. A number column loads as text when its values "
+                    f"are not all numbers (a blank column, 'inf', a currency sign); "
+                    f"propose_cleaning_plan offers the conversion. agg='count' or "
+                    f"'count_distinct' counts a text column as it is.",
+                next_call=f'propose_cleaning_plan(dataset_name="{dataset_name}")',
+            ).to_text())
         m = Measure(name=name, agg=agg, definition=definition)
         built.append(m)
         if not definition:
