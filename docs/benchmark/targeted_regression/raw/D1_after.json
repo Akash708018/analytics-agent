@@ -1,0 +1,245 @@
+{
+ "case": "D1",
+ "src": "/home/user/aa-fixes/src",
+ "commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+ "src_dirty": [],
+ "python": "3.12.3",
+ "duckdb": "1.5.5",
+ "seconds": 11.44,
+ "harness_error": null,
+ "observations": [
+  {
+   "sub": "setup_contract",
+   "tool": "confirm_dataset_contract",
+   "analysis": null,
+   "dataset": null,
+   "rows": null,
+   "parameters": {},
+   "status": "OK",
+   "wall_time_seconds": 4e-06,
+   "response": "Contract stored for adv_cd, version 1.\n\ndataset        adv_cd\ngrain          one row\nprimary key    record_id\ndate column    transaction_date\nwindow         2023-01-01 to 2024-12-31\nbound to       24 columns, 2,000 rows, fingerprint 1626a5e85866\nversion        1\n\n2 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| revenue | sum | - | revenue |\n| customer_id | count_distinct | - | distinct customers |\n\ndimensions     transaction_type, category, payment_method, branch, currency, fraud_flag, fiscal_period, account_id\n\nBound to fingerprint 1626a5e85866 at 2,000 rows. Reloading this dataset with different columns will be detected; more rows will be noted rather than blocking.\nExported to /home/user/aa-fixes/docs/contracts/tr_d1/adv_cd.yaml for version control.",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {}
+  },
+  {
+   "sub": "exact_mix_shift",
+   "tool": "compute_analysis",
+   "analysis": "mix_shift",
+   "dataset": "adv_cd",
+   "rows": 2000,
+   "parameters": {
+    "measure": "customer_id",
+    "dimension": "payment_method",
+    "period": "2024-12",
+    "baseline": "2024-11"
+   },
+   "status": "REFUSED",
+   "wall_time_seconds": 0.091272,
+   "response": "BLOCKED: mix_shift could not be computed on these values.\nWHY: the engine said: Binder Error: No function matches the given name and argument types 'avg(VARCHAR)'. You might need to add explicit type casts. (customer_id is VARCHAR; payment_method is VARCHAR). A measure held as text cannot be averaged or summed; propose_cleaning_plan offers the conversion.\nCURRENT STATE: contract v1 for adv_cd\nNEXT STEP: call propose_cleaning_plan(dataset_name=\"adv_cd\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "role": "defect",
+    "next_step": "propose_cleaning_plan(dataset_name=\"adv_cd\")",
+    "next_tool": "propose_cleaning_plan",
+    "kwargs": {
+     "dataset_name": "adv_cd"
+    },
+    "executable": true
+   }
+  },
+  {
+   "sub": "exact_outlier_detection",
+   "tool": "compute_analysis",
+   "analysis": "outlier_detection",
+   "dataset": "adv_cd",
+   "rows": 2000,
+   "parameters": {
+    "measure": "customer_id"
+   },
+   "status": "REFUSED",
+   "wall_time_seconds": 0.08386,
+   "response": "BLOCKED: outlier_detection could not be computed on these values.\nWHY: the engine said: Binder Error: No function matches the given name and argument types 'quantile_cont(VARCHAR, DECIMAL(3,2))'. You might need to add explicit type casts. (customer_id is VARCHAR). A measure held as text cannot be averaged or summed; propose_cleaning_plan offers the conversion.\nCURRENT STATE: contract v1 for adv_cd\nNEXT STEP: call propose_cleaning_plan(dataset_name=\"adv_cd\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "role": "defect",
+    "next_step": "propose_cleaning_plan(dataset_name=\"adv_cd\")",
+    "next_tool": "propose_cleaning_plan",
+    "kwargs": {
+     "dataset_name": "adv_cd"
+    },
+    "executable": true
+   }
+  },
+  {
+   "sub": "exact_correlation",
+   "tool": "compute_analysis",
+   "analysis": "correlation",
+   "dataset": "adv_cd",
+   "rows": 2000,
+   "parameters": {
+    "measure": "customer_id",
+    "against": "revenue"
+   },
+   "status": "REFUSED",
+   "wall_time_seconds": 0.072464,
+   "response": "BLOCKED: correlation could not be computed on these values.\nWHY: the engine said: Binder Error: No function matches the given name and argument types 'corr(DOUBLE, VARCHAR)'. You might need to add explicit type casts. (customer_id is VARCHAR; revenue is DOUBLE). A measure held as text cannot be averaged or summed; propose_cleaning_plan offers the conversion.\nCURRENT STATE: contract v1 for adv_cd\nNEXT STEP: call propose_cleaning_plan(dataset_name=\"adv_cd\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "role": "defect",
+    "next_step": "propose_cleaning_plan(dataset_name=\"adv_cd\")",
+    "next_tool": "propose_cleaning_plan",
+    "kwargs": {
+     "dataset_name": "adv_cd"
+    },
+    "executable": true
+   }
+  },
+  {
+   "sub": "exact_driver_analysis",
+   "tool": "compute_analysis",
+   "analysis": "driver_analysis",
+   "dataset": "adv_cd",
+   "rows": 2000,
+   "parameters": {
+    "measure": "customer_id"
+   },
+   "status": "REFUSED",
+   "wall_time_seconds": 0.065467,
+   "response": "BLOCKED: driver_analysis could not be computed on these values.\nWHY: the engine said: Binder Error: No function matches the given name and argument types 'avg(VARCHAR)'. You might need to add explicit type casts. (customer_id is VARCHAR). A measure held as text cannot be averaged or summed; propose_cleaning_plan offers the conversion.\nCURRENT STATE: contract v1 for adv_cd\nNEXT STEP: call propose_cleaning_plan(dataset_name=\"adv_cd\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "role": "defect",
+    "next_step": "propose_cleaning_plan(dataset_name=\"adv_cd\")",
+    "next_tool": "propose_cleaning_plan",
+    "kwargs": {
+     "dataset_name": "adv_cd"
+    },
+    "executable": true
+   }
+  },
+  {
+   "sub": "control_text_count",
+   "tool": "compute_analysis",
+   "analysis": "top_n",
+   "dataset": "ctl_text_count",
+   "rows": 2000,
+   "parameters": {
+    "dimension": "payment_method",
+    "measure": "customer_id",
+    "aggregations": {
+     "customer_id": "count"
+    }
+   },
+   "status": "OK",
+   "wall_time_seconds": 0.109873,
+   "response": "Under contract v1 for ctl_text_count: one row.\n\n6 rows x 4 columns, written to\n  /home/user/aa-fixes/workspace/tr_d1/results/top_n_20260924-222322.csv\nfrom dataset   ctl_text_count\ncreated        2026-09-24 22:23:22\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - 6 group(s) of payment_method; the 6 largest by count of customer_id shown.\n  - Share is of 1,968, the count of customer_id across all 6 group(s).\n\nFirst 6 of 6 rows:\n\n| value | customer_id (count) | rows | share |\n|---|---|---|---|\n| card | 1,073 | 1,073 | 54.5% |\n| ach | 492 | 492 | 25.0% |\n| cash | 195 | 195 | 9.9% |\n| wire | 157 | 157 | 8.0% |\n| cheque | 45 | 45 | 2.3% |\n| (null) | 6 | 6 | 0.3% |",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "role": "control",
+    "contract_status": "stored"
+   }
+  },
+  {
+   "sub": "control_text_count_distinct",
+   "tool": "compute_analysis",
+   "analysis": "top_n",
+   "dataset": "ctl_text_count_distinct",
+   "rows": 2000,
+   "parameters": {
+    "dimension": "payment_method",
+    "measure": "customer_id",
+    "aggregations": {
+     "customer_id": "count_distinct"
+    }
+   },
+   "status": "OK",
+   "wall_time_seconds": 0.114943,
+   "response": "Under contract v1 for ctl_text_count_distinct: one row.\n\n6 rows x 4 columns, written to\n  /home/user/aa-fixes/workspace/tr_d1/results/top_n_20260924-222324.csv\nfrom dataset   ctl_text_count_distinct\ncreated        2026-09-24 22:23:24\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - 6 group(s) of payment_method; the 6 largest by count_distinct of customer_id shown.\n  - No share column: count_distinct does not add up across groups, so there is no total for a group to be a share of.\n\nFirst 6 of 6 rows:\n\n| value | customer_id (count_distinct) | rows | share |\n|---|---|---|---|\n| card | 377 | 1,073 |  |\n| ach | 273 | 492 |  |\n| cash | 151 | 195 |  |\n| wire | 130 | 157 |  |\n| cheque | 42 | 45 |  |\n| (null) | 6 | 6 |  |",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "role": "control",
+    "contract_status": "stored"
+   }
+  },
+  {
+   "sub": "control_numeric_sum",
+   "tool": "compute_analysis",
+   "analysis": "mix_shift",
+   "dataset": "ctl_numeric_sum",
+   "rows": 2000,
+   "parameters": {
+    "dimension": "payment_method",
+    "measure": "revenue",
+    "period": "2024-12",
+    "baseline": "2024-11",
+    "aggregations": {
+     "revenue": "sum"
+    }
+   },
+   "status": "OK",
+   "wall_time_seconds": 0.144832,
+   "response": "Under contract v1 for ctl_numeric_sum: one row.\n\n6 rows x 9 columns, written to\n  /home/user/aa-fixes/workspace/tr_d1/results/mix_shift_20260924-222326.csv\nfrom dataset   ctl_numeric_sum\ncreated        2026-09-24 22:23:26\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - Mean revenue per row was 98.714 across 90 row(s) in 2024-11 and 107.6535 across 85 in 2024-12: a change of +8.940.\n  - Of that, +14.663 is rate -- group averages moving -- and +5.496 is mix, the groups' shares of the rows moving. The interaction, -9.942, is both at once and is reported rather than folded into either: folding it is what choosing 2024-11 or 2024-12 as the weighting base does silently, and the two choices disagree by exactly that number.\n  - 1 member(s) appear only in 2024-11: (no payment_method). They have no rate and no mix above -- there is no second mean to subtract and no share to reweight -- so their whole effect sits in the contribution column.\n\nFirst 6 of 6 rows:\n\n| payment_method | mean in 2024-11 | mean in 2024-12 | share in 2024-11 | share in 2024-12 | rate | mix | interaction | contribution |\n|---|---|---|---|---|---|---|---|---|\n| card | 94.1146 | 108.5054 | 0.456 | 0.565 | +6.556 | +10.273 | +1.571 | +18.399 |\n| cash | 99.0336 | 62.9243 | 0.122 | 0.082 | -4.413 | -3.948 | +1.440 | -6.922 |\n| wire | 158.9017 | 69.3522 | 0.067 | 0.106 | -5.970 | +6.231 | -3.512 | -3.250 |\n| ach | 90.2077 | 148.8622 | 0.333 | 0.212 | +19.552 | -10.966 | -7.131 | +1.455 |\n| (no payment_method) | 115 |  | 0.011 |  |  |  |  | -1.278 |\n| cheque | 161.55 | 66.0433 | 0.011 | 0.035 | -1.061 | +3.907 | -2.310 | +0.536 |",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "role": "control",
+    "contract_status": "stored"
+   }
+  },
+  {
+   "sub": "control_numeric_mean",
+   "tool": "compute_analysis",
+   "analysis": "mix_shift",
+   "dataset": "ctl_numeric_mean",
+   "rows": 2000,
+   "parameters": {
+    "dimension": "payment_method",
+    "measure": "revenue",
+    "period": "2024-12",
+    "baseline": "2024-11",
+    "aggregations": {
+     "revenue": "mean"
+    }
+   },
+   "status": "OK",
+   "wall_time_seconds": 0.113559,
+   "response": "Under contract v1 for ctl_numeric_mean: one row.\n\n6 rows x 9 columns, written to\n  /home/user/aa-fixes/workspace/tr_d1/results/mix_shift_20260924-222328.csv\nfrom dataset   ctl_numeric_mean\ncreated        2026-09-24 22:23:28\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - Mean revenue per row was 98.714 across 90 row(s) in 2024-11 and 107.6535 across 85 in 2024-12: a change of +8.940.\n  - Of that, +14.663 is rate -- group averages moving -- and +5.496 is mix, the groups' shares of the rows moving. The interaction, -9.942, is both at once and is reported rather than folded into either: folding it is what choosing 2024-11 or 2024-12 as the weighting base does silently, and the two choices disagree by exactly that number.\n  - 1 member(s) appear only in 2024-11: (no payment_method). They have no rate and no mix above -- there is no second mean to subtract and no share to reweight -- so their whole effect sits in the contribution column.\n\nFirst 6 of 6 rows:\n\n| payment_method | mean in 2024-11 | mean in 2024-12 | share in 2024-11 | share in 2024-12 | rate | mix | interaction | contribution |\n|---|---|---|---|---|---|---|---|---|\n| card | 94.1146 | 108.5054 | 0.456 | 0.565 | +6.556 | +10.273 | +1.571 | +18.399 |\n| cash | 99.0336 | 62.9243 | 0.122 | 0.082 | -4.413 | -3.948 | +1.440 | -6.922 |\n| wire | 158.9017 | 69.3522 | 0.067 | 0.106 | -5.970 | +6.231 | -3.512 | -3.250 |\n| ach | 90.2077 | 148.8622 | 0.333 | 0.212 | +19.552 | -10.966 | -7.131 | +1.455 |\n| (no payment_method) | 115 |  | 0.011 |  |  |  |  | -1.278 |\n| cheque | 161.55 | 66.0433 | 0.011 | 0.035 | -1.061 | +3.907 | -2.310 | +0.536 |",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "role": "control",
+    "contract_status": "stored"
+   }
+  },
+  {
+   "sub": "control_numeric_median",
+   "tool": "compute_analysis",
+   "analysis": "top_n",
+   "dataset": "ctl_numeric_median",
+   "rows": 2000,
+   "parameters": {
+    "dimension": "payment_method",
+    "measure": "revenue",
+    "aggregations": {
+     "revenue": "median"
+    }
+   },
+   "status": "OK",
+   "wall_time_seconds": 0.114178,
+   "response": "Under contract v1 for ctl_numeric_median: one row.\n\n6 rows x 4 columns, written to\n  /home/user/aa-fixes/workspace/tr_d1/results/top_n_20260924-222330.csv\nfrom dataset   ctl_numeric_median\ncreated        2026-09-24 22:23:30\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - 6 group(s) of payment_method; the 6 largest by median of revenue shown.\n  - No share column: median does not add up across groups, so there is no total for a group to be a share of.\n\nFirst 6 of 6 rows:\n\n| value | revenue (median) | rows | share |\n|---|---|---|---|\n| (null) | 69.68 | 6 |  |\n| card | 60.09 | 1,073 |  |\n| cheque | 53.865 | 45 |  |\n| wire | 53.47 | 157 |  |\n| cash | 50.01 | 195 |  |\n| ach | 48.68 | 492 |  |",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "role": "control",
+    "contract_status": "stored"
+   }
+  }
+ ]
+}

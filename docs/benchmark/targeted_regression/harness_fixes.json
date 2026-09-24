@@ -1,0 +1,111 @@
+[
+ {
+  "id": "2.1",
+  "category": "BENCHMARK_DEFECT",
+  "finding": "sample_adequacy: my power solve's bracket reached values where scipy's noncentral t returns NaN (ORACLE_ERROR)."
+ },
+ {
+  "id": "2.2",
+  "category": "BENCHMARK_DEFECT",
+  "finding": "The NULL group of mix_shift is labelled \"(no <dimension>)\", not \"(null)\"."
+ },
+ {
+  "id": "2.3",
+  "category": "BENCHMARK_DEFECT",
+  "finding": "A negative Welch t, and a negative Hedges' g, failed my regex."
+ },
+ {
+  "id": "2.4",
+  "category": "BENCHMARK_DEFECT",
+  "finding": "A zero MAD (discount is 60% zeros): the engine leaves the MAD fence blank rather than divide by zero. The oracle now requires the blank and the reply's reason."
+ },
+ {
+  "id": "2.5",
+  "category": "BENCHMARK_DEFECT",
+  "finding": "Two known answers were mine and wrong: 2024-11 is month 22 of the arithmetic trend (320, not 330), and 240 rows of a 1..9 cycle average 4.9625, not 5. The engine printed both correctly."
+ },
+ {
+  "id": "2.6",
+  "category": "BENCHMARK_DEFECT",
+  "finding": "The result files were deleted with each workspace, so a verification could not be repeated. They are now copied to the evidence directory first, and `--reverify` re-checks a unit from evidence and the regenerated dataset (sha256 checked) without calling a tool. - **In the product**, kept as found: hypothesis_test with two zero-variance groups raises ZeroDivisionError out of compute_analysis (analysis/inferential.py:124, welch). Trace preserved."
+ },
+ {
+  "id": "2.7",
+  "category": "BENCHMARK_DEFECT",
+  "finding": "distribution: the engine gives integer measures integer-aligned bins, so the last bin is narrower. The oracle assumed equal widths. It now checks each count against the edges the result states, and records the unequal last bin as a finding (LOW, section 4)."
+ },
+ {
+  "id": "2.8",
+  "category": "BENCHMARK_DEFECT",
+  "finding": "sample_adequacy: two root-finders on one power curve agree to 1e-3 relative, not to the printed digit (ecommerce: 0.4206 printed, 0.420650 here)."
+ },
+ {
+  "id": "2.9",
+  "category": "BENCHMARK_DEFECT",
+  "finding": "The top_n and frequency oracles were quadratic, and a 1M unit stalled in the oracle, not the tool. I stopped the run at the D/E boundary, made both linear, and resumed from the checkpoint."
+ },
+ {
+  "id": "2.10",
+  "category": "BENCHMARK_DEFECT",
+  "finding": "wait4's ru_maxrss carries the parent's high-water mark across fork+exec on Linux, so every worker \"peaked\" at the parent's size. The worker peak now comes from the per-call VmHWM records."
+ },
+ {
+  "id": "2.11",
+  "category": "BENCHMARK_DEFECT",
+  "finding": "The stress gate scaled from the 1M tier. It asked 16.2 GB for sales 10M against 14.6 free, and skipped it. The gate now scales from the largest completed tier, and sales 10M is re-gated."
+ },
+ {
+  "id": "2.12",
+  "category": "BENCHMARK_DEFECT",
+  "finding": "G's adversarial dataset kept its exact duplicate rows. Its contract on record_id was rightly refused, so 17 wrong calls met the contract gate instead of their own fault. C001 now runs before the contract, and dup_ids expects a refusal naming the contract."
+ },
+ {
+  "id": "2.13",
+  "category": "BENCHMARK_DEFECT",
+  "finding": "The classifier credited only a few phrasings. \"No test: ...\", \"undefined rather than\" and the like are safe diagnoses. Dirty variants are now judged on every step, not only the first."
+ },
+ {
+  "id": "2.14",
+  "category": "BENCHMARK_DEFECT",
+  "finding": "Welch's df printed as \"2e+06\" failed my regex. The regex now accepts it; the notation itself is a finding (section 4)."
+ },
+ {
+  "id": "2.15",
+  "category": "BENCHMARK_DEFECT",
+  "finding": "scipy's noncentral t returns NaN at 1M-row df. `_power` falls back to the normal approximation there."
+ },
+ {
+  "id": "2.16",
+  "category": "BENCHMARK_DEFECT",
+  "finding": "\"p < 1e-300.\" ends a sentence, and my parser read the period as part of the number."
+ },
+ {
+  "id": "2.17",
+  "category": "BENCHMARK_DEFECT",
+  "finding": "Dirty plans were judged against 0 duplicates. Per-row noise makes most of the clean file's duplicates distinct, so the expectation is now each variant file's own exact repeats."
+ },
+ {
+  "id": "2.18",
+  "category": "BENCHMARK_DEFECT",
+  "finding": "read_result_file serves at most 50 rows a page and says so, with the call for the next page. I asked for 200 and counted the stated cap as a failure."
+ },
+ {
+  "id": "2.19",
+  "category": "BENCHMARK_DEFECT",
+  "finding": "H (repeat, traced, concurrency, isolation) and J (reproducibility) contracted on record_id without dropping duplicates first. Every contract was refused, so they measured gate refusals. C001 now runs first everywhere. Isolation now cleans all ten datasets in one workspace, and each ledger must hold exactly its own action with its own count. F, G, H, J and sales 10M are superseded in state.json with their reason, their evidence is moved to _superseded/run2_*, and they are re-run."
+ },
+ {
+  "id": "2.20",
+  "category": "BENCHMARK_DEFECT",
+  "finding": "A call that raised wrote no result, and the oracle was handed None (an ORACLE_ERROR of KeyError). Such a call is now NOT_VERIFIED_NO_RESULT; its own record carries the exception."
+ },
+ {
+  "id": "reverify",
+  "category": "BENCHMARK_DEFECT",
+  "finding": "preserved evidence re-judged with the corrected oracle, no tool called again",
+  "units": 30,
+  "checks_failed_first_judgement": 28,
+  "checks_failed_now": 0,
+  "checks_now": 6157243
+ }
+]

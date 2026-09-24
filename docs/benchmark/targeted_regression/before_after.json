@@ -1,0 +1,2995 @@
+[
+ {
+  "case_id": "D1.exact_mix_shift",
+  "category": "PRODUCT_DEFECT",
+  "defect": "D1",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+  "tool": "compute_analysis",
+  "analysis": "mix_shift",
+  "dataset": "adv_cd",
+  "rows": 2000,
+  "parameters": {
+   "measure": "customer_id",
+   "dimension": "payment_method",
+   "period": "2024-12",
+   "baseline": "2024-11"
+  },
+  "before": {
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.076465,
+   "response": "",
+   "exception_type": "BinderException",
+   "exception_message": "Binder Error: No function matches the given name and argument types 'avg(VARCHAR)'. You might need to add explicit type casts.\n\tCandidate functions:\n\tavg(DECIMAL) -> DECIMAL\n\tavg(SMALLINT) -> DOUBLE\n\tavg(INTEGER) -> DOUBLE\n\tavg(BIGINT) -> DOUBLE\n\tavg(HUGEINT) -> DOUBLE\n\tavg(INTERVAL) -> INTERVAL\n\tavg(DOUBLE) -> DOUBLE\n\tavg(TIMESTAMP) -> TIMESTAMP\n\tavg(TIMESTAMP WITH TIME ZONE) -> TIMESTAMP WITH TIME ZONE\n\tavg(TIME) -> TIME\n\tavg(TIME WITH TIME ZONE) -> TIME WITH TIME ZONE\n\n\nLINE 1: ...)), d AS (SELECT date_trunc('month', \"transaction_date\") AS m, avg(\"customer_id\") AS v, count(*) AS n FROM \"adv"
+  },
+  "after": {
+   "status": "REFUSED",
+   "wall_time_seconds": 0.091272,
+   "response": "BLOCKED: mix_shift could not be computed on these values.\nWHY: the engine said: Binder Error: No function matches the given name and argument types 'avg(VARCHAR)'. You might need to add explicit type casts. (customer_id is VARCHAR; payment_method is VARCHAR). A measure held as text cannot be averaged or summed; propose_cleaning_plan offers the conversion.\nCURRENT STATE: contract v1 for adv_cd\nNEXT STEP: call propose_cleaning_plan(dataset_name=\"adv_cd\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "role": "defect",
+   "next_step": null,
+   "executable": false
+  },
+  "after_extra": {
+   "role": "defect",
+   "next_step": "propose_cleaning_plan(dataset_name=\"adv_cd\")",
+   "next_tool": "propose_cleaning_plan",
+   "kwargs": {
+    "dataset_name": "adv_cd"
+   },
+   "executable": true
+  },
+  "expected_behavior": "a refusal naming the column, its type and a runnable next step",
+  "original_failure_reproduced": true,
+  "correctness_equal_where_required": null,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D1.exact_outlier_detection",
+  "category": "PRODUCT_DEFECT",
+  "defect": "D1",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+  "tool": "compute_analysis",
+  "analysis": "outlier_detection",
+  "dataset": "adv_cd",
+  "rows": 2000,
+  "parameters": {
+   "measure": "customer_id"
+  },
+  "before": {
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.072065,
+   "response": "",
+   "exception_type": "BinderException",
+   "exception_message": "Binder Error: No function matches the given name and argument types 'quantile_cont(VARCHAR, DECIMAL(3,2))'. You might need to add explicit type casts.\n\tCandidate functions:\n\tquantile_cont(DECIMAL, DOUBLE) -> DECIMAL\n\tquantile_cont(DECIMAL, DOUBLE[]) -> DECIMAL\n\tquantile_cont(TINYINT, DOUBLE) -> TINYINT\n\tquantile_cont(TINYINT, DOUBLE[]) -> TINYINT\n\tquantile_cont(SMALLINT, DOUBLE) -> SMALLINT\n\tquantile_cont(SMALLINT, DOUBLE[]) -> SMALLINT\n\tquantile_cont(INTEGER, DOUBLE) -> INTEGER\n\tquantile_cont(INTEGER, DOUBLE[]) -> INTEGER\n\tquantile_cont(BIGINT, DOUBLE) -> BIGINT\n\tquantile_cont(BIGINT, DOUBLE["
+  },
+  "after": {
+   "status": "REFUSED",
+   "wall_time_seconds": 0.08386,
+   "response": "BLOCKED: outlier_detection could not be computed on these values.\nWHY: the engine said: Binder Error: No function matches the given name and argument types 'quantile_cont(VARCHAR, DECIMAL(3,2))'. You might need to add explicit type casts. (customer_id is VARCHAR). A measure held as text cannot be averaged or summed; propose_cleaning_plan offers the conversion.\nCURRENT STATE: contract v1 for adv_cd\nNEXT STEP: call propose_cleaning_plan(dataset_name=\"adv_cd\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "role": "defect",
+   "next_step": null,
+   "executable": false
+  },
+  "after_extra": {
+   "role": "defect",
+   "next_step": "propose_cleaning_plan(dataset_name=\"adv_cd\")",
+   "next_tool": "propose_cleaning_plan",
+   "kwargs": {
+    "dataset_name": "adv_cd"
+   },
+   "executable": true
+  },
+  "expected_behavior": "a refusal naming the column, its type and a runnable next step",
+  "original_failure_reproduced": true,
+  "correctness_equal_where_required": null,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D1.exact_correlation",
+  "category": "PRODUCT_DEFECT",
+  "defect": "D1",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+  "tool": "compute_analysis",
+  "analysis": "correlation",
+  "dataset": "adv_cd",
+  "rows": 2000,
+  "parameters": {
+   "measure": "customer_id",
+   "against": "revenue"
+  },
+  "before": {
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.088806,
+   "response": "",
+   "exception_type": "BinderException",
+   "exception_message": "Binder Error: No function matches the given name and argument types 'corr(DOUBLE, VARCHAR)'. You might need to add explicit type casts.\n\tCandidate functions:\n\tcorr(DOUBLE, DOUBLE) -> DOUBLE\n\n\nLINE 1: ... BY y) AS ay FROM n) SELECT (SELECT count(*) FROM p), (SELECT corr(y, x) FROM p), (SELECT corr(ay, ax) FROM r), (SELECT...\n                                                                         ^"
+  },
+  "after": {
+   "status": "REFUSED",
+   "wall_time_seconds": 0.072464,
+   "response": "BLOCKED: correlation could not be computed on these values.\nWHY: the engine said: Binder Error: No function matches the given name and argument types 'corr(DOUBLE, VARCHAR)'. You might need to add explicit type casts. (customer_id is VARCHAR; revenue is DOUBLE). A measure held as text cannot be averaged or summed; propose_cleaning_plan offers the conversion.\nCURRENT STATE: contract v1 for adv_cd\nNEXT STEP: call propose_cleaning_plan(dataset_name=\"adv_cd\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "role": "defect",
+   "next_step": null,
+   "executable": false
+  },
+  "after_extra": {
+   "role": "defect",
+   "next_step": "propose_cleaning_plan(dataset_name=\"adv_cd\")",
+   "next_tool": "propose_cleaning_plan",
+   "kwargs": {
+    "dataset_name": "adv_cd"
+   },
+   "executable": true
+  },
+  "expected_behavior": "a refusal naming the column, its type and a runnable next step",
+  "original_failure_reproduced": true,
+  "correctness_equal_where_required": null,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D1.exact_driver_analysis",
+  "category": "PRODUCT_DEFECT",
+  "defect": "D1",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+  "tool": "compute_analysis",
+  "analysis": "driver_analysis",
+  "dataset": "adv_cd",
+  "rows": 2000,
+  "parameters": {
+   "measure": "customer_id"
+  },
+  "before": {
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.070751,
+   "response": "",
+   "exception_type": "BinderException",
+   "exception_message": "Binder Error: No function matches the given name and argument types 'avg(VARCHAR)'. You might need to add explicit type casts.\n\tCandidate functions:\n\tavg(DECIMAL) -> DECIMAL\n\tavg(SMALLINT) -> DOUBLE\n\tavg(INTEGER) -> DOUBLE\n\tavg(BIGINT) -> DOUBLE\n\tavg(HUGEINT) -> DOUBLE\n\tavg(INTERVAL) -> INTERVAL\n\tavg(DOUBLE) -> DOUBLE\n\tavg(TIMESTAMP) -> TIMESTAMP\n\tavg(TIMESTAMP WITH TIME ZONE) -> TIMESTAMP WITH TIME ZONE\n\tavg(TIME) -> TIME\n\tavg(TIME WITH TIME ZONE) -> TIME WITH TIME ZONE\n\n\nLINE 1: ...+ INTERVAL 1 DAY) AND \"customer_id\" IS NOT NULL), t AS (SELECT avg(y) AS gm FROM p) SELECT (SELECT count(*) FRO"
+  },
+  "after": {
+   "status": "REFUSED",
+   "wall_time_seconds": 0.065467,
+   "response": "BLOCKED: driver_analysis could not be computed on these values.\nWHY: the engine said: Binder Error: No function matches the given name and argument types 'avg(VARCHAR)'. You might need to add explicit type casts. (customer_id is VARCHAR). A measure held as text cannot be averaged or summed; propose_cleaning_plan offers the conversion.\nCURRENT STATE: contract v1 for adv_cd\nNEXT STEP: call propose_cleaning_plan(dataset_name=\"adv_cd\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "role": "defect",
+   "next_step": null,
+   "executable": false
+  },
+  "after_extra": {
+   "role": "defect",
+   "next_step": "propose_cleaning_plan(dataset_name=\"adv_cd\")",
+   "next_tool": "propose_cleaning_plan",
+   "kwargs": {
+    "dataset_name": "adv_cd"
+   },
+   "executable": true
+  },
+  "expected_behavior": "a refusal naming the column, its type and a runnable next step",
+  "original_failure_reproduced": true,
+  "correctness_equal_where_required": null,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D1.control_text_count",
+  "category": "CONTROL",
+  "defect": "D1",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+  "tool": "compute_analysis",
+  "analysis": "top_n",
+  "dataset": "ctl_text_count",
+  "rows": 2000,
+  "parameters": {
+   "dimension": "payment_method",
+   "measure": "customer_id",
+   "aggregations": {
+    "customer_id": "count"
+   }
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.079646,
+   "response": "Under contract v1 for ctl_text_count: one row.\n\n6 rows x 4 columns, written to\n  /home/user/aa-orig/workspace/tr_d1/results/top_n_20260924-222307.csv\nfrom dataset   ctl_text_count\ncreated        2026-09-24 22:23:07\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - 6 group(s) of payment_method; the 6 largest by count of customer_id shown.\n  - Share is of 1,968, the count of customer_id across all 6 group(s).\n\nFirst 6 of 6 rows:\n\n| value | customer_id (count) | rows | share |\n|---|---|---|---|\n| card | 1,073 | 1,073 | 54.5% |\n| ach | 492 | 492 | 25.0% |\n| cash | 195 | 195 | 9.9% |\n| wire | 157 | 157 | 8.0% |\n| cheque | 45 | 45 | 2.3% |\n| (null) | 6 | 6 | 0.3% |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.109873,
+   "response": "Under contract v1 for ctl_text_count: one row.\n\n6 rows x 4 columns, written to\n  /home/user/aa-fixes/workspace/tr_d1/results/top_n_20260924-222322.csv\nfrom dataset   ctl_text_count\ncreated        2026-09-24 22:23:22\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - 6 group(s) of payment_method; the 6 largest by count of customer_id shown.\n  - Share is of 1,968, the count of customer_id across all 6 group(s).\n\nFirst 6 of 6 rows:\n\n| value | customer_id (count) | rows | share |\n|---|---|---|---|\n| card | 1,073 | 1,073 | 54.5% |\n| ach | 492 | 492 | 25.0% |\n| cash | 195 | 195 | 9.9% |\n| wire | 157 | 157 | 8.0% |\n| cheque | 45 | 45 | 2.3% |\n| (null) | 6 | 6 | 0.3% |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "role": "control",
+   "contract_status": "stored"
+  },
+  "after_extra": {
+   "role": "control",
+   "contract_status": "stored"
+  },
+  "expected_behavior": "valid before and after, same answer",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D1.control_text_count_distinct",
+  "category": "CONTROL",
+  "defect": "D1",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+  "tool": "compute_analysis",
+  "analysis": "top_n",
+  "dataset": "ctl_text_count_distinct",
+  "rows": 2000,
+  "parameters": {
+   "dimension": "payment_method",
+   "measure": "customer_id",
+   "aggregations": {
+    "customer_id": "count_distinct"
+   }
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.105023,
+   "response": "Under contract v1 for ctl_text_count_distinct: one row.\n\n6 rows x 4 columns, written to\n  /home/user/aa-orig/workspace/tr_d1/results/top_n_20260924-222309.csv\nfrom dataset   ctl_text_count_distinct\ncreated        2026-09-24 22:23:09\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - 6 group(s) of payment_method; the 6 largest by count_distinct of customer_id shown.\n  - No share column: count_distinct does not add up across groups, so there is no total for a group to be a share of.\n\nFirst 6 of 6 rows:\n\n| value | customer_id (count_distinct) | rows | share |\n|---|---|---|---|\n| card | 377 | 1,073 |  |\n| ach | 273 | 492 |  |\n| cash | 151 | 195 |  |\n| wire | 130 | 157 |  |\n| cheque | 42 | 45 |  |\n| (null) | 6 | 6 |  |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.114943,
+   "response": "Under contract v1 for ctl_text_count_distinct: one row.\n\n6 rows x 4 columns, written to\n  /home/user/aa-fixes/workspace/tr_d1/results/top_n_20260924-222324.csv\nfrom dataset   ctl_text_count_distinct\ncreated        2026-09-24 22:23:24\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - 6 group(s) of payment_method; the 6 largest by count_distinct of customer_id shown.\n  - No share column: count_distinct does not add up across groups, so there is no total for a group to be a share of.\n\nFirst 6 of 6 rows:\n\n| value | customer_id (count_distinct) | rows | share |\n|---|---|---|---|\n| card | 377 | 1,073 |  |\n| ach | 273 | 492 |  |\n| cash | 151 | 195 |  |\n| wire | 130 | 157 |  |\n| cheque | 42 | 45 |  |\n| (null) | 6 | 6 |  |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "role": "control",
+   "contract_status": "stored"
+  },
+  "after_extra": {
+   "role": "control",
+   "contract_status": "stored"
+  },
+  "expected_behavior": "valid before and after, same answer",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D1.control_numeric_sum",
+  "category": "CONTROL",
+  "defect": "D1",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+  "tool": "compute_analysis",
+  "analysis": "mix_shift",
+  "dataset": "ctl_numeric_sum",
+  "rows": 2000,
+  "parameters": {
+   "dimension": "payment_method",
+   "measure": "revenue",
+   "period": "2024-12",
+   "baseline": "2024-11",
+   "aggregations": {
+    "revenue": "sum"
+   }
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.115229,
+   "response": "Under contract v1 for ctl_numeric_sum: one row.\n\n6 rows x 9 columns, written to\n  /home/user/aa-orig/workspace/tr_d1/results/mix_shift_20260924-222311.csv\nfrom dataset   ctl_numeric_sum\ncreated        2026-09-24 22:23:11\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - Mean revenue per row was 98.714 across 90 row(s) in 2024-11 and 107.6535 across 85 in 2024-12: a change of +8.940.\n  - Of that, +14.663 is rate -- group averages moving -- and +5.496 is mix, the groups' shares of the rows moving. The interaction, -9.942, is both at once and is reported rather than folded into either: folding it is what choosing 2024-11 or 2024-12 as the weighting base does silently, and the two choices disagree by exactly that number.\n  - 1 member(s) appear only in 2024-11: (no payment_method). They have no rate and no mix above -- there is no second mean to subtract and no share to reweight -- so their whole effect sits in the contribution column.\n\nFirst 6 of 6 rows:\n\n| payment_method | mean in 2024-11 | mean in 2024-12 | share in 2024-11 | share in 2024-12 | rate | mix | interaction | contribution |\n|---|---|---|---|---|---|---|---|---|\n| card | 94.1146 | 108.5054 | 0.456 | 0.565 | +6.556 | +10.273 | +1.571 | +18.399 |\n| cash | 99.0336 | 62.9243 | 0.122 | 0.082 | -4.413 | -3.948 | +1.440 | -6.922 |\n| wire | 158.9017 | 69.3522 | 0.067 | 0.106 | -5.970 | +6.231 | -3.512 | -3.250 |\n| ach | 90.2077 | 148.862",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.144832,
+   "response": "Under contract v1 for ctl_numeric_sum: one row.\n\n6 rows x 9 columns, written to\n  /home/user/aa-fixes/workspace/tr_d1/results/mix_shift_20260924-222326.csv\nfrom dataset   ctl_numeric_sum\ncreated        2026-09-24 22:23:26\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - Mean revenue per row was 98.714 across 90 row(s) in 2024-11 and 107.6535 across 85 in 2024-12: a change of +8.940.\n  - Of that, +14.663 is rate -- group averages moving -- and +5.496 is mix, the groups' shares of the rows moving. The interaction, -9.942, is both at once and is reported rather than folded into either: folding it is what choosing 2024-11 or 2024-12 as the weighting base does silently, and the two choices disagree by exactly that number.\n  - 1 member(s) appear only in 2024-11: (no payment_method). They have no rate and no mix above -- there is no second mean to subtract and no share to reweight -- so their whole effect sits in the contribution column.\n\nFirst 6 of 6 rows:\n\n| payment_method | mean in 2024-11 | mean in 2024-12 | share in 2024-11 | share in 2024-12 | rate | mix | interaction | contribution |\n|---|---|---|---|---|---|---|---|---|\n| card | 94.1146 | 108.5054 | 0.456 | 0.565 | +6.556 | +10.273 | +1.571 | +18.399 |\n| cash | 99.0336 | 62.9243 | 0.122 | 0.082 | -4.413 | -3.948 | +1.440 | -6.922 |\n| wire | 158.9017 | 69.3522 | 0.067 | 0.106 | -5.970 | +6.231 | -3.512 | -3.250 |\n| ach | 90.2077 | 148.86",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "role": "control",
+   "contract_status": "stored"
+  },
+  "after_extra": {
+   "role": "control",
+   "contract_status": "stored"
+  },
+  "expected_behavior": "valid before and after, same answer",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D1.control_numeric_mean",
+  "category": "CONTROL",
+  "defect": "D1",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+  "tool": "compute_analysis",
+  "analysis": "mix_shift",
+  "dataset": "ctl_numeric_mean",
+  "rows": 2000,
+  "parameters": {
+   "dimension": "payment_method",
+   "measure": "revenue",
+   "period": "2024-12",
+   "baseline": "2024-11",
+   "aggregations": {
+    "revenue": "mean"
+   }
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.097809,
+   "response": "Under contract v1 for ctl_numeric_mean: one row.\n\n6 rows x 9 columns, written to\n  /home/user/aa-orig/workspace/tr_d1/results/mix_shift_20260924-222313.csv\nfrom dataset   ctl_numeric_mean\ncreated        2026-09-24 22:23:13\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - Mean revenue per row was 98.714 across 90 row(s) in 2024-11 and 107.6535 across 85 in 2024-12: a change of +8.940.\n  - Of that, +14.663 is rate -- group averages moving -- and +5.496 is mix, the groups' shares of the rows moving. The interaction, -9.942, is both at once and is reported rather than folded into either: folding it is what choosing 2024-11 or 2024-12 as the weighting base does silently, and the two choices disagree by exactly that number.\n  - 1 member(s) appear only in 2024-11: (no payment_method). They have no rate and no mix above -- there is no second mean to subtract and no share to reweight -- so their whole effect sits in the contribution column.\n\nFirst 6 of 6 rows:\n\n| payment_method | mean in 2024-11 | mean in 2024-12 | share in 2024-11 | share in 2024-12 | rate | mix | interaction | contribution |\n|---|---|---|---|---|---|---|---|---|\n| card | 94.1146 | 108.5054 | 0.456 | 0.565 | +6.556 | +10.273 | +1.571 | +18.399 |\n| cash | 99.0336 | 62.9243 | 0.122 | 0.082 | -4.413 | -3.948 | +1.440 | -6.922 |\n| wire | 158.9017 | 69.3522 | 0.067 | 0.106 | -5.970 | +6.231 | -3.512 | -3.250 |\n| ach | 90.2077 | 148.8",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.113559,
+   "response": "Under contract v1 for ctl_numeric_mean: one row.\n\n6 rows x 9 columns, written to\n  /home/user/aa-fixes/workspace/tr_d1/results/mix_shift_20260924-222328.csv\nfrom dataset   ctl_numeric_mean\ncreated        2026-09-24 22:23:28\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - Mean revenue per row was 98.714 across 90 row(s) in 2024-11 and 107.6535 across 85 in 2024-12: a change of +8.940.\n  - Of that, +14.663 is rate -- group averages moving -- and +5.496 is mix, the groups' shares of the rows moving. The interaction, -9.942, is both at once and is reported rather than folded into either: folding it is what choosing 2024-11 or 2024-12 as the weighting base does silently, and the two choices disagree by exactly that number.\n  - 1 member(s) appear only in 2024-11: (no payment_method). They have no rate and no mix above -- there is no second mean to subtract and no share to reweight -- so their whole effect sits in the contribution column.\n\nFirst 6 of 6 rows:\n\n| payment_method | mean in 2024-11 | mean in 2024-12 | share in 2024-11 | share in 2024-12 | rate | mix | interaction | contribution |\n|---|---|---|---|---|---|---|---|---|\n| card | 94.1146 | 108.5054 | 0.456 | 0.565 | +6.556 | +10.273 | +1.571 | +18.399 |\n| cash | 99.0336 | 62.9243 | 0.122 | 0.082 | -4.413 | -3.948 | +1.440 | -6.922 |\n| wire | 158.9017 | 69.3522 | 0.067 | 0.106 | -5.970 | +6.231 | -3.512 | -3.250 |\n| ach | 90.2077 | 148.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "role": "control",
+   "contract_status": "stored"
+  },
+  "after_extra": {
+   "role": "control",
+   "contract_status": "stored"
+  },
+  "expected_behavior": "valid before and after, same answer",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D1.control_numeric_median",
+  "category": "CONTROL",
+  "defect": "D1",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+  "tool": "compute_analysis",
+  "analysis": "top_n",
+  "dataset": "ctl_numeric_median",
+  "rows": 2000,
+  "parameters": {
+   "dimension": "payment_method",
+   "measure": "revenue",
+   "aggregations": {
+    "revenue": "median"
+   }
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.072658,
+   "response": "Under contract v1 for ctl_numeric_median: one row.\n\n6 rows x 4 columns, written to\n  /home/user/aa-orig/workspace/tr_d1/results/top_n_20260924-222315.csv\nfrom dataset   ctl_numeric_median\ncreated        2026-09-24 22:23:15\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - 6 group(s) of payment_method; the 6 largest by median of revenue shown.\n  - No share column: median does not add up across groups, so there is no total for a group to be a share of.\n\nFirst 6 of 6 rows:\n\n| value | revenue (median) | rows | share |\n|---|---|---|---|\n| (null) | 69.68 | 6 |  |\n| card | 60.09 | 1,073 |  |\n| cheque | 53.865 | 45 |  |\n| wire | 53.47 | 157 |  |\n| cash | 50.01 | 195 |  |\n| ach | 48.68 | 492 |  |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.114178,
+   "response": "Under contract v1 for ctl_numeric_median: one row.\n\n6 rows x 4 columns, written to\n  /home/user/aa-fixes/workspace/tr_d1/results/top_n_20260924-222330.csv\nfrom dataset   ctl_numeric_median\ncreated        2026-09-24 22:23:30\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - 6 group(s) of payment_method; the 6 largest by median of revenue shown.\n  - No share column: median does not add up across groups, so there is no total for a group to be a share of.\n\nFirst 6 of 6 rows:\n\n| value | revenue (median) | rows | share |\n|---|---|---|---|\n| (null) | 69.68 | 6 |  |\n| card | 60.09 | 1,073 |  |\n| cheque | 53.865 | 45 |  |\n| wire | 53.47 | 157 |  |\n| cash | 50.01 | 195 |  |\n| ach | 48.68 | 492 |  |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "role": "control",
+   "contract_status": "stored"
+  },
+  "after_extra": {
+   "role": "control",
+   "contract_status": "stored"
+  },
+  "expected_behavior": "valid before and after, same answer",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D2.both_zero_variance_hypothesis_test",
+  "category": "PRODUCT_DEFECT",
+  "defect": "D2",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "compute_analysis",
+  "analysis": "hypothesis_test",
+  "dataset": "both_zero_variance",
+  "rows": 20,
+  "parameters": {
+   "dimension": "g",
+   "measure": "v"
+  },
+  "before": {
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.061466,
+   "response": "",
+   "exception_type": "ZeroDivisionError",
+   "exception_message": "both groups have zero variance"
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.101547,
+   "response": "Under contract v1 for both_zero_variance: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/hypothesis_test_20260924-222522.csv\nfrom dataset   both_zero_variance\ncreated        2026-09-24 22:25:22\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - No test: both groups have zero variance. The group means are in the table above; a difference between values that do not vary is not a question sampling can answer.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 5 | 0 | nan |\n| b | 10 | 3 | 0 | nan |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "shape": "both_zero_variance",
+   "p_value_printed": false,
+   "means": [
+    5.0,
+    3.0
+   ],
+   "role": "defect",
+   "states_zero_variance": false
+  },
+  "after_extra": {
+   "shape": "both_zero_variance",
+   "p_value_printed": false,
+   "means": [
+    5.0,
+    3.0
+   ],
+   "role": "defect",
+   "states_zero_variance": true
+  },
+  "expected_behavior": "a stated 'no test' with no manufactured p-value",
+  "original_failure_reproduced": true,
+  "correctness_equal_where_required": null,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D2.both_zero_variance_hypothesis_test_rank",
+  "category": "PRODUCT_DEFECT",
+  "defect": "D2",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "compute_analysis",
+  "analysis": "hypothesis_test",
+  "dataset": "both_zero_variance",
+  "rows": 20,
+  "parameters": {
+   "dimension": "g",
+   "measure": "v",
+   "method": "rank"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.103229,
+   "response": "Under contract v1 for both_zero_variance: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-orig/workspace/tr_d2/results/hypothesis_test_20260924-222516.csv\nfrom dataset   both_zero_variance\ncreated        2026-09-24 22:25:16\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 100, df n/a, p 1.59379e-05.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew nan.\n  - At the conventional 5% threshold, v differs between the groups of g by more than sampling alone would produce. That is a statement about these rows, not a cause.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 5 | 0 | nan |\n| b | 10 | 3 | 0 | nan |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.115703,
+   "response": "Under contract v1 for both_zero_variance: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/hypothesis_test_20260924-222522_2.csv\nfrom dataset   both_zero_variance\ncreated        2026-09-24 22:25:22\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 100, df n/a, p 1.59379e-05.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew nan.\n  - At the conventional 5% threshold, v differs between the groups of g by more than sampling alone would produce. That is a statement about these rows, not a cause.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 5 | 0 | nan |\n| b | 10 | 3 | 0 | nan |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "shape": "both_zero_variance",
+   "p_value_printed": true,
+   "means": [
+    5.0,
+    3.0
+   ],
+   "role": "defect",
+   "states_zero_variance": false
+  },
+  "after_extra": {
+   "shape": "both_zero_variance",
+   "p_value_printed": true,
+   "means": [
+    5.0,
+    3.0
+   ],
+   "role": "defect",
+   "states_zero_variance": false
+  },
+  "expected_behavior": "unchanged",
+  "original_failure_reproduced": true,
+  "correctness_equal_where_required": null,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D2.both_zero_variance_effect_size",
+  "category": "PRODUCT_DEFECT",
+  "defect": "D2",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "compute_analysis",
+  "analysis": "effect_size",
+  "dataset": "both_zero_variance",
+  "rows": 20,
+  "parameters": {
+   "dimension": "g",
+   "measure": "v"
+  },
+  "before": {
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.062677,
+   "response": "",
+   "exception_type": "ZeroDivisionError",
+   "exception_message": "both groups are constant, so the difference has no scale"
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.09153,
+   "response": "Under contract v1 for both_zero_variance: row.\n\n2 rows x 4 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/effect_size_20260924-222522.csv\nfrom dataset   both_zero_variance\ncreated        2026-09-24 22:25:22\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - No effect size: both groups are constant, so the difference has no scale. The group means are in the table above.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 10 | 5 | 0 |\n| b | 10 | 3 | 0 |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "shape": "both_zero_variance",
+   "p_value_printed": false,
+   "means": [
+    5.0,
+    3.0
+   ],
+   "role": "defect",
+   "states_zero_variance": false
+  },
+  "after_extra": {
+   "shape": "both_zero_variance",
+   "p_value_printed": false,
+   "means": [
+    5.0,
+    3.0
+   ],
+   "role": "defect",
+   "states_zero_variance": true
+  },
+  "expected_behavior": "a stated 'no test' with no manufactured p-value",
+  "original_failure_reproduced": true,
+  "correctness_equal_where_required": null,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D2.a_zero_variance_only_hypothesis_test",
+  "category": "CONTROL",
+  "defect": "D2",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "compute_analysis",
+  "analysis": "hypothesis_test",
+  "dataset": "a_zero_variance_only",
+  "rows": 20,
+  "parameters": {
+   "dimension": "g",
+   "measure": "v"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.108346,
+   "response": "Under contract v1 for a_zero_variance_only: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-orig/workspace/tr_d2/results/hypothesis_test_20260924-222517.csv\nfrom dataset   a_zero_variance_only\ncreated        2026-09-24 22:25:17\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic 0.5222, df 9, p 0.614117.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g 0.2237. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew nan.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 5 | 0 | nan |\n| b | 10 | 4.5 | 3.0277 | 0 |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.097136,
+   "response": "Under contract v1 for a_zero_variance_only: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/hypothesis_test_20260924-222523.csv\nfrom dataset   a_zero_variance_only\ncreated        2026-09-24 22:25:23\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic 0.5222, df 9, p 0.614117.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g 0.2237. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew nan.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 5 | 0 | nan |\n| b | 10 | 4.5 | 3.0277 | 0 |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "shape": "a_zero_variance_only",
+   "p_value_printed": true,
+   "means": [
+    5.0,
+    4.5
+   ],
+   "role": "control",
+   "states_zero_variance": false
+  },
+  "after_extra": {
+   "shape": "a_zero_variance_only",
+   "p_value_printed": true,
+   "means": [
+    5.0,
+    4.5
+   ],
+   "role": "control",
+   "states_zero_variance": false
+  },
+  "expected_behavior": "unchanged",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D2.a_zero_variance_only_hypothesis_test_rank",
+  "category": "CONTROL",
+  "defect": "D2",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "compute_analysis",
+  "analysis": "hypothesis_test",
+  "dataset": "a_zero_variance_only",
+  "rows": 20,
+  "parameters": {
+   "dimension": "g",
+   "measure": "v",
+   "method": "rank"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.124726,
+   "response": "Under contract v1 for a_zero_variance_only: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-orig/workspace/tr_d2/results/hypothesis_test_20260924-222517_2.csv\nfrom dataset   a_zero_variance_only\ncreated        2026-09-24 22:25:17\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 55, df n/a, p 0.709628.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew nan.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 5 | 0 | nan |\n| b | 10 | 4.5 | 3.0277 | 0 |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.088147,
+   "response": "Under contract v1 for a_zero_variance_only: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/hypothesis_test_20260924-222523_2.csv\nfrom dataset   a_zero_variance_only\ncreated        2026-09-24 22:25:23\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 55, df n/a, p 0.709628.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew nan.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 5 | 0 | nan |\n| b | 10 | 4.5 | 3.0277 | 0 |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "shape": "a_zero_variance_only",
+   "p_value_printed": true,
+   "means": [
+    5.0,
+    4.5
+   ],
+   "role": "control",
+   "states_zero_variance": false
+  },
+  "after_extra": {
+   "shape": "a_zero_variance_only",
+   "p_value_printed": true,
+   "means": [
+    5.0,
+    4.5
+   ],
+   "role": "control",
+   "states_zero_variance": false
+  },
+  "expected_behavior": "unchanged",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D2.a_zero_variance_only_effect_size",
+  "category": "CONTROL",
+  "defect": "D2",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "compute_analysis",
+  "analysis": "effect_size",
+  "dataset": "a_zero_variance_only",
+  "rows": 20,
+  "parameters": {
+   "dimension": "g",
+   "measure": "v"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.12086,
+   "response": "Under contract v1 for a_zero_variance_only: row.\n\n2 rows x 4 columns, written to\n  /home/user/aa-orig/workspace/tr_d2/results/effect_size_20260924-222517.csv\nfrom dataset   a_zero_variance_only\ncreated        2026-09-24 22:25:17\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Hedges' g 0.2237 \u2014 small by Cohen's convention. a exceeds b by 0.5, which is 0.2237 standard deviation(s).\n  - g rather than d: P10-D17 measured the small-sample correction at 0.9578 for ten rows per group and 0.9962 for a hundred, so it matters where group breakdowns actually land.\n  - Cohen's bands are a vocabulary, not a verdict: they were proposed for psychology and what counts as large is a question about the subject, not about the arithmetic.\n  - An effect size does not fall as rows are added, which is the whole point of reading it beside a p-value rather than instead of one.\n  - Excluded and shown: 0 with no g, 0 with no v. The counts add back to the 20 row(s) in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 10 | 5 | 0 |\n| b | 10 | 4.5 | 3.0277 |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.062177,
+   "response": "Under contract v1 for a_zero_variance_only: row.\n\n2 rows x 4 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/effect_size_20260924-222523.csv\nfrom dataset   a_zero_variance_only\ncreated        2026-09-24 22:25:23\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Hedges' g 0.2237 \u2014 small by Cohen's convention. a exceeds b by 0.5, which is 0.2237 standard deviation(s).\n  - g rather than d: P10-D17 measured the small-sample correction at 0.9578 for ten rows per group and 0.9962 for a hundred, so it matters where group breakdowns actually land.\n  - Cohen's bands are a vocabulary, not a verdict: they were proposed for psychology and what counts as large is a question about the subject, not about the arithmetic.\n  - An effect size does not fall as rows are added, which is the whole point of reading it beside a p-value rather than instead of one.\n  - Excluded and shown: 0 with no g, 0 with no v. The counts add back to the 20 row(s) in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 10 | 5 | 0 |\n| b | 10 | 4.5 | 3.0277 |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "shape": "a_zero_variance_only",
+   "p_value_printed": false,
+   "means": [
+    5.0,
+    4.5
+   ],
+   "role": "control",
+   "states_zero_variance": false
+  },
+  "after_extra": {
+   "shape": "a_zero_variance_only",
+   "p_value_printed": false,
+   "means": [
+    5.0,
+    4.5
+   ],
+   "role": "control",
+   "states_zero_variance": false
+  },
+  "expected_behavior": "unchanged",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D2.b_zero_variance_only_hypothesis_test",
+  "category": "CONTROL",
+  "defect": "D2",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "compute_analysis",
+  "analysis": "hypothesis_test",
+  "dataset": "b_zero_variance_only",
+  "rows": 20,
+  "parameters": {
+   "dimension": "g",
+   "measure": "v"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.116978,
+   "response": "Under contract v1 for b_zero_variance_only: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-orig/workspace/tr_d2/results/hypothesis_test_20260924-222517_3.csv\nfrom dataset   b_zero_variance_only\ncreated        2026-09-24 22:25:17\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic 1.5667, df 9, p 0.151627.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g 0.671. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 4.5 | 3.0277 | 0 |\n| b | 10 | 3 | 0 | nan |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.061273,
+   "response": "Under contract v1 for b_zero_variance_only: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/hypothesis_test_20260924-222523_3.csv\nfrom dataset   b_zero_variance_only\ncreated        2026-09-24 22:25:23\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic 1.5667, df 9, p 0.151627.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g 0.671. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 4.5 | 3.0277 | 0 |\n| b | 10 | 3 | 0 | nan |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "shape": "b_zero_variance_only",
+   "p_value_printed": true,
+   "means": [
+    4.5,
+    3.0
+   ],
+   "role": "control",
+   "states_zero_variance": false
+  },
+  "after_extra": {
+   "shape": "b_zero_variance_only",
+   "p_value_printed": true,
+   "means": [
+    4.5,
+    3.0
+   ],
+   "role": "control",
+   "states_zero_variance": false
+  },
+  "expected_behavior": "unchanged",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D2.b_zero_variance_only_hypothesis_test_rank",
+  "category": "CONTROL",
+  "defect": "D2",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "compute_analysis",
+  "analysis": "hypothesis_test",
+  "dataset": "b_zero_variance_only",
+  "rows": 20,
+  "parameters": {
+   "dimension": "g",
+   "measure": "v",
+   "method": "rank"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.110881,
+   "response": "Under contract v1 for b_zero_variance_only: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-orig/workspace/tr_d2/results/hypothesis_test_20260924-222517_4.csv\nfrom dataset   b_zero_variance_only\ncreated        2026-09-24 22:25:17\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 65, df n/a, p 0.230212.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 4.5 | 3.0277 | 0 |\n| b | 10 | 3 | 0 | nan |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.06552,
+   "response": "Under contract v1 for b_zero_variance_only: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/hypothesis_test_20260924-222523_4.csv\nfrom dataset   b_zero_variance_only\ncreated        2026-09-24 22:25:23\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 65, df n/a, p 0.230212.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 4.5 | 3.0277 | 0 |\n| b | 10 | 3 | 0 | nan |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "shape": "b_zero_variance_only",
+   "p_value_printed": true,
+   "means": [
+    4.5,
+    3.0
+   ],
+   "role": "control",
+   "states_zero_variance": false
+  },
+  "after_extra": {
+   "shape": "b_zero_variance_only",
+   "p_value_printed": true,
+   "means": [
+    4.5,
+    3.0
+   ],
+   "role": "control",
+   "states_zero_variance": false
+  },
+  "expected_behavior": "unchanged",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D2.b_zero_variance_only_effect_size",
+  "category": "CONTROL",
+  "defect": "D2",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "compute_analysis",
+  "analysis": "effect_size",
+  "dataset": "b_zero_variance_only",
+  "rows": 20,
+  "parameters": {
+   "dimension": "g",
+   "measure": "v"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.103418,
+   "response": "Under contract v1 for b_zero_variance_only: row.\n\n2 rows x 4 columns, written to\n  /home/user/aa-orig/workspace/tr_d2/results/effect_size_20260924-222517_2.csv\nfrom dataset   b_zero_variance_only\ncreated        2026-09-24 22:25:17\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Hedges' g 0.671 \u2014 medium by Cohen's convention. a exceeds b by 1.5, which is 0.671 standard deviation(s).\n  - g rather than d: P10-D17 measured the small-sample correction at 0.9578 for ten rows per group and 0.9962 for a hundred, so it matters where group breakdowns actually land.\n  - Cohen's bands are a vocabulary, not a verdict: they were proposed for psychology and what counts as large is a question about the subject, not about the arithmetic.\n  - An effect size does not fall as rows are added, which is the whole point of reading it beside a p-value rather than instead of one.\n  - Excluded and shown: 0 with no g, 0 with no v. The counts add back to the 20 row(s) in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 10 | 4.5 | 3.0277 |\n| b | 10 | 3 | 0 |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.058842,
+   "response": "Under contract v1 for b_zero_variance_only: row.\n\n2 rows x 4 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/effect_size_20260924-222523_2.csv\nfrom dataset   b_zero_variance_only\ncreated        2026-09-24 22:25:23\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Hedges' g 0.671 \u2014 medium by Cohen's convention. a exceeds b by 1.5, which is 0.671 standard deviation(s).\n  - g rather than d: P10-D17 measured the small-sample correction at 0.9578 for ten rows per group and 0.9962 for a hundred, so it matters where group breakdowns actually land.\n  - Cohen's bands are a vocabulary, not a verdict: they were proposed for psychology and what counts as large is a question about the subject, not about the arithmetic.\n  - An effect size does not fall as rows are added, which is the whole point of reading it beside a p-value rather than instead of one.\n  - Excluded and shown: 0 with no g, 0 with no v. The counts add back to the 20 row(s) in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 10 | 4.5 | 3.0277 |\n| b | 10 | 3 | 0 |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "shape": "b_zero_variance_only",
+   "p_value_printed": false,
+   "means": [
+    4.5,
+    3.0
+   ],
+   "role": "control",
+   "states_zero_variance": false
+  },
+  "after_extra": {
+   "shape": "b_zero_variance_only",
+   "p_value_printed": false,
+   "means": [
+    4.5,
+    3.0
+   ],
+   "role": "control",
+   "states_zero_variance": false
+  },
+  "expected_behavior": "unchanged",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D2.identical_groups_hypothesis_test",
+  "category": "CONTROL",
+  "defect": "D2",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "compute_analysis",
+  "analysis": "hypothesis_test",
+  "dataset": "identical_groups",
+  "rows": 20,
+  "parameters": {
+   "dimension": "g",
+   "measure": "v"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.058932,
+   "response": "Under contract v1 for identical_groups: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-orig/workspace/tr_d2/results/hypothesis_test_20260924-222518.csv\nfrom dataset   identical_groups\ncreated        2026-09-24 22:25:18\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic 0, df 18, p 1.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g 0. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 3 | 1.4907 | 0 |\n| b | 10 | 3 | 1.4907 | 0 |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.06635,
+   "response": "Under contract v1 for identical_groups: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/hypothesis_test_20260924-222523_5.csv\nfrom dataset   identical_groups\ncreated        2026-09-24 22:25:23\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic 0, df 18, p 1.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g 0. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 3 | 1.4907 | 0 |\n| b | 10 | 3 | 1.4907 | 0 |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "shape": "identical_groups",
+   "p_value_printed": true,
+   "means": [
+    3.0,
+    3.0
+   ],
+   "role": "control",
+   "states_zero_variance": false
+  },
+  "after_extra": {
+   "shape": "identical_groups",
+   "p_value_printed": true,
+   "means": [
+    3.0,
+    3.0
+   ],
+   "role": "control",
+   "states_zero_variance": false
+  },
+  "expected_behavior": "unchanged",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D2.identical_groups_hypothesis_test_rank",
+  "category": "CONTROL",
+  "defect": "D2",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "compute_analysis",
+  "analysis": "hypothesis_test",
+  "dataset": "identical_groups",
+  "rows": 20,
+  "parameters": {
+   "dimension": "g",
+   "measure": "v",
+   "method": "rank"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.069793,
+   "response": "Under contract v1 for identical_groups: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-orig/workspace/tr_d2/results/hypothesis_test_20260924-222518_2.csv\nfrom dataset   identical_groups\ncreated        2026-09-24 22:25:18\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 50, df n/a, p 1.03073.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 3 | 1.4907 | 0 |\n| b | 10 | 3 | 1.4907 | 0 |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.095164,
+   "response": "Under contract v1 for identical_groups: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/hypothesis_test_20260924-222524.csv\nfrom dataset   identical_groups\ncreated        2026-09-24 22:25:24\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 50, df n/a, p 1.03073.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 3 | 1.4907 | 0 |\n| b | 10 | 3 | 1.4907 | 0 |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "shape": "identical_groups",
+   "p_value_printed": true,
+   "means": [
+    3.0,
+    3.0
+   ],
+   "role": "control",
+   "states_zero_variance": false
+  },
+  "after_extra": {
+   "shape": "identical_groups",
+   "p_value_printed": true,
+   "means": [
+    3.0,
+    3.0
+   ],
+   "role": "control",
+   "states_zero_variance": false
+  },
+  "expected_behavior": "unchanged",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D2.identical_groups_effect_size",
+  "category": "CONTROL",
+  "defect": "D2",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "compute_analysis",
+  "analysis": "effect_size",
+  "dataset": "identical_groups",
+  "rows": 20,
+  "parameters": {
+   "dimension": "g",
+   "measure": "v"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.086978,
+   "response": "Under contract v1 for identical_groups: row.\n\n2 rows x 4 columns, written to\n  /home/user/aa-orig/workspace/tr_d2/results/effect_size_20260924-222518.csv\nfrom dataset   identical_groups\ncreated        2026-09-24 22:25:18\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Hedges' g 0 \u2014 negligible by Cohen's convention. b exceeds a by 0, which is 0 standard deviation(s).\n  - g rather than d: P10-D17 measured the small-sample correction at 0.9578 for ten rows per group and 0.9962 for a hundred, so it matters where group breakdowns actually land.\n  - Cohen's bands are a vocabulary, not a verdict: they were proposed for psychology and what counts as large is a question about the subject, not about the arithmetic.\n  - An effect size does not fall as rows are added, which is the whole point of reading it beside a p-value rather than instead of one.\n  - Excluded and shown: 0 with no g, 0 with no v. The counts add back to the 20 row(s) in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 10 | 3 | 1.4907 |\n| b | 10 | 3 | 1.4907 |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.06078,
+   "response": "Under contract v1 for identical_groups: row.\n\n2 rows x 4 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/effect_size_20260924-222524.csv\nfrom dataset   identical_groups\ncreated        2026-09-24 22:25:24\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Hedges' g 0 \u2014 negligible by Cohen's convention. b exceeds a by 0, which is 0 standard deviation(s).\n  - g rather than d: P10-D17 measured the small-sample correction at 0.9578 for ten rows per group and 0.9962 for a hundred, so it matters where group breakdowns actually land.\n  - Cohen's bands are a vocabulary, not a verdict: they were proposed for psychology and what counts as large is a question about the subject, not about the arithmetic.\n  - An effect size does not fall as rows are added, which is the whole point of reading it beside a p-value rather than instead of one.\n  - Excluded and shown: 0 with no g, 0 with no v. The counts add back to the 20 row(s) in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 10 | 3 | 1.4907 |\n| b | 10 | 3 | 1.4907 |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "shape": "identical_groups",
+   "p_value_printed": false,
+   "means": [
+    3.0,
+    3.0
+   ],
+   "role": "control",
+   "states_zero_variance": false
+  },
+  "after_extra": {
+   "shape": "identical_groups",
+   "p_value_printed": false,
+   "means": [
+    3.0,
+    3.0
+   ],
+   "role": "control",
+   "states_zero_variance": false
+  },
+  "expected_behavior": "unchanged",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D2.constant_same_value_hypothesis_test",
+  "category": "PRODUCT_DEFECT",
+  "defect": "D2",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "compute_analysis",
+  "analysis": "hypothesis_test",
+  "dataset": "constant_same_value",
+  "rows": 20,
+  "parameters": {
+   "dimension": "g",
+   "measure": "v"
+  },
+  "before": {
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.048949,
+   "response": "",
+   "exception_type": "ZeroDivisionError",
+   "exception_message": "both groups have zero variance"
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.062768,
+   "response": "Under contract v1 for constant_same_value: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/hypothesis_test_20260924-222524_2.csv\nfrom dataset   constant_same_value\ncreated        2026-09-24 22:25:24\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - No test: both groups have zero variance. The group means are in the table above; a difference between values that do not vary is not a question sampling can answer.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 4 | 0 | nan |\n| b | 10 | 4 | 0 | nan |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "shape": "constant_same_value",
+   "p_value_printed": false,
+   "means": [
+    4.0,
+    4.0
+   ],
+   "role": "defect",
+   "states_zero_variance": false
+  },
+  "after_extra": {
+   "shape": "constant_same_value",
+   "p_value_printed": false,
+   "means": [
+    4.0,
+    4.0
+   ],
+   "role": "defect",
+   "states_zero_variance": true
+  },
+  "expected_behavior": "a stated 'no test' with no manufactured p-value",
+  "original_failure_reproduced": true,
+  "correctness_equal_where_required": null,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D2.constant_same_value_hypothesis_test_rank",
+  "category": "PRODUCT_DEFECT",
+  "defect": "D2",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "compute_analysis",
+  "analysis": "hypothesis_test",
+  "dataset": "constant_same_value",
+  "rows": 20,
+  "parameters": {
+   "dimension": "g",
+   "measure": "v",
+   "method": "rank"
+  },
+  "before": {
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.05801,
+   "response": "",
+   "exception_type": "ZeroDivisionError",
+   "exception_message": "every value is tied, so the ranks carry no information"
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.070775,
+   "response": "Under contract v1 for constant_same_value: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/hypothesis_test_20260924-222524_3.csv\nfrom dataset   constant_same_value\ncreated        2026-09-24 22:25:24\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - No test: every value is tied, so the ranks carry no information. The group means are in the table above; a difference between values that do not vary is not a question sampling can answer.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 4 | 0 | nan |\n| b | 10 | 4 | 0 | nan |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "shape": "constant_same_value",
+   "p_value_printed": false,
+   "means": [
+    4.0,
+    4.0
+   ],
+   "role": "defect",
+   "states_zero_variance": false
+  },
+  "after_extra": {
+   "shape": "constant_same_value",
+   "p_value_printed": false,
+   "means": [
+    4.0,
+    4.0
+   ],
+   "role": "defect",
+   "states_zero_variance": true
+  },
+  "expected_behavior": "a stated 'no test' with no manufactured p-value",
+  "original_failure_reproduced": true,
+  "correctness_equal_where_required": null,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D2.constant_same_value_effect_size",
+  "category": "PRODUCT_DEFECT",
+  "defect": "D2",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "compute_analysis",
+  "analysis": "effect_size",
+  "dataset": "constant_same_value",
+  "rows": 20,
+  "parameters": {
+   "dimension": "g",
+   "measure": "v"
+  },
+  "before": {
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.056363,
+   "response": "",
+   "exception_type": "ZeroDivisionError",
+   "exception_message": "both groups are constant, so the difference has no scale"
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.084096,
+   "response": "Under contract v1 for constant_same_value: row.\n\n2 rows x 4 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/effect_size_20260924-222524_2.csv\nfrom dataset   constant_same_value\ncreated        2026-09-24 22:25:24\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - No effect size: both groups are constant, so the difference has no scale. The group means are in the table above.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 10 | 4 | 0 |\n| b | 10 | 4 | 0 |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "shape": "constant_same_value",
+   "p_value_printed": false,
+   "means": [
+    4.0,
+    4.0
+   ],
+   "role": "defect",
+   "states_zero_variance": false
+  },
+  "after_extra": {
+   "shape": "constant_same_value",
+   "p_value_printed": false,
+   "means": [
+    4.0,
+    4.0
+   ],
+   "role": "defect",
+   "states_zero_variance": true
+  },
+  "expected_behavior": "a stated 'no test' with no manufactured p-value",
+  "original_failure_reproduced": true,
+  "correctness_equal_where_required": null,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D2.tiny_two_each_hypothesis_test",
+  "category": "CONTROL",
+  "defect": "D2",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "compute_analysis",
+  "analysis": "hypothesis_test",
+  "dataset": "tiny_two_each",
+  "rows": 4,
+  "parameters": {
+   "dimension": "g",
+   "measure": "v"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.058966,
+   "response": "Under contract v1 for tiny_two_each: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-orig/workspace/tr_d2/results/hypothesis_test_20260924-222518_3.csv\nfrom dataset   tiny_two_each\ncreated        2026-09-24 22:25:18\n\nWhat this shows:\n  - 4 of 4 row(s) analysed.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic -2.2361, df 1.471, p 0.198727.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g -1.2778. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 2 row(s).\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 4 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 2 | 1.5 | 0.7071 |  |\n| b | 2 | 4 | 1.4142 |  |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.058555,
+   "response": "Under contract v1 for tiny_two_each: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/hypothesis_test_20260924-222524_4.csv\nfrom dataset   tiny_two_each\ncreated        2026-09-24 22:25:24\n\nWhat this shows:\n  - 4 of 4 row(s) analysed.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic -2.2361, df 1.471, p 0.198727.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g -1.2778. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 2 row(s).\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 4 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 2 | 1.5 | 0.7071 |  |\n| b | 2 | 4 | 1.4142 |  |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "shape": "tiny_two_each",
+   "p_value_printed": true,
+   "means": [
+    1.5,
+    4.0
+   ],
+   "role": "control",
+   "states_zero_variance": false
+  },
+  "after_extra": {
+   "shape": "tiny_two_each",
+   "p_value_printed": true,
+   "means": [
+    1.5,
+    4.0
+   ],
+   "role": "control",
+   "states_zero_variance": false
+  },
+  "expected_behavior": "unchanged",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D2.tiny_two_each_hypothesis_test_rank",
+  "category": "CONTROL",
+  "defect": "D2",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "compute_analysis",
+  "analysis": "hypothesis_test",
+  "dataset": "tiny_two_each",
+  "rows": 4,
+  "parameters": {
+   "dimension": "g",
+   "measure": "v",
+   "method": "rank"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.07292,
+   "response": "Under contract v1 for tiny_two_each: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-orig/workspace/tr_d2/results/hypothesis_test_20260924-222518_4.csv\nfrom dataset   tiny_two_each\ncreated        2026-09-24 22:25:18\n\nWhat this shows:\n  - 4 of 4 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 0, df n/a, p 0.245278.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 2 row(s).\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 4 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 2 | 1.5 | 0.7071 |  |\n| b | 2 | 4 | 1.4142 |  |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.06207,
+   "response": "Under contract v1 for tiny_two_each: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/hypothesis_test_20260924-222524_5.csv\nfrom dataset   tiny_two_each\ncreated        2026-09-24 22:25:24\n\nWhat this shows:\n  - 4 of 4 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 0, df n/a, p 0.245278.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 2 row(s).\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 4 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 2 | 1.5 | 0.7071 |  |\n| b | 2 | 4 | 1.4142 |  |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "shape": "tiny_two_each",
+   "p_value_printed": true,
+   "means": [
+    1.5,
+    4.0
+   ],
+   "role": "control",
+   "states_zero_variance": false
+  },
+  "after_extra": {
+   "shape": "tiny_two_each",
+   "p_value_printed": true,
+   "means": [
+    1.5,
+    4.0
+   ],
+   "role": "control",
+   "states_zero_variance": false
+  },
+  "expected_behavior": "unchanged",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D2.tiny_two_each_effect_size",
+  "category": "CONTROL",
+  "defect": "D2",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "compute_analysis",
+  "analysis": "effect_size",
+  "dataset": "tiny_two_each",
+  "rows": 4,
+  "parameters": {
+   "dimension": "g",
+   "measure": "v"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.087292,
+   "response": "Under contract v1 for tiny_two_each: row.\n\n2 rows x 4 columns, written to\n  /home/user/aa-orig/workspace/tr_d2/results/effect_size_20260924-222519.csv\nfrom dataset   tiny_two_each\ncreated        2026-09-24 22:25:19\n\nWhat this shows:\n  - 4 of 4 row(s) analysed.\n  - Hedges' g -1.2778 \u2014 large by Cohen's convention. b exceeds a by 2.5, which is 1.2778 standard deviation(s).\n  - g rather than d: P10-D17 measured the small-sample correction at 0.9578 for ten rows per group and 0.9962 for a hundred, so it matters where group breakdowns actually land.\n  - Cohen's bands are a vocabulary, not a verdict: they were proposed for psychology and what counts as large is a question about the subject, not about the arithmetic.\n  - An effect size does not fall as rows are added, which is the whole point of reading it beside a p-value rather than instead of one.\n  - Excluded and shown: 0 with no g, 0 with no v. The counts add back to the 4 row(s) in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 2 | 1.5 | 0.7071 |\n| b | 2 | 4 | 1.4142 |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.058134,
+   "response": "Under contract v1 for tiny_two_each: row.\n\n2 rows x 4 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/effect_size_20260924-222524_3.csv\nfrom dataset   tiny_two_each\ncreated        2026-09-24 22:25:24\n\nWhat this shows:\n  - 4 of 4 row(s) analysed.\n  - Hedges' g -1.2778 \u2014 large by Cohen's convention. b exceeds a by 2.5, which is 1.2778 standard deviation(s).\n  - g rather than d: P10-D17 measured the small-sample correction at 0.9578 for ten rows per group and 0.9962 for a hundred, so it matters where group breakdowns actually land.\n  - Cohen's bands are a vocabulary, not a verdict: they were proposed for psychology and what counts as large is a question about the subject, not about the arithmetic.\n  - An effect size does not fall as rows are added, which is the whole point of reading it beside a p-value rather than instead of one.\n  - Excluded and shown: 0 with no g, 0 with no v. The counts add back to the 4 row(s) in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 2 | 1.5 | 0.7071 |\n| b | 2 | 4 | 1.4142 |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "shape": "tiny_two_each",
+   "p_value_printed": false,
+   "means": [
+    1.5,
+    4.0
+   ],
+   "role": "control",
+   "states_zero_variance": false
+  },
+  "after_extra": {
+   "shape": "tiny_two_each",
+   "p_value_printed": false,
+   "means": [
+    1.5,
+    4.0
+   ],
+   "role": "control",
+   "states_zero_variance": false
+  },
+  "expected_behavior": "unchanged",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D2.normal_valid_hypothesis_test",
+  "category": "CONTROL",
+  "defect": "D2",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "compute_analysis",
+  "analysis": "hypothesis_test",
+  "dataset": "normal_valid",
+  "rows": 20,
+  "parameters": {
+   "dimension": "g",
+   "measure": "v"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.056191,
+   "response": "Under contract v1 for normal_valid: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-orig/workspace/tr_d2/results/hypothesis_test_20260924-222519.csv\nfrom dataset   normal_valid\ncreated        2026-09-24 22:25:19\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic -11.4827, df 16.26, p 3.25262e-09.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g -4.9182. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.1278.\n  - At the conventional 5% threshold, v differs between the groups of g by more than sampling alone would produce. That is a statement about these rows, not a cause.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 11.5 | 1.5811 | 0 |\n| b | 10 | 21.4 | 2.2211 | 0.1278 |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.06659,
+   "response": "Under contract v1 for normal_valid: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/hypothesis_test_20260924-222525.csv\nfrom dataset   normal_valid\ncreated        2026-09-24 22:25:25\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic -11.4827, df 16.26, p 3.25262e-09.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g -4.9182. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.1278.\n  - At the conventional 5% threshold, v differs between the groups of g by more than sampling alone would produce. That is a statement about these rows, not a cause.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 11.5 | 1.5811 | 0 |\n| b | 10 | 21.4 | 2.2211 | 0.1278 |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "shape": "normal_valid",
+   "p_value_printed": true,
+   "means": [
+    11.5,
+    21.4
+   ],
+   "role": "control",
+   "states_zero_variance": false
+  },
+  "after_extra": {
+   "shape": "normal_valid",
+   "p_value_printed": true,
+   "means": [
+    11.5,
+    21.4
+   ],
+   "role": "control",
+   "states_zero_variance": false
+  },
+  "expected_behavior": "unchanged",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D2.normal_valid_hypothesis_test_rank",
+  "category": "CONTROL",
+  "defect": "D2",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "compute_analysis",
+  "analysis": "hypothesis_test",
+  "dataset": "normal_valid",
+  "rows": 20,
+  "parameters": {
+   "dimension": "g",
+   "measure": "v",
+   "method": "rank"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.061651,
+   "response": "Under contract v1 for normal_valid: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-orig/workspace/tr_d2/results/hypothesis_test_20260924-222519_2.csv\nfrom dataset   normal_valid\ncreated        2026-09-24 22:25:19\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 0, df n/a, p 0.000176611.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.1278.\n  - At the conventional 5% threshold, v differs between the groups of g by more than sampling alone would produce. That is a statement about these rows, not a cause.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 11.5 | 1.5811 | 0 |\n| b | 10 | 21.4 | 2.2211 | 0.1278 |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.07042,
+   "response": "Under contract v1 for normal_valid: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/hypothesis_test_20260924-222525_2.csv\nfrom dataset   normal_valid\ncreated        2026-09-24 22:25:25\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 0, df n/a, p 0.000176611.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.1278.\n  - At the conventional 5% threshold, v differs between the groups of g by more than sampling alone would produce. That is a statement about these rows, not a cause.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 11.5 | 1.5811 | 0 |\n| b | 10 | 21.4 | 2.2211 | 0.1278 |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "shape": "normal_valid",
+   "p_value_printed": true,
+   "means": [
+    11.5,
+    21.4
+   ],
+   "role": "control",
+   "states_zero_variance": false
+  },
+  "after_extra": {
+   "shape": "normal_valid",
+   "p_value_printed": true,
+   "means": [
+    11.5,
+    21.4
+   ],
+   "role": "control",
+   "states_zero_variance": false
+  },
+  "expected_behavior": "unchanged",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D2.normal_valid_effect_size",
+  "category": "CONTROL",
+  "defect": "D2",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "compute_analysis",
+  "analysis": "effect_size",
+  "dataset": "normal_valid",
+  "rows": 20,
+  "parameters": {
+   "dimension": "g",
+   "measure": "v"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.072737,
+   "response": "Under contract v1 for normal_valid: row.\n\n2 rows x 4 columns, written to\n  /home/user/aa-orig/workspace/tr_d2/results/effect_size_20260924-222519_2.csv\nfrom dataset   normal_valid\ncreated        2026-09-24 22:25:19\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Hedges' g -4.9182 \u2014 large by Cohen's convention. b exceeds a by 9.9, which is 4.9182 standard deviation(s).\n  - g rather than d: P10-D17 measured the small-sample correction at 0.9578 for ten rows per group and 0.9962 for a hundred, so it matters where group breakdowns actually land.\n  - Cohen's bands are a vocabulary, not a verdict: they were proposed for psychology and what counts as large is a question about the subject, not about the arithmetic.\n  - An effect size does not fall as rows are added, which is the whole point of reading it beside a p-value rather than instead of one.\n  - Excluded and shown: 0 with no g, 0 with no v. The counts add back to the 20 row(s) in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 10 | 11.5 | 1.5811 |\n| b | 10 | 21.4 | 2.2211 |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.063074,
+   "response": "Under contract v1 for normal_valid: row.\n\n2 rows x 4 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/effect_size_20260924-222525.csv\nfrom dataset   normal_valid\ncreated        2026-09-24 22:25:25\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Hedges' g -4.9182 \u2014 large by Cohen's convention. b exceeds a by 9.9, which is 4.9182 standard deviation(s).\n  - g rather than d: P10-D17 measured the small-sample correction at 0.9578 for ten rows per group and 0.9962 for a hundred, so it matters where group breakdowns actually land.\n  - Cohen's bands are a vocabulary, not a verdict: they were proposed for psychology and what counts as large is a question about the subject, not about the arithmetic.\n  - An effect size does not fall as rows are added, which is the whole point of reading it beside a p-value rather than instead of one.\n  - Excluded and shown: 0 with no g, 0 with no v. The counts add back to the 20 row(s) in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 10 | 11.5 | 1.5811 |\n| b | 10 | 21.4 | 2.2211 |",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "shape": "normal_valid",
+   "p_value_printed": false,
+   "means": [
+    11.5,
+    21.4
+   ],
+   "role": "control",
+   "states_zero_variance": false
+  },
+  "after_extra": {
+   "shape": "normal_valid",
+   "p_value_printed": false,
+   "means": [
+    11.5,
+    21.4
+   ],
+   "role": "control",
+   "states_zero_variance": false
+  },
+  "expected_behavior": "unchanged",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D3.all_null_col_v_sum",
+  "category": "PRODUCT_DEFECT",
+  "defect": "D3",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "propose_dataset_contract",
+  "analysis": null,
+  "dataset": "all_null_col",
+  "rows": null,
+  "parameters": {
+   "measure": "v",
+   "aggregation": "sum"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.043158,
+   "response": "dataset        all_null_col\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       5 columns, 20 rows, fingerprint 6b7556f5d151\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| v | sum | - | v |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 20 of 20 rows, with no nulls.\n  - w were not paired: their suggested role is measure or free text, and a key is made of columns that name a row rather than measure one. A near-continuous number is unique alongside almost anything, which says nothing.\n  - 1 pair(s) containing d, id, w were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"all_null_col\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"sum\",\n      \"definition\": \"v\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"excluded_columns\": [],\n  \"foreign_keys\": [],\n  \"domains\": {},\n  \"bound_to\": {\n    \"columns\": [\n      {\n        \"name\": \"id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"d\",\n        \"dtype\": ",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "REFUSED",
+   "wall_time_seconds": 0.047097,
+   "response": "BLOCKED: v is declared a measure with agg='sum', but it holds VARCHAR, not numbers.\nWHY: sum needs numbers. A number column loads as text when its values are not all numbers (a blank column, 'inf', a currency sign); propose_cleaning_plan offers the conversion. agg='count' or 'count_distinct' counts a text column as it is.\nNEXT STEP: call propose_cleaning_plan(dataset_name=\"all_null_col\")\n\nreason: CONTRACT_INVALID",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "rejected_at": "analysis",
+   "analysis_status": "EXCEPTION",
+   "analysis_exception": "BinderException",
+   "role": "defect",
+   "next_step": null,
+   "executable": false
+  },
+  "after_extra": {
+   "rejected_at": "propose_dataset_contract",
+   "analysis_status": null,
+   "analysis_exception": null,
+   "role": "defect",
+   "next_step": "propose_cleaning_plan(dataset_name=\"all_null_col\")",
+   "next_tool": "propose_cleaning_plan",
+   "kwargs": {
+    "dataset_name": "all_null_col"
+   },
+   "executable": true
+  },
+  "expected_behavior": "rejected at the contract, never reaching an analysis",
+  "original_failure_reproduced": true,
+  "correctness_equal_where_required": null,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D3.inf_nan_v_sum",
+  "category": "PRODUCT_DEFECT",
+  "defect": "D3",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "propose_dataset_contract",
+  "analysis": null,
+  "dataset": "inf_nan",
+  "rows": null,
+  "parameters": {
+   "measure": "v",
+   "aggregation": "sum"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.043362,
+   "response": "dataset        inf_nan\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       4 columns, 40 rows, fingerprint b04e92ed5b12\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| v | sum | - | v |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 40 of 40 rows, with no nulls.\n  - g holds 2 distinct value(s): x, y. Declare domains={\"g\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - v holds 12 distinct value(s): -inf, 14, 19, 24, 29, 34, 39, 4, 9, NaN, inf, nan. Declare domains={\"v\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - 3 pair(s) containing id were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"inf_nan\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"sum\",\n      \"definition\": \"v\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"excluded_columns\": [],\n  \"foreign_keys\": [],\n  \"do",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "REFUSED",
+   "wall_time_seconds": 0.05035,
+   "response": "BLOCKED: v is declared a measure with agg='sum', but it holds VARCHAR, not numbers.\nWHY: sum needs numbers. A number column loads as text when its values are not all numbers (a blank column, 'inf', a currency sign); propose_cleaning_plan offers the conversion. agg='count' or 'count_distinct' counts a text column as it is.\nNEXT STEP: call propose_cleaning_plan(dataset_name=\"inf_nan\")\n\nreason: CONTRACT_INVALID",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "rejected_at": "analysis",
+   "analysis_status": "EXCEPTION",
+   "analysis_exception": "BinderException",
+   "role": "defect",
+   "next_step": null,
+   "executable": false
+  },
+  "after_extra": {
+   "rejected_at": "propose_dataset_contract",
+   "analysis_status": null,
+   "analysis_exception": null,
+   "role": "defect",
+   "next_step": "propose_cleaning_plan(dataset_name=\"inf_nan\")",
+   "next_tool": "propose_cleaning_plan",
+   "kwargs": {
+    "dataset_name": "inf_nan"
+   },
+   "executable": true
+  },
+  "expected_behavior": "rejected at the contract, never reaching an analysis",
+  "original_failure_reproduced": true,
+  "correctness_equal_where_required": null,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D3.words_v_sum",
+  "category": "PRODUCT_DEFECT",
+  "defect": "D3",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "propose_dataset_contract",
+  "analysis": null,
+  "dataset": "words",
+  "rows": null,
+  "parameters": {
+   "measure": "v",
+   "aggregation": "sum"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.057142,
+   "response": "dataset        words\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       5 columns, 30 rows, fingerprint 6b7556f5d151\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| v | sum | - | v |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 30 of 30 rows, with no nulls.\n  - v holds 7 distinct value(s): name0, name1, name2, name3, name4, name5, name6. Declare domains={\"v\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - w were not paired: their suggested role is measure or free text, and a key is made of columns that name a row rather than measure one. A near-continuous number is unique alongside almost anything, which says nothing.\n  - 1 pair(s) containing id, w were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"words\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"sum\",\n      \"definition\": \"v\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"exclude",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "REFUSED",
+   "wall_time_seconds": 0.049577,
+   "response": "BLOCKED: v is declared a measure with agg='sum', but it holds VARCHAR, not numbers.\nWHY: sum needs numbers. A number column loads as text when its values are not all numbers (a blank column, 'inf', a currency sign); propose_cleaning_plan offers the conversion. agg='count' or 'count_distinct' counts a text column as it is.\nNEXT STEP: call propose_cleaning_plan(dataset_name=\"words\")\n\nreason: CONTRACT_INVALID",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "rejected_at": "analysis",
+   "analysis_status": "EXCEPTION",
+   "analysis_exception": "BinderException",
+   "role": "defect",
+   "next_step": null,
+   "executable": false
+  },
+  "after_extra": {
+   "rejected_at": "propose_dataset_contract",
+   "analysis_status": null,
+   "analysis_exception": null,
+   "role": "defect",
+   "next_step": "propose_cleaning_plan(dataset_name=\"words\")",
+   "next_tool": "propose_cleaning_plan",
+   "kwargs": {
+    "dataset_name": "words"
+   },
+   "executable": true
+  },
+  "expected_behavior": "rejected at the contract, never reaching an analysis",
+  "original_failure_reproduced": true,
+  "correctness_equal_where_required": null,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D3.words_v_mean",
+  "category": "PRODUCT_DEFECT",
+  "defect": "D3",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "propose_dataset_contract",
+  "analysis": null,
+  "dataset": "words",
+  "rows": null,
+  "parameters": {
+   "measure": "v",
+   "aggregation": "mean"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.05154,
+   "response": "dataset        words\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       5 columns, 30 rows, fingerprint 6b7556f5d151\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| v | mean | - | v |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 30 of 30 rows, with no nulls.\n  - v holds 7 distinct value(s): name0, name1, name2, name3, name4, name5, name6. Declare domains={\"v\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - w were not paired: their suggested role is measure or free text, and a key is made of columns that name a row rather than measure one. A near-continuous number is unique alongside almost anything, which says nothing.\n  - 1 pair(s) containing id, w were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"words\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"mean\",\n      \"definition\": \"v\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"exclu",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "REFUSED",
+   "wall_time_seconds": 0.04991,
+   "response": "BLOCKED: v is declared a measure with agg='mean', but it holds VARCHAR, not numbers.\nWHY: mean needs numbers. A number column loads as text when its values are not all numbers (a blank column, 'inf', a currency sign); propose_cleaning_plan offers the conversion. agg='count' or 'count_distinct' counts a text column as it is.\nNEXT STEP: call propose_cleaning_plan(dataset_name=\"words\")\n\nreason: CONTRACT_INVALID",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "rejected_at": "analysis",
+   "analysis_status": "EXCEPTION",
+   "analysis_exception": "BinderException",
+   "role": "defect",
+   "next_step": null,
+   "executable": false
+  },
+  "after_extra": {
+   "rejected_at": "propose_dataset_contract",
+   "analysis_status": null,
+   "analysis_exception": null,
+   "role": "defect",
+   "next_step": "propose_cleaning_plan(dataset_name=\"words\")",
+   "next_tool": "propose_cleaning_plan",
+   "kwargs": {
+    "dataset_name": "words"
+   },
+   "executable": true
+  },
+  "expected_behavior": "rejected at the contract, never reaching an analysis",
+  "original_failure_reproduced": true,
+  "correctness_equal_where_required": null,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D3.words_v_median",
+  "category": "PRODUCT_DEFECT",
+  "defect": "D3",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "propose_dataset_contract",
+  "analysis": null,
+  "dataset": "words",
+  "rows": null,
+  "parameters": {
+   "measure": "v",
+   "aggregation": "median"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.043304,
+   "response": "dataset        words\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       5 columns, 30 rows, fingerprint 6b7556f5d151\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| v | median | - | v |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 30 of 30 rows, with no nulls.\n  - v holds 7 distinct value(s): name0, name1, name2, name3, name4, name5, name6. Declare domains={\"v\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - w were not paired: their suggested role is measure or free text, and a key is made of columns that name a row rather than measure one. A near-continuous number is unique alongside almost anything, which says nothing.\n  - 1 pair(s) containing id, w were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"words\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"median\",\n      \"definition\": \"v\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"e",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "REFUSED",
+   "wall_time_seconds": 0.039881,
+   "response": "BLOCKED: v is declared a measure with agg='median', but it holds VARCHAR, not numbers.\nWHY: median needs numbers. A number column loads as text when its values are not all numbers (a blank column, 'inf', a currency sign); propose_cleaning_plan offers the conversion. agg='count' or 'count_distinct' counts a text column as it is.\nNEXT STEP: call propose_cleaning_plan(dataset_name=\"words\")\n\nreason: CONTRACT_INVALID",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "rejected_at": "analysis",
+   "analysis_status": "EXCEPTION",
+   "analysis_exception": "ConversionException",
+   "role": "defect",
+   "next_step": null,
+   "executable": false
+  },
+  "after_extra": {
+   "rejected_at": "propose_dataset_contract",
+   "analysis_status": null,
+   "analysis_exception": null,
+   "role": "defect",
+   "next_step": "propose_cleaning_plan(dataset_name=\"words\")",
+   "next_tool": "propose_cleaning_plan",
+   "kwargs": {
+    "dataset_name": "words"
+   },
+   "executable": true
+  },
+  "expected_behavior": "rejected at the contract, never reaching an analysis",
+  "original_failure_reproduced": true,
+  "correctness_equal_where_required": null,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D3.words_v_count",
+  "category": "CONTROL",
+  "defect": "D3",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "propose_dataset_contract",
+  "analysis": null,
+  "dataset": "words",
+  "rows": null,
+  "parameters": {
+   "measure": "v",
+   "aggregation": "count"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.049939,
+   "response": "dataset        words\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       5 columns, 30 rows, fingerprint 6b7556f5d151\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| v | count | - | v |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 30 of 30 rows, with no nulls.\n  - v holds 7 distinct value(s): name0, name1, name2, name3, name4, name5, name6. Declare domains={\"v\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - w were not paired: their suggested role is measure or free text, and a key is made of columns that name a row rather than measure one. A near-continuous number is unique alongside almost anything, which says nothing.\n  - 1 pair(s) containing id, w were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"words\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"count\",\n      \"definition\": \"v\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"exc",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.052273,
+   "response": "dataset        words\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       5 columns, 30 rows, fingerprint 6b7556f5d151\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| v | count | - | v |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 30 of 30 rows, with no nulls.\n  - v holds 7 distinct value(s): name0, name1, name2, name3, name4, name5, name6. Declare domains={\"v\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - w were not paired: their suggested role is measure or free text, and a key is made of columns that name a row rather than measure one. A near-continuous number is unique alongside almost anything, which says nothing.\n  - 1 pair(s) containing id, w were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"words\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"count\",\n      \"definition\": \"v\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"exc",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "rejected_at": null,
+   "analysis_status": "OK",
+   "analysis_exception": null,
+   "role": "control",
+   "next_step": null,
+   "executable": false
+  },
+  "after_extra": {
+   "rejected_at": null,
+   "analysis_status": "OK",
+   "analysis_exception": null,
+   "role": "control",
+   "next_step": null,
+   "executable": false
+  },
+  "expected_behavior": "accepted and analysed, before and after",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D3.words_v_count_distinct",
+  "category": "CONTROL",
+  "defect": "D3",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "propose_dataset_contract",
+  "analysis": null,
+  "dataset": "words",
+  "rows": null,
+  "parameters": {
+   "measure": "v",
+   "aggregation": "count_distinct"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.04549,
+   "response": "dataset        words\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       5 columns, 30 rows, fingerprint 6b7556f5d151\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| v | count_distinct | - | v |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 30 of 30 rows, with no nulls.\n  - v holds 7 distinct value(s): name0, name1, name2, name3, name4, name5, name6. Declare domains={\"v\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - w were not paired: their suggested role is measure or free text, and a key is made of columns that name a row rather than measure one. A near-continuous number is unique alongside almost anything, which says nothing.\n  - 1 pair(s) containing id, w were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"words\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"count_distinct\",\n      \"definition\": \"v\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_val",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.045263,
+   "response": "dataset        words\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       5 columns, 30 rows, fingerprint 6b7556f5d151\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| v | count_distinct | - | v |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 30 of 30 rows, with no nulls.\n  - v holds 7 distinct value(s): name0, name1, name2, name3, name4, name5, name6. Declare domains={\"v\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - w were not paired: their suggested role is measure or free text, and a key is made of columns that name a row rather than measure one. A near-continuous number is unique alongside almost anything, which says nothing.\n  - 1 pair(s) containing id, w were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"words\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"count_distinct\",\n      \"definition\": \"v\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_val",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "rejected_at": null,
+   "analysis_status": "OK",
+   "analysis_exception": null,
+   "role": "control",
+   "next_step": null,
+   "executable": false
+  },
+  "after_extra": {
+   "rejected_at": null,
+   "analysis_status": "OK",
+   "analysis_exception": null,
+   "role": "control",
+   "next_step": null,
+   "executable": false
+  },
+  "expected_behavior": "accepted and analysed, before and after",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D3.words_w_sum",
+  "category": "CONTROL",
+  "defect": "D3",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "propose_dataset_contract",
+  "analysis": null,
+  "dataset": "words",
+  "rows": null,
+  "parameters": {
+   "measure": "w",
+   "aggregation": "sum"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.042433,
+   "response": "dataset        words\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       5 columns, 30 rows, fingerprint 6b7556f5d151\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| w | sum | - | w |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 30 of 30 rows, with no nulls.\n  - v holds 7 distinct value(s): name0, name1, name2, name3, name4, name5, name6. Declare domains={\"v\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - w were not paired: their suggested role is measure or free text, and a key is made of columns that name a row rather than measure one. A near-continuous number is unique alongside almost anything, which says nothing.\n  - 1 pair(s) containing id, w were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"words\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"w\",\n      \"agg\": \"sum\",\n      \"definition\": \"w\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"exclude",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.048803,
+   "response": "dataset        words\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       5 columns, 30 rows, fingerprint 6b7556f5d151\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| w | sum | - | w |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 30 of 30 rows, with no nulls.\n  - v holds 7 distinct value(s): name0, name1, name2, name3, name4, name5, name6. Declare domains={\"v\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - w were not paired: their suggested role is measure or free text, and a key is made of columns that name a row rather than measure one. A near-continuous number is unique alongside almost anything, which says nothing.\n  - 1 pair(s) containing id, w were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"words\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"w\",\n      \"agg\": \"sum\",\n      \"definition\": \"w\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"exclude",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "rejected_at": null,
+   "analysis_status": "OK",
+   "analysis_exception": null,
+   "role": "control",
+   "next_step": null,
+   "executable": false
+  },
+  "after_extra": {
+   "rejected_at": null,
+   "analysis_status": "OK",
+   "analysis_exception": null,
+   "role": "control",
+   "next_step": null,
+   "executable": false
+  },
+  "expected_behavior": "accepted and analysed, before and after",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D3.words_w_mean",
+  "category": "CONTROL",
+  "defect": "D3",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "propose_dataset_contract",
+  "analysis": null,
+  "dataset": "words",
+  "rows": null,
+  "parameters": {
+   "measure": "w",
+   "aggregation": "mean"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.045075,
+   "response": "dataset        words\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       5 columns, 30 rows, fingerprint 6b7556f5d151\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| w | mean | - | w |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 30 of 30 rows, with no nulls.\n  - v holds 7 distinct value(s): name0, name1, name2, name3, name4, name5, name6. Declare domains={\"v\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - w were not paired: their suggested role is measure or free text, and a key is made of columns that name a row rather than measure one. A near-continuous number is unique alongside almost anything, which says nothing.\n  - 1 pair(s) containing id, w were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"words\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"w\",\n      \"agg\": \"mean\",\n      \"definition\": \"w\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"exclu",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.041492,
+   "response": "dataset        words\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       5 columns, 30 rows, fingerprint 6b7556f5d151\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| w | mean | - | w |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 30 of 30 rows, with no nulls.\n  - v holds 7 distinct value(s): name0, name1, name2, name3, name4, name5, name6. Declare domains={\"v\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - w were not paired: their suggested role is measure or free text, and a key is made of columns that name a row rather than measure one. A near-continuous number is unique alongside almost anything, which says nothing.\n  - 1 pair(s) containing id, w were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"words\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"w\",\n      \"agg\": \"mean\",\n      \"definition\": \"w\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"exclu",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "rejected_at": null,
+   "analysis_status": "OK",
+   "analysis_exception": null,
+   "role": "control",
+   "next_step": null,
+   "executable": false
+  },
+  "after_extra": {
+   "rejected_at": null,
+   "analysis_status": "OK",
+   "analysis_exception": null,
+   "role": "control",
+   "next_step": null,
+   "executable": false
+  },
+  "expected_behavior": "accepted and analysed, before and after",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D3.words_w_median",
+  "category": "CONTROL",
+  "defect": "D3",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+  "tool": "propose_dataset_contract",
+  "analysis": null,
+  "dataset": "words",
+  "rows": null,
+  "parameters": {
+   "measure": "w",
+   "aggregation": "median"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.047072,
+   "response": "dataset        words\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       5 columns, 30 rows, fingerprint 6b7556f5d151\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| w | median | - | w |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 30 of 30 rows, with no nulls.\n  - v holds 7 distinct value(s): name0, name1, name2, name3, name4, name5, name6. Declare domains={\"v\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - w were not paired: their suggested role is measure or free text, and a key is made of columns that name a row rather than measure one. A near-continuous number is unique alongside almost anything, which says nothing.\n  - 1 pair(s) containing id, w were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"words\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"w\",\n      \"agg\": \"median\",\n      \"definition\": \"w\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"e",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.042221,
+   "response": "dataset        words\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       5 columns, 30 rows, fingerprint 6b7556f5d151\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| w | median | - | w |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 30 of 30 rows, with no nulls.\n  - v holds 7 distinct value(s): name0, name1, name2, name3, name4, name5, name6. Declare domains={\"v\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - w were not paired: their suggested role is measure or free text, and a key is made of columns that name a row rather than measure one. A near-continuous number is unique alongside almost anything, which says nothing.\n  - 1 pair(s) containing id, w were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"words\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"w\",\n      \"agg\": \"median\",\n      \"definition\": \"w\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"e",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "rejected_at": null,
+   "analysis_status": "OK",
+   "analysis_exception": null,
+   "role": "control",
+   "next_step": null,
+   "executable": false
+  },
+  "after_extra": {
+   "rejected_at": null,
+   "analysis_status": "OK",
+   "analysis_exception": null,
+   "role": "control",
+   "next_step": null,
+   "executable": false
+  },
+  "expected_behavior": "accepted and analysed, before and after",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "D12.parser_16_threads",
+  "category": "PRODUCT_DEFECT",
+  "defect": "D12",
+  "severity": "HIGH",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+  "tool": "sql_guard._ast",
+  "analysis": null,
+  "dataset": null,
+  "rows": null,
+  "parameters": {},
+  "before": {
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.231994,
+   "response": "",
+   "exception_type": "IndexError",
+   "exception_message": "IndexError: list index out of range"
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 1.435695,
+   "response": "",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "threads": 16,
+   "parses": 3200,
+   "errors": 15,
+   "swapped_results": 11,
+   "role": "defect"
+  },
+  "after_extra": {
+   "threads": 16,
+   "parses": 3200,
+   "errors": 0,
+   "swapped_results": 0,
+   "role": "defect"
+  },
+  "expected_behavior": "16 threads, 3,200 parses, none swapped or raised",
+  "original_failure_reproduced": true,
+  "correctness_equal_where_required": null,
+  "regression_passed": true
+ },
+ {
+  "case_id": "RECS.dup_rows_key",
+  "category": "PRODUCT_DEFECT",
+  "defect": "D6-D9",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+  "tool": "propose_dataset_contract",
+  "analysis": null,
+  "dataset": "dupkey",
+  "rows": 2000,
+  "parameters": {},
+  "before": {
+   "status": "REFUSED",
+   "wall_time_seconds": 0.209934,
+   "response": "BLOCKED: the primary key stated for 'dupkey' (record_id) does not identify a row.\nWHY: the grain of every later number depends on this. If the key repeats, a join or a sum over it double-counts, and nothing downstream can tell that it did.\nDETAIL: record_id does not identify a row: 2,000 distinct value(s) across 2,007 keyed row(s), so 7 row(s) repeat a key that is meant to be unique. validate_dataset(dataset_name=\"dupkey\") reports this and everything else that disagrees with the contract, rather than stopping at the key.\nNEXT STEP: call propose_dataset_contract(dataset_name=\"dupkey\", primary_key=[...]) with a key that holds, or state the grain that matches the key you gave\n\nreason: KEY_NOT_UNIQUE",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "REFUSED",
+   "wall_time_seconds": 0.124547,
+   "response": "BLOCKED: the primary key stated for 'dupkey' (record_id) does not identify a row.\nWHY: the grain of every later number depends on this. If the key repeats, a join or a sum over it double-counts, and nothing downstream can tell that it did.\nDETAIL: record_id does not identify a row: 2,000 distinct value(s) across 2,007 keyed row(s), so 7 row(s) repeat a key that is meant to be unique. validate_dataset(dataset_name=\"dupkey\") reports this and everything else that disagrees with the contract, rather than stopping at the key.\nNEXT STEP: call propose_cleaning_plan(dataset_name=\"dupkey\") -- 7 row(s) repeat another row in every column, which is every repeat of record_id; dropping them makes the key hold\n\nreason: KEY_NOT_UNIQUE",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "why_reason": "KEY_NOT_UNIQUE",
+   "next_step": "propose_dataset_contract(dataset_name=\"dupkey\", primary_key=[...])",
+   "next_tool": "propose_dataset_contract",
+   "kwargs": {},
+   "executable": false,
+   "followed": null,
+   "role": "defect"
+  },
+  "after_extra": {
+   "why_reason": "KEY_NOT_UNIQUE",
+   "next_step": "propose_cleaning_plan(dataset_name=\"dupkey\")",
+   "next_tool": "propose_cleaning_plan",
+   "kwargs": {
+    "dataset_name": "dupkey"
+   },
+   "executable": true,
+   "followed": {
+    "status": "OK",
+    "head": "1 change(s) proposed for dupkey (2,007 row(s)). Nothing has been changed.\n\n  C001  DROP_DUPLICATE_ROWS: keep one of each of the 7 exactly duplicated row(s) (7 row(s)). 7 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"FIN000001774\",\"transaction_id\":\"T00001774\",\"account_id\":\"A0000002\",\"customer_id\":\"C0000308\",\"transaction_date\":\"2023-04-09\",\"posted_at\":\"2023-04-09 13:",
+    "exception_type": null
+   },
+   "role": "defect"
+  },
+  "expected_behavior": "names the cleaning plan, runnable",
+  "original_failure_reproduced": true,
+  "correctness_equal_where_required": null,
+  "regression_passed": true
+ },
+ {
+  "case_id": "RECS.correlation_one_measure",
+  "category": "PRODUCT_DEFECT",
+  "defect": "D6-D9",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+  "tool": "compute_analysis",
+  "analysis": "correlation",
+  "dataset": "one_measure",
+  "rows": null,
+  "parameters": {
+   "measure": "v"
+  },
+  "before": {
+   "status": "REFUSED",
+   "wall_time_seconds": 0.055501,
+   "response": "BLOCKED: correlation was called without against.\nWHY: correlation needs against, and it was not given.\nCURRENT STATE: declared measures: v; declared dimensions: g\nNEXT STEP: call compute_analysis(dataset_name=\"one_measure\", analysis_type=\"correlation\", against=\"v\")\n\nreason: ANALYSIS_PARAMS_INVALID",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "REFUSED",
+   "wall_time_seconds": 0.037819,
+   "response": "BLOCKED: correlation was called without against.\nWHY: correlation needs against, and it was not given.\nCURRENT STATE: declared measures: v; declared dimensions: g\nNEXT STEP: call propose_dataset_contract(dataset_name=\"one_measure\") -- correlation needs another declared measure for against\n\nreason: ANALYSIS_PARAMS_INVALID",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "why_reason": "ANALYSIS_PARAMS_INVALID",
+   "self_correlation": true,
+   "next_step": "compute_analysis(dataset_name=\"one_measure\", analysis_type=\"correlation\", against=\"v\")",
+   "next_tool": "compute_analysis",
+   "kwargs": {
+    "dataset_name": "one_measure",
+    "analysis_type": "correlation",
+    "against": "v"
+   },
+   "executable": true,
+   "followed": {
+    "status": "REFUSED",
+    "head": "BLOCKED: correlation was called without measure.\nWHY: correlation needs measure, and it was not given.\nCURRENT STATE: declared measures: v; declared dimensions: g\nNEXT STEP: call compute_analysis(dataset_name=\"one_measure\", analysis_type=\"correlation\", measure=\"v\")\n\nreason: ANALYSIS_PARAMS_INVALID",
+    "exception_type": null
+   },
+   "role": "defect"
+  },
+  "after_extra": {
+   "why_reason": "ANALYSIS_PARAMS_INVALID",
+   "self_correlation": false,
+   "next_step": "propose_dataset_contract(dataset_name=\"one_measure\")",
+   "next_tool": "propose_dataset_contract",
+   "kwargs": {
+    "dataset_name": "one_measure"
+   },
+   "executable": true,
+   "followed": {
+    "status": "OK",
+    "head": "dataset        one_measure\ngrain          one row = one id\nprimary key    id\ndate column    d\nwindow         (not set)\nbound to       5 columns, 120 rows, fingerprint 80669c4dbbc9\nPROVISIONAL    grain, analysis_window -- this contract cannot be confirmed as it stands\n\ndimensions     g, v, w\n\nWhat the data showed:\n  - Key from evidence: id is unique across 120 of 120 rows, with no nulls.\n  - Also u",
+    "exception_type": null
+   },
+   "role": "defect"
+  },
+  "expected_behavior": "asks for a contract, not v against v",
+  "original_failure_reproduced": true,
+  "correctness_equal_where_required": null,
+  "regression_passed": true
+ },
+ {
+  "case_id": "RECS.correlation_two_measures",
+  "category": "PRODUCT_DEFECT",
+  "defect": "D6-D9",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+  "tool": "compute_analysis",
+  "analysis": "correlation",
+  "dataset": "two_measures",
+  "rows": null,
+  "parameters": {
+   "measure": "v"
+  },
+  "before": {
+   "status": "REFUSED",
+   "wall_time_seconds": 0.056824,
+   "response": "BLOCKED: correlation was called without against.\nWHY: correlation needs against, and it was not given.\nCURRENT STATE: declared measures: v, w; declared dimensions: g\nNEXT STEP: call compute_analysis(dataset_name=\"two_measures\", analysis_type=\"correlation\", against=\"v\")\n\nreason: ANALYSIS_PARAMS_INVALID",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "REFUSED",
+   "wall_time_seconds": 0.056558,
+   "response": "BLOCKED: correlation was called without against.\nWHY: correlation needs against, and it was not given.\nCURRENT STATE: declared measures: v, w; declared dimensions: g\nNEXT STEP: call compute_analysis(dataset_name=\"two_measures\", analysis_type=\"correlation\", measure=\"v\", against=\"w\")\n\nreason: ANALYSIS_PARAMS_INVALID",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "why_reason": "ANALYSIS_PARAMS_INVALID",
+   "self_correlation": true,
+   "next_step": "compute_analysis(dataset_name=\"two_measures\", analysis_type=\"correlation\", against=\"v\")",
+   "next_tool": "compute_analysis",
+   "kwargs": {
+    "dataset_name": "two_measures",
+    "analysis_type": "correlation",
+    "against": "v"
+   },
+   "executable": true,
+   "followed": {
+    "status": "REFUSED",
+    "head": "BLOCKED: correlation was called without measure.\nWHY: correlation needs measure, and it was not given.\nCURRENT STATE: declared measures: v, w; declared dimensions: g\nNEXT STEP: call compute_analysis(dataset_name=\"two_measures\", analysis_type=\"correlation\", measure=\"v\")\n\nreason: ANALYSIS_PARAMS_INVALID",
+    "exception_type": null
+   },
+   "role": "defect"
+  },
+  "after_extra": {
+   "why_reason": "ANALYSIS_PARAMS_INVALID",
+   "self_correlation": false,
+   "next_step": "compute_analysis(dataset_name=\"two_measures\", analysis_type=\"correlation\", measure=\"v\", against=\"w\")",
+   "next_tool": "compute_analysis",
+   "kwargs": {
+    "dataset_name": "two_measures",
+    "analysis_type": "correlation",
+    "measure": "v",
+    "against": "w"
+   },
+   "executable": true,
+   "followed": {
+    "status": "OK",
+    "head": "Under contract v1 for two_measures: row.\n\n1 rows x 6 columns, written to\n  /home/user/aa-fixes/workspace/tr_recs/results/correlation_20260924-222152.csv\nfrom dataset   two_measures\ncreated        2026-09-24 22:21:52\n\nWhat this shows:\n  - 120 of 120 row(s) analysed.\n  - 120 of 120 analysed row(s) hold both v and w; 0 hold one or neither and are in no coefficient above. A correlation is over pairs, ",
+    "exception_type": null
+   },
+   "role": "defect"
+  },
+  "expected_behavior": "measure v against w, runnable",
+  "original_failure_reproduced": true,
+  "correctness_equal_where_required": null,
+  "regression_passed": true
+ },
+ {
+  "case_id": "RECS.corrupt_xlsx",
+  "category": "PRODUCT_DEFECT",
+  "defect": "D6-D9",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+  "tool": "load_excel",
+  "analysis": null,
+  "dataset": "corrupt.xlsx",
+  "rows": null,
+  "parameters": {},
+  "before": {
+   "status": "REFUSED",
+   "wall_time_seconds": 0.015418,
+   "response": "BLOCKED: corrupt.xlsx is not a readable .xlsx workbook.\nWHY: BadZipFile: File is not a zip file. It may be another kind of file renamed, cut short, or protected with a password.\nNEXT STEP: call propose_ingest_spec(path=\"/tmp/tr_data/tiny/corrupt.xlsx\") -- it reads CSV and Excel alike -- or open the file in Excel and save it as .xlsx.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "REFUSED",
+   "wall_time_seconds": 0.014861,
+   "response": "BLOCKED: corrupt.xlsx is not a readable .xlsx workbook.\nWHY: BadZipFile: File is not a zip file. It may be another kind of file renamed, cut short, or protected with a password.\nNEXT STEP: open it in Excel or the program that made it and save it again as .xlsx, or export it as .csv, then call propose_ingest_spec(path=...) on the new file.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "same_file_suggested": true,
+   "next_step": "propose_ingest_spec(path=\"/tmp/tr_data/tiny/corrupt.xlsx\")",
+   "next_tool": "propose_ingest_spec",
+   "kwargs": {
+    "path": "/tmp/tr_data/tiny/corrupt.xlsx"
+   },
+   "executable": true,
+   "followed": {
+    "status": "REFUSED",
+    "head": "BLOCKED: corrupt.xlsx is not a readable .xlsx workbook.\nWHY: BadZipFile: File is not a zip file. It may be another kind of file renamed, cut short, or protected with a password.\nNEXT STEP: open it in Excel and save it as .xlsx, or export it as CSV.",
+    "exception_type": null
+   },
+   "role": "defect"
+  },
+  "after_extra": {
+   "same_file_suggested": false,
+   "next_step": null,
+   "executable": false,
+   "followed": null,
+   "role": "defect"
+  },
+  "expected_behavior": "does not send the same file back",
+  "original_failure_reproduced": true,
+  "correctness_equal_where_required": null,
+  "regression_passed": true
+ },
+ {
+  "case_id": "RECS.only_result_file",
+  "category": "PRODUCT_DEFECT",
+  "defect": "D6-D9",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+  "tool": "read_result_file",
+  "analysis": null,
+  "dataset": null,
+  "rows": null,
+  "parameters": {},
+  "before": {
+   "status": "REFUSED",
+   "wall_time_seconds": 0.000441,
+   "response": "BLOCKED: '/etc/passwd' is not a result file in this workspace.\nWHY: results are read from the workspace's own results directory and nowhere else. A path that resolves outside it is refused whether or not it exists, because a tool that reads any path on request is a tool that can be asked to read anything.\nCURRENT STATE: results directory: /home/user/aa-orig/workspace/tr_recs_one/results\nNEXT STEP: call read_result_file(path=\"/home/user/aa-orig/workspace/tr_recs_one/results/<one of: only.csv>\")\n\nreason: RESULT_OUT_OF_SCOPE",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "REFUSED",
+   "wall_time_seconds": 0.000462,
+   "response": "BLOCKED: '/etc/passwd' is not a result file in this workspace.\nWHY: results are read from the workspace's own results directory and nowhere else. A path that resolves outside it is refused whether or not it exists, because a tool that reads any path on request is a tool that can be asked to read anything.\nCURRENT STATE: results directory: /home/user/aa-fixes/workspace/tr_recs_one/results\nNEXT STEP: call read_result_file(path=\"/home/user/aa-fixes/workspace/tr_recs_one/results/only.csv\")\n\nreason: RESULT_OUT_OF_SCOPE",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "next_step": "read_result_file(path=\"/home/user/aa-orig/workspace/tr_recs_one/results/<one of: only.csv>\")",
+   "next_tool": "read_result_file",
+   "kwargs": {},
+   "executable": false,
+   "followed": null,
+   "role": "defect"
+  },
+  "after_extra": {
+   "next_step": "read_result_file(path=\"/home/user/aa-fixes/workspace/tr_recs_one/results/only.csv\")",
+   "next_tool": "read_result_file",
+   "kwargs": {
+    "path": "/home/user/aa-fixes/workspace/tr_recs_one/results/only.csv"
+   },
+   "executable": true,
+   "followed": {
+    "status": "OK",
+    "head": "only.csv: rows 1 to 1 of 1, columns 1 to 1 of 1.\n\n| a |\n|---|\n| 1 |\n\nThat is the end of the file.",
+    "exception_type": null
+   },
+   "role": "defect"
+  },
+  "expected_behavior": "the runnable path",
+  "original_failure_reproduced": true,
+  "correctness_equal_where_required": null,
+  "regression_passed": true
+ },
+ {
+  "case_id": "RECS.nonexistent_dataset",
+  "category": "CONTROL",
+  "defect": "D6-D9",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+  "tool": "compute_analysis",
+  "analysis": "top_n",
+  "dataset": "nope",
+  "rows": null,
+  "parameters": {
+   "dataset_name": "nope",
+   "analysis_type": "top_n",
+   "dimension": "x",
+   "measure": "y"
+  },
+  "before": {
+   "status": "REFUSED",
+   "wall_time_seconds": 0.024687,
+   "response": "BLOCKED: there is no dataset called 'nope' in this workspace.\nWHY: analysis runs on a loaded table, and nothing is read from disk here.\nCURRENT STATE: loaded: dupkey, fin, one_measure, two_measures\nNEXT STEP: call propose_ingest_spec(path=\"...\") then confirm_ingest_spec, or list_datasets() to see what is already here\n\nreason: DATASET_NOT_LOADED",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "REFUSED",
+   "wall_time_seconds": 0.027106,
+   "response": "BLOCKED: there is no dataset called 'nope' in this workspace.\nWHY: analysis runs on a loaded table, and nothing is read from disk here.\nCURRENT STATE: loaded: dupkey, fin, one_measure, two_measures\nNEXT STEP: call propose_ingest_spec(path=\"...\") then confirm_ingest_spec, or list_datasets() to see what is already here\n\nreason: DATASET_NOT_LOADED",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "why_reason": "DATASET_NOT_LOADED",
+   "next_step": "propose_ingest_spec(path=\"...\")",
+   "next_tool": "propose_ingest_spec",
+   "kwargs": {},
+   "executable": false,
+   "followed": null,
+   "role": "control"
+  },
+  "after_extra": {
+   "why_reason": "DATASET_NOT_LOADED",
+   "next_step": "propose_ingest_spec(path=\"...\")",
+   "next_tool": "propose_ingest_spec",
+   "kwargs": {},
+   "executable": false,
+   "followed": null,
+   "role": "control"
+  },
+  "expected_behavior": "unchanged refusal and next step",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "RECS.invalid_chart",
+  "category": "CONTROL",
+  "defect": "D6-D9",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+  "tool": "render_chart",
+  "analysis": "trend",
+  "dataset": "fin",
+  "rows": null,
+  "parameters": {
+   "dataset_name": "fin",
+   "analysis_type": "trend",
+   "chart": "pie",
+   "measure": "revenue"
+  },
+  "before": {
+   "status": "REFUSED",
+   "wall_time_seconds": 0.508828,
+   "response": "BLOCKED: trend was computed and cannot be drawn as a 'pie' chart.\nWHY: there is no chart called 'pie'. Available: line, bar, grouped_bar, scatter, histogram, box, heatmap, waterfall.\nDETAIL: The numbers are not in question -- the analysis ran. This is about the shape a chart needs, which is not the shape this result has. Nothing was written.\nCURRENT STATE: contract v1 for fin\nNEXT STEP: call compute_analysis(dataset_name=\"fin\", analysis_type=\"trend\", measure=\"revenue\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "REFUSED",
+   "wall_time_seconds": 0.47842,
+   "response": "BLOCKED: trend was computed and cannot be drawn as a 'pie' chart.\nWHY: there is no chart called 'pie'. Available: line, bar, grouped_bar, scatter, histogram, box, heatmap, waterfall.\nDETAIL: The numbers are not in question -- the analysis ran. This is about the shape a chart needs, which is not the shape this result has. Nothing was written.\nCURRENT STATE: contract v1 for fin\nNEXT STEP: call compute_analysis(dataset_name=\"fin\", analysis_type=\"trend\", measure=\"revenue\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "why_reason": "ANALYSIS_NOT_POSSIBLE",
+   "next_step": "compute_analysis(dataset_name=\"fin\", analysis_type=\"trend\", measure=\"revenue\")",
+   "next_tool": "compute_analysis",
+   "kwargs": {
+    "dataset_name": "fin",
+    "analysis_type": "trend",
+    "measure": "revenue"
+   },
+   "executable": true,
+   "followed": {
+    "status": "OK",
+    "head": "Under contract v1 for fin: one row = one financial record.\n\n24 rows x 3 columns, written to\n  /home/user/aa-orig/workspace/tr_recs/results/trend_20260924-222147.csv\nfrom dataset   fin\ncreated        2026-09-24 22:21:47\n\nWhat this shows:\n  - 1,863 of 2,000 row(s) analysed. 108 excluded by the contract. 19 outside 2023-01-01 to 2024-12-31. 10 undated and so not placed in the window.\n  - Excluded: tr",
+    "exception_type": null
+   },
+   "role": "control"
+  },
+  "after_extra": {
+   "why_reason": "ANALYSIS_NOT_POSSIBLE",
+   "next_step": "compute_analysis(dataset_name=\"fin\", analysis_type=\"trend\", measure=\"revenue\")",
+   "next_tool": "compute_analysis",
+   "kwargs": {
+    "dataset_name": "fin",
+    "analysis_type": "trend",
+    "measure": "revenue"
+   },
+   "executable": true,
+   "followed": {
+    "status": "OK",
+    "head": "Under contract v1 for fin: one row = one financial record.\n\n24 rows x 3 columns, written to\n  /home/user/aa-fixes/workspace/tr_recs/results/trend_20260924-222154.csv\nfrom dataset   fin\ncreated        2026-09-24 22:21:54\n\nWhat this shows:\n  - 1,863 of 2,000 row(s) analysed. 108 excluded by the contract. 19 outside 2023-01-01 to 2024-12-31. 10 undated and so not placed in the window.\n  - Excluded: t",
+    "exception_type": null
+   },
+   "role": "control"
+  },
+  "expected_behavior": "unchanged refusal and next step",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "RECS.group_cap",
+  "category": "CONTROL",
+  "defect": "D6-D9",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+  "tool": "compute_analysis",
+  "analysis": "pareto",
+  "dataset": "fin",
+  "rows": null,
+  "parameters": {
+   "dataset_name": "fin",
+   "analysis_type": "pareto",
+   "dimension": "customer_id",
+   "measure": "revenue"
+  },
+  "before": {
+   "status": "REFUSED",
+   "wall_time_seconds": 0.04723,
+   "response": "BLOCKED: pareto cannot answer that under this contract.\nWHY: customer_id has 397 group(s), NULL counted as a group, against a cap of 49. top_n on customer_id says which of its groups matter.\nCURRENT STATE: contract v1 for fin\nNEXT STEP: call compute_analysis(dataset_name=\"fin\", analysis_type=\"top_n\", dimension=\"customer_id\", measure=\"revenue\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "REFUSED",
+   "wall_time_seconds": 0.049226,
+   "response": "BLOCKED: pareto cannot answer that under this contract.\nWHY: customer_id has 397 group(s), NULL counted as a group, against a cap of 49. top_n on customer_id says which of its groups matter.\nCURRENT STATE: contract v1 for fin\nNEXT STEP: call compute_analysis(dataset_name=\"fin\", analysis_type=\"top_n\", dimension=\"customer_id\", measure=\"revenue\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "why_reason": "ANALYSIS_NOT_POSSIBLE",
+   "next_step": "compute_analysis(dataset_name=\"fin\", analysis_type=\"top_n\", dimension=\"customer_id\", measure=\"revenue\")",
+   "next_tool": "compute_analysis",
+   "kwargs": {
+    "dataset_name": "fin",
+    "analysis_type": "top_n",
+    "dimension": "customer_id",
+    "measure": "revenue"
+   },
+   "executable": true,
+   "followed": {
+    "status": "OK",
+    "head": "Under contract v1 for fin: one row = one financial record.\n\n10 rows x 4 columns, written to\n  /home/user/aa-orig/workspace/tr_recs/results/top_n_20260924-222147.csv\nfrom dataset   fin\ncreated        2026-09-24 22:21:47\n\nWhat this shows:\n  - 1,863 of 2,000 row(s) analysed. 108 excluded by the contract. 19 outside 2023-01-01 to 2024-12-31. 10 undated and so not placed in the window.\n  - Excluded: tr",
+    "exception_type": null
+   },
+   "role": "control"
+  },
+  "after_extra": {
+   "why_reason": "ANALYSIS_NOT_POSSIBLE",
+   "next_step": "compute_analysis(dataset_name=\"fin\", analysis_type=\"top_n\", dimension=\"customer_id\", measure=\"revenue\")",
+   "next_tool": "compute_analysis",
+   "kwargs": {
+    "dataset_name": "fin",
+    "analysis_type": "top_n",
+    "dimension": "customer_id",
+    "measure": "revenue"
+   },
+   "executable": true,
+   "followed": {
+    "status": "OK",
+    "head": "Under contract v1 for fin: one row = one financial record.\n\n10 rows x 4 columns, written to\n  /home/user/aa-fixes/workspace/tr_recs/results/top_n_20260924-222154.csv\nfrom dataset   fin\ncreated        2026-09-24 22:21:54\n\nWhat this shows:\n  - 1,863 of 2,000 row(s) analysed. 108 excluded by the contract. 19 outside 2023-01-01 to 2024-12-31. 10 undated and so not placed in the window.\n  - Excluded: t",
+    "exception_type": null
+   },
+   "role": "control"
+  },
+  "expected_behavior": "unchanged refusal and next step",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PAGING.asked_200",
+  "category": "PRODUCT_DEFECT",
+  "defect": "D13",
+  "severity": "LOW",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+  "tool": "read_result_file",
+  "analysis": null,
+  "dataset": null,
+  "rows": null,
+  "parameters": {
+   "start": 901,
+   "limit": 200
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.001703,
+   "response": "frequency_many.csv: rows 901 to 950 of 984, columns 1 to 2 of 2.\n\n| k | v |\n|---|---|\n| k900 | 900 |\n| k901 | 901 |\n| k902 | 902 |\n| k903 | 903 |\n| k904 | 904 |\n| k905 | 905 |\n| k906 | 906 |\n| k907 | 907 |\n| k908 | 908 |\n| k909 | 909 |\n| k910 | 910 |\n| k911 | 911 |\n| k912 | 912 |\n| k913 | 913 |\n| k914 | 914 |\n| k915 | 915 |\n| k916 | 916 |\n| k917 | 917 |\n| k918 | 918 |\n| k919 | 919 |\n| k920 | 920 |\n| k921 | 921 |\n| k922 | 922 |\n| k923 | 923 |\n| k924 | 924 |\n| k925 | 925 |\n| k926 | 926 |\n| k927 | 927 |\n| k928 | 928 |\n| k929 | 929 |\n| k930 | 930 |\n| k931 | 931 |\n| k932 | 932 |\n| k933 | 933 |\n| k934 | 934 |\n| k935 | 935 |\n| k936 | 936 |\n| k937 | 937 |\n| k938 | 938 |\n| k939 | 939 |\n| k940 | 940 |\n| k941 | 941 |\n| k942 | 942 |\n| k943 | 943 |\n| k944 | 944 |\n| k945 | 945 |\n| k946 | 946 |\n| k947 | 947 |\n| k948 | 948 |\n| k949 | 949 |\n\n34 rows after this page:\n  read_result_file(path=\"/home/user/aa-orig/workspace/tr_page/results/frequency_many.csv\", start=951, limit=50)",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.001235,
+   "response": "frequency_many.csv: rows 901 to 950 of 984, columns 1 to 2 of 2.\nlimit=200 was asked; a page holds at most 50 rows, so 50 are shown; the next page is the call below.\n\n| k | v |\n|---|---|\n| k900 | 900 |\n| k901 | 901 |\n| k902 | 902 |\n| k903 | 903 |\n| k904 | 904 |\n| k905 | 905 |\n| k906 | 906 |\n| k907 | 907 |\n| k908 | 908 |\n| k909 | 909 |\n| k910 | 910 |\n| k911 | 911 |\n| k912 | 912 |\n| k913 | 913 |\n| k914 | 914 |\n| k915 | 915 |\n| k916 | 916 |\n| k917 | 917 |\n| k918 | 918 |\n| k919 | 919 |\n| k920 | 920 |\n| k921 | 921 |\n| k922 | 922 |\n| k923 | 923 |\n| k924 | 924 |\n| k925 | 925 |\n| k926 | 926 |\n| k927 | 927 |\n| k928 | 928 |\n| k929 | 929 |\n| k930 | 930 |\n| k931 | 931 |\n| k932 | 932 |\n| k933 | 933 |\n| k934 | 934 |\n| k935 | 935 |\n| k936 | 936 |\n| k937 | 937 |\n| k938 | 938 |\n| k939 | 939 |\n| k940 | 940 |\n| k941 | 941 |\n| k942 | 942 |\n| k943 | 943 |\n| k944 | 944 |\n| k945 | 945 |\n| k946 | 946 |\n| k947 | 947 |\n| k948 | 948 |\n| k949 | 949 |\n\n34 rows after this page:\n  read_result_file(path=\"/home/user/aa-fixes/workspace/tr_page/results/frequency_many.csv\", start=951, limit=50)",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "requested_limit": 200,
+   "states_cap": false,
+   "range": [
+    "901",
+    "950",
+    "984,"
+   ],
+   "rows_after": "34",
+   "has_more": true,
+   "next_call": "read_result_file(path=\"/home/user/aa-orig/workspace/tr_page/results/frequency_many.csv\", start=951, limit=50)",
+   "role": "defect"
+  },
+  "after_extra": {
+   "requested_limit": 200,
+   "states_cap": true,
+   "range": [
+    "901",
+    "950",
+    "984,"
+   ],
+   "rows_after": "34",
+   "has_more": true,
+   "next_call": "read_result_file(path=\"/home/user/aa-fixes/workspace/tr_page/results/frequency_many.csv\", start=951, limit=50)",
+   "role": "defect"
+  },
+  "expected_behavior": "the same page, and the cap stated",
+  "original_failure_reproduced": true,
+  "correctness_equal_where_required": null,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PAGING.asked_200_first",
+  "category": "PRODUCT_DEFECT",
+  "defect": "D13",
+  "severity": "LOW",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+  "tool": "read_result_file",
+  "analysis": null,
+  "dataset": null,
+  "rows": null,
+  "parameters": {
+   "start": 1,
+   "limit": 200
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.000918,
+   "response": "frequency_many.csv: rows 1 to 50 of 984, columns 1 to 2 of 2.\n\n| k | v |\n|---|---|\n| k0 | 0 |\n| k1 | 1 |\n| k2 | 2 |\n| k3 | 3 |\n| k4 | 4 |\n| k5 | 5 |\n| k6 | 6 |\n| k7 | 7 |\n| k8 | 8 |\n| k9 | 9 |\n| k10 | 10 |\n| k11 | 11 |\n| k12 | 12 |\n| k13 | 13 |\n| k14 | 14 |\n| k15 | 15 |\n| k16 | 16 |\n| k17 | 17 |\n| k18 | 18 |\n| k19 | 19 |\n| k20 | 20 |\n| k21 | 21 |\n| k22 | 22 |\n| k23 | 23 |\n| k24 | 24 |\n| k25 | 25 |\n| k26 | 26 |\n| k27 | 27 |\n| k28 | 28 |\n| k29 | 29 |\n| k30 | 30 |\n| k31 | 31 |\n| k32 | 32 |\n| k33 | 33 |\n| k34 | 34 |\n| k35 | 35 |\n| k36 | 36 |\n| k37 | 37 |\n| k38 | 38 |\n| k39 | 39 |\n| k40 | 40 |\n| k41 | 41 |\n| k42 | 42 |\n| k43 | 43 |\n| k44 | 44 |\n| k45 | 45 |\n| k46 | 46 |\n| k47 | 47 |\n| k48 | 48 |\n| k49 | 49 |\n\n934 rows after this page:\n  read_result_file(path=\"/home/user/aa-orig/workspace/tr_page/results/frequency_many.csv\", start=51, limit=50)",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.000617,
+   "response": "frequency_many.csv: rows 1 to 50 of 984, columns 1 to 2 of 2.\nlimit=200 was asked; a page holds at most 50 rows, so 50 are shown; the next page is the call below.\n\n| k | v |\n|---|---|\n| k0 | 0 |\n| k1 | 1 |\n| k2 | 2 |\n| k3 | 3 |\n| k4 | 4 |\n| k5 | 5 |\n| k6 | 6 |\n| k7 | 7 |\n| k8 | 8 |\n| k9 | 9 |\n| k10 | 10 |\n| k11 | 11 |\n| k12 | 12 |\n| k13 | 13 |\n| k14 | 14 |\n| k15 | 15 |\n| k16 | 16 |\n| k17 | 17 |\n| k18 | 18 |\n| k19 | 19 |\n| k20 | 20 |\n| k21 | 21 |\n| k22 | 22 |\n| k23 | 23 |\n| k24 | 24 |\n| k25 | 25 |\n| k26 | 26 |\n| k27 | 27 |\n| k28 | 28 |\n| k29 | 29 |\n| k30 | 30 |\n| k31 | 31 |\n| k32 | 32 |\n| k33 | 33 |\n| k34 | 34 |\n| k35 | 35 |\n| k36 | 36 |\n| k37 | 37 |\n| k38 | 38 |\n| k39 | 39 |\n| k40 | 40 |\n| k41 | 41 |\n| k42 | 42 |\n| k43 | 43 |\n| k44 | 44 |\n| k45 | 45 |\n| k46 | 46 |\n| k47 | 47 |\n| k48 | 48 |\n| k49 | 49 |\n\n934 rows after this page:\n  read_result_file(path=\"/home/user/aa-fixes/workspace/tr_page/results/frequency_many.csv\", start=51, limit=50)",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "requested_limit": 200,
+   "states_cap": false,
+   "range": [
+    "1",
+    "50",
+    "984,"
+   ],
+   "rows_after": "934",
+   "has_more": true,
+   "next_call": "read_result_file(path=\"/home/user/aa-orig/workspace/tr_page/results/frequency_many.csv\", start=51, limit=50)",
+   "role": "defect"
+  },
+  "after_extra": {
+   "requested_limit": 200,
+   "states_cap": true,
+   "range": [
+    "1",
+    "50",
+    "984,"
+   ],
+   "rows_after": "934",
+   "has_more": true,
+   "next_call": "read_result_file(path=\"/home/user/aa-fixes/workspace/tr_page/results/frequency_many.csv\", start=51, limit=50)",
+   "role": "defect"
+  },
+  "expected_behavior": "the same page, and the cap stated",
+  "original_failure_reproduced": true,
+  "correctness_equal_where_required": null,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PAGING.asked_10_control",
+  "category": "CONTROL",
+  "defect": "D13",
+  "severity": "LOW",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+  "tool": "read_result_file",
+  "analysis": null,
+  "dataset": null,
+  "rows": null,
+  "parameters": {
+   "start": 1,
+   "limit": 10
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.000758,
+   "response": "frequency_many.csv: rows 1 to 10 of 984, columns 1 to 2 of 2.\n\n| k | v |\n|---|---|\n| k0 | 0 |\n| k1 | 1 |\n| k2 | 2 |\n| k3 | 3 |\n| k4 | 4 |\n| k5 | 5 |\n| k6 | 6 |\n| k7 | 7 |\n| k8 | 8 |\n| k9 | 9 |\n\n974 rows after this page:\n  read_result_file(path=\"/home/user/aa-orig/workspace/tr_page/results/frequency_many.csv\", start=11, limit=10)",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.00039,
+   "response": "frequency_many.csv: rows 1 to 10 of 984, columns 1 to 2 of 2.\n\n| k | v |\n|---|---|\n| k0 | 0 |\n| k1 | 1 |\n| k2 | 2 |\n| k3 | 3 |\n| k4 | 4 |\n| k5 | 5 |\n| k6 | 6 |\n| k7 | 7 |\n| k8 | 8 |\n| k9 | 9 |\n\n974 rows after this page:\n  read_result_file(path=\"/home/user/aa-fixes/workspace/tr_page/results/frequency_many.csv\", start=11, limit=10)",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "requested_limit": 10,
+   "states_cap": false,
+   "range": [
+    "1",
+    "10",
+    "984,"
+   ],
+   "rows_after": "974",
+   "has_more": true,
+   "next_call": "read_result_file(path=\"/home/user/aa-orig/workspace/tr_page/results/frequency_many.csv\", start=11, limit=10)",
+   "role": "control"
+  },
+  "after_extra": {
+   "requested_limit": 10,
+   "states_cap": false,
+   "range": [
+    "1",
+    "10",
+    "984,"
+   ],
+   "rows_after": "974",
+   "has_more": true,
+   "next_call": "read_result_file(path=\"/home/user/aa-fixes/workspace/tr_page/results/frequency_many.csv\", start=11, limit=10)",
+   "role": "control"
+  },
+  "expected_behavior": "unchanged, no cap note",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PAGING.last_page",
+  "category": "PRODUCT_DEFECT",
+  "defect": "D13",
+  "severity": "LOW",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+  "tool": "read_result_file",
+  "analysis": null,
+  "dataset": null,
+  "rows": null,
+  "parameters": {
+   "start": 951,
+   "limit": 200
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.000737,
+   "response": "frequency_many.csv: rows 951 to 984 of 984, columns 1 to 2 of 2.\n\n| k | v |\n|---|---|\n| k950 | 950 |\n| k951 | 951 |\n| k952 | 952 |\n| k953 | 953 |\n| k954 | 954 |\n| k955 | 955 |\n| k956 | 956 |\n| k957 | 957 |\n| k958 | 958 |\n| k959 | 959 |\n| k960 | 960 |\n| k961 | 961 |\n| k962 | 962 |\n| k963 | 963 |\n| k964 | 964 |\n| k965 | 965 |\n| k966 | 966 |\n| k967 | 967 |\n| k968 | 968 |\n| k969 | 969 |\n| k970 | 970 |\n| k971 | 971 |\n| k972 | 972 |\n| k973 | 973 |\n| k974 | 974 |\n| k975 | 975 |\n| k976 | 976 |\n| k977 | 977 |\n| k978 | 978 |\n| k979 | 979 |\n| k980 | 980 |\n| k981 | 981 |\n| k982 | 982 |\n| k983 | 983 |\n\nThat is the end of the file.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.000421,
+   "response": "frequency_many.csv: rows 951 to 984 of 984, columns 1 to 2 of 2.\nlimit=200 was asked; a page holds at most 50 rows, so 34 are shown.\n\n| k | v |\n|---|---|\n| k950 | 950 |\n| k951 | 951 |\n| k952 | 952 |\n| k953 | 953 |\n| k954 | 954 |\n| k955 | 955 |\n| k956 | 956 |\n| k957 | 957 |\n| k958 | 958 |\n| k959 | 959 |\n| k960 | 960 |\n| k961 | 961 |\n| k962 | 962 |\n| k963 | 963 |\n| k964 | 964 |\n| k965 | 965 |\n| k966 | 966 |\n| k967 | 967 |\n| k968 | 968 |\n| k969 | 969 |\n| k970 | 970 |\n| k971 | 971 |\n| k972 | 972 |\n| k973 | 973 |\n| k974 | 974 |\n| k975 | 975 |\n| k976 | 976 |\n| k977 | 977 |\n| k978 | 978 |\n| k979 | 979 |\n| k980 | 980 |\n| k981 | 981 |\n| k982 | 982 |\n| k983 | 983 |\n\nThat is the end of the file.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "requested_limit": 200,
+   "states_cap": false,
+   "range": [
+    "951",
+    "984",
+    "984,"
+   ],
+   "rows_after": null,
+   "has_more": false,
+   "next_call": null,
+   "role": "defect"
+  },
+  "after_extra": {
+   "requested_limit": 200,
+   "states_cap": true,
+   "range": [
+    "951",
+    "984",
+    "984,"
+   ],
+   "rows_after": null,
+   "has_more": false,
+   "next_call": null,
+   "role": "defect"
+  },
+  "expected_behavior": "the same page, and the cap stated",
+  "original_failure_reproduced": true,
+  "correctness_equal_where_required": null,
+  "regression_passed": true
+ },
+ {
+  "case_id": "CHART_ISOLATION.chart_ds_a",
+  "category": "PRODUCT_DEFECT",
+  "defect": "H chart (harness)",
+  "severity": "CRITICAL-if-real",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+  "tool": "render_chart",
+  "analysis": "trend",
+  "dataset": "ds_a",
+  "rows": null,
+  "parameters": {
+   "analysis_type": "trend",
+   "chart": "line",
+   "measure": "revenue",
+   "grain": "month"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.721354,
+   "response": "Under contract v1 for ds_a: row.\n\nChart written: /home/user/aa-orig/workspace/tr_iso/charts/trend_20260924-221110.png\n\nA line chart of trend for ds_a. 3 of 12 point(s) drawn, period across the x axis, measure revenue (sum).\n\nYou cannot see this image. What it shows:\n  revenue (sum): lowest 101 at 2024-01, highest 103 at 2024-03, first 101, last 103, 3 point(s)\n\n  9 of 12 point(s) in revenue (sum) are empty and are not drawn; the table beside this chart still holds them.\n\nFrom the analysis it was drawn from:\n  3 of 3 row(s) analysed.\n  12 month(s) between 2024-01 and 2024-12, generated from the declared analysis window, 2024-01-01 to 2024-12-31 and truncated to the month.\n  9 month(s) hold no rows and are blank above, not zero: 2024-04, 2024-05, 2024-06, 2024-07, 2024-08, 2024-09, 2024-10, 2024-11, 2024-12.\n  The longest unbroken gap is 9 month(s). A line drawn through these points crosses those periods without stopping, and nothing here says whether the business paused or the feed did.\n  From 101 in 2024-01 to 103 in 2024-03. That is two endpoints and the periods between them, not a fitted line -- with 9 month(s) absent, a fit would be interpolating over them.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.732963,
+   "response": "Under contract v1 for ds_a: row.\n\nChart written: /home/user/aa-fixes/workspace/tr_iso/charts/trend_20260924-221115.png\n\nA line chart of trend for ds_a. 3 of 12 point(s) drawn, period across the x axis, measure revenue (sum).\n\nYou cannot see this image. What it shows:\n  revenue (sum): lowest 101 at 2024-01, highest 103 at 2024-03, first 101, last 103, 3 point(s)\n\n  9 of 12 point(s) in revenue (sum) are empty and are not drawn; the table beside this chart still holds them.\n\nFrom the analysis it was drawn from:\n  3 of 3 row(s) analysed.\n  12 month(s) between 2024-01 and 2024-12, generated from the declared analysis window, 2024-01-01 to 2024-12-31 and truncated to the month.\n  9 month(s) hold no rows and are blank above, not zero: 2024-04, 2024-05, 2024-06, 2024-07, 2024-08, 2024-09, 2024-10, 2024-11, 2024-12.\n  The longest unbroken gap is 9 month(s). A line drawn through these points crosses those periods without stopping, and nothing here says whether the business paused or the feed did.\n  From 101 in 2024-01 to 103 in 2024-03. That is two endpoints and the periods between them, not a fitted line -- with 9 month(s) absent, a fit would be interpolating over them.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "chart_path": "/home/user/aa-orig/workspace/tr_iso/charts/trend_20260924-221110.png",
+   "names_own_dataset": true,
+   "names_other_dataset": false,
+   "own_values_in_chart_text": [
+    "101",
+    "103"
+   ],
+   "other_values_in_chart_text": [],
+   "own_values_in_table": [
+    "101",
+    "102",
+    "103"
+   ],
+   "other_values_in_table": [],
+   "role": "defect"
+  },
+  "after_extra": {
+   "chart_path": "/home/user/aa-fixes/workspace/tr_iso/charts/trend_20260924-221115.png",
+   "names_own_dataset": true,
+   "names_other_dataset": false,
+   "own_values_in_chart_text": [
+    "101",
+    "103"
+   ],
+   "other_values_in_chart_text": [],
+   "own_values_in_table": [
+    "101",
+    "102",
+    "103"
+   ],
+   "other_values_in_table": [],
+   "role": "defect"
+  },
+  "expected_behavior": "no value of the other dataset anywhere",
+  "original_failure_reproduced": true,
+  "correctness_equal_where_required": null,
+  "regression_passed": true
+ },
+ {
+  "case_id": "CHART_ISOLATION.chart_ds_b",
+  "category": "PRODUCT_DEFECT",
+  "defect": "H chart (harness)",
+  "severity": "CRITICAL-if-real",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+  "tool": "render_chart",
+  "analysis": "trend",
+  "dataset": "ds_b",
+  "rows": null,
+  "parameters": {
+   "analysis_type": "trend",
+   "chart": "line",
+   "measure": "revenue",
+   "grain": "month"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.24326,
+   "response": "Under contract v1 for ds_b: row.\n\nChart written: /home/user/aa-orig/workspace/tr_iso/charts/trend_20260924-221110_2.png\n\nA line chart of trend for ds_b. 3 of 12 point(s) drawn, period across the x axis, measure revenue (sum).\n\nYou cannot see this image. What it shows:\n  revenue (sum): lowest 9,001 at 2024-01, highest 9,003 at 2024-03, first 9,001, last 9,003, 3 point(s)\n\n  9 of 12 point(s) in revenue (sum) are empty and are not drawn; the table beside this chart still holds them.\n\nFrom the analysis it was drawn from:\n  3 of 3 row(s) analysed.\n  12 month(s) between 2024-01 and 2024-12, generated from the declared analysis window, 2024-01-01 to 2024-12-31 and truncated to the month.\n  9 month(s) hold no rows and are blank above, not zero: 2024-04, 2024-05, 2024-06, 2024-07, 2024-08, 2024-09, 2024-10, 2024-11, 2024-12.\n  The longest unbroken gap is 9 month(s). A line drawn through these points crosses those periods without stopping, and nothing here says whether the business paused or the feed did.\n  From 9,001 in 2024-01 to 9,003 in 2024-03. That is two endpoints and the periods between them, not a fitted line -- with 9 month(s) absent, a fit would be interpolating over them.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.257756,
+   "response": "Under contract v1 for ds_b: row.\n\nChart written: /home/user/aa-fixes/workspace/tr_iso/charts/trend_20260924-221115_2.png\n\nA line chart of trend for ds_b. 3 of 12 point(s) drawn, period across the x axis, measure revenue (sum).\n\nYou cannot see this image. What it shows:\n  revenue (sum): lowest 9,001 at 2024-01, highest 9,003 at 2024-03, first 9,001, last 9,003, 3 point(s)\n\n  9 of 12 point(s) in revenue (sum) are empty and are not drawn; the table beside this chart still holds them.\n\nFrom the analysis it was drawn from:\n  3 of 3 row(s) analysed.\n  12 month(s) between 2024-01 and 2024-12, generated from the declared analysis window, 2024-01-01 to 2024-12-31 and truncated to the month.\n  9 month(s) hold no rows and are blank above, not zero: 2024-04, 2024-05, 2024-06, 2024-07, 2024-08, 2024-09, 2024-10, 2024-11, 2024-12.\n  The longest unbroken gap is 9 month(s). A line drawn through these points crosses those periods without stopping, and nothing here says whether the business paused or the feed did.\n  From 9,001 in 2024-01 to 9,003 in 2024-03. That is two endpoints and the periods between them, not a fitted line -- with 9 month(s) absent, a fit would be interpolating over them.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "chart_path": "/home/user/aa-orig/workspace/tr_iso/charts/trend_20260924-221110_2.png",
+   "names_own_dataset": true,
+   "names_other_dataset": false,
+   "own_values_in_chart_text": [
+    "9,001",
+    "9,003"
+   ],
+   "other_values_in_chart_text": [],
+   "own_values_in_table": [],
+   "other_values_in_table": [],
+   "role": "defect"
+  },
+  "after_extra": {
+   "chart_path": "/home/user/aa-fixes/workspace/tr_iso/charts/trend_20260924-221115_2.png",
+   "names_own_dataset": true,
+   "names_other_dataset": false,
+   "own_values_in_chart_text": [
+    "9,001",
+    "9,003"
+   ],
+   "other_values_in_chart_text": [],
+   "own_values_in_table": [],
+   "other_values_in_table": [],
+   "role": "defect"
+  },
+  "expected_behavior": "no value of the other dataset anywhere",
+  "original_failure_reproduced": true,
+  "correctness_equal_where_required": null,
+  "regression_passed": true
+ }
+]

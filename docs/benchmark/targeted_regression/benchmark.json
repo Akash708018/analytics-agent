@@ -1,0 +1,116 @@
+{
+ "generated": "2026-09-24T22:26:05",
+ "environment": {
+  "python": "3.12.3",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+  "fixed_src_dirty": [],
+  "duckdb": "1.5.5"
+ },
+ "summary": {
+  "regression_cases": 55,
+  "product_defects_tested": 7,
+  "product_defects": [
+   "D1",
+   "D12",
+   "D13",
+   "D2",
+   "D3",
+   "D6-D9",
+   "H chart (harness)"
+  ],
+  "product_defect_cases": 26,
+  "original_failures_reproduced": 26,
+  "fixed_passes": 26,
+  "cases_failing": [],
+  "defects_still_failing": [],
+  "controls": 29,
+  "controls_changed": [],
+  "harness_errors": {},
+  "concurrency_isolation": "NOT_RUN",
+  "reproducibility": "NOT_RUN"
+ },
+ "cases": {
+  "D1": {
+   "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+   "after_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+   "after_src_dirty": [],
+   "harness_errors": []
+  },
+  "D2": {
+   "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+   "after_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+   "after_src_dirty": [],
+   "harness_errors": []
+  },
+  "D3": {
+   "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+   "after_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+   "after_src_dirty": [],
+   "harness_errors": []
+  },
+  "D12": {
+   "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+   "after_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+   "after_src_dirty": [],
+   "harness_errors": []
+  },
+  "RECS": {
+   "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+   "after_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+   "after_src_dirty": [],
+   "harness_errors": []
+  },
+  "PAGING": {
+   "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+   "after_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+   "after_src_dirty": [],
+   "harness_errors": []
+  },
+  "CHART_ISOLATION": {
+   "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+   "after_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+   "after_src_dirty": [],
+   "harness_errors": []
+  }
+ },
+ "phase_hj": {
+  "before": {
+   "concurrency_correctness": {
+    "PASS": 41,
+    "ORACLE_ERROR": 1
+   },
+   "isolation": {
+    "correctness": {
+     "PASS": 20
+    },
+    "reports": {
+     "PASS": 10
+    },
+    "ledgers": {
+     "PASS": 10
+    },
+    "charts": {
+     "PASS": 10
+    }
+   },
+   "concurrency_calls": {
+    "OK": 162,
+    "EXCEPTION": 2
+   },
+   "concurrency_exceptions": [
+    "IndexError: list index out of range"
+   ],
+   "H_repeat": {
+    "OK": 196
+   },
+   "H_traced": {
+    "OK": 36
+   },
+   "H_isolation": {
+    "OK": 110
+   }
+  },
+  "after": {}
+ }
+}

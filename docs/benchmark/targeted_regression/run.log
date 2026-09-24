@@ -1,0 +1,42 @@
+2026-09-24T22:10:15 D1 before: 10 observation(s) in 15s
+2026-09-24T22:10:20 D1 after: 0 observation(s) in 5s HARNESS ERROR er/analytics-agent/scripts/targeted_regression/cases.py", line 178, in case_d1
+    out.append(obs(f"exact_{analysis}", "compute_analysis", r, analysis=analysis,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: obs() got multiple values for argument 'tool'
+
+2026-09-24T22:10:26 D2 before: 21 observation(s) in 7s
+2026-09-24T22:10:34 D2 after: 21 observation(s) in 7s
+2026-09-24T22:10:40 D3 before: 10 observation(s) in 6s
+2026-09-24T22:10:43 D3 after: 0 observation(s) in 3s HARNESS ERROR cs-agent/scripts/targeted_regression/cases.py", line 287, in case_d3
+    out.append(obs(f"{name}_{col}_{agg}", "propose_dataset_contract", r, dataset=name,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: obs() got multiple values for argument 'tool'
+
+2026-09-24T22:10:47 D12 before: 1 observation(s) in 3s
+2026-09-24T22:10:51 D12 after: 1 observation(s) in 4s
+2026-09-24T22:10:55 RECS before: 0 observation(s) in 4s HARNESS ERROR lytics-agent/scripts/targeted_regression/cases.py", line 493, in case_recs
+    out.append(obs("dup_rows_key", "propose_dataset_contract", r, dataset="dupkey",
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: obs() got multiple values for argument 'tool'
+
+2026-09-24T22:10:59 RECS after: 0 observation(s) in 5s HARNESS ERROR lytics-agent/scripts/targeted_regression/cases.py", line 493, in case_recs
+    out.append(obs("dup_rows_key", "propose_dataset_contract", r, dataset="dupkey",
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: obs() got multiple values for argument 'tool'
+
+2026-09-24T22:11:03 PAGING before: 4 observation(s) in 3s
+2026-09-24T22:11:06 PAGING after: 4 observation(s) in 3s
+2026-09-24T22:11:11 CHART_ISOLATION before: 2 observation(s) in 5s
+2026-09-24T22:11:16 CHART_ISOLATION after: 2 observation(s) in 5s
+2026-09-24T22:21:47 RECS before: 8 observation(s) in 8s
+2026-09-24T22:21:54 RECS after: 8 observation(s) in 7s
+2026-09-24T22:23:15 D1 before: 10 observation(s) in 15s
+2026-09-24T22:23:30 D1 after: 10 observation(s) in 15s
+2026-09-24T22:23:37 D2 before: 21 observation(s) in 7s
+2026-09-24T22:23:42 D2 after: 21 observation(s) in 5s
+2026-09-24T22:23:48 D3 before: 10 observation(s) in 5s
+2026-09-24T22:23:52 D3 after: 10 observation(s) in 5s
+2026-09-24T22:25:19 D2 before: 21 observation(s) in 6s
+2026-09-24T22:25:25 D2 after: 21 observation(s) in 6s
+2026-09-24T22:25:31 D3 before: 10 observation(s) in 5s
+2026-09-24T22:25:35 D3 after: 10 observation(s) in 5s

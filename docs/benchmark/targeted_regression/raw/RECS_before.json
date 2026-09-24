@@ -1,0 +1,247 @@
+{
+ "case": "RECS",
+ "src": "/home/user/aa-orig/src",
+ "commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+ "src_dirty": [],
+ "python": "3.12.3",
+ "duckdb": "1.5.5",
+ "seconds": 4.37,
+ "harness_error": null,
+ "observations": [
+  {
+   "sub": "dup_rows_key",
+   "tool": "propose_dataset_contract",
+   "analysis": null,
+   "dataset": "dupkey",
+   "rows": 2000,
+   "parameters": {},
+   "status": "REFUSED",
+   "wall_time_seconds": 0.209934,
+   "response": "BLOCKED: the primary key stated for 'dupkey' (record_id) does not identify a row.\nWHY: the grain of every later number depends on this. If the key repeats, a join or a sum over it double-counts, and nothing downstream can tell that it did.\nDETAIL: record_id does not identify a row: 2,000 distinct value(s) across 2,007 keyed row(s), so 7 row(s) repeat a key that is meant to be unique. validate_dataset(dataset_name=\"dupkey\") reports this and everything else that disagrees with the contract, rather than stopping at the key.\nNEXT STEP: call propose_dataset_contract(dataset_name=\"dupkey\", primary_key=[...]) with a key that holds, or state the grain that matches the key you gave\n\nreason: KEY_NOT_UNIQUE",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "why_reason": "KEY_NOT_UNIQUE",
+    "next_step": "propose_dataset_contract(dataset_name=\"dupkey\", primary_key=[...])",
+    "next_tool": "propose_dataset_contract",
+    "kwargs": {},
+    "executable": false,
+    "followed": null,
+    "role": "defect"
+   }
+  },
+  {
+   "sub": "correlation_one_measure",
+   "tool": "compute_analysis",
+   "analysis": "correlation",
+   "dataset": "one_measure",
+   "rows": null,
+   "parameters": {
+    "measure": "v"
+   },
+   "status": "REFUSED",
+   "wall_time_seconds": 0.055501,
+   "response": "BLOCKED: correlation was called without against.\nWHY: correlation needs against, and it was not given.\nCURRENT STATE: declared measures: v; declared dimensions: g\nNEXT STEP: call compute_analysis(dataset_name=\"one_measure\", analysis_type=\"correlation\", against=\"v\")\n\nreason: ANALYSIS_PARAMS_INVALID",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "why_reason": "ANALYSIS_PARAMS_INVALID",
+    "self_correlation": true,
+    "next_step": "compute_analysis(dataset_name=\"one_measure\", analysis_type=\"correlation\", against=\"v\")",
+    "next_tool": "compute_analysis",
+    "kwargs": {
+     "dataset_name": "one_measure",
+     "analysis_type": "correlation",
+     "against": "v"
+    },
+    "executable": true,
+    "followed": {
+     "status": "REFUSED",
+     "head": "BLOCKED: correlation was called without measure.\nWHY: correlation needs measure, and it was not given.\nCURRENT STATE: declared measures: v; declared dimensions: g\nNEXT STEP: call compute_analysis(dataset_name=\"one_measure\", analysis_type=\"correlation\", measure=\"v\")\n\nreason: ANALYSIS_PARAMS_INVALID",
+     "exception_type": null
+    },
+    "role": "defect"
+   }
+  },
+  {
+   "sub": "correlation_two_measures",
+   "tool": "compute_analysis",
+   "analysis": "correlation",
+   "dataset": "two_measures",
+   "rows": null,
+   "parameters": {
+    "measure": "v"
+   },
+   "status": "REFUSED",
+   "wall_time_seconds": 0.056824,
+   "response": "BLOCKED: correlation was called without against.\nWHY: correlation needs against, and it was not given.\nCURRENT STATE: declared measures: v, w; declared dimensions: g\nNEXT STEP: call compute_analysis(dataset_name=\"two_measures\", analysis_type=\"correlation\", against=\"v\")\n\nreason: ANALYSIS_PARAMS_INVALID",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "why_reason": "ANALYSIS_PARAMS_INVALID",
+    "self_correlation": true,
+    "next_step": "compute_analysis(dataset_name=\"two_measures\", analysis_type=\"correlation\", against=\"v\")",
+    "next_tool": "compute_analysis",
+    "kwargs": {
+     "dataset_name": "two_measures",
+     "analysis_type": "correlation",
+     "against": "v"
+    },
+    "executable": true,
+    "followed": {
+     "status": "REFUSED",
+     "head": "BLOCKED: correlation was called without measure.\nWHY: correlation needs measure, and it was not given.\nCURRENT STATE: declared measures: v, w; declared dimensions: g\nNEXT STEP: call compute_analysis(dataset_name=\"two_measures\", analysis_type=\"correlation\", measure=\"v\")\n\nreason: ANALYSIS_PARAMS_INVALID",
+     "exception_type": null
+    },
+    "role": "defect"
+   }
+  },
+  {
+   "sub": "corrupt_xlsx",
+   "tool": "load_excel",
+   "analysis": null,
+   "dataset": "corrupt.xlsx",
+   "rows": null,
+   "parameters": {},
+   "status": "REFUSED",
+   "wall_time_seconds": 0.015418,
+   "response": "BLOCKED: corrupt.xlsx is not a readable .xlsx workbook.\nWHY: BadZipFile: File is not a zip file. It may be another kind of file renamed, cut short, or protected with a password.\nNEXT STEP: call propose_ingest_spec(path=\"/tmp/tr_data/tiny/corrupt.xlsx\") -- it reads CSV and Excel alike -- or open the file in Excel and save it as .xlsx.",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "same_file_suggested": true,
+    "next_step": "propose_ingest_spec(path=\"/tmp/tr_data/tiny/corrupt.xlsx\")",
+    "next_tool": "propose_ingest_spec",
+    "kwargs": {
+     "path": "/tmp/tr_data/tiny/corrupt.xlsx"
+    },
+    "executable": true,
+    "followed": {
+     "status": "REFUSED",
+     "head": "BLOCKED: corrupt.xlsx is not a readable .xlsx workbook.\nWHY: BadZipFile: File is not a zip file. It may be another kind of file renamed, cut short, or protected with a password.\nNEXT STEP: open it in Excel and save it as .xlsx, or export it as CSV.",
+     "exception_type": null
+    },
+    "role": "defect"
+   }
+  },
+  {
+   "sub": "only_result_file",
+   "tool": "read_result_file",
+   "analysis": null,
+   "dataset": null,
+   "rows": null,
+   "parameters": {},
+   "status": "REFUSED",
+   "wall_time_seconds": 0.000441,
+   "response": "BLOCKED: '/etc/passwd' is not a result file in this workspace.\nWHY: results are read from the workspace's own results directory and nowhere else. A path that resolves outside it is refused whether or not it exists, because a tool that reads any path on request is a tool that can be asked to read anything.\nCURRENT STATE: results directory: /home/user/aa-orig/workspace/tr_recs_one/results\nNEXT STEP: call read_result_file(path=\"/home/user/aa-orig/workspace/tr_recs_one/results/<one of: only.csv>\")\n\nreason: RESULT_OUT_OF_SCOPE",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "next_step": "read_result_file(path=\"/home/user/aa-orig/workspace/tr_recs_one/results/<one of: only.csv>\")",
+    "next_tool": "read_result_file",
+    "kwargs": {},
+    "executable": false,
+    "followed": null,
+    "role": "defect"
+   }
+  },
+  {
+   "sub": "nonexistent_dataset",
+   "tool": "compute_analysis",
+   "analysis": "top_n",
+   "dataset": "nope",
+   "rows": null,
+   "parameters": {
+    "dataset_name": "nope",
+    "analysis_type": "top_n",
+    "dimension": "x",
+    "measure": "y"
+   },
+   "status": "REFUSED",
+   "wall_time_seconds": 0.024687,
+   "response": "BLOCKED: there is no dataset called 'nope' in this workspace.\nWHY: analysis runs on a loaded table, and nothing is read from disk here.\nCURRENT STATE: loaded: dupkey, fin, one_measure, two_measures\nNEXT STEP: call propose_ingest_spec(path=\"...\") then confirm_ingest_spec, or list_datasets() to see what is already here\n\nreason: DATASET_NOT_LOADED",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "why_reason": "DATASET_NOT_LOADED",
+    "next_step": "propose_ingest_spec(path=\"...\")",
+    "next_tool": "propose_ingest_spec",
+    "kwargs": {},
+    "executable": false,
+    "followed": null,
+    "role": "control"
+   }
+  },
+  {
+   "sub": "invalid_chart",
+   "tool": "render_chart",
+   "analysis": "trend",
+   "dataset": "fin",
+   "rows": null,
+   "parameters": {
+    "dataset_name": "fin",
+    "analysis_type": "trend",
+    "chart": "pie",
+    "measure": "revenue"
+   },
+   "status": "REFUSED",
+   "wall_time_seconds": 0.508828,
+   "response": "BLOCKED: trend was computed and cannot be drawn as a 'pie' chart.\nWHY: there is no chart called 'pie'. Available: line, bar, grouped_bar, scatter, histogram, box, heatmap, waterfall.\nDETAIL: The numbers are not in question -- the analysis ran. This is about the shape a chart needs, which is not the shape this result has. Nothing was written.\nCURRENT STATE: contract v1 for fin\nNEXT STEP: call compute_analysis(dataset_name=\"fin\", analysis_type=\"trend\", measure=\"revenue\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "why_reason": "ANALYSIS_NOT_POSSIBLE",
+    "next_step": "compute_analysis(dataset_name=\"fin\", analysis_type=\"trend\", measure=\"revenue\")",
+    "next_tool": "compute_analysis",
+    "kwargs": {
+     "dataset_name": "fin",
+     "analysis_type": "trend",
+     "measure": "revenue"
+    },
+    "executable": true,
+    "followed": {
+     "status": "OK",
+     "head": "Under contract v1 for fin: one row = one financial record.\n\n24 rows x 3 columns, written to\n  /home/user/aa-orig/workspace/tr_recs/results/trend_20260924-222147.csv\nfrom dataset   fin\ncreated        2026-09-24 22:21:47\n\nWhat this shows:\n  - 1,863 of 2,000 row(s) analysed. 108 excluded by the contract. 19 outside 2023-01-01 to 2024-12-31. 10 undated and so not placed in the window.\n  - Excluded: tr",
+     "exception_type": null
+    },
+    "role": "control"
+   }
+  },
+  {
+   "sub": "group_cap",
+   "tool": "compute_analysis",
+   "analysis": "pareto",
+   "dataset": "fin",
+   "rows": null,
+   "parameters": {
+    "dataset_name": "fin",
+    "analysis_type": "pareto",
+    "dimension": "customer_id",
+    "measure": "revenue"
+   },
+   "status": "REFUSED",
+   "wall_time_seconds": 0.04723,
+   "response": "BLOCKED: pareto cannot answer that under this contract.\nWHY: customer_id has 397 group(s), NULL counted as a group, against a cap of 49. top_n on customer_id says which of its groups matter.\nCURRENT STATE: contract v1 for fin\nNEXT STEP: call compute_analysis(dataset_name=\"fin\", analysis_type=\"top_n\", dimension=\"customer_id\", measure=\"revenue\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "why_reason": "ANALYSIS_NOT_POSSIBLE",
+    "next_step": "compute_analysis(dataset_name=\"fin\", analysis_type=\"top_n\", dimension=\"customer_id\", measure=\"revenue\")",
+    "next_tool": "compute_analysis",
+    "kwargs": {
+     "dataset_name": "fin",
+     "analysis_type": "top_n",
+     "dimension": "customer_id",
+     "measure": "revenue"
+    },
+    "executable": true,
+    "followed": {
+     "status": "OK",
+     "head": "Under contract v1 for fin: one row = one financial record.\n\n10 rows x 4 columns, written to\n  /home/user/aa-orig/workspace/tr_recs/results/top_n_20260924-222147.csv\nfrom dataset   fin\ncreated        2026-09-24 22:21:47\n\nWhat this shows:\n  - 1,863 of 2,000 row(s) analysed. 108 excluded by the contract. 19 outside 2023-01-01 to 2024-12-31. 10 undated and so not placed in the window.\n  - Excluded: tr",
+     "exception_type": null
+    },
+    "role": "control"
+   }
+  }
+ ]
+}

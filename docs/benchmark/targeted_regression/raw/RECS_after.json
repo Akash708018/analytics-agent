@@ -1,0 +1,250 @@
+{
+ "case": "RECS",
+ "src": "/home/user/aa-fixes/src",
+ "commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+ "src_dirty": [],
+ "python": "3.12.3",
+ "duckdb": "1.5.5",
+ "seconds": 3.9,
+ "harness_error": null,
+ "observations": [
+  {
+   "sub": "dup_rows_key",
+   "tool": "propose_dataset_contract",
+   "analysis": null,
+   "dataset": "dupkey",
+   "rows": 2000,
+   "parameters": {},
+   "status": "REFUSED",
+   "wall_time_seconds": 0.124547,
+   "response": "BLOCKED: the primary key stated for 'dupkey' (record_id) does not identify a row.\nWHY: the grain of every later number depends on this. If the key repeats, a join or a sum over it double-counts, and nothing downstream can tell that it did.\nDETAIL: record_id does not identify a row: 2,000 distinct value(s) across 2,007 keyed row(s), so 7 row(s) repeat a key that is meant to be unique. validate_dataset(dataset_name=\"dupkey\") reports this and everything else that disagrees with the contract, rather than stopping at the key.\nNEXT STEP: call propose_cleaning_plan(dataset_name=\"dupkey\") -- 7 row(s) repeat another row in every column, which is every repeat of record_id; dropping them makes the key hold\n\nreason: KEY_NOT_UNIQUE",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "why_reason": "KEY_NOT_UNIQUE",
+    "next_step": "propose_cleaning_plan(dataset_name=\"dupkey\")",
+    "next_tool": "propose_cleaning_plan",
+    "kwargs": {
+     "dataset_name": "dupkey"
+    },
+    "executable": true,
+    "followed": {
+     "status": "OK",
+     "head": "1 change(s) proposed for dupkey (2,007 row(s)). Nothing has been changed.\n\n  C001  DROP_DUPLICATE_ROWS: keep one of each of the 7 exactly duplicated row(s) (7 row(s)). 7 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"FIN000001774\",\"transaction_id\":\"T00001774\",\"account_id\":\"A0000002\",\"customer_id\":\"C0000308\",\"transaction_date\":\"2023-04-09\",\"posted_at\":\"2023-04-09 13:",
+     "exception_type": null
+    },
+    "role": "defect"
+   }
+  },
+  {
+   "sub": "correlation_one_measure",
+   "tool": "compute_analysis",
+   "analysis": "correlation",
+   "dataset": "one_measure",
+   "rows": null,
+   "parameters": {
+    "measure": "v"
+   },
+   "status": "REFUSED",
+   "wall_time_seconds": 0.037819,
+   "response": "BLOCKED: correlation was called without against.\nWHY: correlation needs against, and it was not given.\nCURRENT STATE: declared measures: v; declared dimensions: g\nNEXT STEP: call propose_dataset_contract(dataset_name=\"one_measure\") -- correlation needs another declared measure for against\n\nreason: ANALYSIS_PARAMS_INVALID",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "why_reason": "ANALYSIS_PARAMS_INVALID",
+    "self_correlation": false,
+    "next_step": "propose_dataset_contract(dataset_name=\"one_measure\")",
+    "next_tool": "propose_dataset_contract",
+    "kwargs": {
+     "dataset_name": "one_measure"
+    },
+    "executable": true,
+    "followed": {
+     "status": "OK",
+     "head": "dataset        one_measure\ngrain          one row = one id\nprimary key    id\ndate column    d\nwindow         (not set)\nbound to       5 columns, 120 rows, fingerprint 80669c4dbbc9\nPROVISIONAL    grain, analysis_window -- this contract cannot be confirmed as it stands\n\ndimensions     g, v, w\n\nWhat the data showed:\n  - Key from evidence: id is unique across 120 of 120 rows, with no nulls.\n  - Also u",
+     "exception_type": null
+    },
+    "role": "defect"
+   }
+  },
+  {
+   "sub": "correlation_two_measures",
+   "tool": "compute_analysis",
+   "analysis": "correlation",
+   "dataset": "two_measures",
+   "rows": null,
+   "parameters": {
+    "measure": "v"
+   },
+   "status": "REFUSED",
+   "wall_time_seconds": 0.056558,
+   "response": "BLOCKED: correlation was called without against.\nWHY: correlation needs against, and it was not given.\nCURRENT STATE: declared measures: v, w; declared dimensions: g\nNEXT STEP: call compute_analysis(dataset_name=\"two_measures\", analysis_type=\"correlation\", measure=\"v\", against=\"w\")\n\nreason: ANALYSIS_PARAMS_INVALID",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "why_reason": "ANALYSIS_PARAMS_INVALID",
+    "self_correlation": false,
+    "next_step": "compute_analysis(dataset_name=\"two_measures\", analysis_type=\"correlation\", measure=\"v\", against=\"w\")",
+    "next_tool": "compute_analysis",
+    "kwargs": {
+     "dataset_name": "two_measures",
+     "analysis_type": "correlation",
+     "measure": "v",
+     "against": "w"
+    },
+    "executable": true,
+    "followed": {
+     "status": "OK",
+     "head": "Under contract v1 for two_measures: row.\n\n1 rows x 6 columns, written to\n  /home/user/aa-fixes/workspace/tr_recs/results/correlation_20260924-222152.csv\nfrom dataset   two_measures\ncreated        2026-09-24 22:21:52\n\nWhat this shows:\n  - 120 of 120 row(s) analysed.\n  - 120 of 120 analysed row(s) hold both v and w; 0 hold one or neither and are in no coefficient above. A correlation is over pairs, ",
+     "exception_type": null
+    },
+    "role": "defect"
+   }
+  },
+  {
+   "sub": "corrupt_xlsx",
+   "tool": "load_excel",
+   "analysis": null,
+   "dataset": "corrupt.xlsx",
+   "rows": null,
+   "parameters": {},
+   "status": "REFUSED",
+   "wall_time_seconds": 0.014861,
+   "response": "BLOCKED: corrupt.xlsx is not a readable .xlsx workbook.\nWHY: BadZipFile: File is not a zip file. It may be another kind of file renamed, cut short, or protected with a password.\nNEXT STEP: open it in Excel or the program that made it and save it again as .xlsx, or export it as .csv, then call propose_ingest_spec(path=...) on the new file.",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "same_file_suggested": false,
+    "next_step": null,
+    "executable": false,
+    "followed": null,
+    "role": "defect"
+   }
+  },
+  {
+   "sub": "only_result_file",
+   "tool": "read_result_file",
+   "analysis": null,
+   "dataset": null,
+   "rows": null,
+   "parameters": {},
+   "status": "REFUSED",
+   "wall_time_seconds": 0.000462,
+   "response": "BLOCKED: '/etc/passwd' is not a result file in this workspace.\nWHY: results are read from the workspace's own results directory and nowhere else. A path that resolves outside it is refused whether or not it exists, because a tool that reads any path on request is a tool that can be asked to read anything.\nCURRENT STATE: results directory: /home/user/aa-fixes/workspace/tr_recs_one/results\nNEXT STEP: call read_result_file(path=\"/home/user/aa-fixes/workspace/tr_recs_one/results/only.csv\")\n\nreason: RESULT_OUT_OF_SCOPE",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "next_step": "read_result_file(path=\"/home/user/aa-fixes/workspace/tr_recs_one/results/only.csv\")",
+    "next_tool": "read_result_file",
+    "kwargs": {
+     "path": "/home/user/aa-fixes/workspace/tr_recs_one/results/only.csv"
+    },
+    "executable": true,
+    "followed": {
+     "status": "OK",
+     "head": "only.csv: rows 1 to 1 of 1, columns 1 to 1 of 1.\n\n| a |\n|---|\n| 1 |\n\nThat is the end of the file.",
+     "exception_type": null
+    },
+    "role": "defect"
+   }
+  },
+  {
+   "sub": "nonexistent_dataset",
+   "tool": "compute_analysis",
+   "analysis": "top_n",
+   "dataset": "nope",
+   "rows": null,
+   "parameters": {
+    "dataset_name": "nope",
+    "analysis_type": "top_n",
+    "dimension": "x",
+    "measure": "y"
+   },
+   "status": "REFUSED",
+   "wall_time_seconds": 0.027106,
+   "response": "BLOCKED: there is no dataset called 'nope' in this workspace.\nWHY: analysis runs on a loaded table, and nothing is read from disk here.\nCURRENT STATE: loaded: dupkey, fin, one_measure, two_measures\nNEXT STEP: call propose_ingest_spec(path=\"...\") then confirm_ingest_spec, or list_datasets() to see what is already here\n\nreason: DATASET_NOT_LOADED",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "why_reason": "DATASET_NOT_LOADED",
+    "next_step": "propose_ingest_spec(path=\"...\")",
+    "next_tool": "propose_ingest_spec",
+    "kwargs": {},
+    "executable": false,
+    "followed": null,
+    "role": "control"
+   }
+  },
+  {
+   "sub": "invalid_chart",
+   "tool": "render_chart",
+   "analysis": "trend",
+   "dataset": "fin",
+   "rows": null,
+   "parameters": {
+    "dataset_name": "fin",
+    "analysis_type": "trend",
+    "chart": "pie",
+    "measure": "revenue"
+   },
+   "status": "REFUSED",
+   "wall_time_seconds": 0.47842,
+   "response": "BLOCKED: trend was computed and cannot be drawn as a 'pie' chart.\nWHY: there is no chart called 'pie'. Available: line, bar, grouped_bar, scatter, histogram, box, heatmap, waterfall.\nDETAIL: The numbers are not in question -- the analysis ran. This is about the shape a chart needs, which is not the shape this result has. Nothing was written.\nCURRENT STATE: contract v1 for fin\nNEXT STEP: call compute_analysis(dataset_name=\"fin\", analysis_type=\"trend\", measure=\"revenue\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "why_reason": "ANALYSIS_NOT_POSSIBLE",
+    "next_step": "compute_analysis(dataset_name=\"fin\", analysis_type=\"trend\", measure=\"revenue\")",
+    "next_tool": "compute_analysis",
+    "kwargs": {
+     "dataset_name": "fin",
+     "analysis_type": "trend",
+     "measure": "revenue"
+    },
+    "executable": true,
+    "followed": {
+     "status": "OK",
+     "head": "Under contract v1 for fin: one row = one financial record.\n\n24 rows x 3 columns, written to\n  /home/user/aa-fixes/workspace/tr_recs/results/trend_20260924-222154.csv\nfrom dataset   fin\ncreated        2026-09-24 22:21:54\n\nWhat this shows:\n  - 1,863 of 2,000 row(s) analysed. 108 excluded by the contract. 19 outside 2023-01-01 to 2024-12-31. 10 undated and so not placed in the window.\n  - Excluded: t",
+     "exception_type": null
+    },
+    "role": "control"
+   }
+  },
+  {
+   "sub": "group_cap",
+   "tool": "compute_analysis",
+   "analysis": "pareto",
+   "dataset": "fin",
+   "rows": null,
+   "parameters": {
+    "dataset_name": "fin",
+    "analysis_type": "pareto",
+    "dimension": "customer_id",
+    "measure": "revenue"
+   },
+   "status": "REFUSED",
+   "wall_time_seconds": 0.049226,
+   "response": "BLOCKED: pareto cannot answer that under this contract.\nWHY: customer_id has 397 group(s), NULL counted as a group, against a cap of 49. top_n on customer_id says which of its groups matter.\nCURRENT STATE: contract v1 for fin\nNEXT STEP: call compute_analysis(dataset_name=\"fin\", analysis_type=\"top_n\", dimension=\"customer_id\", measure=\"revenue\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "why_reason": "ANALYSIS_NOT_POSSIBLE",
+    "next_step": "compute_analysis(dataset_name=\"fin\", analysis_type=\"top_n\", dimension=\"customer_id\", measure=\"revenue\")",
+    "next_tool": "compute_analysis",
+    "kwargs": {
+     "dataset_name": "fin",
+     "analysis_type": "top_n",
+     "dimension": "customer_id",
+     "measure": "revenue"
+    },
+    "executable": true,
+    "followed": {
+     "status": "OK",
+     "head": "Under contract v1 for fin: one row = one financial record.\n\n10 rows x 4 columns, written to\n  /home/user/aa-fixes/workspace/tr_recs/results/top_n_20260924-222154.csv\nfrom dataset   fin\ncreated        2026-09-24 22:21:54\n\nWhat this shows:\n  - 1,863 of 2,000 row(s) analysed. 108 excluded by the contract. 19 outside 2023-01-01 to 2024-12-31. 10 undated and so not placed in the window.\n  - Excluded: t",
+     "exception_type": null
+    },
+    "role": "control"
+   }
+  }
+ ]
+}

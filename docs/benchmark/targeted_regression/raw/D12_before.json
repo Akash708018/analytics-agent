@@ -1,0 +1,32 @@
+{
+ "case": "D12",
+ "src": "/home/user/aa-orig/src",
+ "commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+ "src_dirty": [],
+ "python": "3.12.3",
+ "duckdb": "1.5.5",
+ "seconds": 0.23,
+ "harness_error": null,
+ "observations": [
+  {
+   "sub": "parser_16_threads",
+   "tool": "sql_guard._ast",
+   "analysis": null,
+   "dataset": null,
+   "rows": null,
+   "parameters": {},
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.231994,
+   "response": "",
+   "exception_type": "IndexError",
+   "exception_message": "IndexError: list index out of range",
+   "extra": {
+    "threads": 16,
+    "parses": 3200,
+    "errors": 15,
+    "swapped_results": 11,
+    "role": "defect"
+   }
+  }
+ ]
+}

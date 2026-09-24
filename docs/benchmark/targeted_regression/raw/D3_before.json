@@ -1,0 +1,252 @@
+{
+ "case": "D3",
+ "src": "/home/user/aa-orig/src",
+ "commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+ "src_dirty": [],
+ "python": "3.12.3",
+ "duckdb": "1.5.5",
+ "seconds": 2.26,
+ "harness_error": null,
+ "observations": [
+  {
+   "sub": "all_null_col_v_sum",
+   "tool": "propose_dataset_contract",
+   "analysis": null,
+   "dataset": "all_null_col",
+   "rows": null,
+   "parameters": {
+    "measure": "v",
+    "aggregation": "sum"
+   },
+   "status": "OK",
+   "wall_time_seconds": 0.043158,
+   "response": "dataset        all_null_col\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       5 columns, 20 rows, fingerprint 6b7556f5d151\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| v | sum | - | v |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 20 of 20 rows, with no nulls.\n  - w were not paired: their suggested role is measure or free text, and a key is made of columns that name a row rather than measure one. A near-continuous number is unique alongside almost anything, which says nothing.\n  - 1 pair(s) containing d, id, w were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"all_null_col\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"sum\",\n      \"definition\": \"v\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"excluded_columns\": [],\n  \"foreign_keys\": [],\n  \"domains\": {},\n  \"bound_to\": {\n    \"columns\": [\n      {\n        \"name\": \"id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"d\",\n        \"dtype\": \"DATE\"\n      },\n      {\n        \"name\": \"g\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"v\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"w\",\n        \"dtype\": \"BIGINT\"\n      }\n    ],\n    \"row_count\": 20,\n    \"loaded_at\": \"2026-09-24T22:25:28.383057\"\n  },\n  \"questions\": [],\n  \"unresolved\": [],\n  \"version\": 0,\n  \"confirmed_at\": null\n}\n```",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "rejected_at": "analysis",
+    "analysis_status": "EXCEPTION",
+    "analysis_exception": "BinderException",
+    "role": "defect",
+    "next_step": null,
+    "executable": false
+   }
+  },
+  {
+   "sub": "inf_nan_v_sum",
+   "tool": "propose_dataset_contract",
+   "analysis": null,
+   "dataset": "inf_nan",
+   "rows": null,
+   "parameters": {
+    "measure": "v",
+    "aggregation": "sum"
+   },
+   "status": "OK",
+   "wall_time_seconds": 0.043362,
+   "response": "dataset        inf_nan\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       4 columns, 40 rows, fingerprint b04e92ed5b12\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| v | sum | - | v |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 40 of 40 rows, with no nulls.\n  - g holds 2 distinct value(s): x, y. Declare domains={\"g\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - v holds 12 distinct value(s): -inf, 14, 19, 24, 29, 34, 39, 4, 9, NaN, inf, nan. Declare domains={\"v\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - 3 pair(s) containing id were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"inf_nan\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"sum\",\n      \"definition\": \"v\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"excluded_columns\": [],\n  \"foreign_keys\": [],\n  \"domains\": {},\n  \"bound_to\": {\n    \"columns\": [\n      {\n        \"name\": \"id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"d\",\n        \"dtype\": \"DATE\"\n      },\n      {\n        \"name\": \"g\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"v\",\n        \"dtype\": \"VARCHAR\"\n      }\n    ],\n    \"row_count\": 40,\n    \"loaded_at\": \"2026-09-24T22:25:28.475185\"\n  },\n  \"questions\": [],\n  \"unresolved\": [],\n  \"version\": 0,\n  \"confirmed_at\": null\n}\n```",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "rejected_at": "analysis",
+    "analysis_status": "EXCEPTION",
+    "analysis_exception": "BinderException",
+    "role": "defect",
+    "next_step": null,
+    "executable": false
+   }
+  },
+  {
+   "sub": "words_v_sum",
+   "tool": "propose_dataset_contract",
+   "analysis": null,
+   "dataset": "words",
+   "rows": null,
+   "parameters": {
+    "measure": "v",
+    "aggregation": "sum"
+   },
+   "status": "OK",
+   "wall_time_seconds": 0.057142,
+   "response": "dataset        words\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       5 columns, 30 rows, fingerprint 6b7556f5d151\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| v | sum | - | v |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 30 of 30 rows, with no nulls.\n  - v holds 7 distinct value(s): name0, name1, name2, name3, name4, name5, name6. Declare domains={\"v\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - w were not paired: their suggested role is measure or free text, and a key is made of columns that name a row rather than measure one. A near-continuous number is unique alongside almost anything, which says nothing.\n  - 1 pair(s) containing id, w were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"words\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"sum\",\n      \"definition\": \"v\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"excluded_columns\": [],\n  \"foreign_keys\": [],\n  \"domains\": {},\n  \"bound_to\": {\n    \"columns\": [\n      {\n        \"name\": \"id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"d\",\n        \"dtype\": \"DATE\"\n      },\n      {\n        \"name\": \"g\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"v\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"w\",\n        \"dtype\": \"BIGINT\"\n      }\n    ],\n    \"row_count\": 30,\n    \"loaded_at\": \"2026-09-24T22:25:28.561439\"\n  },\n  \"questions\": [],\n  \"unresolved\": [],\n  \"version\": 0,\n  \"confirmed_at\": null\n}\n```",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "rejected_at": "analysis",
+    "analysis_status": "EXCEPTION",
+    "analysis_exception": "BinderException",
+    "role": "defect",
+    "next_step": null,
+    "executable": false
+   }
+  },
+  {
+   "sub": "words_v_mean",
+   "tool": "propose_dataset_contract",
+   "analysis": null,
+   "dataset": "words",
+   "rows": null,
+   "parameters": {
+    "measure": "v",
+    "aggregation": "mean"
+   },
+   "status": "OK",
+   "wall_time_seconds": 0.05154,
+   "response": "dataset        words\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       5 columns, 30 rows, fingerprint 6b7556f5d151\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| v | mean | - | v |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 30 of 30 rows, with no nulls.\n  - v holds 7 distinct value(s): name0, name1, name2, name3, name4, name5, name6. Declare domains={\"v\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - w were not paired: their suggested role is measure or free text, and a key is made of columns that name a row rather than measure one. A near-continuous number is unique alongside almost anything, which says nothing.\n  - 1 pair(s) containing id, w were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"words\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"mean\",\n      \"definition\": \"v\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"excluded_columns\": [],\n  \"foreign_keys\": [],\n  \"domains\": {},\n  \"bound_to\": {\n    \"columns\": [\n      {\n        \"name\": \"id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"d\",\n        \"dtype\": \"DATE\"\n      },\n      {\n        \"name\": \"g\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"v\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"w\",\n        \"dtype\": \"BIGINT\"\n      }\n    ],\n    \"row_count\": 30,\n    \"loaded_at\": \"2026-09-24T22:25:28.561439\"\n  },\n  \"questions\": [],\n  \"unresolved\": [],\n  \"version\": 0,\n  \"confirmed_at\": null\n}\n```",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "rejected_at": "analysis",
+    "analysis_status": "EXCEPTION",
+    "analysis_exception": "BinderException",
+    "role": "defect",
+    "next_step": null,
+    "executable": false
+   }
+  },
+  {
+   "sub": "words_v_median",
+   "tool": "propose_dataset_contract",
+   "analysis": null,
+   "dataset": "words",
+   "rows": null,
+   "parameters": {
+    "measure": "v",
+    "aggregation": "median"
+   },
+   "status": "OK",
+   "wall_time_seconds": 0.043304,
+   "response": "dataset        words\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       5 columns, 30 rows, fingerprint 6b7556f5d151\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| v | median | - | v |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 30 of 30 rows, with no nulls.\n  - v holds 7 distinct value(s): name0, name1, name2, name3, name4, name5, name6. Declare domains={\"v\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - w were not paired: their suggested role is measure or free text, and a key is made of columns that name a row rather than measure one. A near-continuous number is unique alongside almost anything, which says nothing.\n  - 1 pair(s) containing id, w were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"words\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"median\",\n      \"definition\": \"v\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"excluded_columns\": [],\n  \"foreign_keys\": [],\n  \"domains\": {},\n  \"bound_to\": {\n    \"columns\": [\n      {\n        \"name\": \"id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"d\",\n        \"dtype\": \"DATE\"\n      },\n      {\n        \"name\": \"g\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"v\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"w\",\n        \"dtype\": \"BIGINT\"\n      }\n    ],\n    \"row_count\": 30,\n    \"loaded_at\": \"2026-09-24T22:25:28.561439\"\n  },\n  \"questions\": [],\n  \"unresolved\": [],\n  \"version\": 0,\n  \"confirmed_at\": null\n}\n```",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "rejected_at": "analysis",
+    "analysis_status": "EXCEPTION",
+    "analysis_exception": "ConversionException",
+    "role": "defect",
+    "next_step": null,
+    "executable": false
+   }
+  },
+  {
+   "sub": "words_v_count",
+   "tool": "propose_dataset_contract",
+   "analysis": null,
+   "dataset": "words",
+   "rows": null,
+   "parameters": {
+    "measure": "v",
+    "aggregation": "count"
+   },
+   "status": "OK",
+   "wall_time_seconds": 0.049939,
+   "response": "dataset        words\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       5 columns, 30 rows, fingerprint 6b7556f5d151\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| v | count | - | v |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 30 of 30 rows, with no nulls.\n  - v holds 7 distinct value(s): name0, name1, name2, name3, name4, name5, name6. Declare domains={\"v\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - w were not paired: their suggested role is measure or free text, and a key is made of columns that name a row rather than measure one. A near-continuous number is unique alongside almost anything, which says nothing.\n  - 1 pair(s) containing id, w were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"words\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"count\",\n      \"definition\": \"v\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"excluded_columns\": [],\n  \"foreign_keys\": [],\n  \"domains\": {},\n  \"bound_to\": {\n    \"columns\": [\n      {\n        \"name\": \"id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"d\",\n        \"dtype\": \"DATE\"\n      },\n      {\n        \"name\": \"g\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"v\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"w\",\n        \"dtype\": \"BIGINT\"\n      }\n    ],\n    \"row_count\": 30,\n    \"loaded_at\": \"2026-09-24T22:25:28.561439\"\n  },\n  \"questions\": [],\n  \"unresolved\": [],\n  \"version\": 0,\n  \"confirmed_at\": null\n}\n```",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "rejected_at": null,
+    "analysis_status": "OK",
+    "analysis_exception": null,
+    "role": "control",
+    "next_step": null,
+    "executable": false
+   }
+  },
+  {
+   "sub": "words_v_count_distinct",
+   "tool": "propose_dataset_contract",
+   "analysis": null,
+   "dataset": "words",
+   "rows": null,
+   "parameters": {
+    "measure": "v",
+    "aggregation": "count_distinct"
+   },
+   "status": "OK",
+   "wall_time_seconds": 0.04549,
+   "response": "dataset        words\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       5 columns, 30 rows, fingerprint 6b7556f5d151\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| v | count_distinct | - | v |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 30 of 30 rows, with no nulls.\n  - v holds 7 distinct value(s): name0, name1, name2, name3, name4, name5, name6. Declare domains={\"v\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - w were not paired: their suggested role is measure or free text, and a key is made of columns that name a row rather than measure one. A near-continuous number is unique alongside almost anything, which says nothing.\n  - 1 pair(s) containing id, w were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"words\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"count_distinct\",\n      \"definition\": \"v\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"excluded_columns\": [],\n  \"foreign_keys\": [],\n  \"domains\": {},\n  \"bound_to\": {\n    \"columns\": [\n      {\n        \"name\": \"id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"d\",\n        \"dtype\": \"DATE\"\n      },\n      {\n        \"name\": \"g\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"v\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"w\",\n        \"dtype\": \"BIGINT\"\n      }\n    ],\n    \"row_count\": 30,\n    \"loaded_at\": \"2026-09-24T22:25:28.561439\"\n  },\n  \"questions\": [],\n  \"unresolved\": [],\n  \"version\": 0,\n  \"confirmed_at\": null\n}\n```",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "rejected_at": null,
+    "analysis_status": "OK",
+    "analysis_exception": null,
+    "role": "control",
+    "next_step": null,
+    "executable": false
+   }
+  },
+  {
+   "sub": "words_w_sum",
+   "tool": "propose_dataset_contract",
+   "analysis": null,
+   "dataset": "words",
+   "rows": null,
+   "parameters": {
+    "measure": "w",
+    "aggregation": "sum"
+   },
+   "status": "OK",
+   "wall_time_seconds": 0.042433,
+   "response": "dataset        words\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       5 columns, 30 rows, fingerprint 6b7556f5d151\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| w | sum | - | w |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 30 of 30 rows, with no nulls.\n  - v holds 7 distinct value(s): name0, name1, name2, name3, name4, name5, name6. Declare domains={\"v\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - w were not paired: their suggested role is measure or free text, and a key is made of columns that name a row rather than measure one. A near-continuous number is unique alongside almost anything, which says nothing.\n  - 1 pair(s) containing id, w were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"words\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"w\",\n      \"agg\": \"sum\",\n      \"definition\": \"w\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"excluded_columns\": [],\n  \"foreign_keys\": [],\n  \"domains\": {},\n  \"bound_to\": {\n    \"columns\": [\n      {\n        \"name\": \"id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"d\",\n        \"dtype\": \"DATE\"\n      },\n      {\n        \"name\": \"g\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"v\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"w\",\n        \"dtype\": \"BIGINT\"\n      }\n    ],\n    \"row_count\": 30,\n    \"loaded_at\": \"2026-09-24T22:25:28.561439\"\n  },\n  \"questions\": [],\n  \"unresolved\": [],\n  \"version\": 0,\n  \"confirmed_at\": null\n}\n```",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "rejected_at": null,
+    "analysis_status": "OK",
+    "analysis_exception": null,
+    "role": "control",
+    "next_step": null,
+    "executable": false
+   }
+  },
+  {
+   "sub": "words_w_mean",
+   "tool": "propose_dataset_contract",
+   "analysis": null,
+   "dataset": "words",
+   "rows": null,
+   "parameters": {
+    "measure": "w",
+    "aggregation": "mean"
+   },
+   "status": "OK",
+   "wall_time_seconds": 0.045075,
+   "response": "dataset        words\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       5 columns, 30 rows, fingerprint 6b7556f5d151\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| w | mean | - | w |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 30 of 30 rows, with no nulls.\n  - v holds 7 distinct value(s): name0, name1, name2, name3, name4, name5, name6. Declare domains={\"v\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - w were not paired: their suggested role is measure or free text, and a key is made of columns that name a row rather than measure one. A near-continuous number is unique alongside almost anything, which says nothing.\n  - 1 pair(s) containing id, w were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"words\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"w\",\n      \"agg\": \"mean\",\n      \"definition\": \"w\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"excluded_columns\": [],\n  \"foreign_keys\": [],\n  \"domains\": {},\n  \"bound_to\": {\n    \"columns\": [\n      {\n        \"name\": \"id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"d\",\n        \"dtype\": \"DATE\"\n      },\n      {\n        \"name\": \"g\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"v\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"w\",\n        \"dtype\": \"BIGINT\"\n      }\n    ],\n    \"row_count\": 30,\n    \"loaded_at\": \"2026-09-24T22:25:28.561439\"\n  },\n  \"questions\": [],\n  \"unresolved\": [],\n  \"version\": 0,\n  \"confirmed_at\": null\n}\n```",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "rejected_at": null,
+    "analysis_status": "OK",
+    "analysis_exception": null,
+    "role": "control",
+    "next_step": null,
+    "executable": false
+   }
+  },
+  {
+   "sub": "words_w_median",
+   "tool": "propose_dataset_contract",
+   "analysis": null,
+   "dataset": "words",
+   "rows": null,
+   "parameters": {
+    "measure": "w",
+    "aggregation": "median"
+   },
+   "status": "OK",
+   "wall_time_seconds": 0.047072,
+   "response": "dataset        words\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       5 columns, 30 rows, fingerprint 6b7556f5d151\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| w | median | - | w |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 30 of 30 rows, with no nulls.\n  - v holds 7 distinct value(s): name0, name1, name2, name3, name4, name5, name6. Declare domains={\"v\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - w were not paired: their suggested role is measure or free text, and a key is made of columns that name a row rather than measure one. A near-continuous number is unique alongside almost anything, which says nothing.\n  - 1 pair(s) containing id, w were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"words\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"w\",\n      \"agg\": \"median\",\n      \"definition\": \"w\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"excluded_columns\": [],\n  \"foreign_keys\": [],\n  \"domains\": {},\n  \"bound_to\": {\n    \"columns\": [\n      {\n        \"name\": \"id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"d\",\n        \"dtype\": \"DATE\"\n      },\n      {\n        \"name\": \"g\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"v\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"w\",\n        \"dtype\": \"BIGINT\"\n      }\n    ],\n    \"row_count\": 30,\n    \"loaded_at\": \"2026-09-24T22:25:28.561439\"\n  },\n  \"questions\": [],\n  \"unresolved\": [],\n  \"version\": 0,\n  \"confirmed_at\": null\n}\n```",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "rejected_at": null,
+    "analysis_status": "OK",
+    "analysis_exception": null,
+    "role": "control",
+    "next_step": null,
+    "executable": false
+   }
+  }
+ ]
+}

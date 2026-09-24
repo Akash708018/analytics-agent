@@ -1,0 +1,32 @@
+{
+ "case": "D12",
+ "src": "/home/user/aa-fixes/src",
+ "commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+ "src_dirty": [],
+ "python": "3.12.3",
+ "duckdb": "1.5.5",
+ "seconds": 1.44,
+ "harness_error": null,
+ "observations": [
+  {
+   "sub": "parser_16_threads",
+   "tool": "sql_guard._ast",
+   "analysis": null,
+   "dataset": null,
+   "rows": null,
+   "parameters": {},
+   "status": "OK",
+   "wall_time_seconds": 1.435695,
+   "response": "",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "threads": 16,
+    "parses": 3200,
+    "errors": 0,
+    "swapped_results": 0,
+    "role": "defect"
+   }
+  }
+ ]
+}
