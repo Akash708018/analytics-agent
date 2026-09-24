@@ -1,0 +1,239 @@
+{
+ "case": "D4",
+ "src": "/home/user/analytics-agent/src",
+ "commit": "a0f393b4507b156c1c9fad79600a0f2f74e93708",
+ "src_dirty": [],
+ "python": "3.12.3",
+ "duckdb": "1.5.5",
+ "seconds": 5.36,
+ "harness_error": null,
+ "observations": [
+  {
+   "sub": "site_analysis.runs",
+   "tool": "ensure_table",
+   "analysis": null,
+   "dataset": "analysis.runs",
+   "rows": null,
+   "parameters": {},
+   "status": "OK",
+   "wall_time_seconds": 0.064871,
+   "response": "None",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "retries": 3,
+    "tables": [
+     "_agent_analysis_runs"
+    ],
+    "role": "defect"
+   }
+  },
+  {
+   "sub": "site_clean.ledger",
+   "tool": "ensure_table",
+   "analysis": null,
+   "dataset": "clean.ledger",
+   "rows": null,
+   "parameters": {},
+   "status": "OK",
+   "wall_time_seconds": 0.064312,
+   "response": "None",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "retries": 3,
+    "tables": [
+     "_agent_cleaning_ledger"
+    ],
+    "role": "defect"
+   }
+  },
+  {
+   "sub": "site_clean.plan",
+   "tool": "ensure_table",
+   "analysis": null,
+   "dataset": "clean.plan",
+   "rows": null,
+   "parameters": {},
+   "status": "OK",
+   "wall_time_seconds": 0.064118,
+   "response": "None",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "retries": 3,
+    "tables": [
+     "_agent_cleaning_plans"
+    ],
+    "role": "defect"
+   }
+  },
+  {
+   "sub": "site_contract.store",
+   "tool": "ensure_table",
+   "analysis": null,
+   "dataset": "contract.store",
+   "rows": null,
+   "parameters": {},
+   "status": "OK",
+   "wall_time_seconds": 0.064155,
+   "response": "None",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "retries": 3,
+    "tables": [
+     "_agent_contracts"
+    ],
+    "role": "defect"
+   }
+  },
+  {
+   "sub": "site_profile.runs",
+   "tool": "ensure_table",
+   "analysis": null,
+   "dataset": "profile.runs",
+   "rows": null,
+   "parameters": {},
+   "status": "OK",
+   "wall_time_seconds": 0.064473,
+   "response": "None",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "retries": 3,
+    "tables": [
+     "_agent_profiles"
+    ],
+    "role": "defect"
+   }
+  },
+  {
+   "sub": "site_validate.runs",
+   "tool": "ensure_table",
+   "analysis": null,
+   "dataset": "validate.runs",
+   "rows": null,
+   "parameters": {},
+   "status": "OK",
+   "wall_time_seconds": 0.064151,
+   "response": "None",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "retries": 3,
+    "tables": [
+     "_agent_validations"
+    ],
+    "role": "defect"
+   }
+  },
+  {
+   "sub": "threads_2",
+   "tool": "compute_analysis",
+   "analysis": "top_n",
+   "dataset": "fin",
+   "rows": 2000,
+   "parameters": {},
+   "status": "OK",
+   "wall_time_seconds": 0.085741,
+   "response": "",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "threads": 2,
+    "statuses": [
+     "OK",
+     "OK"
+    ],
+    "tables": [
+     "_agent_analysis_runs",
+     "_agent_cleaning_ledger",
+     "_agent_cleaning_plans",
+     "_agent_contracts",
+     "_agent_datasets",
+     "_agent_history_fin_v1",
+     "fin"
+    ],
+    "analysis_run_rows": 2,
+    "distinct_answers": 2,
+    "role": "defect"
+   }
+  },
+  {
+   "sub": "threads_5",
+   "tool": "compute_analysis",
+   "analysis": "top_n",
+   "dataset": "fin",
+   "rows": 2000,
+   "parameters": {},
+   "status": "OK",
+   "wall_time_seconds": 0.118108,
+   "response": "",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "threads": 5,
+    "statuses": [
+     "OK",
+     "OK",
+     "OK",
+     "OK",
+     "OK"
+    ],
+    "tables": [
+     "_agent_analysis_runs",
+     "_agent_cleaning_ledger",
+     "_agent_cleaning_plans",
+     "_agent_contracts",
+     "_agent_datasets",
+     "_agent_history_fin_v1",
+     "fin"
+    ],
+    "analysis_run_rows": 5,
+    "distinct_answers": 5,
+    "role": "defect"
+   }
+  },
+  {
+   "sub": "threads_10",
+   "tool": "compute_analysis",
+   "analysis": "top_n",
+   "dataset": "fin",
+   "rows": 2000,
+   "parameters": {},
+   "status": "OK",
+   "wall_time_seconds": 0.231414,
+   "response": "",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "threads": 10,
+    "statuses": [
+     "OK",
+     "OK",
+     "OK",
+     "OK",
+     "OK",
+     "OK",
+     "OK",
+     "OK",
+     "OK",
+     "OK"
+    ],
+    "tables": [
+     "_agent_analysis_runs",
+     "_agent_cleaning_ledger",
+     "_agent_cleaning_plans",
+     "_agent_contracts",
+     "_agent_datasets",
+     "_agent_history_fin_v1",
+     "fin"
+    ],
+    "analysis_run_rows": 10,
+    "distinct_answers": 9,
+    "role": "defect"
+   }
+  }
+ ]
+}

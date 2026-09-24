@@ -1,0 +1,66 @@
+{
+ "case": "COHORT",
+ "src": "/home/user/analytics-agent/src",
+ "commit": "63e304f8a59f49a5633a31af0ac45d5864195667",
+ "src_dirty": [],
+ "python": "3.12.3",
+ "duckdb": "1.5.5",
+ "seconds": 6.0,
+ "harness_error": null,
+ "observations": [
+  {
+   "sub": "heatmap_1000",
+   "tool": "render_chart",
+   "analysis": "cohort_retention",
+   "dataset": "education",
+   "rows": 1000,
+   "parameters": {
+    "analysis_type": "cohort_retention",
+    "chart": "heatmap",
+    "entity": "student_id"
+   },
+   "status": "OK",
+   "wall_time_seconds": 0.920752,
+   "response": "Under contract v1 for education: one row = one education record.\n\nChart written: /home/user/analytics-agent/workspace/tr_co_1000/charts/cohort_retention_20260924-224647.png\n\nA heatmap chart of cohort_retention for education. 533 of 1,617 point(s) drawn, cohort across the x axis, measures size, +0, +1, +2, +3, +4, +5, +6, +7, +8, +9, +10 and 37 more.\n\nYou cannot see this image. What it shows:\n  size: lowest 1 at 2022-06-01, highest 18 at 2021-01-01, first 18, last 1, 33 point(s)\n  +0: lowest 1 at 2022-06-01, highest 18 at 2021-01-01, first 18, last 1, 33 point(s)\n  +1: lowest 1 at 2021-02-01, highest 5 at 2021-04-01, first 3, last 1, 12 point(s)\n  +2: lowest 1 at 2021-05-01, highest 3 at 2021-01-01, first 3, last 1, 17 point(s)\n  +3: lowest 1 at 2021-01-01, highest 4 at 2021-05-01, first 1, last 1, 11 point(s)\n  +4: lowest 1 at 2021-01-01, highest 4 at 2021-05-01, first 1, last 1, 11 point(s)\n  +5: lowest 1 at 2021-01-01, highest 2 at 2021-04-01, first 1, last 1, 9 point(s)\n  +6: lowest 1 at 2021-02-01, highest 3 at 2021-04-01, first 2, last 2, 10 point(s)\n  +7: lowest 1 at 2021-04-01, highest 4 at 2021-05-01, first 2, last 1, 12 point(s)\n  +8: lowest 1 at 2021-03-01, highest 4 at 2021-07-01, first 2, last 1, 14 point(s)\n  +9: lowest 1 at 2022-01-01, highest 3 at 2021-04-01, first 2, last 1, 12 point(s)\n  +10: lowest 1 at 2021-06-01, highest 2 at 2021-03-01, first 2, last 1, 11 point(s)\n  ... 37 more series, not described here; compute_analysis with the same arguments returns the table that holds them\n\n  21 of 33 point(s) in +1 are empty and are not drawn; the table beside this chart still holds them.\n  16 of 33 point(s) in +2 are empty and are not drawn; the table beside this chart still holds them.\n  22 of 33 point(s) in +3 are empty and are not drawn; the table beside this chart still holds them.\n  22 of 33 point(s) in +4 are empty and are not drawn; the table beside this chart still holds them.\n  24 of 33 point(s) in +5 are empty and are not drawn; the table beside this chart still holds them.\n  23 of 33 point(s) in +6 are empty and are not drawn; the table beside this chart still holds them.\n  21 of 33 point(s) in +7 are empty and are not drawn; the table beside this chart still holds them.\n  19 of 33 point(s) in +8 are empty and are not drawn; the table beside this chart still holds them.\n  21 of 33 point(s) in +9 are empty and are not drawn; the table beside this chart still holds them.\n  22 of 33 point(s) in +10 are empty and are not drawn; the table beside this chart still holds them.\n  21 of 33 point(s) in +11 are empty and are not drawn; the table beside this chart still holds them.\n  18 of 33 point(s) in +12 are empty and are not drawn; the table beside this chart still holds them.\n  ... 35 more note(s) of the same kind\n\nFrom the analysis it was drawn from:\n  982 of 1,000 row(s) analysed. 13 outside 2021-01-01 to 2024-12-31. 5 undated and so not placed in the window.\n  33 monthly cohort(s) covering 196 distinct student_id value(s) across 982 event(s), from 2021-01-01 to 2024-05-01.\n  Cells are people, not percentages: the count in a cohort's +1 column is how many of its members were active one month later. The size column is what each row rests on, and it is there instead of a minimum-size rule, because any cutoff would be a number nobody measured.\n  Repeat rate 96.939%: 190 of 196 came back at least once, which is enough for the rows to be worth comparing.\n  0 row(s) have no student_id and 0 have no enrollment_date; both are listed so the event counts add back to the 982 in scope. A person occupies several rows, so the grid itself counts people and does not reconcile to a row count.",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "characters": 3661,
+    "png_bytes": 77633,
+    "points": [
+     "533",
+     "1,617"
+    ],
+    "series_described": 11,
+    "role": "defect"
+   }
+  },
+  {
+   "sub": "heatmap_100000",
+   "tool": "render_chart",
+   "analysis": "cohort_retention",
+   "dataset": "education",
+   "rows": 100000,
+   "parameters": {
+    "analysis_type": "cohort_retention",
+    "chart": "heatmap",
+    "entity": "student_id"
+   },
+   "status": "OK",
+   "wall_time_seconds": 0.578473,
+   "response": "Under contract v1 for education: one row = one education record.\n\nChart written: /home/user/analytics-agent/workspace/tr_co_100000/charts/cohort_retention_20260924-224652.png\n\nA heatmap chart of cohort_retention for education. 1,223 of 2,352 point(s) drawn, cohort across the x axis, measures size, +0, +1, +2, +3, +4, +5, +6, +7, +8, +9, +10 and 37 more.\n\nYou cannot see this image. What it shows:\n  size: lowest 11 at 2024-12-01, highest 1,986 at 2021-01-01, first 1,986, last 11, 48 point(s)\n  +0: lowest 11 at 2024-12-01, highest 1,986 at 2021-01-01, first 1,986, last 11, 48 point(s)\n  +1: lowest 1 at 2024-08-01, highest 174 at 2021-03-01, first 168, last 5, 47 point(s)\n  +2: lowest 1 at 2024-06-01, highest 200 at 2021-01-01, first 200, last 3, 46 point(s)\n  +3: lowest 1 at 2024-08-01, highest 186 at 2021-01-01, first 186, last 2, 45 point(s)\n  +4: lowest 1 at 2024-04-01, highest 201 at 2021-01-01, first 201, last 2, 44 point(s)\n  +5: lowest 1 at 2024-04-01, highest 171 at 2021-01-01, first 171, last 2, 43 point(s)\n  +6: lowest 2 at 2024-03-01, highest 196 at 2021-01-01, first 196, last 3, 42 point(s)\n  +7: lowest 3 at 2024-05-01, highest 202 at 2021-01-01, first 202, last 3, 41 point(s)\n  +8: lowest 2 at 2023-09-01, highest 195 at 2021-01-01, first 195, last 2, 39 point(s)\n  +9: lowest 2 at 2024-03-01, highest 177 at 2021-01-01, first 177, last 2, 39 point(s)\n  +10: lowest 4 at 2023-09-01, highest 200 at 2021-01-01, first 200, last 5, 38 point(s)\n  ... 37 more series, not described here; compute_analysis with the same arguments returns the table that holds them\n\n  1 of 48 point(s) in +1 are empty and are not drawn; the table beside this chart still holds them.\n  2 of 48 point(s) in +2 are empty and are not drawn; the table beside this chart still holds them.\n  3 of 48 point(s) in +3 are empty and are not drawn; the table beside this chart still holds them.\n  4 of 48 point(s) in +4 are empty and are not drawn; the table beside this chart still holds them.\n  5 of 48 point(s) in +5 are empty and are not drawn; the table beside this chart still holds them.\n  6 of 48 point(s) in +6 are empty and are not drawn; the table beside this chart still holds them.\n  7 of 48 point(s) in +7 are empty and are not drawn; the table beside this chart still holds them.\n  9 of 48 point(s) in +8 are empty and are not drawn; the table beside this chart still holds them.\n  9 of 48 point(s) in +9 are empty and are not drawn; the table beside this chart still holds them.\n  10 of 48 point(s) in +10 are empty and are not drawn; the table beside this chart still holds them.\n  11 of 48 point(s) in +11 are empty and are not drawn; the table beside this chart still holds them.\n  12 of 48 point(s) in +12 are empty and are not drawn; the table beside this chart still holds them.\n  ... 35 more note(s) of the same kind\n\nFrom the analysis it was drawn from:\n  98,466 of 100,000 row(s) analysed. 1,035 outside 2021-01-01 to 2024-12-31. 499 undated and so not placed in the window.\n  48 monthly cohort(s) covering 19,853 distinct student_id value(s) across 98,466 event(s), from 2021-01-01 to 2024-12-01.\n  Cells are people, not percentages: the count in a cohort's +1 column is how many of its members were active one month later. The size column is what each row rests on, and it is there instead of a minimum-size rule, because any cutoff would be a number nobody measured.\n  Repeat rate 96.308%: 19,120 of 19,853 came back at least once, which is enough for the rows to be worth comparing.\n  0 row(s) have no student_id and 0 have no enrollment_date; both are listed so the event counts add back to the 98,466 in scope. A person occupies several rows, so the grid itself counts people and does not reconcile to a row count.",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "characters": 3738,
+    "png_bytes": 74498,
+    "points": [
+     "1,223",
+     "2,352"
+    ],
+    "series_described": 11,
+    "role": "defect"
+   }
+  }
+ ]
+}
