@@ -1,0 +1,38 @@
+job G_wrong
+tool compute_analysis
+analysis summary_stats
+parameters {"dataset_name": "all_null_col", "analysis_type": "summary_stats"}
+domain None rows 0
+time 2026-09-24T18:46:11
+rss_before_kb 316524
+
+Traceback (most recent call last):
+  File "/home/user/analytics-agent/scripts/domain_benchmark/worker.py", line 161, in call
+    text = fn(**kwargs)
+           ^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/server.py", line 917, in compute_analysis
+    return analysis_tools.compute_analysis(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/analysis/tools.py", line 294, in compute_analysis
+    gate, output, used = _produce(con, dataset_name, analysis_type, params)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/analysis/tools.py", line 239, in _produce
+    output = analysis.run(con, gate, scope, **params)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/analysis/summary_stats.py", line 131, in summary_stats
+    row = con.execute(
+          ^^^^^^^^^^^^
+_duckdb.BinderException: Binder Error: No function matches the given name and argument types 'sum(VARCHAR)'. You might need to add explicit type casts.
+	Candidate functions:
+	sum(DECIMAL) -> DECIMAL
+	sum(BOOLEAN) -> HUGEINT
+	sum(SMALLINT) -> HUGEINT
+	sum(INTEGER) -> HUGEINT
+	sum(BIGINT) -> HUGEINT
+	sum(HUGEINT) -> HUGEINT
+	sum(DOUBLE) -> DOUBLE
+	sum(BIGNUM) -> BIGNUM
+
+
+LINE 1: SELECT count(*), count("v"), sum("v"), min("v"), max("v"), NULL, NULL, NULL FROM "all_nu...
+                                     ^

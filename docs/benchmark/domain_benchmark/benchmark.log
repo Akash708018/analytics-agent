@@ -35,3 +35,95 @@
 2026-09-24T17:09:45 D_healthcare: 100,000 rows generated in 2.57s (12,472,321 bytes); running the workflow
 2026-09-24T17:11:41 D_healthcare: done in 111s, worker peak 830.8 MiB, checks 10164/10165, crashes 0
 2026-09-24T17:11:44 D_manufacturing: 100,000 rows generated in 2.89s (13,459,007 bytes); running the workflow
+2026-09-24T17:14:00 D_manufacturing: done in 129s, worker peak 830.8 MiB, checks 14304/14312, crashes 0
+2026-09-24T17:14:03 D_education: 100,000 rows generated in 2.92s (14,258,084 bytes); running the workflow
+2026-09-24T17:16:28 D_education: done in 136s, worker peak 830.8 MiB, checks 15566/15567, crashes 0
+2026-09-24T17:16:36 A: already done, skipped (evidence kept)
+2026-09-24T17:16:36 B: already done, skipped (evidence kept)
+2026-09-24T17:16:36 C_financial: already done, skipped (evidence kept)
+2026-09-24T17:16:36 C_hr: already done, skipped (evidence kept)
+2026-09-24T17:16:36 C_sales: already done, skipped (evidence kept)
+2026-09-24T17:16:36 C_marketing: already done, skipped (evidence kept)
+2026-09-24T17:16:36 C_crm: already done, skipped (evidence kept)
+2026-09-24T17:16:36 C_ecommerce: already done, skipped (evidence kept)
+2026-09-24T17:16:36 C_logistics: already done, skipped (evidence kept)
+2026-09-24T17:16:36 C_healthcare: already done, skipped (evidence kept)
+2026-09-24T17:16:36 C_manufacturing: already done, skipped (evidence kept)
+2026-09-24T17:16:36 C_education: already done, skipped (evidence kept)
+2026-09-24T17:16:36 D_financial: already done, skipped (evidence kept)
+2026-09-24T17:16:36 D_hr: already done, skipped (evidence kept)
+2026-09-24T17:16:36 D_sales: already done, skipped (evidence kept)
+2026-09-24T17:16:36 D_marketing: already done, skipped (evidence kept)
+2026-09-24T17:16:36 D_crm: already done, skipped (evidence kept)
+2026-09-24T17:16:36 D_ecommerce: already done, skipped (evidence kept)
+2026-09-24T17:16:36 D_logistics: already done, skipped (evidence kept)
+2026-09-24T17:16:36 D_healthcare: already done, skipped (evidence kept)
+2026-09-24T17:16:36 D_manufacturing: already done, skipped (evidence kept)
+2026-09-24T17:16:36 D_education: already done, skipped (evidence kept)
+2026-09-24T17:17:22 E_financial: 1,000,000 rows generated in 45.63s (188,157,556 bytes); running the workflow
+2026-09-24T17:27:43 E_financial: done in 467s, worker peak 438.6 MiB, checks 601543/601543, crashes 0
+2026-09-24T17:28:17 E_hr: 1,000,000 rows generated in 33.58s (136,341,940 bytes); running the workflow
+2026-09-24T17:36:11 E_hr: done in 362s, worker peak 2001.4 MiB, checks 308239/308240, crashes 0
+2026-09-24T17:36:45 E_sales: 1,000,000 rows generated in 32.76s (152,085,310 bytes); running the workflow
+2026-09-24T17:44:37 E_sales: done in 346s, worker peak 2001.4 MiB, checks 602526/602527, crashes 0
+2026-09-24T17:45:13 E_marketing: 1,000,000 rows generated in 35.24s (148,693,302 bytes); running the workflow
+2026-09-24T17:52:31 E_marketing: done in 344s, worker peak 2001.4 MiB, checks 81832/81833, crashes 0
+2026-09-24T17:53:01 E_crm: 1,000,000 rows generated in 28.75s (111,509,035 bytes); running the workflow
+2026-09-24T18:01:39 E_crm: done in 279s, worker peak 2001.4 MiB, checks 2954833/2954834, crashes 0
+2026-09-24T18:02:15 E_ecommerce: 1,000,000 rows generated in 34.41s (163,898,723 bytes); running the workflow
+2026-09-24T18:09:43 E_ecommerce: done in 341s, worker peak 6514.8 MiB, checks 602568/602569, crashes 0
+2026-09-24T18:10:14 E_logistics: 1,000,000 rows generated in 30.07s (158,857,555 bytes); running the workflow
+2026-09-24T18:18:08 E_logistics: done in 376s, worker peak 6514.8 MiB, checks 156971/156971, crashes 0
+2026-09-24T18:18:34 E_healthcare: 1,000,000 rows generated in 25.05s (124,724,030 bytes); running the workflow
+2026-09-24T18:24:24 E_healthcare: done in 280s, worker peak 6514.8 MiB, checks 37156/37157, crashes 0
+2026-09-24T18:24:53 E_manufacturing: 1,000,000 rows generated in 28.44s (134,615,697 bytes); running the workflow
+2026-09-24T18:31:55 E_manufacturing: done in 347s, worker peak 6514.8 MiB, checks 81824/81825, crashes 0
+2026-09-24T18:32:25 E_education: 1,000,000 rows generated in 29.33s (142,597,199 bytes); running the workflow
+2026-09-24T18:39:58 E_education: done in 352s, worker peak 6514.8 MiB, checks 83067/83068, crashes 0
+2026-09-24T18:40:07 A: already done, skipped (evidence kept)
+2026-09-24T18:40:07 B: already done, skipped (evidence kept)
+2026-09-24T18:40:07 C_financial: already done, skipped (evidence kept)
+2026-09-24T18:40:07 C_hr: already done, skipped (evidence kept)
+2026-09-24T18:40:07 C_sales: already done, skipped (evidence kept)
+2026-09-24T18:40:07 C_marketing: already done, skipped (evidence kept)
+2026-09-24T18:40:07 C_crm: already done, skipped (evidence kept)
+2026-09-24T18:40:07 C_ecommerce: already done, skipped (evidence kept)
+2026-09-24T18:40:07 C_logistics: already done, skipped (evidence kept)
+2026-09-24T18:40:07 C_healthcare: already done, skipped (evidence kept)
+2026-09-24T18:40:07 C_manufacturing: already done, skipped (evidence kept)
+2026-09-24T18:40:07 C_education: already done, skipped (evidence kept)
+2026-09-24T18:40:07 D_financial: already done, skipped (evidence kept)
+2026-09-24T18:40:07 D_hr: already done, skipped (evidence kept)
+2026-09-24T18:40:07 D_sales: already done, skipped (evidence kept)
+2026-09-24T18:40:07 D_marketing: already done, skipped (evidence kept)
+2026-09-24T18:40:07 D_crm: already done, skipped (evidence kept)
+2026-09-24T18:40:07 D_ecommerce: already done, skipped (evidence kept)
+2026-09-24T18:40:07 D_logistics: already done, skipped (evidence kept)
+2026-09-24T18:40:07 D_healthcare: already done, skipped (evidence kept)
+2026-09-24T18:40:07 D_manufacturing: already done, skipped (evidence kept)
+2026-09-24T18:40:07 D_education: already done, skipped (evidence kept)
+2026-09-24T18:40:07 E_financial: already done, skipped (evidence kept)
+2026-09-24T18:40:07 E_hr: already done, skipped (evidence kept)
+2026-09-24T18:40:07 E_sales: already done, skipped (evidence kept)
+2026-09-24T18:40:07 E_marketing: already done, skipped (evidence kept)
+2026-09-24T18:40:07 E_crm: already done, skipped (evidence kept)
+2026-09-24T18:40:07 E_ecommerce: already done, skipped (evidence kept)
+2026-09-24T18:40:07 E_logistics: already done, skipped (evidence kept)
+2026-09-24T18:40:07 E_healthcare: already done, skipped (evidence kept)
+2026-09-24T18:40:07 E_manufacturing: already done, skipped (evidence kept)
+2026-09-24T18:40:07 E_education: already done, skipped (evidence kept)
+2026-09-24T18:49:20 I_sales_2000000: resource gate {'ok': True, 'estimated_memory_mb': 3245, 'available_memory_mb': 14756, 'estimated_disk_mb': 913, 'available_disk_mb': 28090, 'basis': '1M run x rows/1M x margin 1.5'}
+2026-09-24T18:50:36 I_sales_2000000: 2,000,000 rows generated in 75.2s (304,168,105 bytes); running the workflow
+2026-09-24T18:59:42 I_sales_2000000: done in 547s, worker peak 722.8 MiB, checks 63/63, crashes 0
+2026-09-24T18:59:44 I_sales_5000000: resource gate {'ok': True, 'estimated_memory_mb': 8114, 'available_memory_mb': 14780, 'estimated_disk_mb': 2282, 'available_disk_mb': 28080, 'basis': '1M run x rows/1M x margin 1.5'}
+2026-09-24T19:02:51 I_sales_5000000: 5,000,000 rows generated in 184.97s (760,437,252 bytes); running the workflow
+2026-09-24T19:25:01 I_sales_5000000: done in 1330s, worker peak 722.9 MiB, checks 63/63, crashes 0
+2026-09-24T19:25:03 I_sales_10000000: resource gate {'ok': False, 'estimated_memory_mb': 16227, 'available_memory_mb': 14563, 'estimated_disk_mb': 4565, 'available_disk_mb': 28055, 'basis': '1M run x rows/1M x margin 1.5'}
+2026-09-24T19:25:03 I_logistics_2000000: resource gate {'ok': True, 'estimated_memory_mb': 2779, 'available_memory_mb': 14733, 'estimated_disk_mb': 889, 'available_disk_mb': 28055, 'basis': '1M run x rows/1M x margin 1.5'}
+2026-09-24T19:26:14 I_logistics_2000000: 2,000,000 rows generated in 69.52s (317,688,687 bytes); running the workflow
+2026-09-24T19:36:13 I_logistics_2000000: done in 599s, worker peak 722.9 MiB, checks 61/61, crashes 0
+2026-09-24T19:36:13 I_logistics_5000000: resource gate {'ok': True, 'estimated_memory_mb': 6946, 'available_memory_mb': 14991, 'estimated_disk_mb': 2223, 'available_disk_mb': 28052, 'basis': '1M run x rows/1M x margin 1.5'}
+2026-09-24T19:39:10 I_logistics_5000000: 5,000,000 rows generated in 174.66s (794,250,707 bytes); running the workflow
+2026-09-24T20:03:12 I_logistics_5000000: done in 1442s, worker peak 722.9 MiB, checks 61/61, crashes 0
+2026-09-24T20:03:13 I_logistics_10000000: resource gate {'ok': True, 'estimated_memory_mb': 13893, 'available_memory_mb': 14936, 'estimated_disk_mb': 4445, 'available_disk_mb': 28045, 'basis': '1M run x rows/1M x margin 1.5'}
+2026-09-24T20:09:16 I_logistics_10000000: 10,000,000 rows generated in 358.06s (1,588,508,165 bytes); running the workflow

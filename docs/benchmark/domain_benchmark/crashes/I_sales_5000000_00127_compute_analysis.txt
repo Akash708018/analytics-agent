@@ -1,0 +1,34 @@
+job I_sales_5000000
+tool compute_analysis
+analysis hypothesis_test
+parameters {"dataset_name": "sales", "analysis_type": "hypothesis_test", "dimension": "returned_flag", "measure": "discount", "method": "rank"}
+domain sales rows 5000000
+time 2026-09-24T19:23:17
+rss_before_kb 454504
+
+Traceback (most recent call last):
+  File "/home/user/analytics-agent/scripts/domain_benchmark/worker.py", line 161, in call
+    text = fn(**kwargs)
+           ^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/server.py", line 917, in compute_analysis
+    return analysis_tools.compute_analysis(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/analysis/tools.py", line 294, in compute_analysis
+    gate, output, used = _produce(con, dataset_name, analysis_type, params)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/analysis/tools.py", line 239, in _produce
+    output = analysis.run(con, gate, scope, **params)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/analysis/hypothesis_test.py", line 119, in hypothesis_test
+    return _difference(con, gate, scope, dimension, measure, method, summary)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/analysis/hypothesis_test.py", line 170, in _difference
+    result, effect, effect_name = _run_difference(con, scope, dimension, measure,
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/analysis/hypothesis_test.py", line 208, in _run_difference
+    result = mann_whitney(con, scope, dimension, measure,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/analysis/inferential.py", line 182, in mann_whitney
+    tie_term, total = con.execute(
+                      ^^^^^^^^^^^^
+_duckdb.OutOfRangeException: Out of Range Error: Overflow in multiplication of INT64 (8569190673124 * 2927318)!

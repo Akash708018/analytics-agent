@@ -1,0 +1,56 @@
+job G_wrong
+tool compute_analysis
+analysis outlier_detection
+parameters {"dataset_name": "inf_nan", "analysis_type": "outlier_detection", "measure": "v"}
+domain None rows 0
+time 2026-09-24T18:46:11
+rss_before_kb 316120
+
+Traceback (most recent call last):
+  File "/home/user/analytics-agent/scripts/domain_benchmark/worker.py", line 161, in call
+    text = fn(**kwargs)
+           ^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/server.py", line 917, in compute_analysis
+    return analysis_tools.compute_analysis(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/analysis/tools.py", line 294, in compute_analysis
+    gate, output, used = _produce(con, dataset_name, analysis_type, params)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/analysis/tools.py", line 239, in _produce
+    output = analysis.run(con, gate, scope, **params)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/analysis/outlier_detection.py", line 107, in outlier_detection
+    q1, q3, mean, sd, med, n = con.execute(
+                               ^^^^^^^^^^^^
+_duckdb.BinderException: Binder Error: No function matches the given name and argument types 'quantile_cont(VARCHAR, DECIMAL(3,2))'. You might need to add explicit type casts.
+	Candidate functions:
+	quantile_cont(DECIMAL, DOUBLE) -> DECIMAL
+	quantile_cont(DECIMAL, DOUBLE[]) -> DECIMAL
+	quantile_cont(TINYINT, DOUBLE) -> TINYINT
+	quantile_cont(TINYINT, DOUBLE[]) -> TINYINT
+	quantile_cont(SMALLINT, DOUBLE) -> SMALLINT
+	quantile_cont(SMALLINT, DOUBLE[]) -> SMALLINT
+	quantile_cont(INTEGER, DOUBLE) -> INTEGER
+	quantile_cont(INTEGER, DOUBLE[]) -> INTEGER
+	quantile_cont(BIGINT, DOUBLE) -> BIGINT
+	quantile_cont(BIGINT, DOUBLE[]) -> BIGINT
+	quantile_cont(HUGEINT, DOUBLE) -> HUGEINT
+	quantile_cont(HUGEINT, DOUBLE[]) -> HUGEINT
+	quantile_cont(FLOAT, DOUBLE) -> FLOAT
+	quantile_cont(FLOAT, DOUBLE[]) -> FLOAT
+	quantile_cont(DOUBLE, DOUBLE) -> DOUBLE
+	quantile_cont(DOUBLE, DOUBLE[]) -> DOUBLE
+	quantile_cont(DATE, DOUBLE) -> DATE
+	quantile_cont(DATE, DOUBLE[]) -> DATE
+	quantile_cont(TIMESTAMP, DOUBLE) -> TIMESTAMP
+	quantile_cont(TIMESTAMP, DOUBLE[]) -> TIMESTAMP
+	quantile_cont(TIME, DOUBLE) -> TIME
+	quantile_cont(TIME, DOUBLE[]) -> TIME
+	quantile_cont(TIMESTAMP WITH TIME ZONE, DOUBLE) -> TIMESTAMP WITH TIME ZONE
+	quantile_cont(TIMESTAMP WITH TIME ZONE, DOUBLE[]) -> TIMESTAMP WITH TIME ZONE
+	quantile_cont(TIME WITH TIME ZONE, DOUBLE) -> TIME WITH TIME ZONE
+	quantile_cont(TIME WITH TIME ZONE, DOUBLE[]) -> TIME WITH TIME ZONE
+
+
+LINE 1: SELECT quantile_cont("v", 0.25), quantile_cont("v", 0.75), avg...
+               ^

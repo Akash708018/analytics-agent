@@ -1,0 +1,29 @@
+job H_concurrency
+tool compute_analysis
+analysis top_n
+parameters {"dataset_name": "financial", "analysis_type": "top_n", "dimension": "payment_method", "measure": "revenue"}
+domain None rows 0
+time 2026-09-24T18:48:54
+rss_before_kb 273688
+
+Traceback (most recent call last):
+  File "/home/user/analytics-agent/scripts/domain_benchmark/worker.py", line 161, in call
+    text = fn(**kwargs)
+           ^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/server.py", line 917, in compute_analysis
+    return analysis_tools.compute_analysis(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/analysis/tools.py", line 294, in compute_analysis
+    gate, output, used = _produce(con, dataset_name, analysis_type, params)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/analysis/tools.py", line 208, in _produce
+    gate = require_contract(con, dataset_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/state.py", line 149, in require_contract
+    live = current(con, dataset_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/contract/store.py", line 214, in current
+    _ensure_table(con)
+  File "/home/user/analytics-agent/src/analytics_agent/contract/store.py", line 156, in _ensure_table
+    con.execute(
+_duckdb.TransactionException: TransactionContext Error: Catalog write-write conflict on create with "Schema\0main\0main\0Table\0main\0_agent_contracts"
