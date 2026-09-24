@@ -43,7 +43,7 @@ from .plan import ActionKind
 # absent. Used by detection to decide whether a sample is required.
 LOSSY_KINDS = frozenset(
     {ActionKind.CONVERT_TYPE, ActionKind.DROP_DUPLICATE_ROWS,
-     ActionKind.NORMALISE_CASE, ActionKind.EXCLUDE_COLUMN}
+     ActionKind.NORMALISE_CASE, ActionKind.EXCLUDE_COLUMN, ActionKind.NULL_NON_FINITE}
 )
 
 SAMPLE_LIMIT = 5
@@ -107,9 +107,14 @@ def _replace_one(target: str, source: str, column: str, expression: str) -> str:
     )
 
 
+# A value a numeric conversion reads but changes: '00311' casts to 311 and the zeros, which are
+# part of a zip code or an account number, are gone (P14-O4, B2).
+LEADING_ZERO = "regexp_matches(trim({col}), '^[+-]?0[0-9]')"
+
+
 def convert_type(
     *, source: str, target: str, column: str, to_type: str,
-    missing_tokens: list[str],
+    missing_tokens: list[str], expression: str | None = None, numeric: bool = False,
 ) -> Rendering:
     """Read a text column as `to_type`.
 
@@ -120,9 +125,15 @@ def convert_type(
     destroys the only record that a price was withheld rather than missing.
     """
     col = ident(column)
-    expression = f"TRY_CAST({col} AS {to_type})"
+    # `expression` is the conversion when TRY_CAST alone cannot read the text: a decimal comma,
+    # a currency sign, a percent sign, several date formats (P14-O10). The loss is counted from
+    # it exactly as from a plain cast. `numeric` counts a value with leading zeros as lost too.
+    expression = expression or f"TRY_CAST({col} AS {to_type})"
+    fails = f"{expression} IS NULL"
+    if numeric:
+        fails = f"({fails} OR {LEADING_ZERO.format(col=col)})"
     undeclared = (
-        f"{col} IS NOT NULL AND {expression} IS NULL"
+        f"{col} IS NOT NULL AND {fails}"
         + (
             f" AND upper(trim({col})) NOT IN ({token_list(missing_tokens)})"
             if missing_tokens
@@ -257,6 +268,52 @@ def drop_duplicate_rows(*, source: str, target: str) -> Rendering:
     )
 
 
+def null_non_finite(*, source: str, target: str, column: str) -> Rendering:
+    """Turn NaN, Infinity and -Infinity in a DOUBLE column into NULL.
+
+    DuckDB reads the text 'NaN' and 'Infinity' as those floats, and they poison every mean and
+    spread (P14-O6, B4). LOSSY, because an infinity may be a sensor's way of saying "off the
+    scale" -- the person decides, with the values shown.
+    """
+    col = ident(column)
+    expression = f"CASE WHEN isfinite({col}) THEN {col} END"
+    hit = f"{col} IS NOT NULL AND ({expression}) IS NULL"
+    return Rendering(
+        expression=expression,
+        statement=_replace_one(target, source, column, expression),
+        affected_sql=f"SELECT count(*) FROM {ident(source)} WHERE {hit}",
+        lost_sql=f"SELECT count(*) FROM {ident(source)} WHERE {hit}",
+        sample_sql=(f"SELECT DISTINCT CAST({col} AS VARCHAR) FROM {ident(source)} "
+                    f"WHERE {hit} LIMIT {SAMPLE_LIMIT}"),
+    )
+
+
+def header_match(columns: list[str], min_match: int) -> str:
+    """A predicate true for a row whose values repeat the column names in `min_match` columns."""
+    parts = []
+    for c in columns:
+        names = {c.lower(), c.lower().replace("_", " ")}
+        listed = ", ".join(literal(n) for n in sorted(names))
+        parts.append(f"CASE WHEN lower(trim(CAST({ident(c)} AS VARCHAR))) IN ({listed}) "
+                     f"THEN 1 ELSE 0 END")
+    return f"({' + '.join(parts)}) >= {min_match}"
+
+
+def drop_header_rows(*, source: str, target: str, columns: list[str],
+                     min_match: int) -> Rendering:
+    """Remove rows that are copies of the header -- two exports pasted together (P14-O11, B11).
+
+    Not lossy: such a row holds the column names and nothing else, and it is what turned every
+    numeric column to text.
+    """
+    expression = header_match(columns, min_match)
+    return Rendering(
+        expression=expression,
+        statement=_rebuild(target, source, "*") + f"\nWHERE NOT ({expression})",
+        affected_sql=f"SELECT count(*) FROM {ident(source)} WHERE {expression}",
+    )
+
+
 def exclude_column(*, source: str, target: str, column: str) -> Rendering:
     """Drop a column.
 
@@ -287,6 +344,8 @@ _RENDERERS = {
     ActionKind.NORMALISE_CASE: normalise_case,
     ActionKind.DROP_DUPLICATE_ROWS: drop_duplicate_rows,
     ActionKind.EXCLUDE_COLUMN: exclude_column,
+    ActionKind.NULL_NON_FINITE: null_non_finite,
+    ActionKind.DROP_HEADER_ROWS: drop_header_rows,
 }
 
 
@@ -307,6 +366,8 @@ __all__ = [
     "Rendering",
     "convert_type",
     "drop_duplicate_rows",
+    "drop_header_rows",
+    "null_non_finite",
     "exclude_column",
     "ident",
     "literal",

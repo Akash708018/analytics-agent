@@ -43,6 +43,7 @@ Three more, found while adding footer skipping and coercion counts:
 
 from __future__ import annotations
 
+import codecs
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -71,6 +72,7 @@ class LoadResult:
     gate_verdict: str = "OK"
     gate_message: str = ""
     coercion_failures: dict[str, int] = field(default_factory=dict)
+    notes: list[str] = field(default_factory=list)  # what the load did that a person should know
 
     @property
     def coercion_total(self) -> int:
@@ -96,6 +98,7 @@ class LoadResult:
                 f"Reload with on_error='stop' to see the first one, or force "
                 f"those columns to text."
             )
+        lines += [f"NOTE: {n}" for n in self.notes]
         lines.append("")
         lines.append("| column | type |")
         lines.append("| --- | --- |")
@@ -142,6 +145,78 @@ def _q(name: str) -> str:
     return '"' + name.replace('"', '""') + '"'
 
 
+# Bytes read from each end of a file to settle its encoding and, at the end, how it finishes.
+# A seek, so the cost is the same on a 10 KB file and on a 2.5 GB one (P14-O3, P14-O9).
+PROBE_BYTES = 64 * 1024
+
+UTF8, LATIN1 = "utf-8", "latin-1"
+
+
+def _decodes_as_utf8(chunk: bytes, *, from_middle: bool) -> bool:
+    """Whether a chunk is UTF-8, allowing a character cut at either edge of the chunk."""
+    if from_middle:
+        i = 0
+        while i < min(3, len(chunk)) and 0x80 <= chunk[i] <= 0xBF:  # continuation bytes
+            i += 1
+        chunk = chunk[i:]
+    try:
+        codecs.getincrementaldecoder("utf-8")().decode(chunk, final=False)
+        return True
+    except UnicodeDecodeError:
+        return False
+
+
+def sniff_encoding(path: Path | str) -> str:
+    """UTF-8 if the first and last PROBE_BYTES decode as UTF-8, else Latin-1.
+
+    Latin-1 is the fallback because every byte is a Latin-1 character: a file that is not UTF-8
+    always reads, and the Western European text such exports hold reads right. DuckDB takes both
+    (measured: encoding='latin-1' reads b'S\\xfcnd' as 'Sünd'). A UTF-8 error in the middle
+    of a large file is caught by load_csv, which retries as Latin-1.
+    """
+    path = Path(path)
+    size = path.stat().st_size
+    with path.open("rb") as f:
+        head = f.read(PROBE_BYTES)
+        tail = b""
+        if size > PROBE_BYTES:
+            f.seek(max(PROBE_BYTES, size - PROBE_BYTES))
+            tail = f.read()
+    ok = _decodes_as_utf8(head, from_middle=False) and (
+        not tail or _decodes_as_utf8(tail, from_middle=True))
+    return UTF8 if ok else LATIN1
+
+
+def tail_lines(path: Path | str, n: int) -> list[str]:
+    """The last n non-blank lines, read from the end with a seek -- never the whole file.
+
+    Blank lines are left out because DuckDB skips them (measured), so they are not rows and must
+    not be counted as a footer. The first line of the probe is dropped when the probe starts
+    mid-file, because it is probably cut.
+    """
+    path = Path(path)
+    size = path.stat().st_size
+    with path.open("rb") as f:
+        start = max(0, size - PROBE_BYTES)
+        f.seek(start)
+        raw = f.read()
+    text = raw.decode(sniff_encoding(path), errors="replace")
+    lines = text.splitlines()
+    if start > 0 and lines:
+        lines = lines[1:]
+    return [ln for ln in lines if ln.strip()][-n:]
+
+
+def has_data_rows(path: Path | str, header_rows: int) -> bool:
+    """Whether any non-blank line follows the header. Stops at the first one found."""
+    path = Path(path)
+    with path.open("r", encoding=sniff_encoding(path), errors="replace", newline="") as f:
+        for i, line in enumerate(f):
+            if i >= header_rows and line.strip():
+                return True
+    return False
+
+
 def preview_lines(path: Path | str, n: int = CSV_PREVIEW_LINES) -> list[str]:
     """First n lines as raw text. Never reads the whole file.
 
@@ -151,7 +226,8 @@ def preview_lines(path: Path | str, n: int = CSV_PREVIEW_LINES) -> list[str]:
     """
     path = Path(path)
     out: list[str] = []
-    with path.open("r", encoding="utf-8", errors="replace", newline="") as f:
+    # Decoded as the load will decode it, so a Latin-1 file previews as 'Sünd', not 'S?nd'.
+    with path.open("r", encoding=sniff_encoding(path), errors="replace", newline="") as f:
         for i, line in enumerate(f):
             if i >= n:
                 break
@@ -160,16 +236,17 @@ def preview_lines(path: Path | str, n: int = CSV_PREVIEW_LINES) -> list[str]:
 
 
 def detect_column_count(
-    con: duckdb.DuckDBPyConnection, path: Path, skip: int = 0
+    con: duckdb.DuckDBPyConnection, path: Path, skip: int = 0, encoding: str = UTF8
 ) -> int:
     """Column count without reading any rows.
 
     LIMIT 0 makes DuckDB sniff the structure and return no data, so this costs
     a few kilobytes regardless of file size.
     """
+    enc = f", encoding='{encoding}'" if encoding != UTF8 else ""
     rel = con.execute(
         f"SELECT * FROM read_csv({_sql_path(path)}, skip={skip}, "
-        f"header=false, sample_size=1024) LIMIT 0"
+        f"header=false, sample_size=1024{enc}) LIMIT 0"
     )
     return len(rel.description)
 
@@ -254,10 +331,26 @@ def load_csv(
             f"NEXT STEP: pass names=[...], one per column."
         )
 
+    # A header with nothing under it. DuckDB sniffs an empty remainder as ONE column, so the
+    # names check below used to refuse it as "9 names but 1 column" (P14-O11, B10).
+    if not has_data_rows(path, header_rows):
+        raise LoadRefused(
+            f"BLOCKED: {path.name} has a header and no data rows.\n"
+            f"WHY: there is nothing to load -- every line after the first "
+            f"{header_rows} is blank or missing.\n"
+            f"NEXT STEP: check the export finished, and upload the file with its rows."
+        )
+
+    encoding = sniff_encoding(path)
+    notes: list[str] = []
+
     # Guard the silent-padding trap: fewer names than columns does not error
     # in DuckDB, it just appends 'column7'.
     if names:
-        actual = detect_column_count(con, path, skip=header_rows)
+        try:
+            actual = detect_column_count(con, path, skip=header_rows, encoding=encoding)
+        except duckdb.Error as exc:
+            raise LoadRefused(_duck_refusal(path, exc)) from exc
         if len(names) != actual:
             raise LoadRefused(
                 f"BLOCKED: {len(names)} column names given but "
@@ -276,6 +369,9 @@ def load_csv(
     # rejects nullstr=[] outright: "requires a non-empty list of possible null
     # strings". Omitting the option is what an empty list has to mean.
     opts = [f"sample_size={sample_size}"]
+    if encoding != UTF8:
+        opts.append(f"encoding='{encoding}'")
+        notes.append(_latin1_note(path))
     if nulls:
         opts.append(f"nullstr={nulls!r}")
     if delimiter:
@@ -295,37 +391,19 @@ def load_csv(
     verb = "CREATE OR REPLACE TABLE" if replace else "CREATE TABLE"
 
     try:
-        if on_error == ON_ERROR_NULL:
-            coercion = _load_with_coercion_counts(
-                con, read_expr, dataset_name, dtypes, footer_skip_rows, verb
-            )
-        else:
-            select = "SELECT * FROM " + read_expr
-            if dtypes:
-                sniffed = _sniff_types(con, read_expr)
-                select = (
-                    "SELECT "
-                    + ", ".join(
-                        f"CAST({_q(c)} AS {dtypes[c]}) AS {_q(c)}"
-                        if c in dtypes
-                        else _q(c)
-                        for c, _t in sniffed
-                    )
-                    + " FROM "
-                    + read_expr
-                )
-            if footer_skip_rows:
-                select = _apply_footer_skip(con, select, read_expr, footer_skip_rows, path)
-            con.execute(f"{verb} {_q(dataset_name)} AS {select}")
+        try:
+            coercion = _load(con, read_expr, dataset_name, dtypes, footer_skip_rows, verb,
+                             on_error, path)
+        except duckdb.Error as exc:
+            # UTF-8 held at the probed ends and broke in the middle: read it all as Latin-1.
+            if encoding != UTF8 or "unicode" not in str(exc).lower():
+                raise
+            read_expr = read_expr[:-1] + f", encoding='{LATIN1}')"
+            notes.append(_latin1_note(path))
+            coercion = _load(con, read_expr, dataset_name, dtypes, footer_skip_rows, verb,
+                             on_error, path)
     except duckdb.Error as exc:
-        raise LoadRefused(
-            f"BLOCKED: DuckDB could not read {path.name}.\n"
-            f"DuckDB said: {exc}\n"
-            f"NEXT STEP: check the delimiter and the number of header rows. "
-            f"Call preview_lines() to see the first lines as they actually "
-            f"are. If a single bad value is the problem, on_error='null' "
-            f"stores it as NULL and counts it instead of stopping."
-        ) from exc
+        raise LoadRefused(_duck_refusal(path, exc)) from exc
 
     rows, cols = db.table_shape(con, dataset_name)
     columns = [
@@ -359,7 +437,65 @@ def load_csv(
         gate_verdict=gate.verdict.value,
         gate_message=gate.message,
         coercion_failures=coercion,
+        notes=list(dict.fromkeys(notes)),
     )
+
+
+def _latin1_note(path: Path) -> str:
+    return (f"{path.name} is not UTF-8, so it was read as Latin-1 (Western European). If "
+            f"accented letters look wrong, the file uses another encoding: save it as UTF-8 and "
+            f"upload it again.")
+
+
+def _duck_refusal(path: Path, exc: Exception) -> str:
+    """DuckDB's reason, without the server's paths or the SQL it was running.
+
+    Its message names the file's absolute path and echoes the query ('LINE 1: SELECT * FROM
+    rea...'); both reached a web visitor through the Latin-1 refusal (P14-O9, B7). The lines
+    before the first blank one, and the 'Possible Solution' lines, are what explain it.
+    """
+    kept = []
+    for line in str(exc).splitlines():
+        stripped = line.strip()
+        if stripped.startswith(("LINE ", "file =")) or stripped.startswith("^"):
+            break
+        if stripped:
+            kept.append(stripped)
+    reason = " ".join(kept).replace(str(path.resolve()), path.name).replace(str(path), path.name)
+    return (
+        f"BLOCKED: DuckDB could not read {path.name}.\n"
+        f"DuckDB said: {reason}\n"
+        f"NEXT STEP: check the delimiter and the number of header rows. "
+        f"Call preview_lines() to see the first lines as they actually "
+        f"are. If a single bad value is the problem, on_error='null' "
+        f"stores it as NULL and counts it instead of stopping."
+    )
+
+
+def _load(con, read_expr, dataset_name, dtypes, footer_skip_rows, verb, on_error, path):
+    """One attempt at the load. Returns the coercion counts (empty unless on_error='null')."""
+    if on_error == ON_ERROR_NULL:
+        return _load_with_coercion_counts(
+            con, read_expr, dataset_name, dtypes, footer_skip_rows, verb
+        )
+    select = "SELECT * FROM " + read_expr
+    if dtypes:
+        sniffed = _sniff_types(con, read_expr)
+        select = (
+            "SELECT "
+            + ", ".join(
+                f"CAST({_q(c)} AS {dtypes[c]}) AS {_q(c)}"
+                if c in dtypes
+                else _q(c)
+                for c, _t in sniffed
+            )
+            + " FROM "
+            + read_expr
+        )
+    if footer_skip_rows:
+        select = _apply_footer_skip(con, select, read_expr, footer_skip_rows, path)
+    con.execute(f"{verb} {_q(dataset_name)} AS {select}")
+    return {}
 
 
 def _apply_footer_skip(

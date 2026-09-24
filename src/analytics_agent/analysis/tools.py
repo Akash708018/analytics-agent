@@ -28,6 +28,8 @@ rows it did not describe, so it is refused as UNSOUND rather than written.
 
 from __future__ import annotations
 
+import re
+
 from analytics_agent.contract import ContractRefused
 from analytics_agent.contract.refusals import Reason, Refusal
 from analytics_agent.state import require_contract
@@ -54,6 +56,67 @@ def _example_call(dataset_name: str) -> str:
     return (
         f'compute_analysis(dataset_name="{dataset_name}", '
         f'analysis_type="summary_stats")'
+    )
+
+
+# Python's TypeError for a missing or unexpected keyword, which used to be the whole WHY:
+# "top_n() missing 1 required positional argument: 'measure'" (P14-O12, B13).
+_MISSING_ARGS = re.compile(r"missing \d+ required (?:positional |keyword-only )?arguments?: (.+)$")
+_UNEXPECTED_ARG = re.compile(r"unexpected keyword argument '(\w+)'")
+# What each argument names, so the example can be filled from the contract.
+_MEASURE_ARGS = ("measure", "against")
+_DIMENSION_ARGS = ("dimension", "rows", "columns", "column", "second_dimension", "entity")
+_PLACEHOLDER = {"period": "YYYY-MM", "baseline": "YYYY-MM", "before_start": "YYYY-MM-DD",
+                "before_end": "YYYY-MM-DD", "after_start": "YYYY-MM-DD", "after_end": "YYYY-MM-DD"}
+
+
+def _params_refusal(analysis_type: str, dataset_name: str, exc: Exception, gate) -> Refusal:
+    """A wrong argument set, in the engine's words, with a call that names declared columns."""
+    text = str(exc)
+    measures = [m.name for m in gate.contract.measures]
+    dims = list(gate.contract.dimensions)
+    declared = (f"declared measures: {', '.join(measures) or '(none)'}; declared "
+                f"dimensions: {', '.join(dims) or '(none)'}")
+    missing = _MISSING_ARGS.search(text)
+    unexpected = _UNEXPECTED_ARG.search(text)
+    if missing:
+        names = re.findall(r"'(\w+)'", missing.group(1))
+        why = (f"{analysis_type} needs {', '.join(names)}, and "
+               f"{'it was' if len(names) == 1 else 'they were'} not given.")
+        short = ([n for n in names if n in _MEASURE_ARGS and not measures]
+                 + [n for n in names if n in _DIMENSION_ARGS and not dims])
+        if short:
+            why += (f" The contract declares no "
+                    f"{'measure' if short[0] in _MEASURE_ARGS else 'dimension'} to pass as "
+                    f"{short[0]}, so the contract is what has to change.")
+            return Refusal(
+                reason=Reason.ANALYSIS_PARAMS_INVALID,
+                what=f"{analysis_type} was called without {', '.join(names)}.",
+                why=why, state=declared,
+                next_call=f'propose_dataset_contract(dataset_name="{dataset_name}")')
+        pool = {"measure": iter(measures), "dimension": iter(dims)}
+        args = []
+        for n in names:
+            kind = "measure" if n in _MEASURE_ARGS else "dimension" if n in _DIMENSION_ARGS else None
+            value = next(pool[kind], None) if kind else _PLACEHOLDER.get(n)
+            args.append(f'{n}="{value or "..."}"')
+        return Refusal(
+            reason=Reason.ANALYSIS_PARAMS_INVALID,
+            what=f"{analysis_type} was called without {', '.join(names)}.",
+            why=why, state=declared,
+            next_call=(f'compute_analysis(dataset_name="{dataset_name}", '
+                       f'analysis_type="{analysis_type}", {", ".join(args)})'))
+    if unexpected:
+        why = (f"{analysis_type} does not take {unexpected.group(1)}. "
+               f"{get(analysis_type).summary}")
+    else:
+        why = text
+    return Refusal(
+        reason=Reason.ANALYSIS_PARAMS_INVALID,
+        what=f"{analysis_type} was called with arguments it cannot take.",
+        why=why,
+        state=f"{analysis_type}: {get(analysis_type).summary}",
+        next_call=_example_call(dataset_name),
     )
 
 
@@ -148,13 +211,7 @@ def _produce(con, dataset_name: str, analysis_type: str, params: dict):
             next_call=f'propose_dataset_contract(dataset_name="{dataset_name}")',
         ).to_text()) from None
     except (TypeError, ParamsInvalid) as exc:
-        raise _Refused(Refusal(
-            reason=Reason.ANALYSIS_PARAMS_INVALID,
-            what=f"{analysis_type} was called with arguments it cannot take.",
-            why=str(exc),
-            state=f"{analysis_type}: {get(analysis_type).summary}",
-            next_call=_example_call(dataset_name),
-        ).to_text()) from None
+        raise _Refused(_params_refusal(analysis_type, dataset_name, exc, gate).to_text()) from None
     except ValueError as exc:
         raise _Refused(Refusal(
             reason=Reason.ANALYSIS_NOT_POSSIBLE,

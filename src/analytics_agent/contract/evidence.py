@@ -107,6 +107,11 @@ def _base_type(dtype: str) -> str:
     return dtype.split("(")[0].strip().upper()
 
 
+def _is_whole(dtype: str) -> bool:
+    return _base_type(dtype) in ("TINYINT", "SMALLINT", "INTEGER", "BIGINT", "HUGEINT",
+                                 "UTINYINT", "USMALLINT", "UINTEGER", "UBIGINT")
+
+
 def _is_numeric(dtype: str) -> bool:
     return _base_type(dtype) in _NUMERIC_TYPES
 
@@ -312,7 +317,11 @@ def suggest_role(col: ColumnEvidence) -> tuple[str, str]:
     if _base_type(col.dtype) == "BOOLEAN":
         return "flag", f"{col.name} is BOOLEAN."
 
-    if col.is_unique and not _is_numeric(col.dtype):
+    # With one row, every value is unique and constant at once and says nothing about what the
+    # column is: the distinctness rules below would call every column "ignore" (P14-O12, B14).
+    counted = col.row_count > 1
+
+    if counted and col.is_unique and not _is_numeric(col.dtype):
         return "identifier", (
             f"{col.name} is unique across all {col.row_count:,} rows, so it "
             f"names a row rather than describing one -- unless it is free "
@@ -333,14 +342,16 @@ def suggest_role(col: ColumnEvidence) -> tuple[str, str]:
             f"meaningless whatever its type."
         )
 
-    if col.is_constant:
+    if counted and col.is_constant:
         return "ignore", (
             f"{col.name} holds a single value in every row, so it cannot "
             f"group or measure anything."
         )
 
     if _is_numeric(col.dtype):
-        if col.distinct <= SMALL_NUMERIC_DISTINCT:
+        # Whole numbers only: a rating or a bucket is 1-5, not 0.0025 or 3.14. A DOUBLE with a
+        # handful of values is a measurement that repeats (P14-O12, B14).
+        if counted and _is_whole(col.dtype) and col.distinct <= SMALL_NUMERIC_DISTINCT:
             return "dimension", (
                 f"{col.name} is numeric but has only {col.distinct:,} distinct "
                 f"values, which is a rating or a bucket more often than "
@@ -353,7 +364,7 @@ def suggest_role(col: ColumnEvidence) -> tuple[str, str]:
         )
 
     if _is_text(col.dtype):
-        if col.distinct_ratio >= FREE_TEXT_RATIO:
+        if counted and col.distinct_ratio >= FREE_TEXT_RATIO:
             return "free_text", (
                 f"{col.name} is text with {col.distinct:,} distinct values in "
                 f"{col.row_count:,} rows -- too many to group by."

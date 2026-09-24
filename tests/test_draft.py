@@ -96,15 +96,17 @@ def test_messy_headers_draft_sets_footer_skip_to_three():
     assert any("footer_skip_rows is set to 3" in a for a in d.spec.assumptions)
 
 
-def test_a_csv_draft_never_guesses_at_a_footer():
+def test_a_csv_draft_reads_its_end_and_finds_no_footer_where_there_is_none():
     """
-    Seeking to the end of a 1.6 GB file to look for a totals row is not worth
-    it, so the CSV path says so instead of pretending it looked.
+    Superseded by Phase 14 Step 7 (P14-O3). This test used to pin "a CSV draft never
+    guesses at a footer", on the premise that seeking to the end of a 1.6 GB file is not worth
+    it. A seek costs the same at any size, and not looking let a totals row double every sum.
+    The end is read now; a file that ends in data keeps every row and claims no footer.
     """
     d = draft.draft_for_path(GAPS)
     assert d.spec is not None
     assert d.spec.footer_skip_rows == 0
-    assert any("end of this file was not examined" in a for a in d.spec.assumptions)
+    assert not any("footer" in a or "not examined" in a for a in d.spec.assumptions)
 
 
 # --------------------------------------------------------------------------
@@ -398,7 +400,10 @@ def test_editing_the_footer_away_changes_what_loads(con):
     spec = draft.spec_from_json(json.dumps(payload))
     result = load_excel(con, spec.path, **spec.to_loader_kwargs(load_excel))
 
-    assert result.row_count == 203
+    # 202, not 203: of the three footer rows one is blank, and a blank row is a gap in the
+    # sheet rather than a record since Phase 14 Step 7 (P14-O8). The two notes rows load.
+    assert result.row_count == 202
+    assert any("1 blank row" in n for n in result.notes)
     assert con.execute(
         "SELECT count(*) FROM with_notes WHERE order_id LIKE 'Notes%'"
     ).fetchone()[0] == 1

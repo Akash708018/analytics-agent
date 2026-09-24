@@ -496,14 +496,28 @@ class TableProfile:
         return "\n".join(lines)
 
 
-def _numeric_exprs(name: str) -> list[str]:
+# Over finite values only. stddev_samp over an Infinity raises "STDDEV_SAMP is out of range",
+# and profile_dataset answered a column holding one with an exception (P14-O6, B4). The sixth
+# expression counts what was set aside, for the note. Floating-point columns only: a FILTER on
+# every column of a 200-column table took the profile from 4 s to 24 s (step 7, measured).
+NUMERIC_EXPRS = 6
+_FLOATING = ("DOUBLE", "FLOAT", "REAL")
+
+
+def _floating(dtype: str) -> bool:
+    return dtype.split("(")[0].strip().upper() in _FLOATING
+
+
+def _numeric_exprs(name: str, dtype: str = "DOUBLE") -> list[str]:
     col = _q(name)
+    keep = f"FILTER (WHERE isfinite({col}))" if _floating(dtype) else ""
     return [
-        f"avg({col})::DOUBLE",
-        f"stddev_samp({col})::DOUBLE",
-        f"quantile_cont({col}, 0.25)::DOUBLE",
-        f"median({col})::DOUBLE",
-        f"quantile_cont({col}, 0.75)::DOUBLE",
+        f"(avg({col}) {keep})::DOUBLE",
+        f"(stddev_samp({col}) {keep})::DOUBLE",
+        f"(quantile_cont({col}, 0.25) {keep})::DOUBLE",
+        f"(median({col}) {keep})::DOUBLE",
+        f"(quantile_cont({col}, 0.75) {keep})::DOUBLE",
+        f"count({col}) FILTER (WHERE NOT isfinite({col}))" if _floating(dtype) else "0",
     ]
 
 
@@ -633,9 +647,10 @@ def _outlier_counts(
         exprs = []
         for c, lo, hi in live:
             col = _q(c.name)
+            fin = f" AND isfinite({col})" if _floating(c.dtype) else ""
             exprs += [
-                f"count(*) FILTER (WHERE {col} < {lo!r})",
-                f"count(*) FILTER (WHERE {col} > {hi!r})",
+                f"count(*) FILTER (WHERE {col} < {lo!r}{fin})",
+                f"count(*) FILTER (WHERE {col} > {hi!r}{fin})",
             ]
         row = con.execute(
             f"SELECT {', '.join(exprs)} FROM {_q(dataset_name)}"
@@ -716,7 +731,7 @@ def profile_table(
 
     exprs: list[str] = []
     for c in numeric:
-        exprs += _numeric_exprs(c.name)
+        exprs += _numeric_exprs(c.name, c.dtype)
     for c in text:
         exprs += _text_exprs(c.name, listed) + _cast_exprs(c.name, listed)
 
@@ -727,15 +742,18 @@ def profile_table(
         ).fetchone()
 
     summaries: dict[str, NumericSummary] = {}
+    non_finite: dict[str, int] = {}
     for i, c in enumerate(numeric):
-        mean, sd, q1, med, q3 = values[5 * i: 5 * i + 5]
+        mean, sd, q1, med, q3, bad = values[NUMERIC_EXPRS * i: NUMERIC_EXPRS * (i + 1)]
         summaries[c.name] = NumericSummary(
             mean=mean, stddev=sd, q1=q1, median=med, q3=q3
         )
+        if bad:
+            non_finite[c.name] = bad
 
     # Per text column: blank, token, considered, then one count per candidate.
     stride = 2 + 1 + len(CAST_CANDIDATES)
-    offset = 5 * len(numeric)
+    offset = NUMERIC_EXPRS * len(numeric)
     blanks: dict[str, int] = {}
     tokens: dict[str, int] = {}
     readings: dict[str, TypeReading] = {}
@@ -744,7 +762,12 @@ def profile_table(
         blanks[c.name], tokens[c.name] = values[base: base + 2]
         readings[c.name] = _read_types(list(values[base + 2: base + stride]))
 
-    notes: list[str] = []
+    notes: list[str] = [
+        f"{name}: {n:,} value(s) are not a finite number (NaN or Infinity). Its mean, spread "
+        f"and quartiles are over the finite values; propose_cleaning_plan offers to turn "
+        f"these into nulls."
+        for name, n in non_finite.items()
+    ]
     flagged = [c.name for c in text if tokens.get(c.name)]
     breakdowns: dict[str, dict[str, int]] = {}
     for name in flagged[:breakdown_cap]:

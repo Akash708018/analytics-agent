@@ -32,7 +32,42 @@ STAT_HEADERS = ["n", "nulls", "min", "max", "mean", "median", "stddev"]
 MAX_GROUPS = MAX_ROWS - 1
 
 
-def stat_exprs(col: str, numeric: bool) -> list[str]:
+# P10-O2: a DOUBLE column can hold NaN and infinity, and IS NOT NULL does not exclude them.
+# P10-D5 measured what a nan does downstream -- it propagates silently and base.number renders
+# it into a cell as the text "nan", which LostRows cannot catch because the row count is right.
+# stddev over an infinity does worse: DuckDB raises "STDDEV_SAMP is out of range", and
+# summary_stats, group_compare, outlier_detection and profile_dataset answered with an exception
+# (P14-O6, B4). The cast is what makes one spelling work on DECIMAL and INTEGER columns.
+FINITE = "NOT isnan(CAST({col} AS DOUBLE)) AND NOT isinf(CAST({col} AS DOUBLE))"
+
+
+def can_be_non_finite(dtype: str) -> bool:
+    """Only floating-point columns hold NaN or Infinity; an integer or DECIMAL never does.
+
+    The filters below are applied to those alone. Measured on 200 columns x 300 rows: the plain
+    aggregates took 0.07 s, the same with a FINITE filter on each 10.06 s, with isfinite() 0.47 s
+    -- a profile of a wide table went from 4 s to 24 s before this guard.
+    """
+    return dtype.split("(")[0].strip().upper() in ("DOUBLE", "FLOAT", "REAL")
+
+
+def finite_only(col: str, floating: bool = True) -> str:
+    """A FILTER clause keeping the finite values of an already-quoted column, or nothing."""
+    return f"FILTER (WHERE isfinite({col}))" if floating else ""
+
+
+def non_finite_count(col: str, floating: bool = True) -> str:
+    """How many values of an already-quoted column are NaN or infinite (0 when it cannot be)."""
+    return f"count({col}) FILTER (WHERE NOT isfinite({col}))" if floating else "0"
+
+
+def non_finite_note(n: int, measure: str) -> str:
+    return (f"{n:,} value(s) of {measure} are not a finite number (NaN or Infinity) and were "
+            f"set aside from every statistic of it; they still count as present in n. "
+            f"propose_cleaning_plan offers to turn them into nulls.")
+
+
+def stat_exprs(col: str, numeric: bool, floating: bool = False) -> list[str]:
     """The seven SQL expressions, for an already-quoted column.
 
     Non-numeric measures get NULL for the derived three rather than being
@@ -40,14 +75,15 @@ def stat_exprs(col: str, numeric: bool) -> list[str]:
     counts and extremes are true, and its average is not. The blank cells say
     which parts do not apply.
     """
-    exprs = [f"count(*)", f"count({col})", f"min({col})", f"max({col})"]
     if numeric:
-        return exprs + [
-            f"avg({col})",
-            f"quantile_cont(CAST({col} AS DOUBLE), 0.5)",
-            f"stddev({col})",
+        keep = finite_only(col, floating)
+        return [
+            "count(*)", f"count({col})", f"min({col}) {keep}", f"max({col}) {keep}",
+            f"avg({col}) {keep}",
+            f"quantile_cont(CAST({col} AS DOUBLE), 0.5) {keep}",
+            f"stddev({col}) {keep}",
         ]
-    return exprs + ["NULL", "NULL", "NULL"]
+    return ["count(*)", f"count({col})", f"min({col})", f"max({col})", "NULL", "NULL", "NULL"]
 
 
 def stat_cells(raw) -> list[Any]:

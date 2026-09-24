@@ -433,6 +433,20 @@ class Rec:
 _FIGURE = re.compile(r"(?<![A-Za-z_])(nan|NaN|-?inf|-?Infinity)(?![A-Za-z_])")
 
 
+def _figure_in_cells(text: str):
+    """nan/inf printed as a FIGURE: in a table cell after the row's label. A note that explains
+    values were set aside names them in prose, and a frequency table's label column holds the
+    data's own values -- neither is a statistic gone wrong."""
+    for line in text.splitlines():
+        if line.lstrip().startswith("|") and "---" not in line:
+            cells = [c.strip() for c in line.strip().strip("|").split("|")]
+            for cell in cells[1:]:
+                m = _FIGURE.fullmatch(cell)
+                if m:
+                    return re.search(re.escape(cell), text)
+    return None
+
+
 def refusal_reason(text: str) -> str | None:
     r = reason_of(text)
     if r is not None:
@@ -470,7 +484,7 @@ class Runner:
             detail = first_lines(refusal.text if refusal is not None else value, 4)
             self.recs.append(Rec(case.name, stage, call, "REFUSED", reason, detail, secs))
         else:
-            m = _FIGURE.search(text) if isinstance(value, str) else None
+            m = _figure_in_cells(text) if isinstance(value, str) else None
             if m:
                 ctx = text[max(0, m.start() - 80):m.end() + 40].replace("\n", " / ")
                 self.recs.append(Rec(case.name, stage, call, "SUSPECT", "NON_FINITE_FIGURE",
@@ -542,19 +556,29 @@ class Runner:
         self.record(case, "inspect", "profile_dataset",
                     lambda: server.profile_dataset(dataset_name=name, workspace_id=ws))
 
-        p = self.record(case, "clean", "propose_cleaning", lambda: be.propose_cleaning(ws, name))
-        if p is not None and p.steps:
+        # Up to three rounds of the engine's own suggestions, as a person clicking Apply on the
+        # Clean screen and looking again would: dropping a pasted header is what makes the
+        # conversions behind it lossless, so they come round on the next proposal.
+        cleaned = False
+        for round_no in range(1, 4):
+            p = self.record(case, "clean", f"propose_cleaning (round {round_no})",
+                            lambda: be.propose_cleaning(ws, name))
+            if p is None or not p.steps:
+                break
             picked = [s.action_id for s in p.steps if s.suggested]
-            self.recs.append(Rec(case.name, "clean", "proposal", "OK", "",
+            self.recs.append(Rec(case.name, "clean", f"proposal (round {round_no})", "OK", "",
                                  "; ".join(f"{s.action_id} {s.kind} {s.column or ''}"
                                            f"{' LOSSY' if s.lossy else ''}" for s in p.steps)[:400]))
-            if picked:
-                self.record(case, "clean", f"apply_cleaning({picked})",
-                            lambda: be.apply_cleaning(ws, name, picked))
-                cols = self._sql(ws, "SELECT column_name, data_type FROM information_schema.columns "
-                                     "WHERE table_name = ? ORDER BY ordinal_position", [name])
-                types = dict(cols)
-                self._check_values(case, ws, name, types, source_to_target, "after_clean")
+            if not picked:
+                break
+            self.record(case, "clean", f"apply_cleaning({picked})",
+                        lambda: be.apply_cleaning(ws, name, picked))
+            cleaned = True
+        if cleaned:
+            cols = self._sql(ws, "SELECT column_name, data_type FROM information_schema.columns "
+                                 "WHERE table_name = ? ORDER BY ordinal_position", [name])
+            types = dict(cols)
+            self._check_load(case, ws, name, cols, types, source_to_target, "after_clean")
 
         answers = self._contract(case, ws, name, types)
         if answers is None:
@@ -566,31 +590,32 @@ class Runner:
                     lambda: server.build_report(dataset_name=name, question="What does this data show?",
                                                 workspace_id=ws))
 
-    def _check_load(self, case, ws, name, cols, types, s2t) -> None:
+    def _check_load(self, case, ws, name, cols, types, s2t, stage="ground_truth") -> None:
+        """Every ground-truth check, at load and again after the suggested cleaning."""
         t = case.truth
         n = self._sql(ws, f'SELECT count(*) FROM "{name}"')[0][0]
         if t.rows is not None:
-            (self.ok if n == t.rows else self.wrong)(case, "ground_truth", "row count",
+            (self.ok if n == t.rows else self.wrong)(case, stage, "row count",
                                                      f"loaded {n}, file has {t.rows}")
         if t.cols is not None:
             (self.ok if len(cols) == t.cols else self.wrong)(
-                case, "ground_truth", "column count", f"loaded {len(cols)}, file has {t.cols}: "
+                case, stage, "column count", f"loaded {len(cols)}, file has {t.cols}: "
                 f"{[c for c, _ in cols][:12]}")
         for src, want in t.sums.items():
             col = s2t.get(src, src)
             if col not in types:
-                self.wrong(case, "ground_truth", f"sum({src})", f"column {src!r} not found as {col!r}; "
+                self.wrong(case, stage, f"sum({src})", f"column {src!r} not found as {col!r}; "
                            f"have {list(types)[:12]}")
                 continue
             if types[col] not in ("BIGINT", "INTEGER", "DOUBLE", "HUGEINT", "SMALLINT", "FLOAT",
                                   "TINYINT", "UBIGINT") and not types[col].startswith("DECIMAL"):
-                self.wrong(case, "ground_truth", f"type({src})",
+                self.wrong(case, stage, f"type({src})",
                            f"{col!r} loaded as {types[col]}, the file holds numbers")
                 continue
             got = self._sql(ws, f'SELECT sum("{col}") FROM "{name}"')[0][0]
             got = round(float(got), 2) if got is not None else None
             (self.ok if got is not None and abs(got - want) <= 0.011 else self.wrong)(
-                case, "ground_truth", f"sum({src})", f"engine {got}, file {want}")
+                case, stage, f"sum({src})", f"engine {got}, file {want}")
         if t.date_col and t.date_range:
             col = s2t.get(t.date_col, t.date_col)
             if col in types:
@@ -599,9 +624,9 @@ class Runner:
                 ok = types[col] in ("DATE", "TIMESTAMP") and (lo or "")[:10] == t.date_range[0] \
                     and (hi or "")[:10] == t.date_range[1]
                 (self.ok if ok else self.wrong)(
-                    case, "ground_truth", f"dates({t.date_col})",
+                    case, stage, f"dates({t.date_col})",
                     f"{types[col]} {lo}..{hi}; file {t.date_range[0]}..{t.date_range[1]}")
-        self._check_values(case, ws, name, types, s2t, "ground_truth")
+        self._check_values(case, ws, name, types, s2t, stage)
 
     def _check_values(self, case, ws, name, types, s2t, stage) -> None:
         """Text that must survive exactly: accents, CJK, leading zeros. Run after loading and

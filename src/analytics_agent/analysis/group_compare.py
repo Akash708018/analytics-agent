@@ -24,7 +24,8 @@ from .base import LostRows, label, number, share_basis
 from .declared import AGG_SQL, agg_of, column_types, is_numeric
 from .declared import require_dimension, require_measure
 from .registry import Output, register
-from .stats import MAX_GROUPS, STAT_HEADERS, stat_cells, stat_exprs
+from .stats import (MAX_GROUPS, STAT_HEADERS, can_be_non_finite, non_finite_count,
+                    non_finite_note, stat_cells, stat_exprs)
 
 ALL = "(all)"
 
@@ -58,7 +59,9 @@ def group_compare(con, gate, scope, dimension: str, measure: str, **params) -> O
     table = quote_identifier(scope.dataset_name)
     dim = quote_identifier(dimension)
     col = quote_identifier(measure)
-    numeric = is_numeric(column_types(con, scope.dataset_name).get(measure, ""))
+    dtype = column_types(con, scope.dataset_name).get(measure, "")
+    numeric = is_numeric(dtype)
+    floating = can_be_non_finite(dtype)
 
     totalled = agg is not None and agg != "none"
     headers = [dimension] + STAT_HEADERS[:2]
@@ -89,7 +92,7 @@ def group_compare(con, gate, scope, dimension: str, measure: str, **params) -> O
             f"top_n on {dimension} says which of its groups matter."
         )
 
-    exprs = stat_exprs(col, numeric)
+    exprs = stat_exprs(col, numeric, floating)
     total_sql = AGG_SQL[agg].format(col=col) if totalled else "NULL"
 
     body = con.execute(
@@ -153,6 +156,11 @@ def group_compare(con, gate, scope, dimension: str, measure: str, **params) -> O
                f"confirm_dataset_contract with agg set is what fixes that.")
         )
 
+    if floating:
+        bad = con.execute(f"SELECT {non_finite_count(col)} FROM {table} "
+                          f"WHERE {scope.where}").fetchall()[0][0]
+        if bad:
+            summary.append(non_finite_note(bad, measure))
     summary.append(
         f"The {ALL} row is computed over the analysed rows, not from the group "
         f"rows above it: a mean of group means is not the mean."

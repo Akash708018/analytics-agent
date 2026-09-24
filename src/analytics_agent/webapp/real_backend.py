@@ -70,6 +70,11 @@ def refusal_from_text(text: str) -> Refusal:
     X / reason: CODE) and the older LoadRefused messages (BLOCKED / WHY? / NEXT STEP: prose). The
     fields are read from their line prefixes; a missing one is left empty rather than invented.
     """
+    # A web visitor never sees where the server keeps files: an engine message that names a path
+    # under the workspace root shows it relative to the workspace (P14-O9).
+    for root in {str(WORKSPACE_ROOT.resolve()), str(WORKSPACE_ROOT)}:
+        text = re.sub(re.escape(root) + r"/ws_[0-9a-f]{12}/(?:uploads/)?", "", text)
+        text = text.replace(root, "workspace")
     what = why = step = ""
     for line in text.splitlines():
         if line.startswith("BLOCKED:"):
@@ -237,8 +242,13 @@ class RealBackend:
                                          header_rows=header_rows, header_join=header_join,
                                          authorised_fill=authorised_fill)
                 grid = self._grid(p, d)
-            except LoadRefused as exc:
-                r = refusal_from_text(str(exc))
+            except (LoadRefused, ValueError) as exc:
+                # ValueError: a file the preview cannot read at all. A refusal, never a crash on
+                # the Upload screen (P14-O7).
+                text = str(exc) if str(exc).startswith("BLOCKED") else (
+                    f"BLOCKED: {Path(path).name} could not be read into a draft.\n"
+                    f"WHY: {exc}\nNEXT STEP: call save_upload(...) with the file re-exported.")
+                r = refusal_from_text(text)
                 return IngestDraft(spec={}, grid=empty, dataset_name="", header_rows=[],
                                    data_start_row=0, footer_skip_rows=0, header_join="space",
                                    columns=[], message=r.what, refusal=r)

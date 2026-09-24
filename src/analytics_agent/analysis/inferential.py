@@ -41,11 +41,9 @@ __all__ = [
 # scipy returns exactly 0.0, and a cell claiming p = 0 claims a certainty no test delivers.
 P_FLOOR = 1e-300
 
-# P10-O2: a DOUBLE column can hold NaN and infinity, and IS NOT NULL does not exclude them.
-# P10-D5 measured what a nan does downstream -- it propagates silently and base.number renders
-# it into a cell as the text "nan", which LostRows cannot catch because the row count is right.
-# The cast is what makes one spelling work on DECIMAL and INTEGER columns as well as DOUBLE.
-FINITE = "NOT isnan(CAST({col} AS DOUBLE)) AND NOT isinf(CAST({col} AS DOUBLE))"
+# P10-O2: a DOUBLE column can hold NaN and infinity. Defined in stats.py since Phase 14 Step 7,
+# where the descriptive analyses need it too (P14-O6); imported here under its old name.
+from .stats import FINITE  # noqa: E402
 
 
 @dataclass(frozen=True)

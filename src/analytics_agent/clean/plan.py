@@ -65,6 +65,9 @@ class ActionKind(str, Enum):
     NORMALISE_CASE = "NORMALISE_CASE"
     DROP_DUPLICATE_ROWS = "DROP_DUPLICATE_ROWS"
     EXCLUDE_COLUMN = "EXCLUDE_COLUMN"
+    # Phase 14 Step 7: found by the stress matrix (P14-O6, P14-O11).
+    NULL_NON_FINITE = "NULL_NON_FINITE"
+    DROP_HEADER_ROWS = "DROP_HEADER_ROWS"
 
 
 @dataclass(frozen=True)

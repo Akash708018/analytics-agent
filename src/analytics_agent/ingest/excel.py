@@ -120,7 +120,8 @@ def preview_rows(
     """
     from openpyxl import load_workbook
 
-    wb = load_workbook(Path(path), read_only=True)
+    # data_only: the value Excel saved for a formula, not the formula's text (P14-O5, B3).
+    wb = load_workbook(Path(path), read_only=True, data_only=True)
     try:
         ws = wb[sheet] if sheet else wb.active
         out = []
@@ -278,7 +279,9 @@ def load_excel(
 
     coercion: dict[str, int] = {}
 
-    wb = load_workbook(path, read_only=True)
+    # data_only: a formula cell loads the value Excel saved for it. Without it openpyxl returns
+    # '=G2*H2', and every formula column loaded as text (P14-O5, B3).
+    wb = load_workbook(path, read_only=True, data_only=True)
     try:
         if sheet is not None and sheet not in wb.sheetnames:
             raise LoadRefused(
@@ -299,7 +302,11 @@ def load_excel(
                     f"NEXT STEP: check the sheet is the one you meant."
                 ) from None
 
-        data = _trim_footer(_apply_na_rows(stream, na_tokens), footer_skip_rows)
+        # Blank rows inside the data are skipped, not loaded as rows of NULLs (P14-O8, B6). After
+        # the footer is trimmed, because footer_skip_rows counts the blank rows in a footer.
+        blanks = [0]
+        data = _apply_na_rows(_skip_blank(_trim_footer(stream, footer_skip_rows), blanks),
+                              na_tokens)
 
         # Buffer enough rows to infer types before creating the table.
         sample: list[tuple] = []
@@ -466,7 +473,18 @@ def load_excel(
         gate_verdict=gate.verdict.value,
         gate_message=gate.message,
         coercion_failures=coercion,
+        notes=([f"{blanks[0]:,} blank row(s) inside the data were skipped: a row with no "
+                f"value in any column is a gap in the sheet, not a record."] if blanks[0] else []),
     )
+
+
+def _skip_blank(stream, counter: list[int]):
+    """Every row that holds at least one value; counter[0] counts the ones that held none."""
+    for row in stream:
+        if all(v is None or (isinstance(v, str) and not v.strip()) for v in row):
+            counter[0] += 1
+            continue
+        yield row
 
 
 def _apply_na_rows(stream, na_tokens: frozenset[str]):

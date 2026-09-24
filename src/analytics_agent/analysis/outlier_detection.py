@@ -40,6 +40,8 @@ from ..util.sql_guard import quote_identifier
 from .base import LostRows, number
 from .declared import require_measure
 from .registry import Output, register
+from .declared import column_types
+from .stats import can_be_non_finite, non_finite_count, non_finite_note
 
 __all__ = ["outlier_detection"]
 
@@ -94,10 +96,18 @@ def outlier_detection(con, gate, scope, measure: str, **params) -> Output:
                "share of rows"]
     summary = [scope.method_note(), *gate.caveats]
 
+    # Finite values only: an infinity has no fence to sit outside of, and stddev over one raises
+    # (P14-O6). Set aside and counted, like a missing value.
+    floating = can_be_non_finite(column_types(con, scope.dataset_name).get(measure, ""))
+    finite = f"isfinite({x})" if floating else "TRUE"
+    bad = con.execute(f"SELECT {non_finite_count(x, floating)} FROM {table} "
+                      f"WHERE {scope.where}").fetchall()[0][0]
+    if bad:
+        summary.append(non_finite_note(bad, measure))
     q1, q3, mean, sd, med, n = con.execute(
         f"SELECT quantile_cont({x}, 0.25), quantile_cont({x}, 0.75), "
         f"avg({x}), stddev_samp({x}), median({x}), count({x}) "
-        f"FROM {table} WHERE {scope.where} AND {x} IS NOT NULL"
+        f"FROM {table} WHERE {scope.where} AND {x} IS NOT NULL AND {finite}"
     ).fetchall()[0]
     missing = scope.analysed - n
     if n + missing != scope.analysed:
@@ -107,7 +117,7 @@ def outlier_detection(con, gate, scope, measure: str, **params) -> Output:
         )
 
     summary.append(
-        f"{n:,} of {scope.analysed:,} analysed row(s) hold a {measure}; "
+        f"{n:,} of {scope.analysed:,} analysed row(s) hold a finite {measure}; "
         f"{missing:,} do not and are in no method below."
     )
     if n < MIN_ROWS:
@@ -121,7 +131,7 @@ def outlier_detection(con, gate, scope, measure: str, **params) -> Output:
 
     mad = con.execute(
         f"SELECT median(abs({x} - ?)) FROM {table} "
-        f"WHERE {scope.where} AND {x} IS NOT NULL",
+        f"WHERE {scope.where} AND {x} IS NOT NULL AND {finite}",
         [med],
     ).fetchall()[0][0]
 
@@ -144,7 +154,7 @@ def outlier_detection(con, gate, scope, measure: str, **params) -> Output:
             continue
         flags[method] = con.execute(
             f"SELECT count(*) FROM {table} WHERE {scope.where} "
-            f"AND {x} IS NOT NULL AND ({x} < ? OR {x} > ?)",
+            f"AND {x} IS NOT NULL AND {finite} AND ({x} < ? OR {x} > ?)",
             [pair[0], pair[1]],
         ).fetchall()[0][0]
 
@@ -158,7 +168,7 @@ def outlier_detection(con, gate, scope, measure: str, **params) -> Output:
     # them -- which is the most interesting number in the table.
     spread = con.execute(
         f"WITH k AS (SELECT ({tests}) AS c FROM {table} "
-        f"WHERE {scope.where} AND {x} IS NOT NULL) "
+        f"WHERE {scope.where} AND {x} IS NOT NULL AND {finite}) "
         f"SELECT c, count(*) FROM k WHERE c > 0 GROUP BY c ORDER BY c",
         args,
     ).fetchall()

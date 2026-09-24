@@ -54,7 +54,7 @@ def _excel_tail(path: Path, sheet: str) -> list:
     """The last TAIL_ROWS rows of a sheet, for footer detection."""
     from openpyxl import load_workbook
 
-    wb = load_workbook(path, read_only=True)
+    wb = load_workbook(path, read_only=True, data_only=True)
     try:
         ws = wb[sheet]
         last = ws.max_row or 0
@@ -64,6 +64,38 @@ def _excel_tail(path: Path, sheet: str) -> list:
         return [list(r) for r in ws.iter_rows(min_row=start, values_only=True)]
     finally:
         wb.close()
+
+
+def _has_values(rows) -> bool:
+    return any(v is not None and str(v).strip() for row in rows for v in row)
+
+
+def _formulas_without_values(path: Path, sheet: str, spec: IngestSpec) -> list[str]:
+    """Target names of columns whose data rows (in the preview) hold a formula with no saved value.
+
+    Values are read with data_only=True, so a formula reads as what Excel saved for it. A file
+    written by a program (openpyxl, pandas) saves none, and the cell reads None: said here rather
+    than loaded as an empty column in silence (P14-O5, B3).
+    """
+    from openpyxl import load_workbook
+
+    first = spec.data_start_row
+    last = first + EXCEL_PREVIEW_ROWS
+    found: set[int] = set()
+    formulas = load_workbook(path, read_only=True)
+    values = load_workbook(path, read_only=True, data_only=True)
+    try:
+        f_rows = formulas[sheet].iter_rows(min_row=first, max_row=last, values_only=True)
+        v_rows = values[sheet].iter_rows(min_row=first, max_row=last, values_only=True)
+        for f_row, v_row in zip(f_rows, v_rows):
+            for i, (f, v) in enumerate(zip(f_row, v_row)):
+                if isinstance(f, str) and f.startswith("=") and v is None:
+                    found.add(i)
+    finally:
+        formulas.close()
+        values.close()
+    names = [c.target_name for c in spec.columns]
+    return [names[i] for i in sorted(found) if i < len(names)]
 
 
 def draft_for_path(
@@ -107,6 +139,25 @@ def draft_for_path(
                 f"NEXT STEP: pass one of those names."
             )
         rows = excel.preview_rows(p, chosen, n=EXCEL_PREVIEW_ROWS)
+        skipped_note = None
+        if not _has_values(rows):
+            # An empty sheet, as a cover page often is. Named explicitly, that is a refusal that
+            # lists the sheets holding data; not named, the first sheet with data is read and the
+            # draft says so. It used to raise "No preview rows" (P14-O7, B5).
+            with_data = [s for s in sheets
+                         if s != chosen and _has_values(excel.preview_rows(p, s, n=5))]
+            if sheet is not None or not with_data:
+                raise LoadRefused(
+                    f"BLOCKED: sheet {chosen!r} of {p.name} is empty.\n"
+                    f"WHY: there is no row in it to read a header or data from.\n"
+                    + (f"Sheets holding data: {', '.join(with_data)}\n"
+                       f"NEXT STEP: pass sheet={with_data[0]!r}." if with_data else
+                       "NEXT STEP: check the workbook -- no sheet in it holds data.")
+                )
+            skipped_note = (f"Sheet {chosen!r} is empty, so {with_data[0]!r} -- the first sheet "
+                            f"holding data -- is read instead. Name another sheet to change it.")
+            chosen = with_data[0]
+            rows = excel.preview_rows(p, chosen, n=EXCEL_PREVIEW_ROWS)
         spec, guess, pivot = preview.draft_spec(
             rows,
             path=str(p),
@@ -118,14 +169,28 @@ def draft_for_path(
             header_rows=header_rows,
             header_join=header_join,
         )
+        if spec is not None:
+            if skipped_note:
+                spec.assumptions.insert(0, skipped_note)
+            unsaved = _formulas_without_values(p, chosen, spec)
+            if unsaved:
+                spec.assumptions.append(
+                    f"{', '.join(unsaved)} hold{'s' if len(unsaved) == 1 else ''} formulas with "
+                    f"no saved result: the file was written by a program, not saved by Excel, so "
+                    f"there is no value to read and those cells load empty. Open the file in "
+                    f"Excel, save it, and upload it again to load the computed values.")
         return Draft(spec, guess, pivot, "excel", chosen, sheets)
 
     lines = csv_loader.preview_lines(p, n=CSV_PREVIEW_LINES)
     rows = preview.parse_csv_preview(lines)
+    # The tail is parsed with the head's delimiter: twenty lines of totals and notes are too
+    # few to sniff one from.
+    delimiter = preview.sniff_delimiter(lines)
+    tail = preview.parse_csv_preview(csv_loader.tail_lines(p, TAIL_ROWS), delimiter=delimiter)
     spec, guess, pivot = preview.draft_spec(
         rows, path=str(p), source_type="csv", dataset_name=name,
         header_rows=header_rows, header_join=header_join,
-        authorised_fill=authorised_fill,
+        authorised_fill=authorised_fill, tail_rows=tail,
     )
     return Draft(spec, guess, pivot, "csv", None, [])
 

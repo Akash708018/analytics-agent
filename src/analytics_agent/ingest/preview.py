@@ -313,10 +313,22 @@ def count_trailing_junk(tail_rows: list, width: int) -> int:
     threshold = width * FOOTER_FILL_RATIO
     count = 0
     for row in reversed(tail_rows):
-        if _fill(row) >= threshold:
+        if _fill(row) >= threshold and not is_totals_row(row):
             break
         count += 1
     return count
+
+
+# A row that labels itself a total, however many of its cells are filled. A totals row under a
+# nine-column CSV filled in three cells was caught by the fill rule; one filled in five was not,
+# and either doubles every sum it is loaded into (P14-O3, B1).
+_TOTALS_LABEL = re.compile(r"^(grand\s+|sub-?)?totals?\b|^sum\b", re.IGNORECASE)
+
+
+def is_totals_row(row) -> bool:
+    """Whether the row's first filled cell is a totals label: Total, Grand total, Subtotal, Sum."""
+    first = next((_c(v) for v in row if not _is_blank(v)), "")
+    return bool(_TOTALS_LABEL.match(first))
 
 
 def describe_footer(n: int, tail_rows: list) -> str:
@@ -326,10 +338,10 @@ def describe_footer(n: int, tail_rows: list) -> str:
         first = next((_c(v) for v in row if not _is_blank(v)), "")
         shown.append(f"'{first[:40]}'" if first else "(blank)")
     return (
-        f"The last {n} row{'s' if n != 1 else ''} of the sheet "
-        f"({', '.join(shown)}) are filled in fewer than half their columns, so "
-        f"they read as notes rather than records and footer_skip_rows is set to "
-        f"{n}. Say so if any of them is real data."
+        f"The last {n} row{'s' if n != 1 else ''} of the file "
+        f"({', '.join(shown)}) read as totals or notes rather than records -- "
+        f"labelled as a total, or filled in fewer than half their columns -- so "
+        f"footer_skip_rows is set to {n}. Say so if any of them is real data."
     )
 
 
@@ -419,14 +431,20 @@ def detect_pivot_dump(names: list[str]) -> PivotVerdict:
 # draft spec
 # --------------------------------------------------------------------------
 
+def sniff_delimiter(lines: list[str]) -> str:
+    """The delimiter of these lines, "," when nothing can be sniffed."""
+    text = "".join(l if l.endswith("\n") else l + "\n" for l in lines)
+    try:
+        return csv.Sniffer().sniff(text[:8192], delimiters=",;\t|").delimiter
+    except csv.Error:
+        return ","
+
+
 def parse_csv_preview(lines: list[str], delimiter: str | None = None) -> list[list]:
     """Turn preview_lines output into rows. Sniffs the delimiter if not given."""
     text = "".join(l if l.endswith("\n") else l + "\n" for l in lines)
     if delimiter is None:
-        try:
-            delimiter = csv.Sniffer().sniff(text[:8192], delimiters=",;\t|").delimiter
-        except csv.Error:
-            delimiter = ","
+        delimiter = sniff_delimiter(lines)
     return [row for row in csv.reader(io.StringIO(text), delimiter=delimiter)]
 
 
@@ -511,16 +529,20 @@ def draft_spec(
             f"from the file, so the ambiguity above is settled."
         )
 
+    # The end of a CSV is read too, now: its last lines are a seek away, not a scan, so the
+    # size of the file never mattered (P14-O3). `tail_rows` is None only for a caller that
+    # did not read the end, and then the draft says so.
     footer = 0
-    if source_type == "excel" and tail_rows:
+    if tail_rows:
         footer = count_trailing_junk(tail_rows, len(result.names))
+        # Never the whole file: a tail that is all "junk" is data that happens to be sparse.
+        if footer and footer >= len(tail_rows) - len(chosen_rows):
+            footer = 0
         if footer:
             assumptions.append(describe_footer(footer, tail_rows))
     elif source_type == "csv":
         assumptions.append(
-            "The end of this file was not examined. A CSV has to be read to "
-            "its last byte to see how it ends, which is not worth doing on a "
-            "large file just to look for a totals row. If it ends with totals "
+            "The end of this file was not examined. If it ends with totals "
             "or notes, say how many rows and they will be dropped."
         )
 

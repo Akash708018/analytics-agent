@@ -6212,3 +6212,78 @@ MEASURED VALIDATION, 24/09/2026. Nothing in src/ or tests/ changed in this step.
   fcdbfd75fff015573b7e7138b665baed5a5667bd2d8d0553ff43cc0c39ddb15d  scripts/stress_matrix.py
   caaeb672a450a74da63f7f4bf9009067cd6f6c17097901b1f35e6b2e82081654  docs/stress/stress_matrix.json
   fb89df10078e45e2b9383a4f5d9dd53ea02bdaef2ad3f701d26e4d9fa491aec7  docs/stress/REPORT.md
+
+## Phase 14, Step 7 - the stress matrix's bugs fixed, 24/09/2026
+
+Step document: docs/steps/phase14_step7_stress_fixes.md. Report: docs/stress/REPORT.md.
+
+P14-D39. A CSV'S END IS READ, AND A TOTALS ROW IS A FOOTER HOWEVER FULL. The CSV draft seeks to the
+last 64 KB and runs the Excel footer rule on its last 20 non-blank lines (DuckDB skips blank
+lines, so they are not rows). A row whose first filled cell is Total, Grand total, Subtotal or
+Sum counts as a footer. Supersedes Phase 3's "a CSV draft never guesses at a footer": its premise
+was that reading the end of a 1.6 GB file costs a scan, and a seek does not.
+P14-O3 IS CLOSED by P14-D39.
+
+P14-D40. A NUMERIC CONVERSION COUNTS A LEADING ZERO AS LOST. '00311' casts to 311, so the action is
+lossy, carries the zeros as its sample, and is never suggested.
+P14-O4 IS CLOSED by P14-D40.
+
+P14-D41. EXCEL IS READ WITH data_only=True. A formula cell loads the value Excel saved. A formula
+saved with no value (a file written by a program) reads empty, and the draft names its columns.
+P14-O5 IS CLOSED by P14-D41.
+
+P14-D42. STATISTICS ARE OVER FINITE VALUES, AND SAY WHAT THEY SET ASIDE. summary_stats,
+group_compare, outlier_detection and profile_dataset filter floating-point columns with
+isfinite() and note the count; NULL_NON_FINITE is a lossy cleaning action. Floating-point only, by
+measurement: a filter on every column of a 200-column table cost 10 s where plain aggregates
+took 0.07 s. FINITE now lives in analysis/stats.py.
+P14-O6 IS CLOSED by P14-D42.
+
+P14-D43. AN EMPTY SHEET IS PASSED OVER OR REFUSED, NEVER RAISED. Unnamed, the first sheet holding
+data is read and the draft says so; named, a refusal lists the sheets with data. RealBackend
+converts any ValueError from a draft into a refusal. Blank rows inside Excel data are skipped
+and counted in the load's notes.
+P14-O7 and P14-O8 ARE CLOSED by P14-D43.
+
+P14-D44. A CSV'S ENCODING IS SNIFFED, AND NO SERVER PATH REACHES A VISITOR. UTF-8 if the first and
+last 64 KB decode, else Latin-1, with one retry as Latin-1 on DuckDB's invalid-unicode error, and
+a note either way. DuckDB errors are cut to their reason, with no path and no SQL.
+refusal_from_text removes workspace paths from every refusal the web backend returns.
+P14-O9 IS CLOSED by P14-D44.
+
+P14-D45. A CONVERSION MAY CARRY ITS OWN EXPRESSION, AND ITS LOSS IS COUNTED FROM IT. Decimal comma,
+currency and thousands separators, percent, and mixed date formats. A number convention is
+chosen only by values that fit it and not the other ('1,234' alone reads both ways and is not
+converted); a numeric date order only when a part above 12 settles it. A header-only CSV is
+refused as having no data rows. DROP_HEADER_ROWS removes pasted header copies, losslessly.
+P14-O10 and P14-O11 ARE CLOSED by P14-D45.
+
+P14-D46. ARGUMENT REFUSALS ARE IN THE ENGINE'S WORDS; ROLE RULES NEED WHAT THEY COUNT. A missing
+argument is named, with the contract's declared measures and dimensions and a NEXT STEP that
+fills them in (or points at the contract when it declares none). Few distinct values suggests a
+dimension for whole numbers only, and no distinctness rule fires on one row.
+P14-O12 IS CLOSED by P14-D46.
+
+C100. I SLOWED EVERY WIDE PROFILE SIXFOLD AND FOUND IT ONLY BY RE-RUNNING THE MATRIX. The first
+finite-value filter was applied to every numeric column; the unit tests passed, and the matrix
+showed wide_201_columns at 24.3 s against 4.0 s. Measured, then limited to floating-point
+columns. The matrix is now part of the step, not an afterthought.
+
+MEASURED VALIDATION, 24/09/2026. Engine 1850 -> 1874 (tests/test_stress_fixes.py, 24); UI 43;
+acceptance in this container 55/0/3, 0/0/1, 0/0/1, 26/0/0, 36/0/0, phase 6 36/0/0; eval 76/76.
+Stress matrix 1,634 calls (2 crashes, 15 wrong) -> 1,773 calls (0 crashes, 9 wrong, all load-time
+and each corrected by the suggested cleaning except a file holding no values). 0 ws_ directories
+left. Digests:
+  887612be1d49e8367bacb90e252fb777acc42099b9e8e87174d62ea1131e4051  src/analytics_agent/ingest/csv_loader.py
+  1af717c515810efccb49f8935a3f54e1f5047bf6d207ba55ef04d0729af8a228  src/analytics_agent/ingest/draft.py
+  f7783235aae2249f6434490e5ac788c04a400c76d259c3700c9e9b9077fc39d6  src/analytics_agent/ingest/excel.py
+  9fbd47458f2b527542a2c82ac00ee6124ffd039848ea351a273a0019d26df9b7  src/analytics_agent/ingest/preview.py
+  c50d866a035441349b7740df898d94e939a1e28ed19a1b2da8e945e76bad9324  src/analytics_agent/clean/detect.py
+  e7237be6981c4d7b25076ff74e7b43ef52f23321cff7fc979893e6d1a7e2721d  src/analytics_agent/clean/sql.py
+  be5ec39927290206bf4065c5f1535496a87d79628146ad071d875d2bfcc60eb7  src/analytics_agent/analysis/stats.py
+  4ad8a9abb05fcc876659e6d70d1c6de239da18cf5454e96812c317e0873e001f  src/analytics_agent/analysis/tools.py
+  ecc8b8b246b65a154b9a6539173230b7529debe1a86b14fc91b7d938e0598004  src/analytics_agent/contract/evidence.py
+  5b1682917669c07bfb8133071e2dba1a86f2d7348938f8177d1cb01cd2c81530  src/analytics_agent/profile/table_profile.py
+  242f73c0c176b300323be4b57c25c8e1302be7129eb62648d1d62d6180e82afd  tests/test_stress_fixes.py
+  91e97ffd23ff8b457fdd9cc1d673ebc21b99dc03a2cb5c7588623d64f8dcb6f5  scripts/stress_matrix.py
+  5736890985df5895175353c382606b345eb953096714ad7f03b0c3b6e9fed853  docs/stress/REPORT.md

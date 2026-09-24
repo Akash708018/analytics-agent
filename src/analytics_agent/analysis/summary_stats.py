@@ -44,6 +44,7 @@ from ..util.sql_guard import quote_identifier
 from .base import number
 from .declared import AGG_SQL, agg_of, column_types, is_numeric
 from .registry import Output, register
+from .stats import can_be_non_finite, finite_only, non_finite_count, non_finite_note
 
 @register(
     "summary_stats",
@@ -107,12 +108,21 @@ def summary_stats(con, gate, scope, **params) -> Output:
             )
 
         if numeric:
+            # Every statistic over the finite values: NaN and Infinity are set aside and said,
+            # never averaged in or left to raise (P14-O6).
+            floating = can_be_non_finite(types.get(measure.name, ""))
+            keep = finite_only(col, floating)
+            total_f = total_sql if total_sql == "NULL" else f"{total_sql} {keep}"
             row = con.execute(
-                f"SELECT count(*), count({col}), {total_sql}, min({col}), "
-                f"max({col}), avg({col}), quantile_cont(CAST({col} AS DOUBLE), 0.5), "
-                f"stddev({col}) "
+                f"SELECT count(*), count({col}), {total_f}, min({col}) {keep}, "
+                f"max({col}) {keep}, avg({col}) {keep}, "
+                f"quantile_cont(CAST({col} AS DOUBLE), 0.5) {keep}, "
+                f"stddev({col}) {keep}, {non_finite_count(col, floating)} "
                 f"FROM {table} WHERE {scope.where}"
             ).fetchall()[0]
+            if row[8]:
+                undeclared_reason.append(non_finite_note(row[8], measure.name))
+            row = row[:8]
         else:
             # A measure on a non-numeric column: the counts and the extremes
             # are true, an average is not. Reported rather than refused,
