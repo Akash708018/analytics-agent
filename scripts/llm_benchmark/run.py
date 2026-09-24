@@ -383,6 +383,7 @@ def score_plan(qn: dict, plan: dict | None) -> dict:
         fails.append("INTENT_ERROR" if flag == "REJECT" else "CAUSAL_OVERREACH")
     total = sum(comp.values())
     return {"total_of_70": total, "total": round(total * 100 / 70, 2), "components": comp,
+            "detail": {"dimension_points": dpts, "time_points": tpts},
             "invalid_steps": [{"step": s, "why": w} for s, (v, w) in zip(steps, valid) if not v],
             "failures": sorted(set(fails))}
 
@@ -777,8 +778,10 @@ def summarise(pname: str) -> dict:
         "json_valid_rate": _pct([r.get("plan") is not None for r in pl]),
         "intent_accuracy": comp(pl, "intent", 10),
         "metric_accuracy": comp(pl, "metric", 10),
-        "dimension_accuracy": _pct([r["score"]["components"].get("dimension_time", 0) >= 5
+        "dimension_accuracy": _pct([r["score"].get("detail", {}).get("dimension_points") == 5
                                     for r in pl if r["score"].get("components")]),
+        "time_accuracy": _pct([r["score"].get("detail", {}).get("time_points") == 5
+                               for r in pl if r["score"].get("components")]),
         "valid_tool_selection_rate": comp(pl, "tool_selection", 15),
         "planner_step_validity": _pct(valid) if steps else None,
         "invalid_call_rate": round(100 * sum(r["score"]["invalid_calls"] for r in e2) / ecalls, 2)

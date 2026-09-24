@@ -5,6 +5,7 @@ from __future__ import annotations
 ROWS = [("Planner score", "planner_score", ""), ("End-to-end score", "e2e_score", ""),
         ("Intent accuracy", "intent_accuracy", "%"), ("Metric accuracy", "metric_accuracy", "%"),
         ("Dimension accuracy", "dimension_accuracy", "%"),
+        ("Time-period accuracy", "time_accuracy", "%"),
         ("Valid tool-selection rate", "valid_tool_selection_rate", "%"),
         ("Planner step validity", "planner_step_validity", "%"),
         ("Invalid call rate", "invalid_call_rate", "%"),
