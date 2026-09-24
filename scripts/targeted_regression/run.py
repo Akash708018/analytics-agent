@@ -126,8 +126,8 @@ def _judge_d2(sub, b, a):
         return (a["status"] == "OK" and a["extra"]["states_zero_variance"]
                 and not a["extra"]["p_value_printed"]), \
             "a stated 'no test' with no manufactured p-value", True
-    return (a["status"] == b["status"] and norm(a["response"]) == norm(b["response"])), \
-        "unchanged", True
+    return (a["status"] == b["status"] == "OK" and norm(a["response"]) == norm(b["response"])), \
+        "unchanged, and a real result", True
 
 
 def _judge_d3(sub, b, a):
@@ -210,7 +210,8 @@ def _judge_perf(sub, b, a):
 def _judge_cleaning(sub, b, a):
     same = [(x["kind"], x["column"], x["text"]) for x in a["extra"]["actions"]] == \
         [(x["kind"], x["column"], x["text"]) for x in b["extra"]["actions"]]
-    return same and a["wall_time_seconds"] < b["wall_time_seconds"], \
+    real = a["status"] == b["status"] == "OK" and a["extra"]["actions"]
+    return bool(real) and same and a["wall_time_seconds"] < b["wall_time_seconds"], \
         "the same actions, word for word, in less time", True
 
 
