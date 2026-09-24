@@ -17,7 +17,7 @@ import zlib
 from dataclasses import dataclass, field, replace
 
 from analytics_agent.webapp.contract import (
-    ActionResult, Artifact, ChatTurn, ColumnDraft, ContractColumn, ContractDraft,
+    ActionResult, Artifact, ChatTurn, CleaningProposal, CleaningStep, ColumnDraft, ContractColumn, ContractDraft,
     DatasetSummary, GridPreview, IngestDraft, Limits, Refusal, ToolCall, UploadResult,
 )
 
@@ -98,6 +98,7 @@ class _Workspace:
     datasets: dict[str, DatasetSummary] = field(default_factory=dict)
     columns: dict[str, list[ContractColumn]] = field(default_factory=dict)
     artifacts: list[tuple[Artifact, bytes]] = field(default_factory=list)
+    cleaned: dict[str, list[str]] = field(default_factory=dict)  # dataset -> applied step ids
 
 
 class FakeBackend:
@@ -312,6 +313,56 @@ class FakeBackend:
         return ActionResult(ok=True, message=(
             f"Contract **v{version}** for **{draft.dataset_name}** confirmed: {draft.grain}. "
             f"Measures: {', '.join(draft.measures) or 'none'}."))
+
+    # Two steps for any dataset, one of each kind the screen must tell apart: a lossless one the
+    # engine would suggest, and a lossy one that is the person's call.
+    _STEPS = (
+        CleaningStep("C001", "TRIM_WHITESPACE", "region", "trim spaces around region",
+                     'UPDATE "{t}" SET "region" = trim("region")', 3),
+        CleaningStep("C002", "NORMALISE_CASE", "region", "fold region to one spelling per value",
+                     'UPDATE "{t}" SET "region" = initcap("region")', 2, values_lost=1,
+                     loss_unit="distinct value", sample=["north"], lossy=True),
+    )
+
+    def propose_cleaning(self, workspace_id: str, dataset_name: str) -> CleaningProposal:
+        with self._lock:
+            space = self._ws(workspace_id)
+            if dataset_name not in space.datasets:
+                r = _refusal("DATASET_NOT_LOADED", f"there is no dataset called '{dataset_name}'.",
+                             "cleaning rebuilds a loaded table.", "list_datasets()")
+                return CleaningProposal(dataset_name, 0, [], message=r.what, refusal=r)
+            done = space.cleaned.get(dataset_name, [])
+            rows = space.datasets[dataset_name].rows
+        steps = [replace(st, sql=st.sql.format(t=dataset_name), suggested=not st.lossy)
+                 for st in self._STEPS if st.action_id not in done]
+        if not steps:
+            return CleaningProposal(dataset_name, rows, [],
+                                    message=f"Nothing to clean in {dataset_name}.")
+        return CleaningProposal(dataset_name, rows, steps, message=(
+            f"{len(steps)} change(s) proposed for {dataset_name}. Nothing has been changed."))
+
+    def apply_cleaning(self, workspace_id: str, dataset_name: str,
+                       approved_action_ids: list[str]) -> ActionResult:
+        if not approved_action_ids:
+            r = _refusal("NOTHING_APPROVED", "no action ids were approved.",
+                         "nothing is run unless it is named.",
+                         f'apply_cleaning_plan(dataset_name="{dataset_name}", '
+                         f'approved_action_ids=["C001"])')
+            return ActionResult(ok=False, message=r.what, refusal=r)
+        with self._lock:
+            space = self._ws(workspace_id)
+            done = space.cleaned.setdefault(dataset_name, [])
+            known = {st.action_id for st in self._STEPS} - set(done)
+            unknown = [i for i in approved_action_ids if i not in known]
+            if unknown:
+                r = _refusal("ACTION_NOT_IN_PLAN",
+                             f"{', '.join(unknown)} is not in the plan for {dataset_name}.",
+                             "an id that is not in the plan cannot be run.",
+                             f'propose_cleaning_plan(dataset_name="{dataset_name}")')
+                return ActionResult(ok=False, message=r.what, refusal=r)
+            done.extend(approved_action_ids)
+        return ActionResult(ok=True, message=(
+            f"Applied {', '.join(approved_action_ids)} to {dataset_name}; row count unchanged."))
 
     def chat(self, workspace_id: str, history: list[dict], message: str) -> ChatTurn:
         text = message.lower()

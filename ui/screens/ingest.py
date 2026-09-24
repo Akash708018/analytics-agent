@@ -184,4 +184,5 @@ def render() -> None:
         else:
             st.success("Loaded.")
             st.markdown(result.message)
-            st.caption("Next: agree what the columns mean on **Contract**.")
+            st.caption("Next: check what the engine would clean on **Clean**, then agree what the "
+                       "columns mean on **Contract**.")

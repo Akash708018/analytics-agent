@@ -216,3 +216,147 @@ def test_both_refusal_shapes_convert():
         "NO_CONTRACT", "x.", "y.", 'run_analysis(dataset_name="d")')
     loose = refusal_from_text("BLOCKED: no file at p.\nNEXT STEP: check the path.")
     assert loose.reason == "LOAD_REFUSED" and loose.next_step == "check the path."
+
+
+# --- expiry of idle web workspaces (Phase 14 Step 5, P14-O1) -------------------------------------
+
+DAY = 86_400
+
+
+@pytest.fixture()
+def root(tmp_path, monkeypatch):
+    """The sweep pointed at a private root, so no test can touch the real workspace/."""
+    monkeypatch.setattr(workspace, "WORKSPACE_ROOT", tmp_path)
+    monkeypatch.setenv("ANALYTICS_WORKSPACE_TTL_HOURS", "72")
+    return tmp_path
+
+
+def _aged(root, name, days):
+    import os
+    import time
+    d = root / name
+    (d / "uploads").mkdir(parents=True)
+    (d / "uploads" / "a.csv").write_text("a\n1\n")
+    (d / "session.duckdb").write_bytes(b"x")
+    t = time.time() - days * DAY
+    for p in [*d.rglob("*"), d]:
+        os.utime(p, (t, t))
+    return d
+
+
+def test_an_idle_web_workspace_is_removed_and_a_fresh_one_kept(be, root):
+    _aged(root, "ws_aaaaaaaaaaaa", 4)
+    _aged(root, "ws_bbbbbbbbbbbb", 1)
+    assert be.sweep() == ["ws_aaaaaaaaaaaa"]
+    assert sorted(p.name for p in root.iterdir()) == ["ws_bbbbbbbbbbbb"]
+
+
+def test_only_web_workspaces_are_ever_swept(be, root):
+    for name in ("local", "ws_short", "ws_AAAAAAAAAAAA", "mine"):
+        _aged(root, name, 400)
+    assert be.sweep() == []
+    assert len(list(root.iterdir())) == 4
+
+
+def test_a_read_keeps_a_workspace_alive(be, root):
+    """Reads write nothing else (step 5 M2), so the marker is what records them."""
+    import time
+    d = _aged(root, "ws_cccccccccccc", 4)
+    be.list_datasets("ws_cccccccccccc")  # a read; the workspace exists so it is marked
+    assert (d / workspace.LAST_USED).is_file()
+    assert be.sweep() == [] and d.is_dir()
+    assert be.sweep(now=time.time() + 4 * DAY) == ["ws_cccccccccccc"]
+
+
+def test_looking_at_a_missing_workspace_still_creates_nothing(be, root):
+    be.list_datasets("ws_dddddddddddd")
+    assert not (root / "ws_dddddddddddd").exists()
+
+
+def test_a_workspace_in_use_is_skipped(be, root):
+    d = _aged(root, "ws_eeeeeeeeeeee", 9)
+    lock = be._lock("ws_eeeeeeeeeeee")
+    with lock:
+        assert be.sweep() == [] and d.is_dir()
+    assert be.sweep() == ["ws_eeeeeeeeeeee"]
+
+
+def test_ttl_zero_turns_expiry_off(be, root, monkeypatch):
+    monkeypatch.setenv("ANALYTICS_WORKSPACE_TTL_HOURS", "0")
+    _aged(root, "ws_ffffffffffff", 400)
+    assert be.sweep() == []
+
+
+def test_a_new_visitor_sweeps_at_most_once_an_hour(be, root):
+    _aged(root, "ws_111111111111", 5)
+    be.new_workspace_id()
+    assert not (root / "ws_111111111111").exists()
+    _aged(root, "ws_222222222222", 5)
+    be.new_workspace_id()  # within the hour: no second sweep
+    assert (root / "ws_222222222222").exists()
+
+
+# --- cleaning through the web backend (Phase 14 Step 5, P14-O2) ----------------------------------
+
+def _merged_answers():
+    """merged_multiheader's own column names ("Identifiers order_id" style under the default join
+    are not used: the draft's target names are read back)."""
+    return dict(ANSWERS)
+
+
+def test_cleaning_is_proposed_as_structure_and_the_date_then_confirms(be, ws):
+    """P14-O2's own case: order_date arrives as text, so its contract cannot name it as the date
+    until a person approves the conversion -- now on a screen."""
+    _loaded(be, ws, "merged_multiheader.xlsx")
+    name = be.list_datasets(ws)[0].name
+    before = be.confirm_contract(ws, be.draft_contract(ws, name, **_merged_answers()))
+    assert not before.ok, "a text column confirmed as the date column"
+
+    p = be.propose_cleaning(ws, name)
+    assert p.refusal is None and p.row_count == 150
+    assert [(s.action_id, s.kind, s.column) for s in p.steps] == [
+        ("C001", "CONVERT_TYPE", "order_date")]
+    step = p.steps[0]
+    assert step.suggested and not step.lossy and step.rows_affected == 150
+    assert "TRY_CAST" in step.sql
+
+    done = be.apply_cleaning(ws, name, ["C001"])
+    assert done.ok, done.message
+    again = be.propose_cleaning(ws, name)
+    assert again.steps == [] and again.refusal is None and again.message.startswith("Nothing")
+    after = be.confirm_contract(ws, be.draft_contract(ws, name, **_merged_answers()))
+    assert after.ok, after.message
+
+
+def test_cleaning_refusals_come_back_as_refusals(be, ws):
+    _loaded(be, ws, "merged_multiheader.xlsx")
+    name = be.list_datasets(ws)[0].name
+    be.propose_cleaning(ws, name)
+    none = be.apply_cleaning(ws, name, [])
+    assert not none.ok and none.refusal.reason == "NOTHING_APPROVED"
+    unknown = be.apply_cleaning(ws, name, ["C999"])
+    assert not unknown.ok and unknown.refusal.reason == "ACTION_NOT_IN_PLAN"
+    missing = be.propose_cleaning(ws, "no_such_table")
+    assert missing.refusal.reason == "DATASET_NOT_LOADED" and missing.steps == []
+
+
+def test_a_lossy_step_is_never_suggested(be, ws):
+    """mixed_types.xlsx read all-text, as phase 6 reads it: unit_price holds 'not priced', which
+    no vocabulary declares missing, so converting it loses information."""
+    path = be.save_upload(ws, "mixed_types.xlsx", (FIXTURES / "mixed_types.xlsx").read_bytes()).path
+    d = be.draft_ingest(ws, path)
+    assert d.refusal is None and not d.unresolved, d.message
+    spec = dict(d.spec, columns=[dict(c, dtype="VARCHAR") for c in d.spec["columns"]])
+    assert be.confirm_ingest(ws, spec).ok
+    p = be.propose_cleaning(ws, d.dataset_name)
+    lossy = [s for s in p.steps if s.lossy]
+    assert lossy, p.message
+    assert all(not s.suggested and s.sample for s in lossy)
+    assert any(s.suggested for s in p.steps), "at least one lossless step is offered"
+
+
+def test_cleaning_a_workspace_never_written_creates_nothing(be):
+    from analytics_agent.config import WORKSPACE_ROOT
+    wid = be.new_workspace_id()
+    assert be.propose_cleaning(wid, "x").refusal.reason == "DATASET_NOT_LOADED"
+    assert not (WORKSPACE_ROOT / wid).exists()

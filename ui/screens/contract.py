@@ -93,7 +93,7 @@ def plain(path: str) -> str:
 
 
 def render() -> None:
-    theme.eyebrow("02 / Agree")
+    theme.eyebrow("03 / Agree")
     st.title("The *contract.*")
     st.caption("No analysis runs without an agreement on what one row is and what each number "
                "means. The engine drafts it from the data; you settle what the data cannot say.")

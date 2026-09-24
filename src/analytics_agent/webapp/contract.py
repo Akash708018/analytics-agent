@@ -181,6 +181,43 @@ class ContractDraft:
 
 
 @dataclass(frozen=True)
+class CleaningStep:
+    """One change the engine proposes for a loaded table, with the numbers that justify it.
+
+    `lossy` means it destroys something not declared missing -- `values_lost` of `loss_unit`,
+    with `sample` showing what. `suggested` means the engine itself would run it: lossless, and
+    in conflict with no other suggested step. Pre-tick only those; the rest are the person's.
+    """
+
+    action_id: str
+    kind: str  # CONVERT_TYPE, NORMALISE_MISSING, TRIM_WHITESPACE, NORMALISE_CASE, ...
+    column: str | None
+    intent: str
+    sql: str
+    rows_affected: int
+    values_lost: int = 0
+    loss_unit: str = "value"
+    sample: list[str] = field(default_factory=list)
+    lossy: bool = False
+    suggested: bool = False
+
+
+@dataclass(frozen=True)
+class CleaningProposal:
+    """Everything the engine would change in one dataset. Nothing is changed by proposing.
+
+    Empty `steps` with no refusal means there is nothing to clean. `message` is the engine's own
+    account, Markdown. Approve by action id with `apply_cleaning`, in the order wanted.
+    """
+
+    dataset_name: str
+    row_count: int
+    steps: list[CleaningStep]
+    message: str = ""
+    refusal: Refusal | None = None
+
+
+@dataclass(frozen=True)
 class DatasetSummary:
     """One dataset in the workspace and where it has got to.
 
@@ -290,6 +327,14 @@ class Backend(Protocol):
     def confirm_contract(self, workspace_id: str, draft: ContractDraft) -> ActionResult:
         """Store the contract. Refused while `draft.provisional` is non-empty."""
 
+    def propose_cleaning(self, workspace_id: str, dataset_name: str) -> CleaningProposal:
+        """What the engine would change in a loaded table, step by step. Changes nothing."""
+
+    def apply_cleaning(self, workspace_id: str, dataset_name: str,
+                       approved_action_ids: list[str]) -> ActionResult:
+        """Run exactly the approved steps of the latest proposal, in the order given, or none.
+        Refused if the table changed since the proposal, an id is unknown, or none is given."""
+
     def chat(self, workspace_id: str, history: list[dict], message: str) -> ChatTurn:
         """Answer one message. history is [{"role": "user"|"assistant", "content": str}, ...],
         oldest first, not including `message`."""
@@ -307,7 +352,8 @@ class Backend(Protocol):
 
 __all__ = [
     "AGGREGATIONS", "DTYPES", "HEADER_JOINS", "ROLES",
-    "ActionResult", "Artifact", "Backend", "ChatTurn", "ColumnDraft", "ContractColumn",
+    "ActionResult", "Artifact", "Backend", "ChatTurn", "CleaningProposal", "CleaningStep",
+    "ColumnDraft", "ContractColumn",
     "ContractDraft", "DatasetSummary", "GridPreview", "IngestDraft", "Limits", "Refusal",
     "ToolCall", "UploadResult",
 ]

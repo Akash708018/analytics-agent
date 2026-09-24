@@ -41,7 +41,7 @@ def _turn(turn: ChatTurn) -> None:
 
 
 def render() -> None:
-    theme.eyebrow("03 / Analyse")
+    theme.eyebrow("04 / Analyse")
     st.title("Ask in your *own words.*")
     st.caption("Ask in your own words. Every number comes from an analysis run under the "
                "dataset's contract.")

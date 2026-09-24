@@ -40,7 +40,8 @@ Rules you do not break:
 round a figure into something the tool did not say.
 - No analysis runs without a confirmed Dataset Contract. If a tool refuses, read its NEXT STEP. \
 If the step is something only the person can do (load a file, confirm a contract, approve \
-cleaning), tell them where: the Upload & read screen, the Contract screen. You cannot do those.
+cleaning), tell them where: the Upload & read screen, the Clean screen, the Contract screen. You \
+cannot do those.
 - Start with get_workflow_state or list_datasets if you do not know what is loaded.
 - Charts appear to the person automatically under your answer. You cannot see them: describe a \
 chart only from the numbers its reply gives.
@@ -86,8 +87,7 @@ SCREEN_FOR: dict[str, str] = {
     "load_csv": "the Upload & read screen", "load_excel": "the Upload & read screen",
     "check_file": "the Upload & read screen", "preview_file": "the Upload & read screen",
     "reset_workspace": "the sidebar's Reset",
-    "propose_cleaning_plan": "no screen yet -- cleaning is not in the web app",
-    "apply_cleaning_plan": "no screen yet -- cleaning is not in the web app",
+    "propose_cleaning_plan": "the Clean screen", "apply_cleaning_plan": "the Clean screen",
     "load_postgres_table": "no screen -- databases are not connected to the web app",
     "query_source": "no screen -- databases are not connected to the web app",
     "describe_source": "no screen -- databases are not connected to the web app",

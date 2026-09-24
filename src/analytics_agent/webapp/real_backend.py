@@ -19,9 +19,11 @@ from __future__ import annotations
 
 import datetime as _dt
 import json
+import os
 import re
 import secrets
 import threading
+import time
 from collections import defaultdict
 from contextlib import contextmanager
 from pathlib import Path
@@ -31,6 +33,8 @@ from analytics_agent.charts.render import CHARTS_DIRNAME
 from analytics_agent.config import (
     DEFAULT_WORKSPACE_ID, SIZE_GATES, WORKSPACE_ROOT, describe_size_gates, validate_workspace_id,
 )
+from analytics_agent.clean import plan as clean_plan
+from analytics_agent.clean import tools as clean_tools
 from analytics_agent.contract import ContractRefused
 from analytics_agent.contract import tools as contract_tools
 from analytics_agent.contract.propose import propose_contract
@@ -45,7 +49,8 @@ from analytics_agent.util.results import RESULTS_DIRNAME
 from analytics_agent.analysis import runs as analysis_runs
 
 from .contract import (
-    ActionResult, Artifact, ChatTurn, ColumnDraft, ContractColumn, ContractDraft,
+    ActionResult, Artifact, ChatTurn, CleaningProposal, CleaningStep, ColumnDraft,
+    ContractColumn, ContractDraft,
     DatasetSummary, GridPreview, IngestDraft, Limits, Refusal, UploadResult,
 )
 
@@ -54,6 +59,8 @@ _ALLOWED = (".csv", ".xlsx")
 _SAFE_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._ -]{0,120}$")
 _ARTIFACT_DIRS = {CHARTS_DIRNAME: "chart", REPORTS_DIRNAME: "report", RESULTS_DIRNAME: "result"}
 _GRID_ROWS = 40  # rows of the sheet shown in the editor
+DEFAULT_TTL_HOURS = 72  # a web workspace unused this long is removed (P14-O1)
+SWEEP_EVERY = 3600  # seconds between sweeps triggered by new visitors
 
 
 def refusal_from_text(text: str) -> Refusal:
@@ -97,6 +104,36 @@ class RealBackend:
     def __init__(self) -> None:
         self._guard = threading.Lock()
         self._locks: dict[str, threading.Lock] = defaultdict(threading.Lock)
+        self._last_sweep = 0.0
+
+    # --- expiry (P14-O1) ---------------------------------------------------------------------
+
+    @staticmethod
+    def ttl_seconds() -> float:
+        """ANALYTICS_WORKSPACE_TTL_HOURS, default 72; 0 turns expiry off."""
+        raw = os.environ.get("ANALYTICS_WORKSPACE_TTL_HOURS", "").strip()
+        return float(raw or DEFAULT_TTL_HOURS) * 3600
+
+    def _lock(self, workspace_id: str) -> threading.Lock:
+        with self._guard:
+            return self._locks[workspace_id]
+
+    def sweep(self, *, now: float | None = None) -> list[str]:
+        """Remove web workspaces unused for longer than the TTL. One in use is skipped."""
+        removed = workspace.sweep_idle(self.ttl_seconds(), now=now, lock_for=self._lock)
+        with self._guard:
+            for wid in removed:
+                self._locks.pop(wid, None)
+        return removed
+
+    def _maybe_sweep(self) -> None:
+        """At most once per SWEEP_EVERY seconds: a new visitor is when the disk grows."""
+        now = time.time()
+        with self._guard:
+            if now - self._last_sweep < SWEEP_EVERY:
+                return
+            self._last_sweep = now
+        self.sweep(now=now)
 
     # --- plumbing -------------------------------------------------------------------------
 
@@ -104,10 +141,13 @@ class RealBackend:
     def _workspace(self, workspace_id: str):
         """This workspace's lock, held for the whole engine call (P14-D8)."""
         validate_workspace_id(workspace_id)
-        with self._guard:
-            lock = self._locks[workspace_id]
-        with lock:
-            yield
+        with self._lock(workspace_id):
+            try:
+                yield
+            finally:
+                # Use, recorded: reads leave no other trace on disk (step 5, M2). Only a
+                # workspace that exists is marked -- looking still creates nothing (P14-D21).
+                workspace.touch(workspace_id)
 
     @staticmethod
     def _exists(workspace_id: str) -> bool:
@@ -143,6 +183,7 @@ class RealBackend:
     # --- Backend ---------------------------------------------------------------------------
 
     def new_workspace_id(self) -> str:
+        self._maybe_sweep()
         wid = f"ws_{secrets.token_hex(6)}"
         assert wid != DEFAULT_WORKSPACE_ID  # Claude Desktop's process holds "local" (P14-D4)
         return validate_workspace_id(wid)
@@ -386,6 +427,45 @@ class RealBackend:
                     workspace_id=workspace_id)
             finally:
                 con.close()
+        if _refused(text):
+            r = refusal_from_text(text)
+            return ActionResult(ok=False, message=r.what, refusal=r)
+        return ActionResult(ok=True, message=text)
+
+    # --- cleaning (P14-O2) -----------------------------------------------------------------
+
+    def propose_cleaning(self, workspace_id: str, dataset_name: str) -> CleaningProposal:
+        """The engine's own proposal, then its stored plan read back as structure: the steps a
+        screen shows are the steps the ids resolve against, never a parse of the text."""
+        with self._workspace(workspace_id):
+            if not self._exists(workspace_id):
+                text = clean_tools._not_loaded_text(dataset_name)
+            else:
+                text = clean_tools.propose_cleaning_plan(workspace_id, dataset_name)
+            if _refused(text):
+                r = refusal_from_text(text)
+                return CleaningProposal(dataset_name, 0, [], message=r.what, refusal=r)
+            con = db.connect(workspace_id)
+            try:
+                rows = con.execute(f'SELECT count(*) FROM "{dataset_name}"').fetchone()[0]
+                stored = clean_plan.latest(con, dataset_name)
+            finally:
+                con.close()
+        if text.startswith("Nothing to clean") or stored is None:
+            return CleaningProposal(dataset_name, rows, [], message=text)
+        suggested = {a.action_id for a in clean_tools._safe_suggestion(stored.actions)}
+        steps = [CleaningStep(
+            action_id=a.action_id, kind=a.kind.value, column=a.column, intent=a.intent,
+            sql=a.sql, rows_affected=a.rows_affected, values_lost=a.values_lost,
+            loss_unit=a.loss_unit, sample=list(a.sample), lossy=a.is_lossy,
+            suggested=a.action_id in suggested) for a in stored.actions]
+        return CleaningProposal(dataset_name, rows, steps, message=text)
+
+    def apply_cleaning(self, workspace_id: str, dataset_name: str,
+                       approved_action_ids: list[str]) -> ActionResult:
+        with self._workspace(workspace_id):
+            text = clean_tools.apply_cleaning_plan(workspace_id, dataset_name,
+                                                   list(approved_action_ids))
         if _refused(text):
             r = refusal_from_text(text)
             return ActionResult(ok=False, message=r.what, refusal=r)

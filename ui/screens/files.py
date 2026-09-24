@@ -11,7 +11,7 @@ _KINDS = {"chart": "Charts", "report": "Reports", "result": "Result tables"}
 
 
 def render() -> None:
-    theme.eyebrow("04 / Keep")
+    theme.eyebrow("05 / Keep")
     st.title("What was *written.*")
     st.caption("Everything the engine wrote, newest first. Each comes with its own account of "
                "what it holds.")

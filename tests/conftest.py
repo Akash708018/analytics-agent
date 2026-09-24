@@ -14,3 +14,10 @@ def no_network(monkeypatch):
     def refuse(*args, **kwargs):
         raise RuntimeError("a test tried to reach the network through urllib")
     monkeypatch.setattr(urllib.request, "urlopen", refuse)
+
+
+@pytest.fixture(autouse=True)
+def no_workspace_expiry(monkeypatch):
+    """A RealBackend sweeps idle web workspaces when it mints an id (P14-O1). No test may sweep
+    the developer's real workspace/ directory; the sweep's own tests point it at a tmp root."""
+    monkeypatch.setenv("ANALYTICS_WORKSPACE_TTL_HOURS", "0")

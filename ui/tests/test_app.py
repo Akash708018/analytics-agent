@@ -18,7 +18,8 @@ sys.path.insert(0, str(ROOT))
 from ui.fake_backend import FakeBackend  # noqa: E402
 
 APP = str(ROOT / "ui" / "app.py")
-SCREENS = {"upload": "ui.screens.ingest", "contract": "ui.screens.contract",
+SCREENS = {"upload": "ui.screens.ingest", "clean": "ui.screens.clean",
+           "contract": "ui.screens.contract",
            "ask": "ui.screens.chat", "files": "ui.screens.files"}
 
 
@@ -315,3 +316,59 @@ def test_the_measure_fields_offer_no_default():
     at = screen("contract").run()
     agg = at.selectbox(key="c_agg_geolocation_geolocation_lat")
     assert agg.value is None and "none" in agg.options
+
+
+# --- the Clean screen (Phase 14 Step 5, P14-O2) ---------------------------------------------------
+
+def test_the_clean_screen_ticks_only_what_loses_nothing_and_shows_the_loss():
+    at = screen("clean").run()
+    assert not at.exception, at.exception
+    boxes = {cb.key: cb.value for cb in at.checkbox if cb.key and cb.key.startswith("clean_")}
+    assert boxes == {"clean_geolocation_C001": True, "clean_geolocation_C002": False}
+    assert any("Discards 1 distinct value(s)" in w.value and "'north'" in w.value
+               for w in at.warning)
+    assert [b for b in at.button if b.label.startswith("Apply")][0].label == "Apply 1 step(s)"
+
+
+def test_applying_runs_exactly_what_is_ticked_and_proposes_afresh():
+    at = screen("clean").run()
+    at.checkbox(key="clean_geolocation_C002").check().run()
+    [b for b in at.button if b.label.startswith("Apply")][0].click().run()
+    assert not at.exception, at.exception
+    assert any("Applied C001, C002 to geolocation" in s.value for s in at.success)
+    assert any("Nothing to clean" in s.value for s in at.success)
+
+
+def test_nothing_ticked_cannot_be_applied():
+    at = screen("clean").run()
+    at.checkbox(key="clean_geolocation_C001").uncheck().run()
+    assert [b for b in at.button if b.label.startswith("Apply")][0].disabled
+
+
+def test_the_clean_screen_converts_the_text_date_on_the_real_engine(monkeypatch):
+    """P14-O2's case end to end through the widgets: merged_multiheader's order_date is text; the
+    screen offers the conversion ticked, applying it runs it, and the next look finds nothing."""
+    monkeypatch.setenv("ANALYTICS_UI_BACKEND", "real")
+    from analytics_agent import workspace
+    from ui import backend
+    backend.get_backend.clear()
+    be = backend.get_backend()
+    ws = be.new_workspace_id()
+    try:
+        path = be.save_upload(ws, "merged_multiheader.xlsx",
+                              (ROOT / "tests/fixtures/merged_multiheader.xlsx").read_bytes()).path
+        assert be.confirm_ingest(ws, be.draft_ingest(ws, path).spec).ok
+        at = screen("clean")
+        at.session_state["workspace_id"] = ws
+        at.run()
+        assert not at.exception, at.exception
+        assert at.checkbox(key="clean_merged_multiheader_C001").value is True
+        [b for b in at.button if b.label == "Apply 1 step(s)"][0].click().run()
+        assert not at.exception, at.exception
+        assert any("Nothing to clean" in s.value for s in at.success)
+        con_types = be.draft_contract(ws, "merged_multiheader").columns
+        assert {c.name: c.dtype for c in con_types}["order_date"] == "DATE"
+    finally:
+        backend.get_backend.clear()
+        workspace.reset(ws)
+        workspace.workspace_dir(ws).rmdir()

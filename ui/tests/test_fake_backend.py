@@ -118,3 +118,16 @@ def test_reset_empties_everything_including_the_seed():
     be.chat(ws, [], "chart")
     assert be.reset_workspace(ws).ok
     assert be.list_datasets(ws) == [] and be.list_artifacts(ws) == []
+
+
+def test_cleaning_proposes_one_free_and_one_lossy_step_and_applies_by_id():
+    be = FakeBackend()
+    ws = be.new_workspace_id()
+    p = be.propose_cleaning(ws, "geolocation")
+    assert [(s.action_id, s.suggested, s.lossy) for s in p.steps] == [
+        ("C001", True, False), ("C002", False, True)]
+    assert not be.apply_cleaning(ws, "geolocation", []).ok
+    assert be.apply_cleaning(ws, "geolocation", ["C999"]).refusal.reason == "ACTION_NOT_IN_PLAN"
+    assert be.apply_cleaning(ws, "geolocation", ["C001"]).ok
+    assert [s.action_id for s in be.propose_cleaning(ws, "geolocation").steps] == ["C002"]
+    assert be.propose_cleaning(ws, "nope").refusal.reason == "DATASET_NOT_LOADED"

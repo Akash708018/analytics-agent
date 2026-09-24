@@ -6136,3 +6136,43 @@ re-drafted with no answers, and showed "Still needed: Grain; ..." beneath "confi
 confirmed draft is now kept. Falsified: dropping it fails the one-click test.
 
 MEASURED VALIDATION, 22/09/2026. UI tests 35 -> 37; engine 1839.
+
+## Phase 14, Step 5 - the open items closed, 24/09/2026
+
+Step document: docs/steps/phase14_step5_open_items.md. Run in a cloud container with no Postgres.
+
+P14-D36. AN IDLE WEB WORKSPACE EXPIRES, AND "IDLE" IS RECORDED, NOT INFERRED. Measured first: a
+full workspace (29 KB upload, contract, result, report) is 1,634,484 bytes, 97% session.duckdb;
+and a read touches no file at all, so file times cannot tell a reader from someone who left. Every
+RealBackend call on an existing workspace touches <workspace>/.last_used; age is the newest of it
+and every file. workspace.sweep_idle removes ws_ + 12 hex directories only -- never "local", never
+a name this code did not mint -- holding each one's lock, taken without waiting, across the check
+and the removal. TTL from ANALYTICS_WORKSPACE_TTL_HOURS (default 72, 0 off); swept at most hourly
+when a new visitor gets an id, and by scripts/sweep_workspaces.py for a cron. Falsified: without
+the marker, the read test fails. The suite runs with the TTL at 0 so no test can sweep a real
+workspace.
+
+P14-O1 IS CLOSED by P14-D36.
+
+P14-D37. CLEANING HAS A SCREEN. The Backend contract gains propose_cleaning -> CleaningProposal of
+CleaningStep (id, kind, column, intent, SQL, counts, loss, sample, lossy, suggested) and
+apply_cleaning -> ActionResult. The steps are the stored plan read back, never the text parsed.
+The Clean screen, between Upload & read and Contract, pre-ticks only what the engine itself would
+suggest (lossless, conflict-free), shows every loss with its sample, applies the ticked ids in the
+order shown, then proposes afresh and drops the contract draft made against the old types. The
+assistant's note for the cleaning tools now names the Clean screen. P14-O2's own case passes end
+to end on the real engine: merged_multiheader's text order_date is refused as the date column,
+converted by one click, then confirmed.
+
+P14-O2 IS CLOSED by P14-D37.
+
+MEASURED VALIDATION, 24/09/2026. Engine 1839 -> 1850; UI 37 -> 43; eval 76/76. Acceptance in this
+container 55/0/3, 0/0/1, 0/0/1, 26/0/0, 36/0/0 -- the same before and after the change, every
+extra skip "no configured source named 'olist'"; the recorded 99/0/2, 19/0/0, 35/0/1 need the
+Postgres host and were not re-measured here. 0 ws_ directories left after the runs. Digests:
+  44159b65da6b693ece3ffc8a767ee1eb9b4fea8e295f288eece30be490b944c3  src/analytics_agent/workspace.py
+  ddbb51f047030100a3ed9964530f827838726a000e4d26bf4a0693603a288fee  src/analytics_agent/webapp/real_backend.py
+  0d451a0dc63956207f5fc0d768b5d33194f1703f0ac1015edc65596b07cc8e2d  src/analytics_agent/webapp/contract.py
+  553c4271386e01e4187911d9885cf69acea049b619f4a7f1552caf916db547c4  ui/screens/clean.py
+  d5e392b2d146991ac5ee9a9dc01dd9144817b84486acdfac302f9ec1009abbb0  ui/fake_backend.py
+  7c040af8dd5209808e21a72d1f1901e20b2599b72844350989268fa4eaf70ce6  scripts/sweep_workspaces.py

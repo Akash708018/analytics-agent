@@ -103,6 +103,19 @@ def _not_loaded(con, dataset_name: str) -> str:
     ).to_text()
 
 
+def _not_loaded_text(dataset_name: str) -> str:
+    """The not-loaded refusal for a workspace with no database yet -- opening one to say so
+    would create it (P14-D21)."""
+    return Refusal(
+        reason=Reason.DATASET_NOT_LOADED,
+        what=f"there is no dataset called '{dataset_name}' in this workspace.",
+        why="cleaning rebuilds a loaded table, and nothing is read from disk here.",
+        state="loaded: (none loaded)",
+        detail="list_datasets() shows what is already here.",
+        next_call="list_datasets()",
+    ).to_text()
+
+
 def _safe_suggestion(actions, limit: int | None = None):
     """Actions worth suggesting: lossless, compatible, and in the right order.
 
