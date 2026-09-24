@@ -1,0 +1,620 @@
+{
+ "case": "PROFILE_CORRECTNESS",
+ "src": "/home/user/aa-orig/src",
+ "commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+ "src_dirty": [],
+ "python": "3.12.3",
+ "duckdb": "1.5.5",
+ "seconds": 6.95,
+ "harness_error": null,
+ "observations": [
+  {
+   "sub": "fin.record_id",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "fin",
+   "rows": null,
+   "parameters": {
+    "column": "record_id"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.000622,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "fin.transaction_id",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "fin",
+   "rows": null,
+   "parameters": {
+    "column": "transaction_id"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.000291,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "fin.account_id",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "fin",
+   "rows": null,
+   "parameters": {
+    "column": "account_id"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.000175,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "fin.customer_id",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "fin",
+   "rows": null,
+   "parameters": {
+    "column": "customer_id"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.000198,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "fin.transaction_date",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "fin",
+   "rows": null,
+   "parameters": {
+    "column": "transaction_date"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.000172,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "fin.posted_at",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "fin",
+   "rows": null,
+   "parameters": {
+    "column": "posted_at"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.000151,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "fin.transaction_type",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "fin",
+   "rows": null,
+   "parameters": {
+    "column": "transaction_type"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.000124,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "fin.category",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "fin",
+   "rows": null,
+   "parameters": {
+    "column": "category"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.000118,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "fin.debit",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "fin",
+   "rows": null,
+   "parameters": {
+    "column": "debit"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.000195,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "fin.credit",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "fin",
+   "rows": null,
+   "parameters": {
+    "column": "credit"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.000163,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "fin.amount",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "fin",
+   "rows": null,
+   "parameters": {
+    "column": "amount"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.000139,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "fin.balance",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "fin",
+   "rows": null,
+   "parameters": {
+    "column": "balance"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.00012,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "fin.currency",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "fin",
+   "rows": null,
+   "parameters": {
+    "column": "currency"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.000126,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "fin.branch",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "fin",
+   "rows": null,
+   "parameters": {
+    "column": "branch"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.00012,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "fin.payment_method",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "fin",
+   "rows": null,
+   "parameters": {
+    "column": "payment_method"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.000116,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "fin.risk_score",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "fin",
+   "rows": null,
+   "parameters": {
+    "column": "risk_score"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.000119,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "fin.fraud_flag",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "fin",
+   "rows": null,
+   "parameters": {
+    "column": "fraud_flag"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.000117,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "fin.revenue",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "fin",
+   "rows": null,
+   "parameters": {
+    "column": "revenue"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.000148,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "fin.expense",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "fin",
+   "rows": null,
+   "parameters": {
+    "column": "expense"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.000126,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "fin.profit",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "fin",
+   "rows": null,
+   "parameters": {
+    "column": "profit"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.000128,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "fin.budget",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "fin",
+   "rows": null,
+   "parameters": {
+    "column": "budget"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.000119,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "fin.actual",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "fin",
+   "rows": null,
+   "parameters": {
+    "column": "actual"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.000114,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "fin.fiscal_period",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "fin",
+   "rows": null,
+   "parameters": {
+    "column": "fiscal_period"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.000114,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "fin.source_system",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "fin",
+   "rows": null,
+   "parameters": {
+    "column": "source_system"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.000116,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "specials.id",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "specials",
+   "rows": null,
+   "parameters": {
+    "column": "id"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.000429,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "specials.num",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "specials",
+   "rows": null,
+   "parameters": {
+    "column": "num"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.000197,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "specials.cat",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "specials",
+   "rows": null,
+   "parameters": {
+    "column": "cat"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.000154,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "specials.when",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "specials",
+   "rows": null,
+   "parameters": {
+    "column": "when"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.000132,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "specials.hi_text",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "specials",
+   "rows": null,
+   "parameters": {
+    "column": "hi_text"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.000118,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "specials.nully",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "specials",
+   "rows": null,
+   "parameters": {
+    "column": "nully"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.000118,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "specials.const",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "specials",
+   "rows": null,
+   "parameters": {
+    "column": "const"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.000131,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  },
+  {
+   "sub": "specials.nope",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "specials",
+   "rows": null,
+   "parameters": {
+    "column": "nope"
+   },
+   "status": "EXCEPTION",
+   "wall_time_seconds": 0.000182,
+   "response": "",
+   "exception_type": "ConnectionException",
+   "exception_message": "Connection Error: Can't open a connection to same database file with a different configuration than existing connections",
+   "extra": {
+    "field_differences": null,
+    "role": "correctness"
+   }
+  }
+ ]
+}
