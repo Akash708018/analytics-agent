@@ -332,6 +332,10 @@ class KeyVerdict:
     distinct: int
     null_counts: dict[str, int] = field(default_factory=dict)
     missing: list[str] = field(default_factory=list)
+    # Rows that repeat another row in every column. Counted only when the key repeats: when they
+    # are the whole repeat, dropping them (propose_cleaning_plan's C001) is the fix, and the
+    # refusal names that call instead of a template (Step 13 benchmark).
+    exact_duplicates: int = 0
 
     @property
     def label(self) -> str:
@@ -421,11 +425,24 @@ class KeyVerdict:
                 f"this and everything else that disagrees with the contract, "
                 f"rather than stopping at the key."
             ),
-            next_call=(
-                f'propose_dataset_contract(dataset_name="{self.dataset_name}", '
-                f"primary_key=[...]) with a key that holds, or state the grain "
-                f"that matches the key you gave"
-            ),
+            next_call=self._next_call(),
+        )
+
+    def _next_call(self) -> str:
+        if (
+            self.duplicate_rows
+            and not self.null_bearing
+            and self.exact_duplicates >= self.duplicate_rows
+        ):
+            return (
+                f'propose_cleaning_plan(dataset_name="{self.dataset_name}") -- '
+                f"{self.exact_duplicates:,} row(s) repeat another row in every column, "
+                f"which is every repeat of {self.label}; dropping them makes the key hold"
+            )
+        return (
+            f'propose_dataset_contract(dataset_name="{self.dataset_name}", '
+            f"primary_key=[...]) with a key that holds, or state the grain "
+            f"that matches the key you gave"
         )
 
 
@@ -495,14 +512,18 @@ def verify_key(con, dataset_name: str, columns: list[str]) -> KeyVerdict:
         f"SELECT count(*), {distinct_expr}, {null_exprs} "
         f"FROM {_q(dataset_name)}"
     ).fetchone()
-
-    return KeyVerdict(
+    verdict = KeyVerdict(
         dataset_name=dataset_name,
         columns=list(columns),
         row_count=row[0],
         distinct=row[1],
         null_counts={c: row[2 + i] for i, c in enumerate(columns)},
     )
+    if verdict.duplicate_rows:
+        verdict.exact_duplicates = row[0] - con.execute(
+            f"SELECT count(*) FROM (SELECT DISTINCT * FROM {_q(dataset_name)})"
+        ).fetchone()[0]
+    return verdict
 
 
 __all__ = [

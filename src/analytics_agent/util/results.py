@@ -233,6 +233,18 @@ def _known(workspace_id: str) -> str:
     return ", ".join(p.name for p in found[:10])
 
 
+def _read_one_of(workspace_id: str) -> str:
+    """The call to make instead: runnable as written when one file is there (Step 13 benchmark
+    counted the `<one of: x>` template a placeholder when x was the only file)."""
+    found = list_results(workspace_id)
+    if len(found) == 1:
+        return f'read_result_file(path="{found[0]}")'
+    return (
+        f'read_result_file(path="{results_dir(workspace_id)}/<one of: '
+        f'{_known(workspace_id)}>")'
+    )
+
+
 def _refuse_outside(workspace_id: str, given: str) -> str:
     return Refusal(
         reason=Reason.RESULT_OUT_OF_SCOPE,
@@ -244,10 +256,7 @@ def _refuse_outside(workspace_id: str, given: str) -> str:
             "is a tool that can be asked to read anything."
         ),
         state=f"results directory: {results_dir(workspace_id)}",
-        next_call=(
-            f'read_result_file(path="{results_dir(workspace_id)}/<one of: '
-            f'{_known(workspace_id)}>")'
-        ),
+        next_call=_read_one_of(workspace_id),
     ).to_text()
 
 

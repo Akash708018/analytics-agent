@@ -135,3 +135,57 @@ def test_d5_the_tie_term_does_not_overflow_at_millions_of_ties():
     scope = SimpleNamespace(dataset_name="t", where="TRUE")
     result = inferential.mann_whitney(con, scope, "g", "v", "a", "b")
     assert 0.0 <= result.p <= 1.0
+
+
+# --- next steps the benchmark could not run (Step 13 warnings: 64 unexecutable) -------------
+
+
+def test_d6_a_key_repeated_only_by_duplicate_rows_points_to_the_cleaning_plan(tmp_path, ws):
+    rows = ROWS + ROWS[:3]                                   # three exact duplicate rows
+    _load(tmp_path, ws, "t", "id,d,g,cust,v", rows)
+    out = _contract(ws, "t", grain="row", primary_key=["id"], date_column="d", measures=["v"],
+                    dimensions=["g"], aggregations={"v": "sum"}, measure_definitions={"v": "v"},
+                    analysis_window_start="2024-01-01", analysis_window_end="2024-12-31")
+    assert out.startswith("BLOCKED") and "KEY_NOT_UNIQUE" in out
+    assert 'NEXT STEP: call propose_cleaning_plan(dataset_name="t")' in out, out
+    assert "3 row(s) repeat another row in every column" in out
+
+
+def test_d6_a_key_repeated_by_distinct_rows_keeps_the_contract_call(tmp_path, ws):
+    rows = ROWS + [ROWS[0].replace(",0", ",9", 1)[:-1] + "4"]  # same id, different values
+    _load(tmp_path, ws, "t", "id,d,g,cust,v", rows)
+    out = _contract(ws, "t", grain="row", primary_key=["id"], date_column="d", measures=["v"],
+                    dimensions=["g"], aggregations={"v": "sum"}, measure_definitions={"v": "v"},
+                    analysis_window_start="2024-01-01", analysis_window_end="2024-12-31")
+    assert "KEY_NOT_UNIQUE" in out and "primary_key=[...]" in out, out
+
+
+def test_d7_correlation_with_one_declared_measure_names_the_contract(tmp_path, ws):
+    _load(tmp_path, ws, "t", "id,d,g,cust,v", ROWS)
+    _contract(ws, "t", grain="row", primary_key=["id"], date_column="d", measures=["v"],
+              dimensions=["g"],
+              aggregations={"v": "sum"}, measure_definitions={"v": "v"},
+              analysis_window_start="2024-01-01", analysis_window_end="2024-12-31")
+    out = server.compute_analysis(dataset_name="t", analysis_type="correlation", measure="v",
+                                  workspace_id=ws)
+    assert out.startswith("BLOCKED") and 'against="..."' not in out, out
+    assert 'propose_dataset_contract(dataset_name="t")' in out
+
+
+def test_d8_a_corrupt_workbook_is_not_sent_back_through_the_same_file(tmp_path):
+    from analytics_agent.ingest import excel
+    bad = tmp_path / "bad.xlsx"
+    bad.write_bytes(b"PK\x03\x04 not really a workbook")
+    with pytest.raises(excel.LoadRefused) as e:
+        excel.load_excel(duckdb.connect(), bad, "bad")
+    assert f'propose_ingest_spec(path="{bad}")' not in str(e.value)
+    assert "save it again as .xlsx" in str(e.value)
+
+
+def test_d9_the_only_result_file_is_named_as_a_runnable_path(tmp_path, ws):
+    from analytics_agent.util import results
+    d = results.results_dir(ws)
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "only.csv").write_text("a\n1\n")
+    out = server.read_result_file(path="/etc/passwd", workspace_id=ws)
+    assert f'read_result_file(path="{d / "only.csv"}")' in out, out
