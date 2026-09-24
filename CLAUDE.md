@@ -4,8 +4,9 @@ MCP server exposing data loading, profiling, cleaning and contract-gated analysi
 to Claude Desktop. Phases 1-13 done, then Cleanup Steps 4-7; Phase 14
 (Track B) in progress, Steps 1-5 done (UI in ui/, on the fake backend or the engine with
 ANALYTICS_UI_BACKEND=real;
-`uv run --group ui streamlit run ui/app.py`; its 43 tests: `uv run --group ui pytest ui/tests`). No open items: P14-O1 and P14-O2
-closed at Step 5 (idle web workspaces expire; cleaning has a screen). The agent's live check:
+`uv run --group ui streamlit run ui/app.py`; its 43 tests: `uv run --group ui pytest ui/tests`). P14-O1 and P14-O2 closed at Step 5
+(idle web workspaces expire; cleaning has a screen). Open: P14-O3 to O12, the stress matrix's
+findings (Step 6; `docs/stress/REPORT.md`, re-run with `uv run python scripts/stress_matrix.py`). The agent's live check:
 `uv run python scripts/agent_live.py` (needs keys in the gitignored .env). Otherwise nothing: P9-O4's feature half was closed by the user's
 decision on 21/09/2026 (copy-first; in-place analysis is a later scaling item).
 

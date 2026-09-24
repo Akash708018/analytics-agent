@@ -6176,3 +6176,39 @@ Postgres host and were not re-measured here. 0 ws_ directories left after the ru
   553c4271386e01e4187911d9885cf69acea049b619f4a7f1552caf916db547c4  ui/screens/clean.py
   d5e392b2d146991ac5ee9a9dc01dd9144817b84486acdfac302f9ec1009abbb0  ui/fake_backend.py
   7c040af8dd5209808e21a72d1f1901e20b2599b72844350989268fa4eaf70ce6  scripts/sweep_workspaces.py
+
+## Phase 14, Step 6 - the stress matrix, 24/09/2026
+
+Step document: docs/steps/phase14_step6_stress_matrix.md. Report: docs/stress/REPORT.md.
+
+P14-D38. A STRESS MATRIX MEASURES, AND DOES NOT PASS OR FAIL. scripts/stress_matrix.py generates 40
+datasets (CSV dialects and encodings, degenerate shapes, hostile names, messy values, five date
+conventions, Excel layouts), each with ground truth computed by the generator. It drives every tool
+on the web path and classifies each call CRASH / WRONG / SUSPECT / REFUSED / OK, exiting zero, for
+the eval's reason (P13-D1). Measured: 1,634 calls in 112.3 s -- 1,431 OK, 184 refused, 15 wrong,
+2 crashed, 2 suspect. Every refusal was read by hand. The findings are registered below; none is
+fixed in this step.
+
+P14-O3 IS OPEN (B1). A CSV total row is loaded as data and doubles every sum; the footer check
+runs for Excel only, and the draft blames file size for a 10 KB file.
+P14-O4 IS OPEN (B2). Cleaning suggests converting leading-zero ids to BIGINT as lossless; applying
+it loses the zeros ('00311' -> 311), and the contract then suggests the column as a measure.
+P14-O5 IS OPEN (B3). Excel formula columns load as formula text even with cached values:
+load_workbook is called without data_only=True.
+P14-O6 IS OPEN (B4). Infinity in a DOUBLE column makes profile_dataset, summary_stats and
+outlier_detection raise OutOfRangeException out of the tool.
+P14-O7 IS OPEN (B5). An empty first sheet makes RealBackend.draft_ingest raise ValueError; the MCP
+refusal calls the file empty.
+P14-O8 IS OPEN (B6). Blank rows mid-sheet in Excel load as all-NULL rows.
+P14-O9 IS OPEN (B7). Latin-1 CSVs cannot load; the refusal shows the server's absolute path.
+P14-O10 IS OPEN (B8, B9, B12). Decimal commas, currency, thousands separators, percentages and
+mixed date formats stay text, and cleaning says every column already reads as its type.
+P14-O11 IS OPEN (B10, B11). Header-only CSV refused with a false reason; a header repeated
+mid-file is not recognised.
+P14-O12 IS OPEN (B13, B14). Missing-argument refusals quote Python's TypeError; role suggestions
+treat a low-cardinality DOUBLE as a dimension.
+
+MEASURED VALIDATION, 24/09/2026. Nothing in src/ or tests/ changed in this step. Digests:
+  fcdbfd75fff015573b7e7138b665baed5a5667bd2d8d0553ff43cc0c39ddb15d  scripts/stress_matrix.py
+  caaeb672a450a74da63f7f4bf9009067cd6f6c17097901b1f35e6b2e82081654  docs/stress/stress_matrix.json
+  fb89df10078e45e2b9383a4f5d9dd53ea02bdaef2ad3f701d26e4d9fa491aec7  docs/stress/REPORT.md
