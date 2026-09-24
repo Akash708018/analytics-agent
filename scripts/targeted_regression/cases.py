@@ -118,7 +118,7 @@ def next_step(text: str) -> dict:
                 kwargs[k] = json.loads(v)
             except json.JSONDecodeError:
                 kwargs[k] = v
-    return {"next_step": f"{tool}({args})", "tool": tool, "kwargs": kwargs,
+    return {"next_step": f"{tool}({args})", "next_tool": tool, "kwargs": kwargs,
             "executable": not placeholder and hasattr(server, tool)}
 
 
@@ -127,9 +127,9 @@ def follow(ns: dict, ws: str) -> dict | None:
     if not ns.get("executable"):
         return None
     kw = dict(ns["kwargs"])
-    if "workspace_id" in server.__dict__[ns["tool"]].__code__.co_varnames:
+    if "workspace_id" in server.__dict__[ns["next_tool"]].__code__.co_varnames:
         kw.setdefault("workspace_id", ws)
-    r = call(getattr(server, ns["tool"]), **kw)
+    r = call(getattr(server, ns["next_tool"]), **kw)
     return {"status": r["status"], "head": r["response"][:400],
             "exception_type": r["exception_type"]}
 
@@ -241,6 +241,8 @@ def case_d2() -> list[dict]:
                            parameters=p, shape=tag,
                            p_value_printed=bool(re.search(r"\bp [<\d]", text)),
                            means=[statistics.fmean(a), statistics.fmean(b)],
+                           role="defect" if tag in ("both_zero_variance", "constant_same_value")
+                           else "control",
                            states_zero_variance="zero variance" in text or "constant" in text))
     workspace.reset(ws)
     return out
@@ -279,8 +281,15 @@ def case_d3() -> list[dict]:
                         workspace_id=ws)
             stage = "confirm_dataset_contract" if conf["status"] != "OK" else "stored"
             if conf["status"] == "OK":
+                # G's exact calls: summary_stats (every measure) and trend on this measure
                 analysis = call(server.compute_analysis, dataset_name=name,
-                                analysis_type="summary_stats", measure=col, workspace_id=ws)
+                                analysis_type="summary_stats", workspace_id=ws)
+                trend = call(server.compute_analysis, dataset_name=name, analysis_type="trend",
+                             measure=col, grain="month", workspace_id=ws)
+                if trend["status"] == "EXCEPTION" or analysis["status"] == "EXCEPTION":
+                    analysis = trend if trend["status"] == "EXCEPTION" else analysis
+                elif trend["status"] != "OK":
+                    analysis = trend
                 if analysis["status"] != "OK":
                     stage = "analysis"
             r = conf if conf["status"] != "OK" else r

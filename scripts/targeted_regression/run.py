@@ -98,6 +98,10 @@ def norm(text: str) -> str:
     text = re.sub(r"/\S*/workspace/\S*", "<path>", text)
     text = re.sub(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}(:\d{2})?", "<time>", text)
     text = re.sub(r"\d{8}-\d{6}(_\d+)?", "<ts>", text)
+    # Welch's df is printed differently on purpose (D11: "1.569e+04" became "15,690.3"): the
+    # value is compared, to three significant figures, rather than the text
+    text = re.sub(r"df ([\d.,eE+]+?)(?=, p)",
+                  lambda m: f"df {float(m.group(1).replace(',', '')):.3g}", text)
     return text
 
 
@@ -169,11 +173,11 @@ def _judge_recs(sub, b, a):
         return (a["status"] == b["status"] and x.get("next_step") == y.get("next_step")), \
             "unchanged refusal and next step", True
     if sub == "dup_rows_key":
-        return (x.get("tool") == "propose_cleaning_plan" and x["executable"]
+        return (x.get("next_tool") == "propose_cleaning_plan" and x["executable"]
                 and fol.get("status") == "OK"), "names the cleaning plan, runnable", \
             not y.get("executable")
     if sub == "correlation_one_measure":
-        return (not x["self_correlation"] and x.get("tool") == "propose_dataset_contract"
+        return (not x["self_correlation"] and x.get("next_tool") == "propose_dataset_contract"
                 and fol.get("status") == "OK"), "asks for a contract, not v against v", \
             y["self_correlation"] or not y.get("executable")
     if sub == "correlation_two_measures":
@@ -286,6 +290,8 @@ def judge_all() -> tuple[list[dict], dict]:
             else:
                 ok, expected, reproduced = JUDGES[case](sub, b, a)
             role = (a or b)["extra"].get("role", "")
+            if sub.startswith("setup"):
+                continue                                 # fixtures, not cases
             records.append({
                 "case_id": f"{case}.{sub}",
                 "category": "PRODUCT_DEFECT" if role == "defect" else
