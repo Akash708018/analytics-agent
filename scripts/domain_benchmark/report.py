@@ -23,8 +23,14 @@ from .matrix import cases
 
 EXPLAINS = re.compile(r"Declared|Available|accepted|one of|Columns:|expected|must|needs|takes|"
                       r"is not a|cannot|only", re.I)
-WARNS = re.compile(r"cannot|could not|not |lost|PROVISIONAL|WARN|no rows|undated|outside",
-                   re.I)
+WARNS = re.compile(r"cannot|could not|not |lost|PROVISIONAL|WARN|no rows|undated|outside|"
+                   r"ambiguous|No spec proposed|CONVERT_TYPE|would be discarded", re.I)
+# An answer that states why it did not compute (Step 13 run 2: "No test: g has 1 group(s)",
+# "both coefficients are undefined rather than zero", "no spread and no interval", a rank test
+# chosen "because the parametric test has no denominator").
+DIAGNOSES = re.compile(r"No test|undefined rather than|no spread and no interval|"
+                       r"Method chosen, not requested|No assessment|cannot be computed|"
+                       r"has no (?:spread|variance)", re.I)
 SEVERITY_RANK = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3}
 
 
@@ -95,7 +101,8 @@ def classify(call: dict, follow: dict | None) -> dict:
     if st_ in ("EXCEPTION", "TIMEOUT"):
         cls = "FAIL_EXCEPTION"
     elif expect == "reject":
-        cls = ("FAIL_SILENT_ERROR" if st_ == "OK" else
+        cls = (("PASS_USEFUL_WARNING" if DIAGNOSES.search(text) else "FAIL_SILENT_ERROR")
+               if st_ == "OK" else
                "PASS_SAFE_REJECTION" if names in (None, True) else "FAIL_MISLEADING_RESPONSE")
     elif expect == "accept":
         cls = "PASS_ACCEPTED" if st_ == "OK" else "FAIL_UNNECESSARY_REJECTION"
@@ -106,7 +113,8 @@ def classify(call: dict, follow: dict | None) -> dict:
         cls = "PASS_AUTOCORRECTED" if st_ == "OK" else "PASS_SAFE_REJECTION"
     else:  # either
         cls = ("PASS_SAFE_REJECTION" if st_ == "REFUSED" and names in (None, True) else
-               "FAIL_MISLEADING_RESPONSE" if st_ == "REFUSED" else "PASS_AUTOCORRECTED")
+               "FAIL_MISLEADING_RESPONSE" if st_ == "REFUSED" else
+               "PASS_USEFUL_WARNING" if DIAGNOSES.search(text) else "PASS_AUTOCORRECTED")
     quality = None
     if st_ == "REFUSED":
         nxt = call.get("next_step") or ""
@@ -140,6 +148,12 @@ def aggregate(raw: dict) -> dict:
     for uname, u in units.items():
         dv = u["derived"]
         follow_by = {f.get("of_seq"): f for f in u["notes"] if f.get("event") == "follow"}
+        # A dirty variant is one case of several steps: whether it warned is judged on all of
+        # them (the load may be silent and the plan name the defect).
+        case_text = defaultdict(str)
+        if uname.startswith("F_dirty"):
+            for r in u["calls"]:
+                case_text[r.get("case")] += "\n" + (r.get("response_full") or "")
         corr_by_seq = {c.get("call_seq"): c for c in dv.get("correctness", [])}
         for c in dv.get("correctness", []):
             corr_all.append({"unit": uname, **{k: v for k, v in c.items() if k != "checks"},
@@ -203,7 +217,10 @@ def aggregate(raw: dict) -> dict:
             }
             if r.get("expect") or r.get("class") == "NOT_APPLICABLE":
                 if r.get("variant") != "follow":
-                    b = classify({**r, "expect": r.get("expect") or "either"},
+                    rr = dict(r)
+                    if case_text.get(r.get("case")):
+                        rr["response_full"] = case_text[r["case"]]
+                    b = classify({**rr, "expect": r.get("expect") or "either"},
                                  follow_by.get(r.get("seq")))
                     if r.get("expect") == "trivial" and cr is not None and cr["status"] == "FAIL":
                         b["classification"] = "FAIL_WRONG_RESULT"
@@ -278,15 +295,27 @@ def scaling(perf: dict) -> dict:
                                    for a, b in pairs}}
 
 
+def worker_peaks(per_call) -> dict:
+    """Each worker's own peak, from its per-call VmHWM / VmRSS records."""
+    peaks = defaultdict(float)
+    for r in per_call:
+        for k in ("peak_memory_mb", "memory_after_mb", "memory_before_mb"):
+            if r.get(k):
+                peaks[r["unit"]] = max(peaks[r["unit"]], r[k])
+    return peaks
+
+
 def memory(per_call, worker_runs, units) -> dict:
     by_size = defaultdict(list)
+    peaks = worker_peaks(per_call)
     for w in worker_runs:
         m = re.match(r"[CDEI]_(\w+?)(?:_(\d+))?$", w["unit"])
         rows = {"C": 1_000, "D": 100_000, "E": 1_000_000}.get(w["unit"][0])
         if w["unit"].startswith("I_"):
             rows = int(w["unit"].rsplit("_", 1)[1])
         if rows and m:
-            by_size[rows].append({"unit": w["unit"], "child_peak_rss_mb": w["child_peak_rss_mb"]})
+            by_size[rows].append({"unit": w["unit"], "child_peak_rss_mb": peaks.get(w["unit"]),
+                                  "wait4_ru_maxrss_mb_inherited": w["child_peak_rss_mb"]})
     top_calls = sorted((r for r in per_call if r.get("peak_memory_mb")),
                        key=lambda r: -r["peak_memory_mb"])[:10]
     drift = []
@@ -314,8 +343,9 @@ def memory(per_call, worker_runs, units) -> dict:
                                  series.items()},
             "tracemalloc_peaks_mb": traced,
             "note": "peak_memory_mb is VmHWM after a reset through /proc/self/clear_refs just "
-                    "before each call; child_peak_rss_mb is wait4's ru_maxrss for the whole "
-                    "worker process"}
+                    "before each call; a worker's peak is the largest of those. wait4's "
+                    "ru_maxrss is kept for the record but is NOT the worker's peak: Linux carries "
+                    "the parent's high-water mark across fork+exec"}
 
 
 def errors_and_warnings(agg: dict, perf: dict, scal: dict) -> tuple[list, list]:
@@ -552,8 +582,8 @@ def main() -> None:
                       "p95": _pct(times, 0.95), "slowest": max(times) if times else None},
         "median_call_seconds_by_rows": size_medians,
         "median_time_growth": scal["median_time_growth"],
-        "peak_worker_memory_mb": max((w.get("child_peak_rss_mb") or 0)
-                                     for w in agg["worker_runs"]) if agg["worker_runs"] else None,
+        "peak_worker_memory_mb": round(max(worker_peaks(agg["per_call"]).values(), default=0),
+                                       1),
         "max_workspace_mb": round(ws_max / 2 ** 20, 2),
         "total_runtime_seconds": run_secs,
         "behaviour_classes": dict(beh),

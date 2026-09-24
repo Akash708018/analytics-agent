@@ -497,8 +497,14 @@ def wrong_calls(root: Path, clean_csv: Path, ws: str, fresh_ws: str) -> dict:
                aggregations=dict(FINANCIAL.measures),
                measure_definitions={m: m for m in FINANCIAL.measures},
                analysis_window_start="2023-01-01", analysis_window_end="2024-12-31")
+    # The file carries exact duplicate rows by construction: they are dropped (C001) before the
+    # contract, or the key is rightly refused and every later call meets the gate instead of the
+    # fault it was built to probe (Step 13 run 2's first G).
     steps += [{"id": "adv_plan", "tool": "propose_cleaning_plan", "stage": "setup",
-               "kwargs": {"dataset_name": name, "workspace_id": W}}]
+               "kwargs": {"dataset_name": name, "workspace_id": W}},
+              {"id": "adv_dedupe", "tool": "apply_cleaning_plan", "stage": "setup",
+               "kwargs": {"dataset_name": name, "approved_action_ids": ["C001"],
+                          "workspace_id": W}}]
     steps += contract_steps("adv", name, W, **fin)
     steps += [{"id": "st_repeat_confirm", "tool": "confirm_dataset_contract",
                "kwargs": {"contract_json": "$json:adv_cprop", "workspace_id": W},
@@ -577,6 +583,11 @@ def wrong_calls(root: Path, clean_csv: Path, ws: str, fresh_ws: str) -> dict:
     # count_distinct over a text column, fed to every analysis that computes on a measure --
     # the class of the BinderException found by the aggregation probe while designing (Step 13)
     steps += ingest_steps("cd", str(clean_csv), "adv_cd", W)
+    steps += [{"id": "cd_plan", "tool": "propose_cleaning_plan", "stage": "setup",
+               "kwargs": {"dataset_name": "adv_cd", "workspace_id": W}},
+              {"id": "cd_dedupe", "tool": "apply_cleaning_plan", "stage": "setup",
+               "kwargs": {"dataset_name": "adv_cd", "approved_action_ids": ["C001"],
+                          "workspace_id": W}}]
     steps += contract_steps("cd", "adv_cd", W, **dict(
         fin, measures=["revenue", "customer_id"],
         aggregations={"revenue": "sum", "customer_id": "count_distinct"},
@@ -618,8 +629,11 @@ def wrong_calls(root: Path, clean_csv: Path, ws: str, fresh_ws: str) -> dict:
         steps.append({"id": f"t_{tag}_cconf", "tool": "confirm_dataset_contract",
                       "kwargs": {"contract_json": f"$json:t_{tag}_cprop", "workspace_id": W},
                       "expect": "either", "must_mention": []})
+        # dup_ids: its key is rightly refused, so every analysis after it meets the gate
+        gated = tag == "dup_ids"
         for sid, analysis, kw, expect, mention in (
-                ("summary", "summary_stats", {}, "accept", []),
+                ("summary", "summary_stats", {}, "reject" if gated else "accept",
+                 ["contract"] if gated else []),
                 ("t", "hypothesis_test", {"dimension": "g", "measure": "v"}, "reject", ["g"]),
                 ("ci", "confidence_interval", {"measure": "v"},
                  "reject" if tag in ("one_row", "all_null_col") else "either", ["v"]),
@@ -627,6 +641,8 @@ def wrong_calls(root: Path, clean_csv: Path, ws: str, fresh_ws: str) -> dict:
                 ("trend", "trend", {"measure": "v", "grain": "month"}, "either", []),
                 ("corr", "correlation", {"measure": "v", "against": "w" if tag ==
                                          "all_null_col" else "v"}, "reject", ["v"])):
+            if gated:
+                expect, mention = "reject", ["contract"]
             steps.append({"id": f"t_{tag}_{sid}", "tool": "compute_analysis",
                           "analysis": analysis, "expect": expect, "must_mention": mention,
                           "kwargs": {"dataset_name": tag, "analysis_type": analysis,

@@ -407,14 +407,34 @@ def principal_unit(unit: str, phase: str, domain: str, n: int) -> None:
     mark(unit, {"checks": [npass, ntot], "crashes": len(crashes)})
 
 
+def worker_peak_mb(unit: str) -> float:
+    """The worker's own peak: the largest per-call VmHWM (reset before each call) or VmRSS.
+    NOT wait4's ru_maxrss, which Linux carries across fork+exec from the parent -- it reported
+    the parent's oracle memory (830.8 MiB for every late-D unit, 2,001.4 for E_hr and E_sales),
+    found in run 2."""
+    best = 0.0
+    for p in sorted((C.CHECKPOINT / unit).glob("calls*.jsonl")):
+        for r in verify.load(p):
+            for k in ("peak_memory_mb", "memory_after_mb", "memory_before_mb"):
+                if r.get(k):
+                    best = max(best, r[k])
+    return best
+
+
 def stress_gate(domain: str, n: int) -> dict:
-    """Section 54: estimate from this domain's 1M run, scaled linearly, times the margin."""
-    ref = C.CHECKPOINT / f"E_{domain}" / "derived.json"
-    if not ref.exists():
-        return {"ok": False, "why": "no 1M reference run to estimate from"}
+    """Section 54: estimate from the LARGEST completed run of this domain (1M, 2M or 5M),
+    scaled linearly to n, times the margin. The first version always scaled from 1M, which
+    asked 16 GB for 10M rows on a 1.08 GB 1M peak; a larger reference is better evidence."""
+    refs = [(1_000_000, f"E_{domain}")] + [(k, f"I_{domain}_{k}") for k in C.STRESS_SIZES
+                                           if k < n]
+    usable = [(k, u) for k, u in refs if (C.CHECKPOINT / u / "derived.json").exists()]
+    if not usable:
+        return {"ok": False, "why": "no completed reference run to estimate from"}
+    base, unit = max(usable)
+    ref = C.CHECKPOINT / unit / "derived.json"
     d = json.loads(ref.read_text())
-    f = n / 1_000_000
-    peak = max((e.get("child_peak_rss_mb") or 0) for e in d["worker_runs"])
+    f = n / base
+    peak = worker_peak_mb(unit)
     csv_b = d["manifest"]["bytes"]
     ws_b = d["workspace_end"].get("workspace_bytes") or 0
     need_mem = peak * f * C.SAFETY_MARGIN
@@ -424,8 +444,9 @@ def stress_gate(domain: str, n: int) -> dict:
     ok = need_mem < have_mem and need_disk < have_disk
     return {"ok": ok, "estimated_memory_mb": round(need_mem), "available_memory_mb":
             round(have_mem), "estimated_disk_mb": round(need_disk),
-            "available_disk_mb": round(have_disk), "basis": "1M run x rows/1M x margin "
-                                                            f"{C.SAFETY_MARGIN}"}
+            "available_disk_mb": round(have_disk), "basis": f"{unit} x rows/{base:,} x margin "
+                                                            f"{C.SAFETY_MARGIN}",
+            "reference_peak_mb": round(peak)}
 
 
 # --------------------------------------------------------------------------- steps units
