@@ -59,3 +59,5 @@ TypeError: obs() got multiple values for argument 'tool'
 2026-09-24T22:46:43 COHORT before: 2 observation(s) in 13s
 2026-09-24T22:46:53 COHORT after: 2 observation(s) in 9s
 2026-09-24T22:47:01 D4 before: 9 observation(s) in 8s
+2026-09-24T22:47:09 D4 after: 9 observation(s) in 8s
+2026-09-24T22:47:12 PRESCREEN before: 1 observation(s) in 3s

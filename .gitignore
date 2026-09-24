@@ -5,3 +5,4 @@ __pycache__/
 .env
 .DS_Store
 tests/fixtures/big_synthetic.csv
+docs/benchmark/targeted_regression/raw/*.partial
