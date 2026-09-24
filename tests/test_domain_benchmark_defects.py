@@ -216,6 +216,15 @@ def test_d11_welch_df_is_a_number_and_a_narrow_last_bin_is_said(tmp_path, ws):
     t = server.compute_analysis(dataset_name="w", analysis_type="hypothesis_test", dimension="g",
                                 measure="v", workspace_id=ws)
     assert "df " in t and "e+" not in t.split("df ", 1)[1][:12], t[:600]
+    from analytics_agent.analysis import inferential as inf
+
+    def g(n, mean, var):
+        return inf.GroupStats(name="x", n=n, mean=mean, variance=var, skewness=0.0,
+                              kurtosis=0.0)
+    small = inf.welch(g(2, 1.5, 0.5), g(2, 4.0, 2.0))
+    big = inf.welch(g(10**6, 1.0, 1.0), g(10**6, 1.1, 2.0))
+    assert small.df == "1.471", small.df               # four significant figures below 1,000
+    assert big.df == f"{float(big.df.replace(',', '')):,.1f}" and "e+" not in big.df, big.df
     d = server.compute_analysis(dataset_name="w", analysis_type="distribution", measure="v",
                                 bins=5, workspace_id=ws)
     # v spans 0..12, 13 values: 3-wide bins make 5, the last 1 value wide
