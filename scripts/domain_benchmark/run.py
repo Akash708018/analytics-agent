@@ -13,6 +13,7 @@ evidence: a rerun gets a new run directory, and the earlier one is kept.
 from __future__ import annotations
 
 import argparse
+import csv
 import hashlib
 import json
 import os
@@ -625,8 +626,15 @@ def phase_f() -> None:
         plan = next((r for r in recs if r.get("variant") == f"dv_{tag}_plan"
                      and r.get("kind") != "note"), None)
         text = (plan or {}).get("response_full", "")
+        # the duplicates a plan should find are the variant file's own exact repeats: noise
+        # applied per row turns most of the clean file's duplicates into distinct rows (run 2
+        # judged every variant against 0 and called a correct C001 dangerous)
+        with open(v["path"], newline="") as fh:
+            body = list(csv.reader(fh))[1:]
+        dups = len(body) - len(set(map(tuple, body)))
         quality[tag] = {"expect": v["expect"], "injected": v["injected"],
-                        "actions": verify.plan_quality(text, {"anomalies": {"duplicate_rows": 0}},
+                        "duplicate_rows_in_file": dups,
+                        "actions": verify.plan_quality(text, {"anomalies": {"duplicate_rows": dups}},
                                                        v["injected"]),
                         "injected_without_action": [c for c in v["injected"]
                                                     if c not in text]}
@@ -661,6 +669,7 @@ def phase_h() -> None:
     ws = "dbench_repeat"
     r = dom.roles
     steps = F.ingest_steps("rp", str(path), "sales", ws)
+    steps += F.dedupe_steps("rp", "sales", ws)
     steps += F.contract_steps("rp", "sales", ws, **contract_kwargs(dom, dom.key))
     mix = [c for c in cases(dom, list(_registry())) if c["class"] not in ("NOT_APPLICABLE",
                                                                          "UNCLASSIFIED")][:10]
@@ -685,6 +694,7 @@ def phase_h() -> None:
                   "kwargs": {"dataset_name": "sales", "workspace_id": ws, "question": "q"}})
     steps_unit("H_repeat", "H", {"name": "repeat", "steps": steps, "ws": ws})
     tm = F.ingest_steps("tm", str(path), "sales", "dbench_traced")
+    tm += F.dedupe_steps("tm", "sales", "dbench_traced")
     tm += F.contract_steps("tm", "sales", "dbench_traced", **contract_kwargs(dom, dom.key))
     for k in range(3):
         for c in mix:
@@ -706,6 +716,7 @@ def phase_h() -> None:
         for mode, wsid in (("separate", f"dbench_c_{name}"), ("shared", "dbench_shared")):
             reset_ws(wsid)
             setup += F.ingest_steps(f"c_{mode}_{name}", str(p), name, wsid)
+            setup += F.dedupe_steps(f"c_{mode}_{name}", name, wsid)
             setup += F.contract_steps(f"c_{mode}_{name}", name, wsid,
                                       **contract_kwargs(d, "record_id"))
             datasets.append({"ws": wsid, "name": name, "domain": name, "mode": mode,
@@ -753,12 +764,8 @@ def isolation_unit(csvs: dict, oracles: dict) -> dict:
     for name, p in csvs.items():
         d = DOMAINS[name]
         steps += F.ingest_steps(f"iso_{name}", str(p), name, ws)
-        steps.append({"id": f"iso_{name}_plan", "tool": "propose_cleaning_plan",
-                      "stage": "setup", "kwargs": {"dataset_name": name, "workspace_id": ws}})
+        steps += F.dedupe_steps(f"iso_{name}", name, ws)
         steps += F.contract_steps(f"iso_{name}", name, ws, **contract_kwargs(d, "record_id"))
-    steps.append({"id": "iso_apply_financial", "tool": "apply_cleaning_plan", "stage": "iso",
-                  "kwargs": {"dataset_name": "financial", "approved_action_ids": ["C001"],
-                             "workspace_id": ws}})
     for name in csvs:
         d = DOMAINS[name]
         r = d.roles
@@ -778,18 +785,13 @@ def isolation_unit(csvs: dict, oracles: dict) -> dict:
         ]
     recs = steps_unit("H_isolation", "H", {"name": "isolation", "steps": steps, "ws": ws})
     calls = {r["variant"]: r for r in recs if r.get("kind") != "note"}
-    raw = {n: oracle.Data(p, DOMAINS[n].types, DOMAINS[n].date, DOMAINS[n].window,
-                          DOMAINS[n].exclusions, dedupe=False) for n, p in csvs.items()}
+    dups = {n: write_dataset(DOMAINS[n], 10_000, p, C.SEED)["anomalies"]["duplicate_rows"]
+            for n, p in csvs.items()}
     out = {"correctness": [], "reports": [], "ledgers": [], "charts": []}
     for note in (r for r in recs if r.get("event") == "verify"):
         name = note["variant"].split("_")[1]
-        # after financial's dedupe the oracle's own dedupe matches; the others were not
-        # cleaned, so their duplicates are still in the table -- verify against raw rows
-        dataset = oracles[name] if name == "financial" else raw[name]
-        out["correctness"] += verify.correctness([note], dataset, DOMAINS[name], context={
-            "domain": name, "rows": 10_000, "unit": "H_isolation", "phase": "H",
-            "note": "unapplied duplicates remain in non-financial tables" if name != "financial"
-            else ""})
+        out["correctness"] += verify.correctness([note], oracles[name], DOMAINS[name], context={
+            "domain": name, "rows": 10_000, "unit": "H_isolation", "phase": "H"})
     for name in csvs:
         rep = calls.get(f"iso_{name}_report", {})
         text = rep.get("response_full", "")
@@ -800,10 +802,16 @@ def isolation_unit(csvs: dict, oracles: dict) -> dict:
                                "names_itself": name in body[:3000],
                                "names_another_as_its_dataset": others,
                                "status": "PASS" if body and not others else "FAIL"})
+        # every dataset was deduplicated in the one workspace: each ledger must hold exactly its
+        # own action, with its own count, and name no other dataset
         led = calls.get(f"iso_{name}_ledger", {}).get("response_full", "")
-        cleaned = "action(s) applied" in led
-        out["ledgers"].append({"dataset": name, "cleaned": cleaned,
-                               "status": "PASS" if cleaned == (name == "financial") else "FAIL"})
+        lines = [x for x in led.splitlines() if "DROP_DUPLICATE_ROWS" in x]
+        foreign = [o for o in csvs if o != name and any(f"  {o}  " in x for x in lines)]
+        own = len(lines) == 1 and f"  {name}  " in lines[0] and \
+            f": {dups[name]:,} row(s) removed" in lines[0]
+        out["ledgers"].append({"dataset": name, "entries": len(lines),
+                               "expected_removed": dups[name], "names_another": foreign,
+                               "status": "PASS" if own and not foreign else "FAIL"})
         ch = calls.get(f"iso_{name}_chart", {})
         reply = ch.get("chart_reply", "") or ""
         ms = DOMAINS[name].roles["m_sum"]
@@ -832,6 +840,7 @@ def phase_j() -> None:
                 reset_ws(ws)
                 d = DOMAINS[name]
                 st = F.ingest_steps(f"j{tag}", str(a), name, ws)
+                st += F.dedupe_steps(f"j{tag}", name, ws)
                 st += F.contract_steps(f"j{tag}", name, ws, **contract_kwargs(d, "record_id"))
                 for c in cases(d, list(_registry()))[:12]:
                     if c["class"] in ("NOT_APPLICABLE", "UNCLASSIFIED"):

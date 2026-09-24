@@ -114,7 +114,9 @@ def paging(records: list[dict], context: dict) -> list[dict]:
         path, start, limit = n["path"], n["start"], n["limit"]
         lines = Path(path).read_text().splitlines() if Path(path).exists() else []
         data = lines[1:]
-        want = data[start - 1: start - 1 + limit]
+        # read_result_file serves at most 50 rows a page and says so, with the call for the next
+        # page (run 2 asked for 200 and judged the stated cap a failure)
+        want = data[start - 1: start - 1 + min(limit, 50)]
         text = n.get("text", "")
         present = sum(1 for w in want if w.split(",")[0].strip('"') in text)
         ok = present == len(want) if want else ("past the end" in text or "Nothing" in text)

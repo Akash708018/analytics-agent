@@ -45,6 +45,18 @@ def contract_steps(prefix: str, name: str, ws: str, **contract) -> list[dict]:
     ]
 
 
+def dedupe_steps(prefix: str, name: str, ws: str) -> list[dict]:
+    """Every generated file carries exact duplicate rows, so its key is rightly refused until
+    they are dropped: C001 before any contract on record_id (Step 13 run 2: H and J met the gate
+    on every call because their setup skipped this)."""
+    return [
+        {"id": f"{prefix}_plan", "tool": "propose_cleaning_plan", "stage": "setup",
+         "kwargs": {"dataset_name": name, "workspace_id": ws}},
+        {"id": f"{prefix}_dedupe", "tool": "apply_cleaning_plan", "stage": "setup",
+         "kwargs": {"dataset_name": name, "approved_action_ids": ["C001"], "workspace_id": ws}},
+    ]
+
+
 def call(sid, analysis, params, ws, name, known=None, stage="known", **extra):
     return {"id": sid, "tool": "compute_analysis", "stage": stage, "analysis": analysis,
             "kwargs": {"dataset_name": name, "analysis_type": analysis, "workspace_id": ws,

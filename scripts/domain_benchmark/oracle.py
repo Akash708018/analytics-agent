@@ -256,7 +256,7 @@ class Checker:
         return ok
 
     def pvalue(self, what, actual_text, expected):
-        s = str(actual_text).strip()
+        s = str(actual_text).strip().rstrip(".")      # "p < 1e-300." ends a sentence
         bound = s.startswith("<")
         v = float(s.lstrip("< "))
         if bound:
@@ -716,7 +716,9 @@ def _groups(d, dim, m):
 
 def o_hypothesis(c, sk, p, rows, text, d, measures, dims):
     line = next((ln for ln in text.splitlines() if "Test:" in ln), "")
-    m = re.search(r"Statistic (-?[\d.,]+), df ([\d.]+|n/a)(?:, ([\d.]+))?, "
+    # df is printed with 4 significant figures, in scientific notation past 9,999 ("df 1.569e+04",
+    # Step 13 run 2): the regex reads both.
+    m = re.search(r"Statistic (-?[\d.,]+), df ([\d.eE+]+|n/a)(?:, ([\d.eE+]+))?, "
                   r"p (<\s?[\d.eE+-]+|[\d.eE+-]*\d)", line)
     if not m:
         c.equal("the reply states a statistic and a p value", line[:120], "Test: ... p ...")
@@ -827,7 +829,13 @@ def _power(dd, n1, n2, alpha=0.05):
     df = n1 + n2 - 2
     nc = dd * math.sqrt(n1 * n2 / (n1 + n2))
     tc = sps.t.ppf(1 - alpha / 2, df)
-    return (1 - sps.nct.cdf(tc, df, nc)) + sps.nct.cdf(-tc, df, nc)
+    p = (1 - sps.nct.cdf(tc, df, nc)) + sps.nct.cdf(-tc, df, nc)
+    if math.isnan(p):
+        # scipy's noncentral t returns NaN at very large df (run 2, 1M rows); there the t is
+        # normal to far below the printed precision
+        z = sps.norm.ppf(1 - alpha / 2)
+        p = sps.norm.sf(z - nc) + sps.norm.cdf(-z - nc)
+    return p
 
 
 def o_adequacy(c, sk, p, rows, text, d, measures, dims):
