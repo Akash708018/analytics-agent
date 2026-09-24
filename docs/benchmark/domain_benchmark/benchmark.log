@@ -1,0 +1,37 @@
+2026-09-24T16:35:53 C_financial: 1,000 rows generated in 0.04s (188,587 bytes); running the workflow
+2026-09-24T16:36:41 C_financial: done in 48s, worker peak 332.7 MiB, checks 3640/3640, crashes 0
+2026-09-24T16:36:41 C_hr: 1,000 rows generated in 0.03s (136,679 bytes); running the workflow
+2026-09-24T16:37:24 C_hr: done in 43s, worker peak 324.2 MiB, checks 2885/2885, crashes 0
+2026-09-24T16:37:24 C_sales: 1,000 rows generated in 0.03s (152,645 bytes); running the workflow
+2026-09-24T16:38:05 C_sales: done in 40s, worker peak 316.8 MiB, checks 3372/3372, crashes 0
+2026-09-24T16:38:05 C_marketing: 1,000 rows generated in 0.04s (149,735 bytes); running the workflow
+2026-09-24T16:38:44 C_marketing: done in 40s, worker peak 327.3 MiB, checks 1490/1490, crashes 0
+2026-09-24T16:38:44 C_crm: 1,000 rows generated in 0.03s (111,282 bytes); running the workflow
+2026-09-24T16:39:29 C_crm: done in 45s, worker peak 330.1 MiB, checks 9524/9524, crashes 0
+2026-09-24T16:39:29 C_ecommerce: 1,000 rows generated in 0.03s (163,651 bytes); running the workflow
+2026-09-24T16:40:11 C_ecommerce: done in 41s, worker peak 313.8 MiB, checks 3538/3539, crashes 0
+2026-09-24T16:40:11 C_logistics: 1,000 rows generated in 0.03s (158,817 bytes); running the workflow
+2026-09-24T16:40:51 C_logistics: done in 41s, worker peak 319.9 MiB, checks 1690/1690, crashes 0
+2026-09-24T16:40:51 C_healthcare: 1,000 rows generated in 0.02s (125,019 bytes); running the workflow
+2026-09-24T16:41:29 C_healthcare: done in 37s, worker peak 321.0 MiB, checks 1678/1678, crashes 0
+2026-09-24T16:41:29 C_manufacturing: 1,000 rows generated in 0.03s (134,878 bytes); running the workflow
+2026-09-24T16:42:07 C_manufacturing: done in 39s, worker peak 325.1 MiB, checks 1516/1522, crashes 0
+2026-09-24T16:42:07 C_education: 1,000 rows generated in 0.03s (142,865 bytes); running the workflow
+2026-09-24T16:42:47 C_education: done in 40s, worker peak 333.7 MiB, checks 2148/2148, crashes 0
+2026-09-24T16:42:52 D_financial: 100,000 rows generated in 4.47s (18,812,536 bytes); running the workflow
+2026-09-24T16:46:36 D_financial: done in 192s, worker peak 340.9 MiB, checks 66567/66567, crashes 0
+2026-09-24T16:46:40 D_hr: 100,000 rows generated in 3.34s (13,631,692 bytes); running the workflow
+2026-09-24T16:49:22 D_hr: done in 149s, worker peak 506.4 MiB, checks 37716/37717, crashes 0
+2026-09-24T16:49:26 D_sales: 100,000 rows generated in 3.22s (15,205,436 bytes); running the workflow
+2026-09-24T16:52:10 D_sales: done in 134s, worker peak 445.4 MiB, checks 66466/66466, crashes 0
+2026-09-24T16:52:13 D_marketing: 100,000 rows generated in 3.5s (14,872,215 bytes); running the workflow
+2026-09-24T16:54:42 D_marketing: done in 140s, worker peak 412.0 MiB, checks 14293/14294, crashes 0
+2026-09-24T16:54:45 D_crm: 100,000 rows generated in 3.07s (11,150,955 bytes); running the workflow
+2026-09-24T17:04:24 D_crm: done in 107s, worker peak 423.5 MiB, checks 301390/301391, crashes 0
+2026-09-24T17:04:27 D_ecommerce: 100,000 rows generated in 3.41s (16,386,449 bytes); running the workflow
+2026-09-24T17:07:07 D_ecommerce: done in 132s, worker peak 830.8 MiB, checks 66581/66581, crashes 0
+2026-09-24T17:07:11 D_logistics: 100,000 rows generated in 3.15s (15,887,807 bytes); running the workflow
+2026-09-24T17:09:42 D_logistics: done in 143s, worker peak 830.8 MiB, checks 21989/21989, crashes 0
+2026-09-24T17:09:45 D_healthcare: 100,000 rows generated in 2.57s (12,472,321 bytes); running the workflow
+2026-09-24T17:11:41 D_healthcare: done in 111s, worker peak 830.8 MiB, checks 10164/10165, crashes 0
+2026-09-24T17:11:44 D_manufacturing: 100,000 rows generated in 2.89s (13,459,007 bytes); running the workflow

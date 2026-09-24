@@ -1,0 +1,33 @@
+job B_stat
+tool compute_analysis
+analysis hypothesis_test
+parameters {"dataset_name": "stat_edges", "analysis_type": "hypothesis_test", "dimension": "g", "measure": "const"}
+domain None rows 0
+time 2026-09-24T16:35:43
+rss_before_kb 265344
+
+Traceback (most recent call last):
+  File "/home/user/analytics-agent/scripts/domain_benchmark/worker.py", line 161, in call
+    text = fn(**kwargs)
+           ^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/server.py", line 917, in compute_analysis
+    return analysis_tools.compute_analysis(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/analysis/tools.py", line 294, in compute_analysis
+    gate, output, used = _produce(con, dataset_name, analysis_type, params)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/analysis/tools.py", line 239, in _produce
+    output = analysis.run(con, gate, scope, **params)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/analysis/hypothesis_test.py", line 119, in hypothesis_test
+    return _difference(con, gate, scope, dimension, measure, method, summary)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/analysis/hypothesis_test.py", line 170, in _difference
+    result, effect, effect_name = _run_difference(con, scope, dimension, measure,
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/analysis/hypothesis_test.py", line 223, in _run_difference
+    return welch(groups[0], groups[1]), hedges_g(groups[0], groups[1]), "Hedges' g"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/analysis/inferential.py", line 124, in welch
+    raise ZeroDivisionError("both groups have zero variance")
+ZeroDivisionError: both groups have zero variance

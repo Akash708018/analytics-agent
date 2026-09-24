@@ -1,0 +1,101 @@
+{
+ "os": "Linux-6.18.44-fc-v37-x86_64-with-glibc2.39",
+ "architecture": "x86_64",
+ "cpu_model": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+ "cpu_cores": 4,
+ "ram_total_mb": 16095,
+ "ram_available_mb_at_start": 15381,
+ "swap": "SwapTotal:             0 kB",
+ "disk_free_gb_at_start": 29.0,
+ "python": "3.12.3 (main, Mar  3 2026, 12:15:18) [GCC 13.3.0]",
+ "libraries": {
+  "duckdb": "1.5.5",
+  "scipy": "1.18.1",
+  "statsmodels": "0.15.0",
+  "matplotlib": "3.11.2",
+  "openpyxl": "3.1.5"
+ },
+ "git_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+ "git_branch": "claude/trusting-edison-en0jnk",
+ "git_status_at_start": "?? docs/benchmark/domain_benchmark/\n?? docs/steps/phase14_step13_domain_benchmark.md\n?? scripts/domain_benchmark/\n?? tests/test_domain_benchmark.py",
+ "timestamp": "2026-09-24T16:35:35+0000",
+ "config": {
+  "ROOT": "/home/user/analytics-agent",
+  "OUT": "/home/user/analytics-agent/docs/benchmark/domain_benchmark",
+  "DATA": "/tmp/domain_benchmark_data",
+  "CHECKPOINT": "/tmp/domain_benchmark_data/checkpoint",
+  "EVIDENCE": "/tmp/domain_benchmark_data/evidence",
+  "SEED": 20260924,
+  "PRINCIPAL_SIZES": [
+   1000,
+   100000,
+   1000000
+  ],
+  "STRESS_SIZES": [
+   2000000,
+   5000000,
+   10000000
+  ],
+  "STRESS_DOMAINS": [
+   "sales",
+   "logistics"
+  ],
+  "MEASURED_RUNS": 3,
+  "HEAVY_MEASURED_RUNS_1M": 2,
+  "PROFILE_COLUMN_MEASURED_RUNS_1M": 1,
+  "STRESS_MEASURED_RUNS": 1,
+  "CALL_TIMEOUT_S": {
+   "1000": 60,
+   "100000": 180,
+   "1000000": 600,
+   "2000000": 900,
+   "5000000": 1800,
+   "10000000": 3600
+  },
+  "WORKER_TIMEOUT_S": {
+   "1000": 900,
+   "100000": 2400,
+   "1000000": 7200,
+   "2000000": 7200,
+   "5000000": 10800,
+   "10000000": 14400
+  },
+  "AGENT_READ": 8000,
+  "LARGE_RESPONSE": 8000,
+  "SAFETY_MARGIN": 1.5,
+  "HIGH_CARD_NS": [
+   5,
+   10,
+   100,
+   200,
+   1000
+  ],
+  "SPEED_CLASSES": [
+   [
+    "0.5",
+    "FAST"
+   ],
+   [
+    "2.0",
+    "MODERATE"
+   ],
+   [
+    "5.0",
+    "SLOW"
+   ],
+   [
+    "10.0",
+    "VERY_SLOW"
+   ],
+   [
+    "inf",
+    "SEVERE"
+   ]
+  ]
+ },
+ "env": {
+  "DOMAIN_BENCH_BASELINE": "/tmp/claude-0/-home-user-analytics-agent/6d08ce2e-163d-5aad-a1ec-5daa62b24bde/scratchpad/db/baseline_tests.txt"
+ },
+ "application_cache": "none: grep finds no lru_cache/cache in src/ outside the web agent's model list, so every call is a CACHE_MISS",
+ "baseline_tests": "commit 2d3d52f3667b3c920859f657addca7313f21bf3f\nstatus_lines 0\n1947 passed in 123.41s (0:02:03)\n50 passed in 13.68s\nphase6:   36 passed, 0 failed, 0 skipped\nphase8: 55 passed, 0 failed, 3 skipped\nphase9: 0 passed, 0 failed, 1 skipped\nphase10: 0 passed, 0 failed, 1 skipped\nphase11: 26 passed, 0 failed, 0 skipped\nphase12: 36 passed, 0 failed, 0 skipped\nSCORE: 76/76 (100%)\n"
+}
