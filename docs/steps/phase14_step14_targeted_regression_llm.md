@@ -79,3 +79,39 @@ free-tier LLMs as the planning layer over the deterministic engine.
   -- 26 in all, counted from before_after.json: BinderException 8, ZeroDivisionError 5,
   ConversionException 1, IndexError 1, and 11 of the non-exception kind (a next step that could
   not run, a cap applied without a word, a chart reply judged against isolation).
+
+### 2. The original benchmark's last phases, and what they found
+
+- 2.1 Sales 10M (original code): 63/63 checks, 0 crashes, 2,618 s, worker peak 511 MiB. Its two
+  exceptions are D5 at 5,851,188 tied values (INT64 overflow in the tie term): the D5 case now
+  adds a 6M-row point (5,739,130 ties) beside 2.3M.
+- 2.2 J (reproducibility, original code, corrected setup): 5 of 6 PASS. crm 100k printed one
+  total two ways in two identical runs -- 3,032,008,136.98 and 3,032,008,136.9801 (summary_stats,
+  group_compare, cross_tab). Measured: the DISTINCT that drops duplicates stores rows in the
+  order its parallel hash leaves them (4 orders in 20 rebuilds of one file) and a DOUBLE sum
+  depends on order (19 values in 20; fsum 2). The same table queried 60 times gave 1 value:
+  the variation is the rebuild, not the sum. D14, fixed: the rebuild keeps first occurrences
+  in file order (GROUP BY ALL with min(rowid)); 12 rebuilds, 1 order, 1 sum; NULL rows collapse
+  as under DISTINCT; the counts use the same grouped projection, keeping the rule that a count
+  and its statement share one expression (tests/test_cleaning_sql.py caught my first draft).
+- 2.3 The final report of the original run: 6,159,473 checks, 0 incorrect; 12,763 calls; 0 worker
+  crashes, 18 exceptions (D1-D5, D12).
+- 2.4 Merged `step14-fixes-wip` at a7573c6: engine suite 1994 passed.
+
+### 3. Targeted regression, heavy cases (merged tree a7573c6)
+
+- 3.1 PROFILE_CORRECTNESS, first run, was a harness fault: the case held a read-only connection
+  open while calling profile_column, so every call on BOTH revisions raised ConnectionException,
+  and the judge -- comparing texts -- called two equal failures "unchanged". Calls now run
+  first; the judge requires a real result (and a refusal for the missing column). The invalid
+  raw files are kept at /tmp/tr_data/invalid, not in the repository. The same weakness was
+  closed in the cleaning and D2 judges.
+- 3.2 D5 (after): 8 of 8 match scipy's statistic and p to every printed digit at 100k, 1M, 2.3M
+  and 6M rows; before, 2.3M and 6M raised OutOfRangeException.
+- 3.3 CLEANING, 1M rows: dirty 23.01 s -> 14.94 s (1.54x), clean 16.22 s -> 7.91 s (2.05x);
+  date-format query time 8.86 s -> 0.20 s and 8.21 s -> 0.21 s; 357 and 260 detector queries
+  on both revisions; the same actions (kind, column, counts). The texts differed only in the
+  example values each action quotes -- which a second proposal on ONE revision also changes:
+  five sample queries (and the profile's cast examples) ended in LIMIT with no ORDER BY. D15,
+  LOW. The patch is held back (/tmp/tr_data/d15.patch) until the timing cases finish, so that
+  they measure the merged commit and nothing uncommitted.
