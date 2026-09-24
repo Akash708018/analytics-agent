@@ -1,0 +1,182 @@
+[
+ {
+  "family": "L",
+  "check": "re-uploading the same file keeps the contract usable",
+  "outcome": "OK",
+  "detail": "('contract v1, ready', None)"
+ },
+ {
+  "family": "L",
+  "check": "re-uploading a DIFFERENT file under the same name blocks the old contract",
+  "outcome": "OK",
+  "detail": "('contract v1, BLOCKED', 'CONTRACT_STALE')"
+ },
+ {
+  "family": "L",
+  "check": "cleaning after the contract: a type change is caught as drift",
+  "outcome": "OK",
+  "detail": "('contract v1, BLOCKED', 'CONTRACT_STALE')"
+ },
+ {
+  "family": "L",
+  "check": "two datasets: Explore is gated per dataset",
+  "outcome": "OK",
+  "detail": "(None, 'NO_CONTRACT')"
+ },
+ {
+  "family": "L",
+  "check": "reset in the middle leaves an empty, working workspace",
+  "outcome": "OK",
+  "detail": "('NO_CONTRACT', True)"
+ },
+ {
+  "family": "L",
+  "check": "a confirmed contract re-drafts as itself (a reload shows it, not a blank form)",
+  "outcome": "OK",
+  "detail": "([], 'one row = one order')"
+ },
+ {
+  "family": "L",
+  "check": "the report before any analysis still has nine sections",
+  "outcome": "OK",
+  "detail": "# clean_sales\n\nWritten 2026-09-24 14:27.\n\n## Contents\n\n1. [The question asked](#the-question-asked)\n2. [Dataset and grain](#dataset-and-grain)\n3. [Data quality](#data-quality)\n4. [Cleaning ledger](#cl"
+ },
+ {
+  "family": "H",
+  "check": "a spec whose path points into another workspace is refused",
+  "outcome": "OK",
+  "detail": "clean_sales.csv is not a file uploaded to this workspace."
+ },
+ {
+  "family": "H",
+  "check": "a column renamed to an injection string loads safely or is refused",
+  "outcome": "OK",
+  "detail": "(False, 'that is not a usable ingest spec.')"
+ },
+ {
+  "family": "H",
+  "check": "two columns renamed to the same name are refused, not merged",
+  "outcome": "OK",
+  "detail": "that is not a usable ingest spec."
+ },
+ {
+  "family": "H",
+  "check": "an empty column name is refused",
+  "outcome": "OK",
+  "detail": "that is not a usable ingest spec."
+ },
+ {
+  "family": "H",
+  "check": "a forced type the data cannot hold is a refusal, not a crash",
+  "outcome": "OK",
+  "detail": "DuckDB could not read clean_sales.csv."
+ },
+ {
+  "family": "H",
+  "check": "a dataset name that is an injection string is refused",
+  "outcome": "OK",
+  "detail": "that is not a usable ingest spec."
+ },
+ {
+  "family": "H",
+  "check": "read_artifact refuses every traversal",
+  "outcome": "OK",
+  "detail": "served: []"
+ },
+ {
+  "family": "H",
+  "check": "analysis params carrying SQL are refused and the table survives",
+  "outcome": "OK",
+  "detail": "([True, True, True], 500)"
+ },
+ {
+  "family": "H",
+  "check": "absurd numbers are refusals, not crashes or hangs",
+  "outcome": "OK",
+  "detail": "ran instead of refusing: []"
+ },
+ {
+  "family": "H",
+  "check": "an unknown analysis and unknown parameters are refusals",
+  "outcome": "OK",
+  "detail": "('ANALYSIS_NOT_FOUND', 'ANALYSIS_PARAMS_INVALID')"
+ },
+ {
+  "family": "H",
+  "check": "a period in the wrong shape is a refusal",
+  "outcome": "OK",
+  "detail": ""
+ },
+ {
+  "family": "H",
+  "check": "markup in the report question is written as text, not as markup",
+  "outcome": "OK",
+  "detail": "The question asked\n\n&lt;script>alert(1)&lt;/script> &lt;img src=x onerror=alert(2)> **bold** [link](blocked-javascript:x)\n\n## Dataset and grain\n\n**Dataset:** `clean_sales`, contract v1, confirmed 2026"
+ },
+ {
+  "family": "H",
+  "check": "a corrupt .xlsx is refused, not raised",
+  "outcome": "OK",
+  "detail": "broken.xlsx is not a readable .xlsx workbook."
+ },
+ {
+  "family": "H",
+  "check": "a CSV renamed .xlsx is refused, not raised",
+  "outcome": "OK",
+  "detail": "sales.xlsx is not a readable .xlsx workbook."
+ },
+ {
+  "family": "H",
+  "check": "binary content named .csv is refused or read without crashing",
+  "outcome": "OK",
+  "detail": "PROVISIONAL -- header_rows still a guess."
+ },
+ {
+  "family": "H",
+  "check": "file names that are SQL words or digits make valid datasets",
+  "outcome": "OK",
+  "detail": "[('select.csv', 'select'), ('2024.csv', 'd_2024'), ('a b-c.csv', 'a_b_c'), ('ÉTÉ.csv', 'ete'), ('.hidden.csv', 'hidden'), ('x.CSV', 'x')]"
+ },
+ {
+  "family": "H",
+  "check": "invalid workspace ids are refused everywhere",
+  "outcome": "OK",
+  "detail": "accepted: []"
+ },
+ {
+  "family": "H",
+  "check": "apply_cleaning with ids from another dataset's plan is refused",
+  "outcome": "OK",
+  "detail": "NO_CLEANING_PLAN"
+ },
+ {
+  "family": "T",
+  "check": "every tool answers hostile strings with text, never an exception",
+  "outcome": "OK",
+  "detail": "['(0 in all)']"
+ },
+ {
+  "family": "T",
+  "check": "wrong types through the MCP layer are validation errors, not crashes",
+  "outcome": "OK",
+  "detail": "[]"
+ },
+ {
+  "family": "T",
+  "check": "a workspace_id that is a path is refused by every tool that takes one",
+  "outcome": "OK",
+  "detail": "[]"
+ },
+ {
+  "family": "C",
+  "check": "two workspaces load and analyse at once, each sees only its own",
+  "outcome": "OK",
+  "detail": "([], ['clean_sales'], ['merged_multiheader'])"
+ },
+ {
+  "family": "C",
+  "check": "one workspace: parallel analyses and a reload do not corrupt it",
+  "outcome": "OK",
+  "detail": "([], 6, 500)"
+ }
+]

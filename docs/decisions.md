@@ -6387,3 +6387,41 @@ exceptions. Digests:
   d640da09ead514155918e315efa58ae0a523b7d80bda1983686eb36004499a19  scripts/browser_check.py
   b09783b3f25702e8145a2fa896a894190387d6959270c7fc0dbfae1d439a3ee4  ui/samples/sales_2024.xlsx
   93954ef35b42eda1348e800d36dca8caf9a35efd7e12bc309e56b74e41e21d8e  docs/DEMO.md
+
+## Phase 14, Step 10 - behaviour under test: lifecycles, hostile input, tools fuzzed, 24/09/2026
+
+Step document: docs/steps/phase14_step10_scenario_matrix.md.
+
+P14-D68. A CONFIRMED CONTRACT RE-DRAFTS AS ITSELF. A fresh session -- every page reload -- drafts
+with no answers, and showed a blank PROVISIONAL form under a contract in force. With no answers,
+the draft is now the stored contract's fields, "vN is in force"; drift or no contract falls back
+to the evidence-only draft.
+P14-D69. THE WEB BOUNDARY CHECKS ANALYSIS PARAMETER NAMES against compute_analysis's signature; an
+unknown one is ANALYSIS_PARAMS_INVALID naming the accepted ones, not a TypeError.
+P14-D70. A FILE THAT IS NOT A WORKBOOK IS REFUSED ("not a readable .xlsx workbook"), and the web
+draft turns any exception into a refusal.
+P14-D71. THE REPORT CARRIES NO RUNNABLE MARKUP. defang at its single write: a tag-opening '<'
+becomes '&lt;', a javascript: link loses its scheme. The question's words are kept -- the report
+never paraphrases the user.
+P14-D72. EVERY PATH-TAKING MCP TOOL ANSWERS AN UNUSABLE PATH WITH TEXT (NUL byte, a name the OS
+refuses), never OSError or ValueError.
+P14-D73. scripts/scenario_matrix.py: 30 checks in four families (lifecycle, hostile input, every
+tool fuzzed, concurrency), a measurement that exits zero. Confirmed correct as found: drift
+after re-upload or cleaning (CONTRACT_STALE), per-dataset gating, reset, tampered specs,
+traversal, injection strings in parameters, invalid workspace ids, cross-dataset cleaning ids,
+two workspaces and one workspace under parallel load.
+
+C103. A CHECK OF MINE PASSED WHAT IT SHOULD HAVE CAUGHT. "A confirmed contract survives a
+re-draft" accepted any draft with columns; the real expectation -- the draft IS the contract --
+failed at once when written down, and became S1. A check is its expectation, stated exactly.
+
+MEASURED VALIDATION, 24/09/2026. Engine 1900 -> 1910; UI 49 -> 50; acceptance 55/0/3, 0/0/1,
+0/0/1, 26/0/0, 36/0/0, phase 6 36/0/0; eval 76/76; scenario matrix 30/30; stress rounds
+unchanged; browser walk 11 screens, 0 exceptions. Digests:
+  b5481bd271a71ad833c4c28758ada60fa359928c94626efb4644fc8204aa9a48  src/analytics_agent/webapp/real_backend.py
+  c78ffad0beebd2274223fc3dd3dab0ce98431e22f44be8253b4236e0a85a89ea  src/analytics_agent/server.py
+  614b09e3785d2f65135753f069128ee399140beaa7c53caa5d25685236697886  src/analytics_agent/ingest/draft.py
+  c75b85092a907d5656f0bd3df67efda49488f583f69e5f8561abc5703131e918  src/analytics_agent/report/assemble.py
+  abbb5642d57d0ddab349c0ff1777537678fc05ac6adfb9b9acb8e31fc433bba4  scripts/scenario_matrix.py
+  35819faef675d7315cdf32581ee0afec107c92a5424b2246f2fc6e35abbe7fda  tests/test_scenarios.py
+  30225b13adc3b49a7b12ada511cbf40920daa7a3b4a0d3adc5eb991fb31c610d  docs/stress/scenario_matrix.json

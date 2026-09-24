@@ -421,3 +421,35 @@ def test_the_sidebar_says_where_the_next_step_is_taken():
     assert "**Contract**" in next_step_words('propose_dataset_contract(dataset_name="x")')
     assert "**Explore**" in next_step_words('compute_analysis(dataset_name="x", ...)')
     assert next_step_words("mystery()") == "`mystery()`"
+
+
+def test_a_reload_shows_the_confirmed_contract_not_a_blank_form(monkeypatch):
+    """P14-D68: a fresh session (any page reload) drafted with no answers and showed a blank,
+    PROVISIONAL form under a contract in force. Real engine, through the screen."""
+    monkeypatch.setenv("ANALYTICS_UI_BACKEND", "real")
+    from analytics_agent import workspace
+    from ui import backend
+    backend.get_backend.clear()
+    be = backend.get_backend()
+    ws = be.new_workspace_id()
+    try:
+        path = be.save_upload(ws, "clean_sales.csv",
+                              (ROOT / "tests/fixtures/clean_sales.csv").read_bytes()).path
+        assert be.confirm_ingest(ws, be.draft_ingest(ws, path).spec).ok
+        answers = dict(grain="one row = one order", primary_key=["order_id"],
+                       date_column="order_date", measures=["units", "revenue"],
+                       dimensions=["region"], aggregations={"units": "sum", "revenue": "sum"},
+                       measure_definitions={"units": "items", "revenue": "money"},
+                       analysis_window_start="2024-01-01", analysis_window_end="2024-12-31")
+        assert be.confirm_contract(ws, be.draft_contract(ws, "clean_sales", **answers)).ok
+        at = screen("contract")
+        at.session_state["workspace_id"] = ws  # a new session: nothing of the old one
+        at.run()
+        assert not at.exception, at.exception
+        assert not at.warning, [w.value for w in at.warning]
+        assert at.text_input[0].value == "one row = one order"
+        assert "v1 is in force" in _text(at)
+    finally:
+        backend.get_backend.clear()
+        workspace.reset(ws)
+        workspace.workspace_dir(ws).rmdir()

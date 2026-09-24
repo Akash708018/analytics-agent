@@ -289,9 +289,10 @@ class RealBackend:
                                          header_rows=header_rows, header_join=header_join,
                                          authorised_fill=authorised_fill)
                 grid = self._grid(p, d)
-            except (LoadRefused, ValueError) as exc:
-                # ValueError: a file the preview cannot read at all. A refusal, never a crash on
-                # the Upload screen (P14-O7).
+            except Exception as exc:  # noqa: BLE001 - no file may crash the Upload screen
+                # LoadRefused is the engine's refusal; anything else -- a ValueError from a file
+                # the preview cannot read (P14-O7), a BadZipFile from a workbook that is not one
+                # (P14-D70) -- is turned into one here.
                 text = str(exc) if str(exc).startswith("BLOCKED") else (
                     f"BLOCKED: {Path(path).name} could not be read into a draft.\n"
                     f"WHY: {exc}\nNEXT STEP: call save_upload(...) with the file re-exported.")
@@ -398,11 +399,16 @@ class RealBackend:
                        measure_definitions=measure_definitions,
                        analysis_window_start=analysis_window_start,
                        analysis_window_end=analysis_window_end, caveats=caveats)
+        in_force = None
         try:
             with self._workspace(workspace_id):
                 con = db.connect(workspace_id)
                 try:
-                    proposal = self._propose(con, dataset_name, **answers)
+                    proposal = None
+                    if all(v is None for v in answers.values()):
+                        proposal, in_force = self._draft_in_force(con, dataset_name)
+                    if proposal is None:
+                        proposal = self._propose(con, dataset_name, **answers)
                 finally:
                     con.close()
         except (ContractRefused, ValueError) as exc:
@@ -441,7 +447,40 @@ class RealBackend:
             caveats=list(c.caveats), columns=columns, provisional=list(c.unresolved),
             questions=list(c.questions), evidence=list(proposal.notes),
             message=("PROVISIONAL -- settle what is listed before confirming." if c.unresolved
+                     else f"Contract v{in_force} is in force, as shown. Change a field and "
+                          f"confirm to agree v{in_force + 1}." if in_force
                      else "Ready to confirm: nothing in it is a guess."))
+
+    def _draft_in_force(self, con, dataset_name: str):
+        """The contract in force, drafted from its own fields: (proposal, version), or (None, None).
+
+        A fresh session -- every page reload -- asks for a draft with no answers, and got one
+        built from the evidence alone: a blank, PROVISIONAL form under a confirmed contract
+        (P14-D68). None when there is no contract, or when the table has drifted so the stored
+        fields no longer draft cleanly -- the evidence-only draft is then the honest one.
+        """
+        from analytics_agent.contract import store as contract_store
+
+        stored = contract_store.current(con, dataset_name)
+        if stored is None:
+            return None, None
+        c = stored.contract
+        window = getattr(c, "analysis_window", None)
+        try:
+            proposal = self._propose(
+                con, dataset_name, grain=c.grain, primary_key=list(c.primary_key) or None,
+                date_column=c.date_column, measures=[m.name for m in c.measures],
+                dimensions=list(c.dimensions),
+                aggregations={m.name: m.agg for m in c.measures if m.agg},
+                measure_definitions={m.name: m.definition for m in c.measures if m.definition},
+                analysis_window_start=window.start.isoformat() if window else None,
+                analysis_window_end=window.end.isoformat() if window else None,
+                caveats=list(c.caveats))
+        except (ContractRefused, ValueError):
+            return None, None
+        if proposal.contract.unresolved:
+            return None, None
+        return proposal, stored.version
 
     def confirm_contract(self, workspace_id: str, draft: ContractDraft) -> ActionResult:
         if draft.provisional:
@@ -632,6 +671,20 @@ class RealBackend:
         from analytics_agent.analysis import tools as analysis_tools
 
         args = {k: v for k, v in params.items() if v not in (None, "")}
+        # The boundary checks the names: compute_analysis's own signature refused 'colour' with a
+        # TypeError that escaped to the screen (P14-D69).
+        import inspect
+        accepted = [p for p in inspect.signature(server.compute_analysis).parameters
+                    if p not in ("dataset_name", "analysis_type", "workspace_id")]
+        unknown = sorted(set(args) - set(accepted))
+        if unknown:
+            return AnalysisRun("", refusal=refusal_from_text(
+                f"BLOCKED: {analysis_type} was called with {', '.join(unknown)}, which no "
+                f"analysis takes.\nWHY: every argument is a column, a period or a number the "
+                f"analysis names; accepted: {', '.join(accepted)}.\n"
+                f'NEXT STEP: call run_analysis(dataset_name="{dataset_name}", '
+                f'analysis_type="{analysis_type}", ...) with those names.'
+                f"\n\nreason: ANALYSIS_PARAMS_INVALID"))
         before = {a.path for a in self.list_artifacts(workspace_id)}
         with self._workspace(workspace_id):
             text = server.compute_analysis(dataset_name=dataset_name,

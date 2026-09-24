@@ -63,6 +63,7 @@ gets back.
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 from fastmcp import FastMCP
@@ -93,6 +94,28 @@ READ_ONLY = {"readOnlyHint": True, "openWorldHint": False}
 READ_EXTERNAL = {"readOnlyHint": True, "openWorldHint": True}
 WRITES = {"readOnlyHint": False, "destructiveHint": False, "idempotentHint": True}
 DESTRUCTIVE = {"readOnlyHint": False, "destructiveHint": True}
+
+
+def _unusable_path(path: str) -> str | None:
+    """A refusal for a path the operating system cannot even look up, else None.
+
+    A NUL byte raised ValueError and a 5,000-character name raised OSError out of check_file,
+    preview_file and read_result_file (P14-D72): a tool answers with text, never an exception.
+    A path that merely does not exist is not this function's business -- each tool says so.
+    """
+    try:
+        if "\x00" in path:
+            raise ValueError("it contains a NUL byte")
+        os.stat(path)
+    except FileNotFoundError:
+        return None
+    except (OSError, ValueError) as exc:
+        shown = path.replace("\x00", "\\0")
+        return (f"BLOCKED: that is not a usable path ({shown[:80]!r}"
+                f"{'...' if len(shown) > 80 else ''}).\n"
+                f"WHY: {getattr(exc, 'strerror', None) or exc}.\n"
+                f"NEXT STEP: pass the full path of an existing .csv or .xlsx file.")
+    return None
 
 
 def _refusal(exc: Exception) -> str:
@@ -154,6 +177,8 @@ def check_file(path: str) -> str:
     Call this first when a file might be large. Reports OK, a warning, or a
     refusal explaining what to do instead.
     """
+    if (unusable := _unusable_path(path)):
+        return unusable
     result = sizegate.check_file(path)
     if result.verdict.value == "OK":
         return f"{Path(path).name}: within limits. Safe to load."
@@ -170,6 +195,8 @@ def preview_file(path: str, sheet: str | None = None, lines: int = 15) -> str:
     For a messy file, prefer propose_ingest_spec: it reads the same rows and
     works out what they mean.
     """
+    if (unusable := _unusable_path(path)):
+        return unusable
     p = Path(path)
     if not p.exists():
         return f"BLOCKED: no file at {path}.\nNEXT STEP: check the path."
@@ -233,6 +260,8 @@ def propose_ingest_spec(
 
     The spec that comes back has nothing outstanding and can be confirmed.
     """
+    if (unusable := _unusable_path(path)):
+        return unusable
     try:
         d = draft.draft_for_path(
             path, dataset_name=dataset_name, sheet=sheet,
@@ -329,6 +358,8 @@ def load_csv(
                       column. 'null' stores that cell as NULL, keeps the row,
                       and reports the count per column.
     """
+    if (unusable := _unusable_path(path)):
+        return unusable
     con = db.connect(workspace_id or DEFAULT_WORKSPACE_ID)
     try:
         r = csv_loader.load_csv(
@@ -381,6 +412,8 @@ def load_excel(
     all_text          Load every column as text. The blunt version of
                       on_error='null'.
     """
+    if (unusable := _unusable_path(path)):
+        return unusable
     con = db.connect(workspace_id or DEFAULT_WORKSPACE_ID)
     try:
         r = excel.load_excel(
@@ -1060,6 +1093,8 @@ def read_result_file(
     columns wide, and without start_col the ones past the twelfth are in the
     file and reachable by nothing.
     """
+    if (unusable := _unusable_path(path)):
+        return unusable
     # No connection: a result file is on disk, not in DuckDB.
     return profile_tools.read_result(
         workspace_id or DEFAULT_WORKSPACE_ID, path, start, limit,

@@ -130,7 +130,17 @@ def draft_for_path(
     source_type = sizegate.source_type_for(p)
 
     if source_type == "excel":
-        sheets = excel.list_sheets(p)
+        try:
+            sheets = excel.list_sheets(p)
+        except Exception as exc:  # noqa: BLE001 - BadZipFile, InvalidFileException, KeyError
+            # A CSV renamed .xlsx, a truncated download, a password-protected workbook: all
+            # arrive here as a file that is not a zip of sheets (P14-D70).
+            raise LoadRefused(
+                f"BLOCKED: {p.name} is not a readable .xlsx workbook.\n"
+                f"WHY: {type(exc).__name__}: {exc}. It may be another kind of file renamed, "
+                f"cut short, or protected with a password.\n"
+                f"NEXT STEP: open it in Excel and save it as .xlsx, or export it as CSV."
+            ) from exc
         chosen = sheet or merges.active_sheet_name(str(p))
         if chosen not in sheets:
             raise LoadRefused(

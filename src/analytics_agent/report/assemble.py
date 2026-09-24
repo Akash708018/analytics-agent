@@ -69,6 +69,21 @@ def _bullets(items) -> list[str]:
 
 # --- the nine sections ---------------------------------------------------------------------
 
+_TAG_OPEN = re.compile(r"<(?=[A-Za-z/!?])")
+_JS_LINK = re.compile(r"\]\(\s*javascript:", re.IGNORECASE)
+
+
+def defang(markdown: str) -> str:
+    """The report with no markup that could run where it is opened (P14-D71).
+
+    The question is the user's words, written as given (never paraphrased), and column names and
+    values come from files anyone can make: '<script>' and '](javascript:' reached the .md a
+    person downloads. A '<' that opens a tag becomes '&lt;' -- it reads the same rendered, and
+    'p < 0.05' is untouched -- and a javascript: link loses its scheme.
+    """
+    return _JS_LINK.sub("](blocked-javascript:", _TAG_OPEN.sub("&lt;", markdown))
+
+
 def _question(question: str) -> tuple[list[str], bool]:
     text = (question or "").strip()
     if not text:
@@ -335,7 +350,7 @@ def assemble(
     for i, (heading, body) in enumerate(zip(SECTIONS, bodies), start=1):
         out += [f"## {heading}", ""] + list(body) + [""]
 
-    path.write_text("\n".join(out) + "\n", encoding="utf-8")
+    path.write_text(defang("\n".join(out) + "\n"), encoding="utf-8")
 
     return Report(
         path=path,
