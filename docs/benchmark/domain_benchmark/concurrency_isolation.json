@@ -1,0 +1,392 @@
+{
+ "batches": [
+  {
+   "job": "H_concurrency",
+   "phase": "H",
+   "domain": null,
+   "rows": 0,
+   "stage": "concurrency",
+   "kind": "note",
+   "event": "batch",
+   "mode": "separate",
+   "width": 2,
+   "wall_seconds": 0.040741548998994404,
+   "statuses": [
+    "REFUSED",
+    "REFUSED"
+   ],
+   "result_paths": [
+    null,
+    null
+   ]
+  },
+  {
+   "job": "H_concurrency",
+   "phase": "H",
+   "domain": null,
+   "rows": 0,
+   "stage": "concurrency",
+   "kind": "note",
+   "event": "batch",
+   "mode": "shared",
+   "width": 2,
+   "wall_seconds": 0.043575322000833694,
+   "statuses": [
+    "EXCEPTION",
+    "REFUSED"
+   ],
+   "result_paths": [
+    null,
+    null
+   ]
+  },
+  {
+   "job": "H_concurrency",
+   "phase": "H",
+   "domain": null,
+   "rows": 0,
+   "stage": "concurrency",
+   "kind": "note",
+   "event": "batch",
+   "mode": "separate",
+   "width": 5,
+   "wall_seconds": 0.06601828299972112,
+   "statuses": [
+    "REFUSED",
+    "REFUSED",
+    "REFUSED",
+    "REFUSED",
+    "REFUSED"
+   ],
+   "result_paths": [
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  },
+  {
+   "job": "H_concurrency",
+   "phase": "H",
+   "domain": null,
+   "rows": 0,
+   "stage": "concurrency",
+   "kind": "note",
+   "event": "batch",
+   "mode": "shared",
+   "width": 5,
+   "wall_seconds": 0.044125496000560815,
+   "statuses": [
+    "REFUSED",
+    "REFUSED",
+    "REFUSED",
+    "REFUSED",
+    "REFUSED"
+   ],
+   "result_paths": [
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  },
+  {
+   "job": "H_concurrency",
+   "phase": "H",
+   "domain": null,
+   "rows": 0,
+   "stage": "concurrency",
+   "kind": "note",
+   "event": "batch",
+   "mode": "separate",
+   "width": 10,
+   "wall_seconds": 0.15188293699975475,
+   "statuses": [
+    "REFUSED",
+    "REFUSED",
+    "REFUSED",
+    "REFUSED",
+    "REFUSED",
+    "REFUSED",
+    "REFUSED",
+    "REFUSED",
+    "REFUSED",
+    "REFUSED"
+   ],
+   "result_paths": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  },
+  {
+   "job": "H_concurrency",
+   "phase": "H",
+   "domain": null,
+   "rows": 0,
+   "stage": "concurrency",
+   "kind": "note",
+   "event": "batch",
+   "mode": "shared",
+   "width": 10,
+   "wall_seconds": 0.08838822100005927,
+   "statuses": [
+    "REFUSED",
+    "REFUSED",
+    "REFUSED",
+    "REFUSED",
+    "REFUSED",
+    "REFUSED",
+    "REFUSED",
+    "REFUSED",
+    "REFUSED",
+    "REFUSED"
+   ],
+   "result_paths": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  },
+  {
+   "job": "H_concurrency",
+   "phase": "H",
+   "domain": null,
+   "rows": 0,
+   "stage": "concurrency",
+   "kind": "note",
+   "event": "batch",
+   "mode": "same_dataset",
+   "width": 10,
+   "statuses": [
+    "REFUSED",
+    "REFUSED",
+    "REFUSED",
+    "REFUSED",
+    "REFUSED",
+    "REFUSED",
+    "REFUSED",
+    "REFUSED",
+    "REFUSED",
+    "REFUSED"
+   ],
+   "result_paths": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  }
+ ],
+ "isolation": {
+  "correctness": [],
+  "reports": [
+   {
+    "dataset": "financial",
+    "report_file": "/home/user/analytics-agent/workspace/dbench_iso/reports/financial_20260924-184910.md",
+    "names_itself": true,
+    "names_another_as_its_dataset": [],
+    "status": "PASS"
+   },
+   {
+    "dataset": "hr",
+    "report_file": "/home/user/analytics-agent/workspace/dbench_iso/reports/hr_20260924-184910.md",
+    "names_itself": true,
+    "names_another_as_its_dataset": [],
+    "status": "PASS"
+   },
+   {
+    "dataset": "sales",
+    "report_file": "/home/user/analytics-agent/workspace/dbench_iso/reports/sales_20260924-184911.md",
+    "names_itself": true,
+    "names_another_as_its_dataset": [],
+    "status": "PASS"
+   },
+   {
+    "dataset": "marketing",
+    "report_file": "/home/user/analytics-agent/workspace/dbench_iso/reports/marketing_20260924-184912.md",
+    "names_itself": true,
+    "names_another_as_its_dataset": [],
+    "status": "PASS"
+   },
+   {
+    "dataset": "crm",
+    "report_file": "/home/user/analytics-agent/workspace/dbench_iso/reports/crm_20260924-184912.md",
+    "names_itself": true,
+    "names_another_as_its_dataset": [],
+    "status": "PASS"
+   },
+   {
+    "dataset": "ecommerce",
+    "report_file": "/home/user/analytics-agent/workspace/dbench_iso/reports/ecommerce_20260924-184913.md",
+    "names_itself": true,
+    "names_another_as_its_dataset": [],
+    "status": "PASS"
+   },
+   {
+    "dataset": "logistics",
+    "report_file": "/home/user/analytics-agent/workspace/dbench_iso/reports/logistics_20260924-184914.md",
+    "names_itself": true,
+    "names_another_as_its_dataset": [],
+    "status": "PASS"
+   },
+   {
+    "dataset": "healthcare",
+    "report_file": "/home/user/analytics-agent/workspace/dbench_iso/reports/healthcare_20260924-184915.md",
+    "names_itself": true,
+    "names_another_as_its_dataset": [],
+    "status": "PASS"
+   },
+   {
+    "dataset": "manufacturing",
+    "report_file": "/home/user/analytics-agent/workspace/dbench_iso/reports/manufacturing_20260924-184916.md",
+    "names_itself": true,
+    "names_another_as_its_dataset": [],
+    "status": "PASS"
+   },
+   {
+    "dataset": "education",
+    "report_file": "/home/user/analytics-agent/workspace/dbench_iso/reports/education_20260924-184916.md",
+    "names_itself": true,
+    "names_another_as_its_dataset": [],
+    "status": "PASS"
+   }
+  ],
+  "ledgers": [
+   {
+    "dataset": "financial",
+    "cleaned": true,
+    "status": "PASS"
+   },
+   {
+    "dataset": "hr",
+    "cleaned": false,
+    "status": "PASS"
+   },
+   {
+    "dataset": "sales",
+    "cleaned": false,
+    "status": "PASS"
+   },
+   {
+    "dataset": "marketing",
+    "cleaned": false,
+    "status": "PASS"
+   },
+   {
+    "dataset": "crm",
+    "cleaned": false,
+    "status": "PASS"
+   },
+   {
+    "dataset": "ecommerce",
+    "cleaned": false,
+    "status": "PASS"
+   },
+   {
+    "dataset": "logistics",
+    "cleaned": false,
+    "status": "PASS"
+   },
+   {
+    "dataset": "healthcare",
+    "cleaned": false,
+    "status": "PASS"
+   },
+   {
+    "dataset": "manufacturing",
+    "cleaned": false,
+    "status": "PASS"
+   },
+   {
+    "dataset": "education",
+    "cleaned": false,
+    "status": "PASS"
+   }
+  ],
+  "charts": [
+   {
+    "dataset": "financial",
+    "names_its_measure": false,
+    "names_another_dataset": [],
+    "status": "FAIL"
+   },
+   {
+    "dataset": "hr",
+    "names_its_measure": false,
+    "names_another_dataset": [],
+    "status": "FAIL"
+   },
+   {
+    "dataset": "sales",
+    "names_its_measure": false,
+    "names_another_dataset": [],
+    "status": "FAIL"
+   },
+   {
+    "dataset": "marketing",
+    "names_its_measure": false,
+    "names_another_dataset": [],
+    "status": "FAIL"
+   },
+   {
+    "dataset": "crm",
+    "names_its_measure": false,
+    "names_another_dataset": [],
+    "status": "FAIL"
+   },
+   {
+    "dataset": "ecommerce",
+    "names_its_measure": false,
+    "names_another_dataset": [],
+    "status": "FAIL"
+   },
+   {
+    "dataset": "logistics",
+    "names_its_measure": false,
+    "names_another_dataset": [],
+    "status": "FAIL"
+   },
+   {
+    "dataset": "healthcare",
+    "names_its_measure": false,
+    "names_another_dataset": [],
+    "status": "FAIL"
+   },
+   {
+    "dataset": "manufacturing",
+    "names_its_measure": false,
+    "names_another_dataset": [],
+    "status": "FAIL"
+   },
+   {
+    "dataset": "education",
+    "names_its_measure": false,
+    "names_another_dataset": [],
+    "status": "FAIL"
+   }
+  ]
+ }
+}

@@ -594,7 +594,16 @@ def main() -> None:
     _atomic(OUT / "benchmark.json", {"generated": time.strftime("%Y-%m-%dT%H:%M:%S"),
                                      "environment": raw["env"], "summary": summary,
                                      "calls": agg["per_call"]})
-    _atomic(OUT / "correctness.json", {"summary": csum, "records": agg["correctness"],
+    # Every check of every call is 1.5 GB at 6M checks (run 2): that file stays with the
+    # evidence, outside the repository. The committed one keeps each call's totals and every
+    # check that did not pass.
+    _atomic(C.DATA / "correctness_full.json", {"summary": csum, "records": agg["correctness"]})
+    slim = [{**r, "checks": [k for k in r.get("checks", [])
+                             if isinstance(k, dict) and k.get("status") != "PASS"],
+             "checks_listed": "non-passing only; every check: correctness_full.json in the "
+                              "benchmark's data directory"}
+            for r in agg["correctness"]]
+    _atomic(OUT / "correctness.json", {"summary": csum, "records": slim,
                                        "known_answers": agg["known"],
                                        "temporal_order_independence": agg["order"]})
     _atomic(OUT / "performance.json", perf)

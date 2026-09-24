@@ -1,0 +1,1254 @@
+{
+ "worker_peak_by_size": {
+  "1000": [
+   {
+    "unit": "C_crm",
+    "child_peak_rss_mb": 357.18,
+    "wait4_ru_maxrss_mb_inherited": 330.1
+   },
+   {
+    "unit": "C_ecommerce",
+    "child_peak_rss_mb": 348.59,
+    "wait4_ru_maxrss_mb_inherited": 313.8
+   },
+   {
+    "unit": "C_education",
+    "child_peak_rss_mb": 354.53,
+    "wait4_ru_maxrss_mb_inherited": 333.7
+   },
+   {
+    "unit": "C_financial",
+    "child_peak_rss_mb": 364.58,
+    "wait4_ru_maxrss_mb_inherited": 332.7
+   },
+   {
+    "unit": "C_healthcare",
+    "child_peak_rss_mb": 343.26,
+    "wait4_ru_maxrss_mb_inherited": 321.0
+   },
+   {
+    "unit": "C_hr",
+    "child_peak_rss_mb": 355.45,
+    "wait4_ru_maxrss_mb_inherited": 324.2
+   },
+   {
+    "unit": "C_logistics",
+    "child_peak_rss_mb": 351.27,
+    "wait4_ru_maxrss_mb_inherited": 319.9
+   },
+   {
+    "unit": "C_manufacturing",
+    "child_peak_rss_mb": 358.17,
+    "wait4_ru_maxrss_mb_inherited": 325.1
+   },
+   {
+    "unit": "C_marketing",
+    "child_peak_rss_mb": 364.12,
+    "wait4_ru_maxrss_mb_inherited": 327.3
+   },
+   {
+    "unit": "C_sales",
+    "child_peak_rss_mb": 353.8,
+    "wait4_ru_maxrss_mb_inherited": 316.8
+   }
+  ],
+  "100000": [
+   {
+    "unit": "D_crm",
+    "child_peak_rss_mb": 475.03,
+    "wait4_ru_maxrss_mb_inherited": 423.5
+   },
+   {
+    "unit": "D_ecommerce",
+    "child_peak_rss_mb": 466.64,
+    "wait4_ru_maxrss_mb_inherited": 830.8
+   },
+   {
+    "unit": "D_education",
+    "child_peak_rss_mb": 540.6,
+    "wait4_ru_maxrss_mb_inherited": 830.8
+   },
+   {
+    "unit": "D_financial",
+    "child_peak_rss_mb": 518.15,
+    "wait4_ru_maxrss_mb_inherited": 340.9
+   },
+   {
+    "unit": "D_healthcare",
+    "child_peak_rss_mb": 458.37,
+    "wait4_ru_maxrss_mb_inherited": 830.8
+   },
+   {
+    "unit": "D_hr",
+    "child_peak_rss_mb": 568.31,
+    "wait4_ru_maxrss_mb_inherited": 506.4
+   },
+   {
+    "unit": "D_logistics",
+    "child_peak_rss_mb": 470.77,
+    "wait4_ru_maxrss_mb_inherited": 830.8
+   },
+   {
+    "unit": "D_manufacturing",
+    "child_peak_rss_mb": 522.23,
+    "wait4_ru_maxrss_mb_inherited": 830.8
+   },
+   {
+    "unit": "D_marketing",
+    "child_peak_rss_mb": 531.02,
+    "wait4_ru_maxrss_mb_inherited": 412.0
+   },
+   {
+    "unit": "D_sales",
+    "child_peak_rss_mb": 487.48,
+    "wait4_ru_maxrss_mb_inherited": 445.4
+   }
+  ],
+  "1000000": [
+   {
+    "unit": "E_crm",
+    "child_peak_rss_mb": 955.22,
+    "wait4_ru_maxrss_mb_inherited": 2001.4
+   },
+   {
+    "unit": "E_ecommerce",
+    "child_peak_rss_mb": 931.95,
+    "wait4_ru_maxrss_mb_inherited": 6514.8
+   },
+   {
+    "unit": "E_education",
+    "child_peak_rss_mb": 1153.38,
+    "wait4_ru_maxrss_mb_inherited": 6514.8
+   },
+   {
+    "unit": "E_financial",
+    "child_peak_rss_mb": 1307.93,
+    "wait4_ru_maxrss_mb_inherited": 438.6
+   },
+   {
+    "unit": "E_healthcare",
+    "child_peak_rss_mb": 938.89,
+    "wait4_ru_maxrss_mb_inherited": 6514.8
+   },
+   {
+    "unit": "E_hr",
+    "child_peak_rss_mb": 1254.24,
+    "wait4_ru_maxrss_mb_inherited": 2001.4
+   },
+   {
+    "unit": "E_logistics",
+    "child_peak_rss_mb": 926.17,
+    "wait4_ru_maxrss_mb_inherited": 6514.8
+   },
+   {
+    "unit": "E_manufacturing",
+    "child_peak_rss_mb": 1203.27,
+    "wait4_ru_maxrss_mb_inherited": 6514.8
+   },
+   {
+    "unit": "E_marketing",
+    "child_peak_rss_mb": 1413.46,
+    "wait4_ru_maxrss_mb_inherited": 2001.4
+   },
+   {
+    "unit": "E_sales",
+    "child_peak_rss_mb": 1081.83,
+    "wait4_ru_maxrss_mb_inherited": 2001.4
+   }
+  ],
+  "2000000": [
+   {
+    "unit": "I_logistics_2000000",
+    "child_peak_rss_mb": 1338.2,
+    "wait4_ru_maxrss_mb_inherited": 722.9
+   },
+   {
+    "unit": "I_sales_2000000",
+    "child_peak_rss_mb": 1696.8,
+    "wait4_ru_maxrss_mb_inherited": 722.8
+   }
+  ],
+  "5000000": [
+   {
+    "unit": "I_logistics_5000000",
+    "child_peak_rss_mb": 2185.77,
+    "wait4_ru_maxrss_mb_inherited": 722.9
+   },
+   {
+    "unit": "I_sales_5000000",
+    "child_peak_rss_mb": 2511.99,
+    "wait4_ru_maxrss_mb_inherited": 722.9
+   }
+  ],
+  "10000000": [
+   {
+    "unit": "I_logistics_10000000",
+    "child_peak_rss_mb": 3627.24,
+    "wait4_ru_maxrss_mb_inherited": 722.9
+   }
+  ]
+ },
+ "top_calls_by_peak": [
+  {
+   "unit": "I_logistics_10000000",
+   "tool": "apply_cleaning_plan",
+   "analysis": null,
+   "variant": "",
+   "rows": 10000000,
+   "peak_memory_mb": 3627.24,
+   "memory_before_mb": 449.63,
+   "memory_after_mb": 447.24
+  },
+  {
+   "unit": "I_logistics_10000000",
+   "tool": "profile_column",
+   "analysis": null,
+   "variant": "",
+   "rows": 10000000,
+   "peak_memory_mb": 3199.51,
+   "memory_before_mb": 425.01,
+   "memory_after_mb": 441.86
+  },
+  {
+   "unit": "I_logistics_10000000",
+   "tool": "profile_column",
+   "analysis": null,
+   "variant": "",
+   "rows": 10000000,
+   "peak_memory_mb": 3193.14,
+   "memory_before_mb": 366.62,
+   "memory_after_mb": 455.12
+  },
+  {
+   "unit": "I_logistics_10000000",
+   "tool": "propose_cleaning_plan",
+   "analysis": null,
+   "variant": "",
+   "rows": 10000000,
+   "peak_memory_mb": 3170.12,
+   "memory_before_mb": 441.41,
+   "memory_after_mb": 425.71
+  },
+  {
+   "unit": "I_logistics_10000000",
+   "tool": "profile_column",
+   "analysis": null,
+   "variant": "",
+   "rows": 10000000,
+   "peak_memory_mb": 3164.97,
+   "memory_before_mb": 340.88,
+   "memory_after_mb": 434.15
+  },
+  {
+   "unit": "I_logistics_10000000",
+   "tool": "profile_column",
+   "analysis": null,
+   "variant": "",
+   "rows": 10000000,
+   "peak_memory_mb": 3159.28,
+   "memory_before_mb": 314.33,
+   "memory_after_mb": 405.06
+  },
+  {
+   "unit": "I_logistics_10000000",
+   "tool": "propose_cleaning_plan",
+   "analysis": null,
+   "variant": "",
+   "rows": 10000000,
+   "peak_memory_mb": 3154.54,
+   "memory_before_mb": 425.71,
+   "memory_after_mb": 449.63
+  },
+  {
+   "unit": "I_logistics_10000000",
+   "tool": "profile_column",
+   "analysis": null,
+   "variant": "",
+   "rows": 10000000,
+   "peak_memory_mb": 3138.65,
+   "memory_before_mb": 455.12,
+   "memory_after_mb": 439.24
+  },
+  {
+   "unit": "I_logistics_10000000",
+   "tool": "profile_column",
+   "analysis": null,
+   "variant": "",
+   "rows": 10000000,
+   "peak_memory_mb": 3125.18,
+   "memory_before_mb": 413.68,
+   "memory_after_mb": 417.32
+  },
+  {
+   "unit": "I_logistics_10000000",
+   "tool": "profile_column",
+   "analysis": null,
+   "variant": "",
+   "rows": 10000000,
+   "peak_memory_mb": 3102.79,
+   "memory_before_mb": 405.06,
+   "memory_after_mb": 413.68
+  }
+ ],
+ "rss_drift_per_worker": [
+  {
+   "unit": "B_known",
+   "first_after_mb": 247.2,
+   "last_after_mb": 258.96,
+   "max_after_mb": 262.63,
+   "growth_mb": 11.76,
+   "calls": 22
+  },
+  {
+   "unit": "B_stat",
+   "first_after_mb": 246.75,
+   "last_after_mb": 262.41,
+   "max_after_mb": 265.18,
+   "growth_mb": 15.66,
+   "calls": 21
+  },
+  {
+   "unit": "B_temporal",
+   "first_after_mb": 247.18,
+   "last_after_mb": 263.7,
+   "max_after_mb": 263.83,
+   "growth_mb": 16.52,
+   "calls": 53
+  },
+  {
+   "unit": "C_crm",
+   "first_after_mb": 246.57,
+   "last_after_mb": 327.01,
+   "max_after_mb": 341.57,
+   "growth_mb": 80.44,
+   "calls": 349
+  },
+  {
+   "unit": "C_ecommerce",
+   "first_after_mb": 246.66,
+   "last_after_mb": 311.07,
+   "max_after_mb": 326.92,
+   "growth_mb": 64.41,
+   "calls": 367
+  },
+  {
+   "unit": "C_education",
+   "first_after_mb": 246.47,
+   "last_after_mb": 328.59,
+   "max_after_mb": 338.87,
+   "growth_mb": 82.12,
+   "calls": 363
+  },
+  {
+   "unit": "C_financial",
+   "first_after_mb": 246.61,
+   "last_after_mb": 327.79,
+   "max_after_mb": 349.25,
+   "growth_mb": 81.18,
+   "calls": 385
+  },
+  {
+   "unit": "C_healthcare",
+   "first_after_mb": 246.37,
+   "last_after_mb": 318.19,
+   "max_after_mb": 327.05,
+   "growth_mb": 71.82,
+   "calls": 359
+  },
+  {
+   "unit": "C_hr",
+   "first_after_mb": 246.63,
+   "last_after_mb": 321.06,
+   "max_after_mb": 335.64,
+   "growth_mb": 74.43,
+   "calls": 377
+  },
+  {
+   "unit": "C_logistics",
+   "first_after_mb": 246.65,
+   "last_after_mb": 316.84,
+   "max_after_mb": 328.76,
+   "growth_mb": 70.19,
+   "calls": 367
+  },
+  {
+   "unit": "C_manufacturing",
+   "first_after_mb": 246.62,
+   "last_after_mb": 320.83,
+   "max_after_mb": 333.14,
+   "growth_mb": 74.21,
+   "calls": 363
+  },
+  {
+   "unit": "C_marketing",
+   "first_after_mb": 246.69,
+   "last_after_mb": 324.25,
+   "max_after_mb": 341.59,
+   "growth_mb": 77.56,
+   "calls": 369
+  },
+  {
+   "unit": "C_sales",
+   "first_after_mb": 246.59,
+   "last_after_mb": 313.58,
+   "max_after_mb": 331.49,
+   "growth_mb": 66.99,
+   "calls": 361
+  },
+  {
+   "unit": "D_crm",
+   "first_after_mb": 246.54,
+   "last_after_mb": 417.98,
+   "max_after_mb": 433.95,
+   "growth_mb": 171.44,
+   "calls": 349
+  },
+  {
+   "unit": "D_ecommerce",
+   "first_after_mb": 246.52,
+   "last_after_mb": 420.44,
+   "max_after_mb": 433.35,
+   "growth_mb": 173.92,
+   "calls": 367
+  },
+  {
+   "unit": "D_education",
+   "first_after_mb": 246.41,
+   "last_after_mb": 488.61,
+   "max_after_mb": 491.48,
+   "growth_mb": 242.2,
+   "calls": 363
+  },
+  {
+   "unit": "D_financial",
+   "first_after_mb": 246.48,
+   "last_after_mb": 335.27,
+   "max_after_mb": 421.05,
+   "growth_mb": 88.79,
+   "calls": 385
+  },
+  {
+   "unit": "D_healthcare",
+   "first_after_mb": 246.6,
+   "last_after_mb": 435.94,
+   "max_after_mb": 437.22,
+   "growth_mb": 189.34,
+   "calls": 359
+  },
+  {
+   "unit": "D_hr",
+   "first_after_mb": 246.58,
+   "last_after_mb": 503.13,
+   "max_after_mb": 519.02,
+   "growth_mb": 256.55,
+   "calls": 376
+  },
+  {
+   "unit": "D_logistics",
+   "first_after_mb": 246.57,
+   "last_after_mb": 425.06,
+   "max_after_mb": 426.48,
+   "growth_mb": 178.49,
+   "calls": 367
+  },
+  {
+   "unit": "D_manufacturing",
+   "first_after_mb": 246.49,
+   "last_after_mb": 497.09,
+   "max_after_mb": 498.12,
+   "growth_mb": 250.6,
+   "calls": 363
+  },
+  {
+   "unit": "D_marketing",
+   "first_after_mb": 246.69,
+   "last_after_mb": 408.8,
+   "max_after_mb": 429.56,
+   "growth_mb": 162.11,
+   "calls": 369
+  },
+  {
+   "unit": "D_sales",
+   "first_after_mb": 246.66,
+   "last_after_mb": 442.41,
+   "max_after_mb": 455.08,
+   "growth_mb": 195.75,
+   "calls": 361
+  },
+  {
+   "unit": "E_crm",
+   "first_after_mb": 246.58,
+   "last_after_mb": 427.71,
+   "max_after_mb": 455.5,
+   "growth_mb": 181.13,
+   "calls": 315
+  },
+  {
+   "unit": "E_ecommerce",
+   "first_after_mb": 246.66,
+   "last_after_mb": 412.3,
+   "max_after_mb": 424.47,
+   "growth_mb": 165.64,
+   "calls": 323
+  },
+  {
+   "unit": "E_education",
+   "first_after_mb": 246.54,
+   "last_after_mb": 419.4,
+   "max_after_mb": 431.86,
+   "growth_mb": 172.86,
+   "calls": 321
+  },
+  {
+   "unit": "E_financial",
+   "first_after_mb": 246.45,
+   "last_after_mb": 432.6,
+   "max_after_mb": 446.33,
+   "growth_mb": 186.15,
+   "calls": 335
+  },
+  {
+   "unit": "E_healthcare",
+   "first_after_mb": 246.52,
+   "last_after_mb": 450.75,
+   "max_after_mb": 452.37,
+   "growth_mb": 204.23,
+   "calls": 319
+  },
+  {
+   "unit": "E_hr",
+   "first_after_mb": 246.83,
+   "last_after_mb": 406.25,
+   "max_after_mb": 434.18,
+   "growth_mb": 159.42,
+   "calls": 330
+  },
+  {
+   "unit": "E_logistics",
+   "first_after_mb": 246.57,
+   "last_after_mb": 443.94,
+   "max_after_mb": 458.71,
+   "growth_mb": 197.37,
+   "calls": 323
+  },
+  {
+   "unit": "E_manufacturing",
+   "first_after_mb": 246.45,
+   "last_after_mb": 442.43,
+   "max_after_mb": 454.2,
+   "growth_mb": 195.98,
+   "calls": 321
+  },
+  {
+   "unit": "E_marketing",
+   "first_after_mb": 246.6,
+   "last_after_mb": 426.07,
+   "max_after_mb": 441.52,
+   "growth_mb": 179.47,
+   "calls": 325
+  },
+  {
+   "unit": "E_sales",
+   "first_after_mb": 246.59,
+   "last_after_mb": 440.46,
+   "max_after_mb": 446.9,
+   "growth_mb": 193.87,
+   "calls": 321
+  },
+  {
+   "unit": "F_dirty",
+   "first_after_mb": 246.51,
+   "last_after_mb": 266.2,
+   "max_after_mb": 274.42,
+   "growth_mb": 19.69,
+   "calls": 64
+  },
+  {
+   "unit": "F_formats",
+   "first_after_mb": 247.8,
+   "last_after_mb": 265.87,
+   "max_after_mb": 271.58,
+   "growth_mb": 18.07,
+   "calls": 19
+  },
+  {
+   "unit": "G_wrong",
+   "first_after_mb": 252.66,
+   "last_after_mb": 307.38,
+   "max_after_mb": 317.44,
+   "growth_mb": 54.72,
+   "calls": 167
+  },
+  {
+   "unit": "H_concurrency",
+   "first_after_mb": 248.11,
+   "last_after_mb": 260.84,
+   "max_after_mb": 261.12,
+   "growth_mb": 12.73,
+   "calls": 80
+  },
+  {
+   "unit": "H_isolation",
+   "first_after_mb": 247.88,
+   "last_after_mb": 286.21,
+   "max_after_mb": 286.48,
+   "growth_mb": 38.33,
+   "calls": 131
+  },
+  {
+   "unit": "H_repeat",
+   "first_after_mb": 247.9,
+   "last_after_mb": 393.94,
+   "max_after_mb": 395.36,
+   "growth_mb": 146.04,
+   "calls": 296
+  },
+  {
+   "unit": "H_traced",
+   "first_after_mb": 248.81,
+   "last_after_mb": 262.71,
+   "max_after_mb": 263.32,
+   "growth_mb": 13.9,
+   "calls": 64
+  },
+  {
+   "unit": "I_logistics_10000000",
+   "first_after_mb": 246.66,
+   "last_after_mb": 501.85,
+   "max_after_mb": 510.83,
+   "growth_mb": 255.19,
+   "calls": 199
+  },
+  {
+   "unit": "I_logistics_2000000",
+   "first_after_mb": 246.62,
+   "last_after_mb": 462.9,
+   "max_after_mb": 477.71,
+   "growth_mb": 216.28,
+   "calls": 199
+  },
+  {
+   "unit": "I_logistics_5000000",
+   "first_after_mb": 246.66,
+   "last_after_mb": 494.91,
+   "max_after_mb": 505.44,
+   "growth_mb": 248.25,
+   "calls": 199
+  },
+  {
+   "unit": "I_sales_2000000",
+   "first_after_mb": 246.55,
+   "last_after_mb": 467.25,
+   "max_after_mb": 478.88,
+   "growth_mb": 220.7,
+   "calls": 197
+  },
+  {
+   "unit": "I_sales_5000000",
+   "first_after_mb": 246.57,
+   "last_after_mb": 499.34,
+   "max_after_mb": 511.08,
+   "growth_mb": 252.77,
+   "calls": 197
+  },
+  {
+   "unit": "J_crm_100000_r1",
+   "first_after_mb": 247.85,
+   "last_after_mb": 258.59,
+   "max_after_mb": 260.19,
+   "growth_mb": 10.74,
+   "calls": 28
+  },
+  {
+   "unit": "J_crm_100000_r2",
+   "first_after_mb": 247.64,
+   "last_after_mb": 259.31,
+   "max_after_mb": 260.54,
+   "growth_mb": 11.67,
+   "calls": 28
+  },
+  {
+   "unit": "J_crm_1000_r1",
+   "first_after_mb": 247.79,
+   "last_after_mb": 257.62,
+   "max_after_mb": 259.3,
+   "growth_mb": 9.83,
+   "calls": 28
+  },
+  {
+   "unit": "J_crm_1000_r2",
+   "first_after_mb": 247.58,
+   "last_after_mb": 257.24,
+   "max_after_mb": 259.0,
+   "growth_mb": 9.66,
+   "calls": 28
+  },
+  {
+   "unit": "J_financial_100000_r1",
+   "first_after_mb": 247.86,
+   "last_after_mb": 260.77,
+   "max_after_mb": 261.76,
+   "growth_mb": 12.91,
+   "calls": 28
+  },
+  {
+   "unit": "J_financial_100000_r2",
+   "first_after_mb": 247.85,
+   "last_after_mb": 260.77,
+   "max_after_mb": 261.91,
+   "growth_mb": 12.92,
+   "calls": 28
+  },
+  {
+   "unit": "J_financial_1000_r1",
+   "first_after_mb": 247.98,
+   "last_after_mb": 258.09,
+   "max_after_mb": 259.92,
+   "growth_mb": 10.11,
+   "calls": 28
+  },
+  {
+   "unit": "J_financial_1000_r2",
+   "first_after_mb": 247.93,
+   "last_after_mb": 259.21,
+   "max_after_mb": 260.96,
+   "growth_mb": 11.28,
+   "calls": 28
+  },
+  {
+   "unit": "J_logistics_100000_r1",
+   "first_after_mb": 247.62,
+   "last_after_mb": 261.83,
+   "max_after_mb": 262.81,
+   "growth_mb": 14.21,
+   "calls": 28
+  },
+  {
+   "unit": "J_logistics_100000_r2",
+   "first_after_mb": 247.72,
+   "last_after_mb": 261.71,
+   "max_after_mb": 262.49,
+   "growth_mb": 13.99,
+   "calls": 28
+  },
+  {
+   "unit": "J_logistics_1000_r1",
+   "first_after_mb": 247.86,
+   "last_after_mb": 257.51,
+   "max_after_mb": 259.3,
+   "growth_mb": 9.65,
+   "calls": 28
+  },
+  {
+   "unit": "J_logistics_1000_r2",
+   "first_after_mb": 247.75,
+   "last_after_mb": 257.67,
+   "max_after_mb": 259.42,
+   "growth_mb": 9.92,
+   "calls": 28
+  }
+ ],
+ "repeat_series_mb": {
+  "rp_pro": [
+   247.9
+  ],
+  "rp_loa": [
+   256.02
+  ],
+  "rp_cpr": [
+   259.34
+  ],
+  "rp_cco": [
+   259.9
+  ],
+  "same50": [
+   260.2,
+   257.68,
+   259.64,
+   259.85,
+   257.55,
+   259.52,
+   259.65,
+   259.7,
+   259.44,
+   259.89,
+   260.07,
+   257.62,
+   259.61,
+   259.82,
+   257.57,
+   259.56,
+   259.68,
+   257.61,
+   259.52,
+   259.62,
+   257.59,
+   259.55,
+   259.6,
+   257.58,
+   259.41,
+   259.65,
+   257.56,
+   259.56,
+   259.58,
+   257.49,
+   259.53,
+   259.73,
+   257.6,
+   259.57,
+   259.59,
+   257.59,
+   259.51,
+   259.53,
+   257.61,
+   259.46,
+   257.55,
+   259.47,
+   259.7,
+   260.09,
+   259.57,
+   259.74,
+   259.99,
+   259.61,
+   259.85,
+   259.86
+  ],
+  "follow": [
+   259.73,
+   260.02,
+   260.13,
+   259.98,
+   260.06,
+   260.51,
+   260.7,
+   260.89,
+   261.21,
+   261.14,
+   261.07,
+   261.1,
+   261.26,
+   261.6,
+   261.27,
+   261.3,
+   261.84,
+   261.77,
+   261.59,
+   261.87,
+   261.54,
+   261.87,
+   261.5,
+   261.57,
+   261.15,
+   261.15,
+   261.29,
+   261.43,
+   261.27,
+   261.26,
+   261.2,
+   261.3,
+   261.27,
+   261.3,
+   261.35,
+   261.59,
+   262.14,
+   261.95,
+   262.01,
+   262.29,
+   262.18,
+   262.18,
+   262.29,
+   261.96,
+   262.09,
+   262.2,
+   262.2,
+   262.05,
+   262.25,
+   262.18,
+   262.17,
+   262.33,
+   262.54,
+   262.51,
+   262.55,
+   262.46,
+   262.6,
+   262.02,
+   262.43,
+   262.73,
+   262.46,
+   262.79,
+   262.68,
+   262.52,
+   262.24,
+   262.7,
+   262.4,
+   262.85,
+   262.83,
+   262.77,
+   262.81,
+   262.89,
+   262.82,
+   262.7,
+   262.79,
+   262.7,
+   262.79,
+   262.83,
+   262.72,
+   262.69,
+   262.59,
+   262.78,
+   262.9,
+   262.52,
+   262.76,
+   262.66,
+   262.69,
+   262.68,
+   262.7,
+   262.64,
+   262.63,
+   262.68,
+   262.86,
+   262.77,
+   262.81,
+   262.7,
+   262.75,
+   262.78,
+   262.72,
+   262.85,
+   262.91,
+   394.35
+  ],
+  "mix0_c": [
+   261.03,
+   261.08
+  ],
+  "mix0_d": [
+   261.18
+  ],
+  "mix0_f": [
+   260.93,
+   260.95
+  ],
+  "mix0_t": [
+   261.59,
+   261.71
+  ],
+  "mix0_s": [
+   262.06
+  ],
+  "mix0_g": [
+   262.36,
+   262.26
+  ],
+  "mix1_c": [
+   262.23,
+   262.29
+  ],
+  "mix1_d": [
+   262.58
+  ],
+  "mix1_f": [
+   262.71,
+   262.7
+  ],
+  "mix1_t": [
+   262.65,
+   262.67
+  ],
+  "mix1_s": [
+   262.77
+  ],
+  "mix1_g": [
+   262.57,
+   262.79
+  ],
+  "mix2_c": [
+   262.63,
+   262.78
+  ],
+  "mix2_d": [
+   262.59
+  ],
+  "mix2_f": [
+   262.5,
+   262.2
+  ],
+  "mix2_t": [
+   262.22,
+   262.29
+  ],
+  "mix2_s": [
+   262.46
+  ],
+  "mix2_g": [
+   262.16,
+   262.33
+  ],
+  "mix3_c": [
+   262.31,
+   262.33
+  ],
+  "mix3_d": [
+   262.4
+  ],
+  "mix3_f": [
+   262.34,
+   262.38
+  ],
+  "mix3_t": [
+   262.71,
+   263.22
+  ],
+  "mix3_s": [
+   262.97
+  ],
+  "mix3_g": [
+   263.01,
+   263.35
+  ],
+  "mix4_c": [
+   263.27,
+   263.31
+  ],
+  "mix4_d": [
+   263.46
+  ],
+  "mix4_f": [
+   263.08,
+   263.17
+  ],
+  "mix4_t": [
+   263.31,
+   263.28
+  ],
+  "mix4_s": [
+   263.07
+  ],
+  "mix4_g": [
+   263.16,
+   263.3
+  ],
+  "mix5_c": [
+   263.41,
+   263.54
+  ],
+  "mix5_d": [
+   263.6
+  ],
+  "mix5_f": [
+   263.56,
+   263.54
+  ],
+  "mix5_t": [
+   263.66,
+   263.61
+  ],
+  "mix5_s": [
+   263.08
+  ],
+  "mix5_g": [
+   263.44,
+   263.75
+  ],
+  "mix6_c": [
+   263.52,
+   263.91
+  ],
+  "mix6_d": [
+   263.76
+  ],
+  "mix6_f": [
+   263.78,
+   263.31
+  ],
+  "mix6_t": [
+   263.72,
+   263.59
+  ],
+  "mix6_s": [
+   263.91
+  ],
+  "mix6_g": [
+   263.91,
+   263.85
+  ],
+  "mix7_c": [
+   263.88,
+   263.97
+  ],
+  "mix7_d": [
+   263.77
+  ],
+  "mix7_f": [
+   263.82,
+   263.76
+  ],
+  "mix7_t": [
+   263.83,
+   263.85
+  ],
+  "mix7_s": [
+   263.91
+  ],
+  "mix7_g": [
+   263.89,
+   263.73
+  ],
+  "mix8_c": [
+   263.88,
+   263.75
+  ],
+  "mix8_d": [
+   263.79
+  ],
+  "mix8_f": [
+   263.74,
+   263.81
+  ],
+  "mix8_t": [
+   263.75,
+   263.74
+  ],
+  "mix8_s": [
+   263.73
+  ],
+  "mix8_g": [
+   263.75,
+   263.71
+  ],
+  "mix9_c": [
+   263.74,
+   263.62
+  ],
+  "mix9_d": [
+   263.83
+  ],
+  "mix9_f": [
+   263.86,
+   263.95
+  ],
+  "mix9_t": [
+   263.82,
+   263.77
+  ],
+  "mix9_s": [
+   263.91
+  ],
+  "mix9_g": [
+   263.8,
+   263.96
+  ],
+  "profil": [
+   297.95,
+   332.77,
+   367.87,
+   368.1,
+   368.42,
+   368.48,
+   369.52,
+   368.64,
+   368.54,
+   368.73
+  ],
+  "chart2": [
+   392.23,
+   393.62,
+   393.66,
+   393.86,
+   392.45,
+   393.73,
+   393.84,
+   394.07,
+   393.86,
+   393.93,
+   394.07,
+   392.55,
+   393.98,
+   394.01,
+   394.26,
+   393.87,
+   393.94,
+   394.16,
+   393.86,
+   394.09
+  ],
+  "report": [
+   395.23,
+   395.36,
+   392.41,
+   393.71,
+   393.96,
+   392.45,
+   393.71,
+   393.93,
+   393.74,
+   393.94
+  ]
+ },
+ "tracemalloc_peaks_mb": [
+  1.134,
+  0.243,
+  0.085,
+  0.077,
+  0.08,
+  0.113,
+  0.09,
+  0.119,
+  0.095,
+  0.123,
+  0.099,
+  0.127,
+  0.103,
+  0.13,
+  0.106,
+  0.134,
+  0.11,
+  0.137,
+  0.113,
+  0.141,
+  0.116,
+  0.144,
+  0.12,
+  0.148,
+  0.123,
+  0.151,
+  0.127,
+  0.154,
+  0.13,
+  0.158,
+  0.134,
+  0.161,
+  0.137,
+  0.164,
+  0.14,
+  0.167,
+  0.143,
+  0.17,
+  0.147,
+  0.174,
+  0.15,
+  0.177,
+  0.153,
+  0.18,
+  0.156,
+  0.183,
+  0.16,
+  0.186,
+  0.162,
+  0.19,
+  0.166,
+  0.193,
+  0.169,
+  0.196,
+  0.172,
+  0.199,
+  0.175,
+  0.202,
+  0.178,
+  0.205,
+  0.181,
+  0.208,
+  0.185,
+  0.211
+ ],
+ "note": "peak_memory_mb is VmHWM after a reset through /proc/self/clear_refs just before each call; a worker's peak is the largest of those. wait4's ru_maxrss is kept for the record but is NOT the worker's peak: Linux carries the parent's high-water mark across fork+exec"
+}

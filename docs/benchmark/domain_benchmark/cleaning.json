@@ -1,0 +1,737 @@
+[
+ {
+  "unit": "C_crm",
+  "domain": "crm",
+  "rows": 1000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 2 exactly duplicated row(s) (2 row(s)). 2 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"CRM000000029\",\"customer_id\":\"CU00000029\",\"signup_date\":\"2022-10-17\",\"last_purchase_date\":\"2023-12-17\",\"region\":\"na\",\"segment\":\"smb\",\"acquisition_channel\":\"",
+    "verdict": "valid",
+    "why": "removes 2 exact duplicate(s); the generator inserted 2",
+    "rows_affected": 2
+   },
+   {
+    "id": "C002",
+    "kind": "NORMALISE_MISSING",
+    "column": "region",
+    "text": "turn the 459 declared missing token(s) in region into real nulls (459 row(s))",
+    "verdict": "unnecessary",
+    "why": "no defect was inserted in this column",
+    "rows_affected": 459
+   }
+  ]
+ },
+ {
+  "unit": "C_ecommerce",
+  "domain": "ecommerce",
+  "rows": 1000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 3 exactly duplicated row(s) (3 row(s)). 3 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"ECO000000938\",\"order_id\":\"EO00000938\",\"customer_id\":\"C0000016\",\"product_id\":\"P000000\",\"seller_id\":\"S00000\",\"category\":\"home\",\"order_date\":\"2023-01-08\",\"shi",
+    "verdict": "valid",
+    "why": "removes 3 exact duplicate(s); the generator inserted 3",
+    "rows_affected": 3
+   }
+  ]
+ },
+ {
+  "unit": "C_education",
+  "domain": "education",
+  "rows": 1000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 3 exactly duplicated row(s) (3 row(s)). 3 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"EDU000000455\",\"enrollment_id\":\"EN000000455\",\"student_id\":\"ST0000110\",\"course_id\":\"CRS00020\",\"instructor_id\":\"IN00003\",\"department\":\"languages\",\"enrollment_",
+    "verdict": "valid",
+    "why": "removes 3 exact duplicate(s); the generator inserted 3",
+    "rows_affected": 3
+   }
+  ]
+ },
+ {
+  "unit": "C_financial",
+  "domain": "financial",
+  "rows": 1000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 3 exactly duplicated row(s) (3 row(s)). 3 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"FIN000000346\",\"transaction_id\":\"T00000346\",\"account_id\":\"A0000077\",\"customer_id\":\"C0000026\",\"transaction_date\":\"2023-04-06\",\"posted_at\":\"2023-04-06 12:28:4",
+    "verdict": "valid",
+    "why": "removes 3 exact duplicate(s); the generator inserted 3",
+    "rows_affected": 3
+   }
+  ]
+ },
+ {
+  "unit": "C_healthcare",
+  "domain": "healthcare",
+  "rows": 1000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 2 exactly duplicated row(s) (2 row(s)). 2 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"HEA000000840\",\"admission_id\":\"AD000000840\",\"patient_id\":\"PT0000086\",\"doctor_id\":\"DR00001\",\"hospital_id\":\"H09\",\"admission_date\":\"2024-10-01\",\"discharge_date",
+    "verdict": "valid",
+    "why": "removes 2 exact duplicate(s); the generator inserted 2",
+    "rows_affected": 2
+   }
+  ]
+ },
+ {
+  "unit": "C_hr",
+  "domain": "hr",
+  "rows": 1000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 3 exactly duplicated row(s) (3 row(s)). 3 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"HR000000827\",\"employee_id\":\"E0000827\",\"department\":\"engineering\",\"team\":\"eng-5\",\"job_role\":\"role_27\",\"hire_date\":\"2016-10-21\",\"termination_date\":\"2019-07-2",
+    "verdict": "valid",
+    "why": "removes 3 exact duplicate(s); the generator inserted 3",
+    "rows_affected": 3
+   }
+  ]
+ },
+ {
+  "unit": "C_logistics",
+  "domain": "logistics",
+  "rows": 1000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 3 exactly duplicated row(s) (3 row(s)). 3 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"LOG000000571\",\"shipment_id\":\"SH000000571\",\"order_id\":\"O000000358\",\"customer_id\":\"C0000043\",\"hub_id\":\"HUB27\",\"rider_id\":\"R000013\",\"origin_city\":\"oc_19\",\"des",
+    "verdict": "valid",
+    "why": "removes 3 exact duplicate(s); the generator inserted 3",
+    "rows_affected": 3
+   }
+  ]
+ },
+ {
+  "unit": "C_manufacturing",
+  "domain": "manufacturing",
+  "rows": 1000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 3 exactly duplicated row(s) (3 row(s)). 3 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"MAN000000889\",\"production_id\":\"PR000000889\",\"plant_id\":\"PL5\",\"machine_id\":\"MC00001\",\"product_id\":\"SKU02\",\"shift\":\"B\",\"operator_id\":\"OP000013\",\"production_d",
+    "verdict": "valid",
+    "why": "removes 3 exact duplicate(s); the generator inserted 3",
+    "rows_affected": 3
+   }
+  ]
+ },
+ {
+  "unit": "C_marketing",
+  "domain": "marketing",
+  "rows": 1000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 5 exactly duplicated row(s) (5 row(s)). 5 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"MAR000000144\",\"campaign_row_id\":\"MR00000144\",\"campaign_id\":\"CMP00007\",\"channel\":\"affiliate\",\"campaign_type\":\"conversion\",\"date\":\"2023-07-11\",\"impressions\":",
+    "verdict": "valid",
+    "why": "removes 5 exact duplicate(s); the generator inserted 5",
+    "rows_affected": 5
+   }
+  ]
+ },
+ {
+  "unit": "C_sales",
+  "domain": "sales",
+  "rows": 1000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 5 exactly duplicated row(s) (5 row(s)). 5 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"SAL000000004\",\"order_id\":\"SO00000004\",\"customer_id\":\"C0000100\",\"salesperson_id\":\"SP00014\",\"product_id\":\"P000012\",\"product_category\":\"electronics\",\"region\":",
+    "verdict": "valid",
+    "why": "removes 5 exact duplicate(s); the generator inserted 5",
+    "rows_affected": 5
+   }
+  ]
+ },
+ {
+  "unit": "D_crm",
+  "domain": "crm",
+  "rows": 100000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 301 exactly duplicated row(s) (301 row(s)). 301 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"CRM000000165\",\"customer_id\":\"CU00000165\",\"signup_date\":\"2022-08-08\",\"last_purchase_date\":\"2022-08-21\",\"region\":\"apac\",\"segment\":\"consumer\",\"acquisiti",
+    "verdict": "valid",
+    "why": "removes 301 exact duplicate(s); the generator inserted 301",
+    "rows_affected": 301
+   },
+   {
+    "id": "C002",
+    "kind": "NORMALISE_MISSING",
+    "column": "region",
+    "text": "turn the 45,168 declared missing token(s) in region into real nulls (45,168 row(s))",
+    "verdict": "unnecessary",
+    "why": "no defect was inserted in this column",
+    "rows_affected": 45168
+   }
+  ]
+ },
+ {
+  "unit": "D_ecommerce",
+  "domain": "ecommerce",
+  "rows": 100000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 289 exactly duplicated row(s) (289 row(s)). 289 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"ECO000006991\",\"order_id\":\"EO00006991\",\"customer_id\":\"C0009555\",\"product_id\":\"P002267\",\"seller_id\":\"S00647\",\"category\":\"auto\",\"order_date\":\"2024-04-25",
+    "verdict": "valid",
+    "why": "removes 289 exact duplicate(s); the generator inserted 289",
+    "rows_affected": 289
+   }
+  ]
+ },
+ {
+  "unit": "D_education",
+  "domain": "education",
+  "rows": 100000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 294 exactly duplicated row(s) (294 row(s)). 294 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"EDU000034674\",\"enrollment_id\":\"EN000034674\",\"student_id\":\"ST0001358\",\"course_id\":\"CRS00466\",\"instructor_id\":\"IN00725\",\"department\":\"biology\",\"enrollm",
+    "verdict": "valid",
+    "why": "removes 294 exact duplicate(s); the generator inserted 294",
+    "rows_affected": 294
+   }
+  ]
+ },
+ {
+  "unit": "D_financial",
+  "domain": "financial",
+  "rows": 100000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 278 exactly duplicated row(s) (278 row(s)). 278 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"FIN000021791\",\"transaction_id\":\"T00021791\",\"account_id\":\"A0001590\",\"customer_id\":\"C0000825\",\"transaction_date\":\"2024-04-20\",\"posted_at\":\"2024-04-20 1",
+    "verdict": "valid",
+    "why": "removes 278 exact duplicate(s); the generator inserted 278",
+    "rows_affected": 278
+   }
+  ]
+ },
+ {
+  "unit": "D_healthcare",
+  "domain": "healthcare",
+  "rows": 100000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 293 exactly duplicated row(s) (293 row(s)). 293 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"HEA000008737\",\"admission_id\":\"AD000008737\",\"patient_id\":\"PT0007147\",\"doctor_id\":\"DR00157\",\"hospital_id\":\"H01\",\"admission_date\":\"2024-11-22\",\"discharg",
+    "verdict": "valid",
+    "why": "removes 293 exact duplicate(s); the generator inserted 293",
+    "rows_affected": 293
+   }
+  ]
+ },
+ {
+  "unit": "D_hr",
+  "domain": "hr",
+  "rows": 100000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 284 exactly duplicated row(s) (284 row(s)). 284 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"HR000061464\",\"employee_id\":\"E0061464\",\"department\":\"sales\",\"team\":\"sal-3\",\"job_role\":\"role_19\",\"hire_date\":\"2008-05-04\",\"termination_date\":null,\"empl",
+    "verdict": "valid",
+    "why": "removes 284 exact duplicate(s); the generator inserted 284",
+    "rows_affected": 284
+   }
+  ]
+ },
+ {
+  "unit": "D_logistics",
+  "domain": "logistics",
+  "rows": 100000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 278 exactly duplicated row(s) (278 row(s)). 278 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"LOG000004411\",\"shipment_id\":\"SH000004411\",\"order_id\":\"O000131928\",\"customer_id\":\"C0004936\",\"hub_id\":\"HUB22\",\"rider_id\":\"R003760\",\"origin_city\":\"oc_13",
+    "verdict": "valid",
+    "why": "removes 278 exact duplicate(s); the generator inserted 278",
+    "rows_affected": 278
+   }
+  ]
+ },
+ {
+  "unit": "D_manufacturing",
+  "domain": "manufacturing",
+  "rows": 100000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 303 exactly duplicated row(s) (303 row(s)). 303 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"MAN000003472\",\"production_id\":\"PR000003472\",\"plant_id\":\"PL0\",\"machine_id\":\"MC02496\",\"product_id\":\"SKU04\",\"shift\":\"B\",\"operator_id\":\"OP002100\",\"produc",
+    "verdict": "valid",
+    "why": "removes 303 exact duplicate(s); the generator inserted 303",
+    "rows_affected": 303
+   }
+  ]
+ },
+ {
+  "unit": "D_marketing",
+  "domain": "marketing",
+  "rows": 100000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 309 exactly duplicated row(s) (309 row(s)). 309 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"MAR000005532\",\"campaign_row_id\":\"MR00005532\",\"campaign_id\":\"CMP01835\",\"channel\":\"display\",\"campaign_type\":\"consideration\",\"date\":\"2023-12-27\",\"impres",
+    "verdict": "valid",
+    "why": "removes 309 exact duplicate(s); the generator inserted 309",
+    "rows_affected": 309
+   }
+  ]
+ },
+ {
+  "unit": "D_sales",
+  "domain": "sales",
+  "rows": 100000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 288 exactly duplicated row(s) (288 row(s)). 288 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"SAL000006708\",\"order_id\":\"SO00006708\",\"customer_id\":\"C0004097\",\"salesperson_id\":\"SP00551\",\"product_id\":\"P000219\",\"product_category\":\"apparel\",\"region",
+    "verdict": "valid",
+    "why": "removes 288 exact duplicate(s); the generator inserted 288",
+    "rows_affected": 288
+   }
+  ]
+ },
+ {
+  "unit": "E_crm",
+  "domain": "crm",
+  "rows": 1000000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 2,961 exactly duplicated row(s) (2,961 row(s)). 2,961 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"CRM000010080\",\"customer_id\":\"CU00010080\",\"signup_date\":\"2022-06-08\",\"last_purchase_date\":\"2022-06-10\",\"region\":\"emea\",\"segment\":\"smb\",\"acquisit",
+    "verdict": "valid",
+    "why": "removes 2961 exact duplicate(s); the generator inserted 2961",
+    "rows_affected": 2961
+   },
+   {
+    "id": "C002",
+    "kind": "NORMALISE_MISSING",
+    "column": "region",
+    "text": "turn the 449,183 declared missing token(s) in region into real nulls (449,183 row(s))",
+    "verdict": "unnecessary",
+    "why": "no defect was inserted in this column",
+    "rows_affected": 449183
+   }
+  ]
+ },
+ {
+  "unit": "E_ecommerce",
+  "domain": "ecommerce",
+  "rows": 1000000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 3,055 exactly duplicated row(s) (3,055 row(s)). 3,055 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"ECO000245783\",\"order_id\":\"EO00245783\",\"customer_id\":\"C0088660\",\"product_id\":\"P011707\",\"seller_id\":\"S02483\",\"category\":\"beauty\",\"order_date\":\"20",
+    "verdict": "valid",
+    "why": "removes 3055 exact duplicate(s); the generator inserted 3055",
+    "rows_affected": 3055
+   }
+  ]
+ },
+ {
+  "unit": "E_education",
+  "domain": "education",
+  "rows": 1000000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 2,977 exactly duplicated row(s) (2,977 row(s)). 2,977 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"EDU000003616\",\"enrollment_id\":\"EN000003616\",\"student_id\":\"ST0041752\",\"course_id\":\"CRS10530\",\"instructor_id\":\"IN02949\",\"department\":\"languages\",",
+    "verdict": "valid",
+    "why": "removes 2977 exact duplicate(s); the generator inserted 2977",
+    "rows_affected": 2977
+   }
+  ]
+ },
+ {
+  "unit": "E_financial",
+  "domain": "financial",
+  "rows": 1000000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 3,045 exactly duplicated row(s) (3,045 row(s)). 3,045 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"FIN000340877\",\"transaction_id\":\"T00340877\",\"account_id\":\"A0068160\",\"customer_id\":\"C0171793\",\"transaction_date\":\"2024-10-19\",\"posted_at\":\"2024-1",
+    "verdict": "valid",
+    "why": "removes 3045 exact duplicate(s); the generator inserted 3045",
+    "rows_affected": 3045
+   }
+  ]
+ },
+ {
+  "unit": "E_healthcare",
+  "domain": "healthcare",
+  "rows": 1000000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 2,954 exactly duplicated row(s) (2,954 row(s)). 2,954 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"HEA000274004\",\"admission_id\":\"AD000274004\",\"patient_id\":\"PT0102098\",\"doctor_id\":\"DR04093\",\"hospital_id\":\"H04\",\"admission_date\":\"2023-04-08\",\"di",
+    "verdict": "valid",
+    "why": "removes 2954 exact duplicate(s); the generator inserted 2954",
+    "rows_affected": 2954
+   }
+  ]
+ },
+ {
+  "unit": "E_hr",
+  "domain": "hr",
+  "rows": 1000000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 2,992 exactly duplicated row(s) (2,992 row(s)). 2,992 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"HR000359796\",\"employee_id\":\"E0359796\",\"department\":\"engineering\",\"team\":\"eng-5\",\"job_role\":\"role_17\",\"hire_date\":\"2016-12-29\",\"termination_date",
+    "verdict": "valid",
+    "why": "removes 2992 exact duplicate(s); the generator inserted 2992",
+    "rows_affected": 2992
+   }
+  ]
+ },
+ {
+  "unit": "E_logistics",
+  "domain": "logistics",
+  "rows": 1000000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 2,982 exactly duplicated row(s) (2,982 row(s)). 2,982 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"LOG000130314\",\"shipment_id\":\"SH000130314\",\"order_id\":\"O001665456\",\"customer_id\":\"C0177815\",\"hub_id\":\"HUB00\",\"rider_id\":\"R018249\",\"origin_city\":",
+    "verdict": "valid",
+    "why": "removes 2982 exact duplicate(s); the generator inserted 2982",
+    "rows_affected": 2982
+   }
+  ]
+ },
+ {
+  "unit": "E_manufacturing",
+  "domain": "manufacturing",
+  "rows": 1000000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 3,072 exactly duplicated row(s) (3,072 row(s)). 3,072 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"MAN000144486\",\"production_id\":\"PR000144486\",\"plant_id\":\"PL1\",\"machine_id\":\"MC07987\",\"product_id\":\"SKU13\",\"shift\":\"C\",\"operator_id\":\"OP049080\",\"",
+    "verdict": "valid",
+    "why": "removes 3072 exact duplicate(s); the generator inserted 3072",
+    "rows_affected": 3072
+   }
+  ]
+ },
+ {
+  "unit": "E_marketing",
+  "domain": "marketing",
+  "rows": 1000000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 2,967 exactly duplicated row(s) (2,967 row(s)). 2,967 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"MAR000370730\",\"campaign_row_id\":\"MR00370730\",\"campaign_id\":\"CMP08703\",\"channel\":\"social\",\"campaign_type\":\"retention\",\"date\":\"2024-09-17\",\"impre",
+    "verdict": "valid",
+    "why": "removes 2967 exact duplicate(s); the generator inserted 2967",
+    "rows_affected": 2967
+   }
+  ]
+ },
+ {
+  "unit": "E_sales",
+  "domain": "sales",
+  "rows": 1000000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 2,942 exactly duplicated row(s) (2,942 row(s)). 2,942 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"SAL000021045\",\"order_id\":\"SO00021045\",\"customer_id\":\"C0115422\",\"salesperson_id\":\"SP05881\",\"product_id\":\"P001353\",\"product_category\":\"electronic",
+    "verdict": "valid",
+    "why": "removes 2942 exact duplicate(s); the generator inserted 2942",
+    "rows_affected": 2942
+   }
+  ]
+ },
+ {
+  "unit": "F_dirty",
+  "domain": null,
+  "rows": null,
+  "plan_quality": {
+   "format_noise": {
+    "expect": "accept",
+    "injected": {
+     "category": "padding and 300-character labels",
+     "payment_method": "inconsistent capitalisation",
+     "revenue": "currency symbol and thousands separator",
+     "risk score %": "percent sign",
+     "balance": "thousands separator",
+     "expense": "NA / N/A / null / None / unknown tokens",
+     "branch": "unicode labels",
+     "notes": "an empty column"
+    },
+    "actions": [
+     {
+      "id": "C001",
+      "kind": "DROP_DUPLICATE_ROWS",
+      "column": null,
+      "text": "keep one of each of the 3 exactly duplicated row(s) (3 row(s)). 3 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"FIN000001796\",\"transaction_id\":\"T00001796\",\"account_id\":\"A0000012\",\"customer_id\":\"C0000300\",\"transaction_date\":\"2023-08-02\",\"posted_at\":\"2023-08-02 02:40:1",
+      "verdict": "dangerous",
+      "why": "removes 3 exact duplicate(s); the generator inserted 0",
+      "rows_affected": 3
+     },
+     {
+      "id": "C002",
+      "kind": "TRIM_WHITESPACE",
+      "column": "category",
+      "text": "strip padding from 1,472 value(s) in category (1,472 row(s))",
+      "verdict": "valid",
+      "why": "fixes the inserted defect: padding and 300-character labels",
+      "rows_affected": 1472
+     },
+     {
+      "id": "C003",
+      "kind": "CONVERT_TYPE",
+      "column": "balance",
+      "text": "read balance as DECIMAL(18,2), with its currency signs and thousands separators removed ('$1,234.56' is 1234.56) (5,018 row(s))",
+      "verdict": "valid",
+      "why": "fixes the inserted defect: thousands separator",
+      "rows_affected": 5018
+     },
+     {
+      "id": "C004",
+      "kind": "NORMALISE_CASE",
+      "column": "payment_method",
+      "text": "fold payment_method to one case, merging 10 distinct value(s) into others (3,368 row(s)). 10 distinct value(s) will be discarded and are not declared missing anywhere: 'Card', 'WIRE', 'cash'. That is information, not absence -- approve this only if you mean to lose it.",
+      "verdict": "valid",
+      "why": "fixes the inserted defect: inconsistent capitalisation",
+      "rows_affected": 3368
+     },
+     {
+      "id": "C005",
+      "kind": "CONVERT_TYPE",
+      "column": "risk_score_pct",
+      "text": "read risk_score_pct as DECIMAL(18,2), the number before its % sign, so '12.5%' becomes 12.5 (4,912 row(s))",
+      "verdict": "unnecessary",
+      "why": "no defect was inserted in this column",
+      "rows_affected": 4912
+     },
+     {
+      "id": "C006",
+      "kind": "CONVERT_TYPE",
+      "column": "revenue",
+      "text": "read revenue as DECIMAL(18,2), with its currency signs and thousands separators removed ('$1,234.56' is 1234.56) (4,998 row(s))",
+      "verdict": "valid",
+      "why": "fixes the inserted defect: currency symbol and thousands separator",
+      "rows_affected": 4998
+     },
+     {
+      "id": "C007",
+      "kind": "CONVERT_TYPE",
+      "column": "expense",
+      "text": "read expense as DECIMAL(18,2) (4,796 row(s)). 52 value(s) will be discarded and are not declared missing anywhere: 'unknown'. That is information, not absence -- approve this only if you mean to lose it.",
+      "verdict": "valid",
+      "why": "fixes the inserted defect: NA / N/A / null / None / unknown tokens",
+      "rows_affected": 4796
+     }
+    ],
+    "injected_without_action": [
+     "risk score %"
+    ]
+   },
+   "bad_dates": {
+    "expect": "warn",
+    "injected": {
+     "transaction_date": "malformed, impossible and mixed-format dates"
+    },
+    "actions": [
+     {
+      "id": "C001",
+      "kind": "DROP_DUPLICATE_ROWS",
+      "column": null,
+      "text": "keep one of each of the 6 exactly duplicated row(s) (6 row(s)). 6 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"FIN000003035\",\"transaction_id\":\"T00003035\",\"account_id\":\"A0000356\",\"customer_id\":\"C0000731\",\"transaction_date\":\"2023-05-07\",\"posted_at\":\"2023-05-07 11:32:2",
+      "verdict": "dangerous",
+      "why": "removes 6 exact duplicate(s); the generator inserted 0",
+      "rows_affected": 6
+     }
+    ],
+    "injected_without_action": []
+   },
+   "duplicate_columns": {
+    "expect": "either",
+    "injected": {
+     "category": "duplicated column name"
+    },
+    "actions": [
+     {
+      "id": "C001",
+      "kind": "DROP_DUPLICATE_ROWS",
+      "column": null,
+      "text": "keep one of each of the 18 exactly duplicated row(s) (18 row(s)). 18 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"FIN000000219\",\"transaction_id\":\"T00000219\",\"account_id\":\"A0000239\",\"customer_id\":\"C0000887\",\"transaction_date\":\"2024-10-17\",\"posted_at\":\"2024-10-17 05:0",
+      "verdict": "dangerous",
+      "why": "removes 18 exact duplicate(s); the generator inserted 0",
+      "rows_affected": 18
+     }
+    ],
+    "injected_without_action": []
+   },
+   "missing_header": {
+    "expect": "warn",
+    "injected": {},
+    "actions": [],
+    "injected_without_action": []
+   },
+   "reordered_extra": {
+    "expect": "accept",
+    "injected": {
+     "extra": "an unexpected extra column"
+    },
+    "actions": [
+     {
+      "id": "C001",
+      "kind": "DROP_DUPLICATE_ROWS",
+      "column": null,
+      "text": "keep one of each of the 18 exactly duplicated row(s) (18 row(s)). 18 row(s) will be discarded and are not declared missing anywhere: '{\"source_system\":\"CORE\",\"fiscal_period\":\"FY2024-Q4\",\"actual\":117.36,\"budget\":115.99,\"profit\":12.41,\"expense\":7.92,\"revenue\":20.33,\"fraud_flag\":false,\"risk_score\":0.33",
+      "verdict": "dangerous",
+      "why": "removes 18 exact duplicate(s); the generator inserted 0",
+      "rows_affected": 18
+     }
+    ],
+    "injected_without_action": []
+   }
+  }
+ },
+ {
+  "unit": "I_logistics_10000000",
+  "domain": "logistics",
+  "rows": 10000000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 30,191 exactly duplicated row(s) (30,191 row(s)). 30,191 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"LOG000274023\",\"shipment_id\":\"SH000274023\",\"order_id\":\"O018017093\",\"customer_id\":\"C1168843\",\"hub_id\":\"HUB02\",\"rider_id\":\"R402588\",\"origin_cit",
+    "verdict": "valid",
+    "why": "removes 30191 exact duplicate(s); the generator inserted 30191",
+    "rows_affected": 30191
+   }
+  ]
+ },
+ {
+  "unit": "I_logistics_2000000",
+  "domain": "logistics",
+  "rows": 2000000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 6,040 exactly duplicated row(s) (6,040 row(s)). 6,040 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"LOG000010149\",\"shipment_id\":\"SH000010149\",\"order_id\":\"O002896972\",\"customer_id\":\"C0216213\",\"hub_id\":\"HUB10\",\"rider_id\":\"R097471\",\"origin_city\":",
+    "verdict": "valid",
+    "why": "removes 6040 exact duplicate(s); the generator inserted 6040",
+    "rows_affected": 6040
+   }
+  ]
+ },
+ {
+  "unit": "I_logistics_5000000",
+  "domain": "logistics",
+  "rows": 5000000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 15,096 exactly duplicated row(s) (15,096 row(s)). 15,096 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"LOG000125004\",\"shipment_id\":\"SH000125004\",\"order_id\":\"O009657023\",\"customer_id\":\"C0849270\",\"hub_id\":\"HUB03\",\"rider_id\":\"R229094\",\"origin_cit",
+    "verdict": "valid",
+    "why": "removes 15096 exact duplicate(s); the generator inserted 15096",
+    "rows_affected": 15096
+   }
+  ]
+ },
+ {
+  "unit": "I_sales_2000000",
+  "domain": "sales",
+  "rows": 2000000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 5,924 exactly duplicated row(s) (5,924 row(s)). 5,924 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"SAL000026647\",\"order_id\":\"SO00026647\",\"customer_id\":\"C0356163\",\"salesperson_id\":\"SP14129\",\"product_id\":\"P010275\",\"product_category\":\"apparel\",\"",
+    "verdict": "valid",
+    "why": "removes 5924 exact duplicate(s); the generator inserted 5924",
+    "rows_affected": 5924
+   }
+  ]
+ },
+ {
+  "unit": "I_sales_5000000",
+  "domain": "sales",
+  "rows": 5000000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 15,094 exactly duplicated row(s) (15,094 row(s)). 15,094 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"SAL000376536\",\"order_id\":\"SO00376536\",\"customer_id\":\"C0937206\",\"salesperson_id\":\"SP36368\",\"product_id\":\"P085826\",\"product_category\":\"electro",
+    "verdict": "valid",
+    "why": "removes 15094 exact duplicate(s); the generator inserted 15094",
+    "rows_affected": 15094
+   }
+  ]
+ }
+]

@@ -1,0 +1,6279 @@
+{
+ "registered_analyses": [
+  "cross_tab",
+  "distribution",
+  "frequency",
+  "top_n",
+  "summary_stats",
+  "group_compare",
+  "pareto",
+  "concentration",
+  "ranking_shift",
+  "calendar_coverage",
+  "trend",
+  "seasonality",
+  "period_compare",
+  "growth_decomposition",
+  "correlation",
+  "bivariate",
+  "driver_analysis",
+  "mix_shift",
+  "outlier_detection",
+  "changepoint",
+  "correlated_shift",
+  "hypothesis_test",
+  "confidence_interval",
+  "effect_size",
+  "sample_adequacy",
+  "repeat_behaviour",
+  "cohort_retention"
+ ],
+ "domains": {
+  "financial": [
+   {
+    "analysis": "cross_tab",
+    "variant": "count",
+    "class": "VALID",
+    "params": {
+     "rows": "payment_method",
+     "columns": "transaction_type"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "cross_tab",
+    "variant": "sum",
+    "class": "VALID",
+    "params": {
+     "rows": "payment_method",
+     "columns": "transaction_type",
+     "measure": "revenue"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "distribution",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "revenue"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "frequency",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "column": "payment_method"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "frequency",
+    "variant": "hi",
+    "class": "REQUIRED",
+    "params": {
+     "column": "customer_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "top_n",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "payment_method",
+     "measure": "revenue"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "top_n",
+    "variant": "mean",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "transaction_type",
+     "measure": "risk_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "summary_stats",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {},
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "group_compare",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "payment_method",
+     "measure": "revenue"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "group_compare",
+    "variant": "mean",
+    "class": "VALID",
+    "params": {
+     "dimension": "transaction_type",
+     "measure": "risk_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "pareto",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "branch",
+     "measure": "revenue"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "concentration",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "branch",
+     "measure": "revenue"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "ranking_shift",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "payment_method",
+     "measure": "revenue",
+     "before_start": "2023-01-01",
+     "before_end": "2024-01-01",
+     "after_start": "2024-01-02",
+     "after_end": "2024-12-31"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "calendar_coverage",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "trend",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "revenue",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "trend",
+    "variant": "mean",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "risk_score",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "seasonality",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "revenue",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "period_compare",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "revenue",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "growth_decomposition",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "revenue",
+     "dimension": "payment_method",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlation",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "revenue",
+     "against": "expense"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlation",
+    "variant": "indep",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "revenue",
+     "against": "budget"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "bivariate",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "revenue",
+     "against": "expense"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "driver_analysis",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "revenue"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "mix_shift",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "revenue",
+     "dimension": "payment_method",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "outlier_detection",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "revenue"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "outlier_detection",
+    "variant": "mean",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "risk_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "changepoint",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "revenue",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlated_shift",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "revenue",
+     "against": "expense",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "t",
+    "class": "VALID",
+    "params": {
+     "dimension": "fraud_flag",
+     "measure": "risk_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "anova",
+    "class": "VALID",
+    "params": {
+     "dimension": "payment_method",
+     "measure": "risk_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "chi2",
+    "class": "VALID",
+    "params": {
+     "dimension": "fraud_flag",
+     "second_dimension": "payment_method"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "rank",
+    "class": "VALID",
+    "params": {
+     "dimension": "fraud_flag",
+     "measure": "risk_score",
+     "method": "rank"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "confidence_interval",
+    "variant": "all",
+    "class": "VALID",
+    "params": {
+     "measure": "risk_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "confidence_interval",
+    "variant": "by",
+    "class": "VALID",
+    "params": {
+     "dimension": "fraud_flag",
+     "measure": "risk_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "effect_size",
+    "variant": "g",
+    "class": "VALID",
+    "params": {
+     "dimension": "fraud_flag",
+     "measure": "risk_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "effect_size",
+    "variant": "anova",
+    "class": "VALID",
+    "params": {
+     "dimension": "payment_method",
+     "measure": "risk_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "effect_size",
+    "variant": "v",
+    "class": "VALID",
+    "params": {
+     "dimension": "fraud_flag",
+     "second_dimension": "payment_method"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "sample_adequacy",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "fraud_flag",
+     "measure": "risk_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "repeat_behaviour",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "entity": "customer_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "cohort_retention",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "entity": "customer_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlation",
+    "variant": "na0",
+    "class": "NOT_APPLICABLE",
+    "params": {
+     "measure": "revenue",
+     "against": "category"
+    },
+    "reason": "category is text, not a measure",
+    "expect": "reject",
+    "outcome_by_rows": {}
+   },
+   {
+    "analysis": "trend",
+    "variant": "na1",
+    "class": "NOT_APPLICABLE",
+    "params": {
+     "measure": "balance",
+     "grain": "month"
+    },
+    "reason": "balance is non-additive (agg none)",
+    "expect": "reject",
+    "outcome_by_rows": {}
+   },
+   {
+    "analysis": "pareto",
+    "variant": "na2",
+    "class": "NOT_APPLICABLE",
+    "params": {
+     "dimension": "branch",
+     "measure": "risk_score"
+    },
+    "reason": "a mean has no share",
+    "expect": "reject",
+    "outcome_by_rows": {}
+   }
+  ],
+  "hr": [
+   {
+    "analysis": "cross_tab",
+    "variant": "count",
+    "class": "VALID",
+    "params": {
+     "rows": "department",
+     "columns": "location"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "cross_tab",
+    "variant": "sum",
+    "class": "VALID",
+    "params": {
+     "rows": "department",
+     "columns": "location",
+     "measure": "salary"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "distribution",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "salary"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "frequency",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "column": "department"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "frequency",
+    "variant": "hi",
+    "class": "REQUIRED",
+    "params": {
+     "column": "manager_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "top_n",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "department",
+     "measure": "salary"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "top_n",
+    "variant": "mean",
+    "class": "VALID",
+    "params": {
+     "dimension": "location",
+     "measure": "performance_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "summary_stats",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {},
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "group_compare",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "department",
+     "measure": "salary"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "group_compare",
+    "variant": "mean",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "location",
+     "measure": "performance_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "pareto",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "team",
+     "measure": "salary"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "REFUSED",
+     "100000": "REFUSED",
+     "1000000": "REFUSED"
+    }
+   },
+   {
+    "analysis": "concentration",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "team",
+     "measure": "salary"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "REFUSED",
+     "100000": "REFUSED",
+     "1000000": "REFUSED"
+    }
+   },
+   {
+    "analysis": "ranking_shift",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "department",
+     "measure": "salary",
+     "before_start": "2015-01-01",
+     "before_end": "2020-01-01",
+     "after_start": "2020-01-02",
+     "after_end": "2024-12-31"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "calendar_coverage",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "trend",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "salary",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "trend",
+    "variant": "mean",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "performance_score",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "seasonality",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "salary",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "period_compare",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "salary",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "growth_decomposition",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "salary",
+     "dimension": "department",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlation",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "age",
+     "against": "years_experience"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlation",
+    "variant": "indep",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "salary",
+     "against": "training_hours"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "bivariate",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "age",
+     "against": "years_experience"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "driver_analysis",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "salary"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "mix_shift",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "salary",
+     "dimension": "department",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "outlier_detection",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "salary"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "outlier_detection",
+    "variant": "mean",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "performance_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "changepoint",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "salary",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlated_shift",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "age",
+     "against": "years_experience",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "t",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "attrition_flag",
+     "measure": "performance_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "anova",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "department",
+     "measure": "performance_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "chi2",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "attrition_flag",
+     "second_dimension": "department"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "rank",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "attrition_flag",
+     "measure": "performance_score",
+     "method": "rank"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "confidence_interval",
+    "variant": "all",
+    "class": "VALID",
+    "params": {
+     "measure": "performance_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "confidence_interval",
+    "variant": "by",
+    "class": "VALID",
+    "params": {
+     "dimension": "attrition_flag",
+     "measure": "performance_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "effect_size",
+    "variant": "g",
+    "class": "VALID",
+    "params": {
+     "dimension": "attrition_flag",
+     "measure": "performance_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "effect_size",
+    "variant": "anova",
+    "class": "VALID",
+    "params": {
+     "dimension": "department",
+     "measure": "performance_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "effect_size",
+    "variant": "v",
+    "class": "VALID",
+    "params": {
+     "dimension": "attrition_flag",
+     "second_dimension": "department"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "sample_adequacy",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "attrition_flag",
+     "measure": "performance_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "repeat_behaviour",
+    "variant": "",
+    "class": "EDGE_CASE",
+    "params": {
+     "entity": "employee_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "REFUSED",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "cohort_retention",
+    "variant": "",
+    "class": "EDGE_CASE",
+    "params": {
+     "entity": "employee_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "REFUSED",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "repeat_behaviour",
+    "variant": "na0",
+    "class": "NOT_APPLICABLE",
+    "params": {
+     "entity": "employee_id"
+    },
+    "reason": "one row per employee: everybody occurs once",
+    "expect": "trivial",
+    "outcome_by_rows": {}
+   },
+   {
+    "analysis": "correlation",
+    "variant": "na1",
+    "class": "NOT_APPLICABLE",
+    "params": {
+     "measure": "salary",
+     "against": "department"
+    },
+    "reason": "department is text",
+    "expect": "reject",
+    "outcome_by_rows": {}
+   },
+   {
+    "analysis": "growth_decomposition",
+    "variant": "na2",
+    "class": "NOT_APPLICABLE",
+    "params": {
+     "measure": "performance_score",
+     "dimension": "department",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "a mean does not split across members",
+    "expect": "reject",
+    "outcome_by_rows": {}
+   }
+  ],
+  "sales": [
+   {
+    "analysis": "cross_tab",
+    "variant": "count",
+    "class": "VALID",
+    "params": {
+     "rows": "region",
+     "columns": "channel"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "cross_tab",
+    "variant": "sum",
+    "class": "VALID",
+    "params": {
+     "rows": "region",
+     "columns": "channel",
+     "measure": "net_sales"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "distribution",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "net_sales"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "frequency",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "column": "region"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "frequency",
+    "variant": "hi",
+    "class": "VALID",
+    "params": {
+     "column": "customer_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "top_n",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "region",
+     "measure": "net_sales"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "top_n",
+    "variant": "mean",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "channel",
+     "measure": "discount"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "summary_stats",
+    "variant": "",
+    "class": "VALID",
+    "params": {},
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "group_compare",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "region",
+     "measure": "net_sales"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "group_compare",
+    "variant": "mean",
+    "class": "VALID",
+    "params": {
+     "dimension": "channel",
+     "measure": "discount"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "pareto",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "city",
+     "measure": "net_sales"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "REFUSED",
+     "100000": "REFUSED",
+     "1000000": "REFUSED"
+    }
+   },
+   {
+    "analysis": "concentration",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "city",
+     "measure": "net_sales"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "REFUSED",
+     "100000": "REFUSED",
+     "1000000": "REFUSED"
+    }
+   },
+   {
+    "analysis": "ranking_shift",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "region",
+     "measure": "net_sales",
+     "before_start": "2023-01-01",
+     "before_end": "2024-01-01",
+     "after_start": "2024-01-02",
+     "after_end": "2024-12-31"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "calendar_coverage",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "trend",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "net_sales",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "trend",
+    "variant": "mean",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "discount",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "seasonality",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "net_sales",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "period_compare",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "net_sales",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "growth_decomposition",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "net_sales",
+     "dimension": "region",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlation",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "gross_sales",
+     "against": "net_sales"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlation",
+    "variant": "indep",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "net_sales",
+     "against": "discount"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "bivariate",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "gross_sales",
+     "against": "net_sales"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "driver_analysis",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "net_sales"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "mix_shift",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "net_sales",
+     "dimension": "region",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "outlier_detection",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "net_sales"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "outlier_detection",
+    "variant": "mean",
+    "class": "VALID",
+    "params": {
+     "measure": "discount"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "changepoint",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "net_sales",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlated_shift",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "gross_sales",
+     "against": "net_sales",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "t",
+    "class": "VALID",
+    "params": {
+     "dimension": "returned_flag",
+     "measure": "discount"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "anova",
+    "class": "VALID",
+    "params": {
+     "dimension": "region",
+     "measure": "discount"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "chi2",
+    "class": "VALID",
+    "params": {
+     "dimension": "returned_flag",
+     "second_dimension": "region"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "rank",
+    "class": "VALID",
+    "params": {
+     "dimension": "returned_flag",
+     "measure": "discount",
+     "method": "rank"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "confidence_interval",
+    "variant": "all",
+    "class": "VALID",
+    "params": {
+     "measure": "discount"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "confidence_interval",
+    "variant": "by",
+    "class": "VALID",
+    "params": {
+     "dimension": "returned_flag",
+     "measure": "discount"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "effect_size",
+    "variant": "g",
+    "class": "VALID",
+    "params": {
+     "dimension": "returned_flag",
+     "measure": "discount"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "effect_size",
+    "variant": "anova",
+    "class": "VALID",
+    "params": {
+     "dimension": "region",
+     "measure": "discount"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "effect_size",
+    "variant": "v",
+    "class": "VALID",
+    "params": {
+     "dimension": "returned_flag",
+     "second_dimension": "region"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "sample_adequacy",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "returned_flag",
+     "measure": "discount"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "repeat_behaviour",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "entity": "customer_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "cohort_retention",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "entity": "customer_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlation",
+    "variant": "na0",
+    "class": "NOT_APPLICABLE",
+    "params": {
+     "measure": "net_sales",
+     "against": "region"
+    },
+    "reason": "region is text",
+    "expect": "reject",
+    "outcome_by_rows": {}
+   },
+   {
+    "analysis": "top_n",
+    "variant": "na1",
+    "class": "NOT_APPLICABLE",
+    "params": {
+     "dimension": "region",
+     "measure": "unit_price"
+    },
+    "reason": "unit_price is non-additive",
+    "expect": "reject",
+    "outcome_by_rows": {}
+   }
+  ],
+  "marketing": [
+   {
+    "analysis": "cross_tab",
+    "variant": "count",
+    "class": "VALID",
+    "params": {
+     "rows": "channel",
+     "columns": "device"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "cross_tab",
+    "variant": "sum",
+    "class": "VALID",
+    "params": {
+     "rows": "channel",
+     "columns": "device",
+     "measure": "revenue"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "distribution",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "revenue"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "frequency",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "column": "channel"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "frequency",
+    "variant": "hi",
+    "class": "VALID",
+    "params": {
+     "column": "campaign_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "top_n",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "channel",
+     "measure": "revenue"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "top_n",
+    "variant": "mean",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "device",
+     "measure": "ctr"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "summary_stats",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {},
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "group_compare",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "channel",
+     "measure": "revenue"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "group_compare",
+    "variant": "mean",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "device",
+     "measure": "ctr"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "pareto",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "geography",
+     "measure": "revenue"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "concentration",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "geography",
+     "measure": "revenue"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "ranking_shift",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "channel",
+     "measure": "revenue",
+     "before_start": "2023-01-01",
+     "before_end": "2024-01-01",
+     "after_start": "2024-01-02",
+     "after_end": "2024-12-31"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "calendar_coverage",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "trend",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "revenue",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "trend",
+    "variant": "mean",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "ctr",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "seasonality",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "revenue",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "period_compare",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "revenue",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "growth_decomposition",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "revenue",
+     "dimension": "channel",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlation",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "spend",
+     "against": "clicks"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlation",
+    "variant": "indep",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "revenue",
+     "against": "ctr"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "bivariate",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "spend",
+     "against": "clicks"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "driver_analysis",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "revenue"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "mix_shift",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "revenue",
+     "dimension": "channel",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "outlier_detection",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "revenue"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "outlier_detection",
+    "variant": "mean",
+    "class": "VALID",
+    "params": {
+     "measure": "ctr"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "changepoint",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "revenue",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlated_shift",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "spend",
+     "against": "clicks",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "t",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "retargeting_flag",
+     "measure": "ctr"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "anova",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "channel",
+     "measure": "ctr"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "chi2",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "retargeting_flag",
+     "second_dimension": "channel"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "rank",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "retargeting_flag",
+     "measure": "ctr",
+     "method": "rank"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "confidence_interval",
+    "variant": "all",
+    "class": "VALID",
+    "params": {
+     "measure": "ctr"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "confidence_interval",
+    "variant": "by",
+    "class": "VALID",
+    "params": {
+     "dimension": "retargeting_flag",
+     "measure": "ctr"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "effect_size",
+    "variant": "g",
+    "class": "VALID",
+    "params": {
+     "dimension": "retargeting_flag",
+     "measure": "ctr"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "effect_size",
+    "variant": "anova",
+    "class": "VALID",
+    "params": {
+     "dimension": "channel",
+     "measure": "ctr"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "effect_size",
+    "variant": "v",
+    "class": "VALID",
+    "params": {
+     "dimension": "retargeting_flag",
+     "second_dimension": "channel"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "sample_adequacy",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "retargeting_flag",
+     "measure": "ctr"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "repeat_behaviour",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "entity": "campaign_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "cohort_retention",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "entity": "campaign_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "trend",
+    "variant": "na0",
+    "class": "NOT_APPLICABLE",
+    "params": {
+     "measure": "roas",
+     "grain": "month"
+    },
+    "reason": "roas is a ratio declared non-additive",
+    "expect": "reject",
+    "outcome_by_rows": {}
+   },
+   {
+    "analysis": "correlation",
+    "variant": "na1",
+    "class": "NOT_APPLICABLE",
+    "params": {
+     "measure": "spend",
+     "against": "channel"
+    },
+    "reason": "channel is text",
+    "expect": "reject",
+    "outcome_by_rows": {}
+   }
+  ],
+  "crm": [
+   {
+    "analysis": "cross_tab",
+    "variant": "count",
+    "class": "VALID",
+    "params": {
+     "rows": "segment",
+     "columns": "region"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "cross_tab",
+    "variant": "sum",
+    "class": "VALID",
+    "params": {
+     "rows": "segment",
+     "columns": "region",
+     "measure": "total_spend"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "distribution",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "total_spend"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "frequency",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "column": "segment"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "frequency",
+    "variant": "hi",
+    "class": "REQUIRED",
+    "params": {
+     "column": "customer_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "top_n",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "segment",
+     "measure": "total_spend"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "top_n",
+    "variant": "mean",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "region",
+     "measure": "satisfaction_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "summary_stats",
+    "variant": "",
+    "class": "VALID",
+    "params": {},
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "group_compare",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "segment",
+     "measure": "total_spend"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "group_compare",
+    "variant": "mean",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "region",
+     "measure": "satisfaction_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "pareto",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "acquisition_channel",
+     "measure": "total_spend"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "concentration",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "acquisition_channel",
+     "measure": "total_spend"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "ranking_shift",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "segment",
+     "measure": "total_spend",
+     "before_start": "2022-01-01",
+     "before_end": "2023-07-02",
+     "after_start": "2023-07-03",
+     "after_end": "2024-12-31"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "calendar_coverage",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "trend",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "total_spend",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "trend",
+    "variant": "mean",
+    "class": "VALID",
+    "params": {
+     "measure": "satisfaction_score",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "seasonality",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "total_spend",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "period_compare",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "total_spend",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "growth_decomposition",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "total_spend",
+     "dimension": "segment",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlation",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "orders_count",
+     "against": "total_spend"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlation",
+    "variant": "indep",
+    "class": "VALID",
+    "params": {
+     "measure": "total_spend",
+     "against": "satisfaction_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "bivariate",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "orders_count",
+     "against": "total_spend"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "driver_analysis",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "total_spend"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "mix_shift",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "total_spend",
+     "dimension": "segment",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "outlier_detection",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "total_spend"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "outlier_detection",
+    "variant": "mean",
+    "class": "VALID",
+    "params": {
+     "measure": "satisfaction_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "changepoint",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "total_spend",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlated_shift",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "orders_count",
+     "against": "total_spend",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "t",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "churn_flag",
+     "measure": "satisfaction_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "anova",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "segment",
+     "measure": "satisfaction_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "chi2",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "churn_flag",
+     "second_dimension": "segment"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "rank",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "churn_flag",
+     "measure": "satisfaction_score",
+     "method": "rank"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "confidence_interval",
+    "variant": "all",
+    "class": "VALID",
+    "params": {
+     "measure": "satisfaction_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "confidence_interval",
+    "variant": "by",
+    "class": "VALID",
+    "params": {
+     "dimension": "churn_flag",
+     "measure": "satisfaction_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "effect_size",
+    "variant": "g",
+    "class": "VALID",
+    "params": {
+     "dimension": "churn_flag",
+     "measure": "satisfaction_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "effect_size",
+    "variant": "anova",
+    "class": "VALID",
+    "params": {
+     "dimension": "segment",
+     "measure": "satisfaction_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "effect_size",
+    "variant": "v",
+    "class": "VALID",
+    "params": {
+     "dimension": "churn_flag",
+     "second_dimension": "segment"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "sample_adequacy",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "churn_flag",
+     "measure": "satisfaction_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "repeat_behaviour",
+    "variant": "",
+    "class": "EDGE_CASE",
+    "params": {
+     "entity": "customer_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "cohort_retention",
+    "variant": "",
+    "class": "EDGE_CASE",
+    "params": {
+     "entity": "customer_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "pareto",
+    "variant": "na0",
+    "class": "NOT_APPLICABLE",
+    "params": {
+     "dimension": "customer_id",
+     "measure": "total_spend"
+    },
+    "reason": "a customer per row exceeds the group cap",
+    "expect": "reject",
+    "outcome_by_rows": {}
+   },
+   {
+    "analysis": "trend",
+    "variant": "na1",
+    "class": "NOT_APPLICABLE",
+    "params": {
+     "measure": "average_order_value",
+     "grain": "month"
+    },
+    "reason": "average_order_value is non-additive",
+    "expect": "reject",
+    "outcome_by_rows": {}
+   }
+  ],
+  "ecommerce": [
+   {
+    "analysis": "cross_tab",
+    "variant": "count",
+    "class": "VALID",
+    "params": {
+     "rows": "category",
+     "columns": "payment_type"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "cross_tab",
+    "variant": "sum",
+    "class": "VALID",
+    "params": {
+     "rows": "category",
+     "columns": "payment_type",
+     "measure": "payment_value"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "distribution",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "payment_value"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "frequency",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "column": "category"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "frequency",
+    "variant": "hi",
+    "class": "REQUIRED",
+    "params": {
+     "column": "customer_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "top_n",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "category",
+     "measure": "payment_value"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "top_n",
+    "variant": "mean",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "payment_type",
+     "measure": "review_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "summary_stats",
+    "variant": "",
+    "class": "VALID",
+    "params": {},
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "group_compare",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "category",
+     "measure": "payment_value"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "group_compare",
+    "variant": "mean",
+    "class": "VALID",
+    "params": {
+     "dimension": "payment_type",
+     "measure": "review_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "pareto",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "traffic_source",
+     "measure": "payment_value"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "concentration",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "traffic_source",
+     "measure": "payment_value"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "ranking_shift",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "category",
+     "measure": "payment_value",
+     "before_start": "2023-01-01",
+     "before_end": "2024-01-01",
+     "after_start": "2024-01-02",
+     "after_end": "2024-12-31"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "calendar_coverage",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "trend",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "payment_value",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "trend",
+    "variant": "mean",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "review_score",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "seasonality",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "payment_value",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "period_compare",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "payment_value",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "growth_decomposition",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "payment_value",
+     "dimension": "category",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlation",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "quantity",
+     "against": "payment_value"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlation",
+    "variant": "indep",
+    "class": "VALID",
+    "params": {
+     "measure": "payment_value",
+     "against": "review_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "bivariate",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "quantity",
+     "against": "payment_value"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "driver_analysis",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "payment_value"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "mix_shift",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "payment_value",
+     "dimension": "category",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "outlier_detection",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "payment_value"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "outlier_detection",
+    "variant": "mean",
+    "class": "VALID",
+    "params": {
+     "measure": "review_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "changepoint",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "payment_value",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlated_shift",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "quantity",
+     "against": "payment_value",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "t",
+    "class": "VALID",
+    "params": {
+     "dimension": "returned_flag",
+     "measure": "review_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "anova",
+    "class": "VALID",
+    "params": {
+     "dimension": "category",
+     "measure": "review_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "chi2",
+    "class": "VALID",
+    "params": {
+     "dimension": "returned_flag",
+     "second_dimension": "category"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "rank",
+    "class": "VALID",
+    "params": {
+     "dimension": "returned_flag",
+     "measure": "review_score",
+     "method": "rank"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "confidence_interval",
+    "variant": "all",
+    "class": "VALID",
+    "params": {
+     "measure": "review_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "confidence_interval",
+    "variant": "by",
+    "class": "VALID",
+    "params": {
+     "dimension": "returned_flag",
+     "measure": "review_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "effect_size",
+    "variant": "g",
+    "class": "VALID",
+    "params": {
+     "dimension": "returned_flag",
+     "measure": "review_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "effect_size",
+    "variant": "anova",
+    "class": "VALID",
+    "params": {
+     "dimension": "category",
+     "measure": "review_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "effect_size",
+    "variant": "v",
+    "class": "VALID",
+    "params": {
+     "dimension": "returned_flag",
+     "second_dimension": "category"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "sample_adequacy",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "returned_flag",
+     "measure": "review_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "repeat_behaviour",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "entity": "customer_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "cohort_retention",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "entity": "customer_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlation",
+    "variant": "na0",
+    "class": "NOT_APPLICABLE",
+    "params": {
+     "measure": "payment_value",
+     "against": "device"
+    },
+    "reason": "device is text",
+    "expect": "reject",
+    "outcome_by_rows": {}
+   }
+  ],
+  "logistics": [
+   {
+    "analysis": "cross_tab",
+    "variant": "count",
+    "class": "VALID",
+    "params": {
+     "rows": "zone",
+     "columns": "status"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "cross_tab",
+    "variant": "sum",
+    "class": "VALID",
+    "params": {
+     "rows": "zone",
+     "columns": "status",
+     "measure": "cod_amount"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "distribution",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "cod_amount"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "frequency",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "column": "zone"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "frequency",
+    "variant": "hi",
+    "class": "REQUIRED",
+    "params": {
+     "column": "rider_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "top_n",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "zone",
+     "measure": "cod_amount"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "top_n",
+    "variant": "mean",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "status",
+     "measure": "delivery_time_hours"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "summary_stats",
+    "variant": "",
+    "class": "VALID",
+    "params": {},
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "group_compare",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "zone",
+     "measure": "cod_amount"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "group_compare",
+    "variant": "mean",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "status",
+     "measure": "delivery_time_hours"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "pareto",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "hub_id",
+     "measure": "cod_amount"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "concentration",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "hub_id",
+     "measure": "cod_amount"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "ranking_shift",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "zone",
+     "measure": "cod_amount",
+     "before_start": "2023-01-01",
+     "before_end": "2024-01-01",
+     "after_start": "2024-01-02",
+     "after_end": "2024-12-31"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "calendar_coverage",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "trend",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "cod_amount",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "trend",
+    "variant": "mean",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "delivery_time_hours",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "seasonality",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "cod_amount",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "period_compare",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "cod_amount",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "growth_decomposition",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "cod_amount",
+     "dimension": "zone",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlation",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "distance_km",
+     "against": "delivery_time_hours"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlation",
+    "variant": "indep",
+    "class": "VALID",
+    "params": {
+     "measure": "cod_amount",
+     "against": "weight_kg"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "bivariate",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "distance_km",
+     "against": "delivery_time_hours"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "driver_analysis",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "cod_amount"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "mix_shift",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "cod_amount",
+     "dimension": "zone",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "outlier_detection",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "cod_amount"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "outlier_detection",
+    "variant": "mean",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "delivery_time_hours"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "changepoint",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "cod_amount",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlated_shift",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "distance_km",
+     "against": "delivery_time_hours",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "t",
+    "class": "VALID",
+    "params": {
+     "dimension": "sla_breach",
+     "measure": "delivery_time_hours"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "anova",
+    "class": "VALID",
+    "params": {
+     "dimension": "zone",
+     "measure": "delivery_time_hours"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "chi2",
+    "class": "VALID",
+    "params": {
+     "dimension": "sla_breach",
+     "second_dimension": "zone"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "rank",
+    "class": "VALID",
+    "params": {
+     "dimension": "sla_breach",
+     "measure": "delivery_time_hours",
+     "method": "rank"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "confidence_interval",
+    "variant": "all",
+    "class": "VALID",
+    "params": {
+     "measure": "delivery_time_hours"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "confidence_interval",
+    "variant": "by",
+    "class": "VALID",
+    "params": {
+     "dimension": "sla_breach",
+     "measure": "delivery_time_hours"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "effect_size",
+    "variant": "g",
+    "class": "VALID",
+    "params": {
+     "dimension": "sla_breach",
+     "measure": "delivery_time_hours"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "effect_size",
+    "variant": "anova",
+    "class": "VALID",
+    "params": {
+     "dimension": "zone",
+     "measure": "delivery_time_hours"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "effect_size",
+    "variant": "v",
+    "class": "VALID",
+    "params": {
+     "dimension": "sla_breach",
+     "second_dimension": "zone"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "sample_adequacy",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "sla_breach",
+     "measure": "delivery_time_hours"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "repeat_behaviour",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "entity": "customer_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "cohort_retention",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "entity": "customer_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlation",
+    "variant": "na0",
+    "class": "NOT_APPLICABLE",
+    "params": {
+     "measure": "distance_km",
+     "against": "zone"
+    },
+    "reason": "zone is text",
+    "expect": "reject",
+    "outcome_by_rows": {}
+   }
+  ],
+  "healthcare": [
+   {
+    "analysis": "cross_tab",
+    "variant": "count",
+    "class": "VALID",
+    "params": {
+     "rows": "hospital_id",
+     "columns": "outcome"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "cross_tab",
+    "variant": "sum",
+    "class": "VALID",
+    "params": {
+     "rows": "hospital_id",
+     "columns": "outcome",
+     "measure": "treatment_cost"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "distribution",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "treatment_cost"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "frequency",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "column": "hospital_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "frequency",
+    "variant": "hi",
+    "class": "VALID",
+    "params": {
+     "column": "doctor_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "top_n",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "hospital_id",
+     "measure": "treatment_cost"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "top_n",
+    "variant": "mean",
+    "class": "VALID",
+    "params": {
+     "dimension": "outcome",
+     "measure": "length_of_stay"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "summary_stats",
+    "variant": "",
+    "class": "VALID",
+    "params": {},
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "group_compare",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "hospital_id",
+     "measure": "treatment_cost"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "group_compare",
+    "variant": "mean",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "outcome",
+     "measure": "length_of_stay"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "pareto",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "diagnosis_group",
+     "measure": "treatment_cost"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "concentration",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "diagnosis_group",
+     "measure": "treatment_cost"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "ranking_shift",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "hospital_id",
+     "measure": "treatment_cost",
+     "before_start": "2023-01-01",
+     "before_end": "2024-01-01",
+     "after_start": "2024-01-02",
+     "after_end": "2024-12-31"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "calendar_coverage",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "trend",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "treatment_cost",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "trend",
+    "variant": "mean",
+    "class": "VALID",
+    "params": {
+     "measure": "length_of_stay",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "seasonality",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "treatment_cost",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "period_compare",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "treatment_cost",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "growth_decomposition",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "treatment_cost",
+     "dimension": "hospital_id",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlation",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "length_of_stay",
+     "against": "treatment_cost"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlation",
+    "variant": "indep",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "treatment_cost",
+     "against": "lab_value"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "bivariate",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "length_of_stay",
+     "against": "treatment_cost"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "driver_analysis",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "treatment_cost"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "mix_shift",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "treatment_cost",
+     "dimension": "hospital_id",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "outlier_detection",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "treatment_cost"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "outlier_detection",
+    "variant": "mean",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "length_of_stay"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "changepoint",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "treatment_cost",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlated_shift",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "length_of_stay",
+     "against": "treatment_cost",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "t",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "treatment_group",
+     "measure": "length_of_stay"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "anova",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "hospital_id",
+     "measure": "length_of_stay"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "chi2",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "treatment_group",
+     "second_dimension": "hospital_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "rank",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "treatment_group",
+     "measure": "length_of_stay",
+     "method": "rank"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "confidence_interval",
+    "variant": "all",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "length_of_stay"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "confidence_interval",
+    "variant": "by",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "treatment_group",
+     "measure": "length_of_stay"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "effect_size",
+    "variant": "g",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "treatment_group",
+     "measure": "length_of_stay"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "effect_size",
+    "variant": "anova",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "hospital_id",
+     "measure": "length_of_stay"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "effect_size",
+    "variant": "v",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "treatment_group",
+     "second_dimension": "hospital_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "sample_adequacy",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "treatment_group",
+     "measure": "length_of_stay"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "repeat_behaviour",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "entity": "patient_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "cohort_retention",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "entity": "patient_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlation",
+    "variant": "na0",
+    "class": "NOT_APPLICABLE",
+    "params": {
+     "measure": "lab_value",
+     "against": "sex"
+    },
+    "reason": "sex is text",
+    "expect": "reject",
+    "outcome_by_rows": {}
+   }
+  ],
+  "manufacturing": [
+   {
+    "analysis": "cross_tab",
+    "variant": "count",
+    "class": "VALID",
+    "params": {
+     "rows": "plant_id",
+     "columns": "shift"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "cross_tab",
+    "variant": "sum",
+    "class": "VALID",
+    "params": {
+     "rows": "plant_id",
+     "columns": "shift",
+     "measure": "defective_units"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "distribution",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "defective_units"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "frequency",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "column": "plant_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "frequency",
+    "variant": "hi",
+    "class": "VALID",
+    "params": {
+     "column": "machine_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "top_n",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "plant_id",
+     "measure": "defective_units"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "top_n",
+    "variant": "mean",
+    "class": "VALID",
+    "params": {
+     "dimension": "shift",
+     "measure": "vibration"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "summary_stats",
+    "variant": "",
+    "class": "VALID",
+    "params": {},
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "group_compare",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "plant_id",
+     "measure": "defective_units"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "group_compare",
+    "variant": "mean",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "shift",
+     "measure": "vibration"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "pareto",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "product_id",
+     "measure": "defective_units"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "concentration",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "product_id",
+     "measure": "defective_units"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "ranking_shift",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "plant_id",
+     "measure": "defective_units",
+     "before_start": "2023-01-01",
+     "before_end": "2024-01-01",
+     "after_start": "2024-01-02",
+     "after_end": "2024-12-31"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "calendar_coverage",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "trend",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "defective_units",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "trend",
+    "variant": "mean",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "vibration",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "seasonality",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "defective_units",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "period_compare",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "defective_units",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "growth_decomposition",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "defective_units",
+     "dimension": "plant_id",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlation",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "runtime_minutes",
+     "against": "energy_usage"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlation",
+    "variant": "indep",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "defective_units",
+     "against": "temperature"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "bivariate",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "runtime_minutes",
+     "against": "energy_usage"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "driver_analysis",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "defective_units"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "mix_shift",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "defective_units",
+     "dimension": "plant_id",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "outlier_detection",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "defective_units"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "outlier_detection",
+    "variant": "mean",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "vibration"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "changepoint",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "defective_units",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlated_shift",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "runtime_minutes",
+     "against": "energy_usage",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "t",
+    "class": "VALID",
+    "params": {
+     "dimension": "maintenance_flag",
+     "measure": "vibration"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "anova",
+    "class": "VALID",
+    "params": {
+     "dimension": "plant_id",
+     "measure": "vibration"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "chi2",
+    "class": "VALID",
+    "params": {
+     "dimension": "maintenance_flag",
+     "second_dimension": "plant_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "rank",
+    "class": "VALID",
+    "params": {
+     "dimension": "maintenance_flag",
+     "measure": "vibration",
+     "method": "rank"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "confidence_interval",
+    "variant": "all",
+    "class": "VALID",
+    "params": {
+     "measure": "vibration"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "confidence_interval",
+    "variant": "by",
+    "class": "VALID",
+    "params": {
+     "dimension": "maintenance_flag",
+     "measure": "vibration"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "effect_size",
+    "variant": "g",
+    "class": "VALID",
+    "params": {
+     "dimension": "maintenance_flag",
+     "measure": "vibration"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "effect_size",
+    "variant": "anova",
+    "class": "VALID",
+    "params": {
+     "dimension": "plant_id",
+     "measure": "vibration"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "effect_size",
+    "variant": "v",
+    "class": "VALID",
+    "params": {
+     "dimension": "maintenance_flag",
+     "second_dimension": "plant_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "sample_adequacy",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "maintenance_flag",
+     "measure": "vibration"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "repeat_behaviour",
+    "variant": "",
+    "class": "EDGE_CASE",
+    "params": {
+     "entity": "machine_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "cohort_retention",
+    "variant": "",
+    "class": "EDGE_CASE",
+    "params": {
+     "entity": "machine_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "trend",
+    "variant": "na0",
+    "class": "NOT_APPLICABLE",
+    "params": {
+     "measure": "defect_rate",
+     "grain": "month"
+    },
+    "reason": "a rate is non-additive",
+    "expect": "reject",
+    "outcome_by_rows": {}
+   }
+  ],
+  "education": [
+   {
+    "analysis": "cross_tab",
+    "variant": "count",
+    "class": "VALID",
+    "params": {
+     "rows": "department",
+     "columns": "campus"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "cross_tab",
+    "variant": "sum",
+    "class": "VALID",
+    "params": {
+     "rows": "department",
+     "columns": "campus",
+     "measure": "study_hours"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "distribution",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "study_hours"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "frequency",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "column": "department"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "frequency",
+    "variant": "hi",
+    "class": "VALID",
+    "params": {
+     "column": "course_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "top_n",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "department",
+     "measure": "study_hours"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "top_n",
+    "variant": "mean",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "campus",
+     "measure": "total_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "summary_stats",
+    "variant": "",
+    "class": "VALID",
+    "params": {},
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "group_compare",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "department",
+     "measure": "study_hours"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "group_compare",
+    "variant": "mean",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "campus",
+     "measure": "total_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "pareto",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "semester",
+     "measure": "study_hours"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "concentration",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "semester",
+     "measure": "study_hours"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "ranking_shift",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "department",
+     "measure": "study_hours",
+     "before_start": "2021-01-01",
+     "before_end": "2023-01-01",
+     "after_start": "2023-01-02",
+     "after_end": "2024-12-31"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "calendar_coverage",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "trend",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "study_hours",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "trend",
+    "variant": "mean",
+    "class": "VALID",
+    "params": {
+     "measure": "total_score",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "seasonality",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "study_hours",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "period_compare",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "study_hours",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "growth_decomposition",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "study_hours",
+     "dimension": "department",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlation",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "midterm_score",
+     "against": "final_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlation",
+    "variant": "indep",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "study_hours",
+     "against": "previous_gpa"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "bivariate",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "midterm_score",
+     "against": "final_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "driver_analysis",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "study_hours"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "mix_shift",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "study_hours",
+     "dimension": "department",
+     "period": "2024-12",
+     "baseline": "2024-11",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "outlier_detection",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "study_hours"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "outlier_detection",
+    "variant": "mean",
+    "class": "VALID",
+    "params": {
+     "measure": "total_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "changepoint",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "study_hours",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlated_shift",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "measure": "midterm_score",
+     "against": "final_score",
+     "grain": "month"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "t",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "scholarship_flag",
+     "measure": "total_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "anova",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "department",
+     "measure": "total_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "chi2",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "scholarship_flag",
+     "second_dimension": "department"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "hypothesis_test",
+    "variant": "rank",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "scholarship_flag",
+     "measure": "total_score",
+     "method": "rank"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "confidence_interval",
+    "variant": "all",
+    "class": "REQUIRED",
+    "params": {
+     "measure": "total_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "confidence_interval",
+    "variant": "by",
+    "class": "REQUIRED",
+    "params": {
+     "dimension": "scholarship_flag",
+     "measure": "total_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "effect_size",
+    "variant": "g",
+    "class": "VALID",
+    "params": {
+     "dimension": "scholarship_flag",
+     "measure": "total_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "effect_size",
+    "variant": "anova",
+    "class": "VALID",
+    "params": {
+     "dimension": "department",
+     "measure": "total_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "effect_size",
+    "variant": "v",
+    "class": "VALID",
+    "params": {
+     "dimension": "scholarship_flag",
+     "second_dimension": "department"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "sample_adequacy",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "dimension": "scholarship_flag",
+     "measure": "total_score"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "repeat_behaviour",
+    "variant": "",
+    "class": "VALID",
+    "params": {
+     "entity": "student_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "cohort_retention",
+    "variant": "",
+    "class": "REQUIRED",
+    "params": {
+     "entity": "student_id"
+    },
+    "reason": "",
+    "outcome_by_rows": {
+     "1000": "OK",
+     "100000": "OK",
+     "1000000": "OK"
+    }
+   },
+   {
+    "analysis": "correlation",
+    "variant": "na0",
+    "class": "NOT_APPLICABLE",
+    "params": {
+     "measure": "total_score",
+     "against": "campus"
+    },
+    "reason": "campus is text",
+    "expect": "reject",
+    "outcome_by_rows": {}
+   }
+  ]
+ }
+}
