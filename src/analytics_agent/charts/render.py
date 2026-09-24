@@ -39,6 +39,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402  -- must follow the backend choice
 
 from .. import workspace  # noqa: E402
+from ..util.results import claim  # noqa: E402
 
 CHARTS_DIRNAME = "charts"
 
@@ -446,11 +447,7 @@ def render(
 
     stamp = (now or datetime.now()).strftime(_STAMP_FORMAT)
     directory = charts_dir(workspace_id)
-    path = directory / f"{label}_{stamp}.png"
-    counter = 2
-    while path.exists():
-        path = directory / f"{label}_{stamp}_{counter}.png"
-        counter += 1
+    path = claim(directory, f"{label}_{stamp}", ".png")   # atomic, as results (D16)
 
     fig, ax = plt.subplots(figsize=(8.0, 4.5))
     try:
@@ -458,6 +455,9 @@ def render(
         ax.set_title(title or f"{label}: {kind}")
         fig.tight_layout()
         fig.savefig(path)
+    except BaseException:
+        path.unlink(missing_ok=True)                  # the claimed name, never drawn on
+        raise
     finally:
         plt.close(fig)
 

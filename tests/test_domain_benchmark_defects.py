@@ -295,3 +295,46 @@ def test_d14_deduplication_keeps_file_order_so_sums_repeat(tmp_path, ws):
         con.close()
         assert first == [("r0",), ("r1",), ("r2",)]          # file order kept
     assert len(totals) == 1 and len(orders) == 1, (totals, len(orders))
+
+
+def test_d16_concurrent_results_never_share_a_file(tmp_path, ws):
+    """Ten threads of one workspace writing a result in the same second each picked a name that
+    did not exist yet and then opened it for writing: two could take one name, and one dataset's
+    file then held another's rows (Step 14, H_concurrency's oracle error)."""
+    from datetime import datetime
+
+    from analytics_agent.util import results
+    now = datetime(2026, 9, 24, 23, 10, 51)
+    barrier = threading.Barrier(24)
+    got = [None] * 24
+
+    def work(k):
+        barrier.wait()
+        got[k] = results.write_result(ws, label="top_n", headers=["who"], rows=[[f"t{k}"]] * 3,
+                                      now=now)
+
+    threads = [threading.Thread(target=work, args=(k,)) for k in range(24)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    paths = [r.path for r in got]
+    assert len(set(paths)) == 24, sorted(p.name for p in paths)
+    for k, r in enumerate(got):
+        assert r.path.read_text().splitlines()[1:] == [f"t{k}"] * 3, (k, r.path.name)
+
+
+def test_d15_a_plan_proposed_twice_quotes_the_same_examples(tmp_path, ws):
+    """Sample queries ended in LIMIT with no ORDER BY: on a table scanned in parallel, one plan
+    proposed twice quoted different example values (Step 14 regression, CLEANING)."""
+    rows = [f"r{i},2024-{1 + i % 12:02d}-05,{['Card', 'card', 'CARD', 'Wire', 'wire'][i % 5]},"
+            f"{i % 97}" for i in range(300_000)]
+    rows += rows[:4000]                                    # duplicates to sample
+    texts = []
+    for k in range(2):
+        _load(tmp_path, ws, f"p{k}", "id,d,pay,v", rows)
+        out = server.propose_cleaning_plan(dataset_name=f"p{k}", workspace_id=ws)
+        texts.append(out.replace(f"p{k}", "P"))
+    body = [t.split("NEXT STEP", 1)[0] for t in texts]
+    assert "DROP_DUPLICATE_ROWS" in body[0] and "NORMALISE_CASE" in body[0], body[0][:800]
+    assert body[0] == body[1]

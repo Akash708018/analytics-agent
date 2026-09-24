@@ -1,75 +1,130 @@
 {
- "generated": "2026-09-24T22:26:05",
+ "generated": "2026-09-24T23:13:46",
  "environment": {
   "python": "3.12.3",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
   "fixed_src_dirty": [],
   "duckdb": "1.5.5"
  },
  "summary": {
-  "regression_cases": 55,
-  "product_defects_tested": 7,
+  "regression_cases": 95,
+  "product_defects_tested": 11,
   "product_defects": [
    "D1",
+   "D10",
+   "D11",
    "D12",
    "D13",
    "D2",
    "D3",
+   "D4",
+   "D5",
    "D6-D9",
    "H chart (harness)"
   ],
-  "product_defect_cases": 26,
-  "original_failures_reproduced": 26,
-  "fixed_passes": 26,
-  "cases_failing": [],
-  "defects_still_failing": [],
-  "controls": 29,
+  "product_defect_cases": 43,
+  "original_failures_reproduced": 43,
+  "fixed_passes": 40,
+  "cases_failing": [
+   "D4.threads_2",
+   "D4.threads_5",
+   "D4.threads_10",
+   "CLEANING.plan_dirty_1000000",
+   "CLEANING.plan_clean_1000000"
+  ],
+  "defects_still_failing": [
+   "D4",
+   "P2"
+  ],
+  "controls": 33,
   "controls_changed": [],
   "harness_errors": {},
-  "concurrency_isolation": "NOT_RUN",
-  "reproducibility": "NOT_RUN"
+  "concurrency_isolation": "PASS",
+  "reproducibility": "PASS"
  },
  "cases": {
   "D1": {
    "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-   "after_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+   "after_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
    "after_src_dirty": [],
    "harness_errors": []
   },
   "D2": {
    "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-   "after_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+   "after_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
    "after_src_dirty": [],
    "harness_errors": []
   },
   "D3": {
    "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-   "after_commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+   "after_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+   "after_src_dirty": [],
+   "harness_errors": []
+  },
+  "D4": {
+   "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+   "after_commit": "a0f393b4507b156c1c9fad79600a0f2f74e93708",
+   "after_src_dirty": [],
+   "harness_errors": []
+  },
+  "D5": {
+   "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+   "after_commit": "ebe38dc48b220fdbf0dde50542a94ad27d395ba8",
    "after_src_dirty": [],
    "harness_errors": []
   },
   "D12": {
    "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-   "after_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+   "after_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
    "after_src_dirty": [],
    "harness_errors": []
   },
   "RECS": {
    "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-   "after_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+   "after_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+   "after_src_dirty": [],
+   "harness_errors": []
+  },
+  "PROFILE_PERF": {
+   "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+   "after_commit": "5785935d2ad5a87234e8db54732b01a858e18189",
+   "after_src_dirty": [],
+   "harness_errors": []
+  },
+  "CLEANING": {
+   "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+   "after_commit": "84ef09197ca396c2347bcab7ece4cff86aa8fb10",
+   "after_src_dirty": [],
+   "harness_errors": []
+  },
+  "PRESCREEN": {
+   "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+   "after_commit": "7ff28b46bc55076da741751b6a17c437fd19ef31",
+   "after_src_dirty": [],
+   "harness_errors": []
+  },
+  "COHORT": {
+   "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+   "after_commit": "63e304f8a59f49a5633a31af0ac45d5864195667",
+   "after_src_dirty": [],
+   "harness_errors": []
+  },
+  "WELCH": {
+   "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+   "after_commit": "916a5d2192e07e48864549b1af6aaea18124eae7",
    "after_src_dirty": [],
    "harness_errors": []
   },
   "PAGING": {
    "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-   "after_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+   "after_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
    "after_src_dirty": [],
    "harness_errors": []
   },
   "CHART_ISOLATION": {
    "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-   "after_commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+   "after_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
    "after_src_dirty": [],
    "harness_errors": []
   }
@@ -109,8 +164,132 @@
    },
    "H_isolation": {
     "OK": 110
-   }
+   },
+   "reproducibility": [
+    {
+     "domain": "financial",
+     "rows": 1000,
+     "status": "PASS",
+     "results_identical": 12,
+     "results_different": []
+    },
+    {
+     "domain": "financial",
+     "rows": 100000,
+     "status": "PASS",
+     "results_identical": 12,
+     "results_different": []
+    },
+    {
+     "domain": "crm",
+     "rows": 1000,
+     "status": "PASS",
+     "results_identical": 12,
+     "results_different": []
+    },
+    {
+     "domain": "crm",
+     "rows": 100000,
+     "status": "FAIL",
+     "results_identical": 9,
+     "results_different": [
+      "cross_tab_sum",
+      "group_compare_",
+      "summary_stats_"
+     ]
+    },
+    {
+     "domain": "logistics",
+     "rows": 1000,
+     "status": "PASS",
+     "results_identical": 12,
+     "results_different": []
+    },
+    {
+     "domain": "logistics",
+     "rows": 100000,
+     "status": "PASS",
+     "results_identical": 12,
+     "results_different": []
+    }
+   ]
   },
-  "after": {}
+  "after": {
+   "concurrency_correctness": {
+    "PASS": 43,
+    "ORACLE_ERROR": 1
+   },
+   "isolation": {
+    "correctness": {
+     "PASS": 20
+    },
+    "reports": {
+     "PASS": 10
+    },
+    "ledgers": {
+     "PASS": 10
+    },
+    "charts": {
+     "PASS": 10
+    }
+   },
+   "concurrency_calls": {
+    "OK": 164
+   },
+   "concurrency_exceptions": [],
+   "H_repeat": {
+    "OK": 196
+   },
+   "H_traced": {
+    "OK": 36
+   },
+   "H_isolation": {
+    "OK": 110
+   },
+   "reproducibility": [
+    {
+     "domain": "financial",
+     "rows": 1000,
+     "status": "PASS",
+     "results_identical": 12,
+     "results_different": []
+    },
+    {
+     "domain": "financial",
+     "rows": 100000,
+     "status": "PASS",
+     "results_identical": 12,
+     "results_different": []
+    },
+    {
+     "domain": "crm",
+     "rows": 1000,
+     "status": "PASS",
+     "results_identical": 12,
+     "results_different": []
+    },
+    {
+     "domain": "crm",
+     "rows": 100000,
+     "status": "PASS",
+     "results_identical": 12,
+     "results_different": []
+    },
+    {
+     "domain": "logistics",
+     "rows": 1000,
+     "status": "PASS",
+     "results_identical": 12,
+     "results_different": []
+    },
+    {
+     "domain": "logistics",
+     "rows": 100000,
+     "status": "PASS",
+     "results_identical": 12,
+     "results_different": []
+    }
+   ]
+  }
  }
 }

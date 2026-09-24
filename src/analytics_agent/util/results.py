@@ -74,6 +74,25 @@ _LABEL_RE = re.compile(r"^[A-Za-z][A-Za-z0-9_]{0,62}$")
 _STAMP_FORMAT = "%Y%m%d-%H%M%S"
 
 
+def claim(directory: Path, stem: str, suffix: str) -> Path:
+    """A new file's path, created empty so no other writer can take it.
+
+    `exists()` then `open("w")` let two threads of one workspace pick the same free name inside
+    one second, and the second write replaced the first: a reply named a file that held another
+    dataset's rows (Step 14, H_concurrency; D16). Exclusive creation is atomic, so the loser of
+    a race moves on to the next counter.
+    """
+    directory.mkdir(parents=True, exist_ok=True)
+    counter = 1
+    while True:
+        path = directory / (f"{stem}{suffix}" if counter == 1 else f"{stem}_{counter}{suffix}")
+        try:
+            with path.open("x"):
+                return path
+        except FileExistsError:
+            counter += 1
+
+
 def results_dir(workspace_id: str) -> Path:
     """
     The results directory for one workspace, created if it is not there.
@@ -188,12 +207,9 @@ def write_result(
 
     # Two runs inside one second must not share a name. The counter is checked
     # against the filesystem rather than held in memory, because a second
-    # process writing to the same workspace is exactly the F13 situation.
-    path = directory / f"{label}_{stamp}.csv"
-    counter = 2
-    while path.exists():
-        path = directory / f"{label}_{stamp}_{counter}.csv"
-        counter += 1
+    # process writing to the same workspace is exactly the F13 situation -- and
+    # the name is claimed by creating the file, because a check is not a claim.
+    path = claim(directory, f"{label}_{stamp}", ".csv")
 
     head = [str(h) for h in headers]
     written = 0

@@ -602,7 +602,7 @@ def _cast_examples(con, dataset_name: str, name: str, listed: str,
     rows = con.execute(
         f"SELECT DISTINCT {col} FROM {_q(dataset_name)} "
         f"WHERE {_considered(col, listed)} AND NOT ({_cast_ok(col, sql_type)}) "
-        f"LIMIT {CAST_EXAMPLE_LIMIT}"
+        f"ORDER BY 1 LIMIT {CAST_EXAMPLE_LIMIT}"      # the same examples every run (D15)
     ).fetchall()
     return [r[0] for r in rows]
 

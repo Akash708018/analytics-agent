@@ -30,6 +30,7 @@ from ..clean import ledger
 from ..contract import store
 from ..profile import runs as profile_runs
 from ..util import db
+from ..util.results import claim
 from ..validate import runs as validation_runs
 
 REPORTS_DIRNAME = "reports"
@@ -327,11 +328,7 @@ def assemble(
     stamp = (now or datetime.now()).strftime(_STAMP_FORMAT)
     safe = _SAFE.sub("_", dataset_name).strip("_") or "dataset"
     directory = reports_dir(workspace_id)
-    path = directory / f"{safe}_{stamp}.md"
-    counter = 2
-    while path.exists():
-        path = directory / f"{safe}_{stamp}_{counter}.md"
-        counter += 1
+    path = claim(directory, f"{safe}_{stamp}", ".md")    # atomic, as results (D16)
 
     stored = store.current(con, dataset_name)
     profile = profile_runs.latest(con, dataset_name)

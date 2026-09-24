@@ -46,6 +46,8 @@ LOSSY_KINDS = frozenset(
      ActionKind.NORMALISE_CASE, ActionKind.EXCLUDE_COLUMN, ActionKind.NULL_NON_FINITE}
 )
 
+# Samples are ordered: LIMIT alone returned whichever rows a parallel scan reached first, so
+# one plan proposed twice quoted different examples (Step 14 regression, D15).
 SAMPLE_LIMIT = 5
 
 
@@ -153,7 +155,7 @@ def convert_type(
         lost_sql=f"SELECT count(*) FROM {ident(source)} WHERE {undeclared}",
         sample_sql=(
             f"SELECT DISTINCT {col} FROM {ident(source)} WHERE {undeclared} "
-            f"LIMIT {SAMPLE_LIMIT}"
+            f"ORDER BY 1 LIMIT {SAMPLE_LIMIT}"
         ),
     )
 
@@ -232,7 +234,7 @@ def normalise_case(
         sample_sql=(
             f"SELECT DISTINCT {col} FROM {src} WHERE {expression} IN ("
             f"  SELECT {expression} FROM {src} GROUP BY {expression} "
-            f"  HAVING count(DISTINCT {col}) > 1) LIMIT {SAMPLE_LIMIT}"
+            f"  HAVING count(DISTINCT {col}) > 1) ORDER BY 1 LIMIT {SAMPLE_LIMIT}"
         ),
     )
 
@@ -272,7 +274,7 @@ def drop_duplicate_rows(*, source: str, target: str) -> Rendering:
         sample_sql=(
             f"SELECT to_json(d)::VARCHAR FROM (SELECT *, count(*) AS "
             f"duplicate_count FROM {src} GROUP BY ALL HAVING count(*) > 1) d "
-            f"LIMIT {SAMPLE_LIMIT}"
+            f"ORDER BY 1 LIMIT {SAMPLE_LIMIT}"
         ),
     )
 
@@ -293,7 +295,7 @@ def null_non_finite(*, source: str, target: str, column: str) -> Rendering:
         affected_sql=f"SELECT count(*) FROM {ident(source)} WHERE {hit}",
         lost_sql=f"SELECT count(*) FROM {ident(source)} WHERE {hit}",
         sample_sql=(f"SELECT DISTINCT CAST({col} AS VARCHAR) FROM {ident(source)} "
-                    f"WHERE {hit} LIMIT {SAMPLE_LIMIT}"),
+                    f"WHERE {hit} ORDER BY 1 LIMIT {SAMPLE_LIMIT}"),
     )
 
 
@@ -342,7 +344,7 @@ def exclude_column(*, source: str, target: str, column: str) -> Rendering:
         affected_sql=f"SELECT count(*) FROM {src}",
         lost_sql=f"SELECT count(*) FROM {src} WHERE {col} IS NOT NULL",
         sample_sql=f"SELECT DISTINCT {col} FROM {src} WHERE {col} IS NOT NULL "
-                   f"LIMIT {SAMPLE_LIMIT}",
+                   f"ORDER BY 1 LIMIT {SAMPLE_LIMIT}",
     )
 
 

@@ -1,17 +1,25 @@
 # Targeted regression: the Step 13 defects, before and after
 
-Original revision `2d3d52f3667b3c920859f657addca7313f21bf3f` (the code the cross-domain benchmark measured); fixed revision `fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52`. Python 3.12.3, DuckDB 1.5.5.
+Original revision `2d3d52f3667b3c920859f657addca7313f21bf3f` (the code the cross-domain benchmark measured); fixed revision `a7573c62b0f282ab9a35f48e12cf385887d80084`. Python 3.12.3, DuckDB 1.5.5.
 
 | measure | value |
 |---|---|
-| regression cases | 55 |
-| product defects tested | 7 (D1, D12, D13, D2, D3, D6-D9, H chart (harness)) |
-| defect cases whose original failure reproduced | 26 of 26 |
-| defect cases passing on the fixed code | 26 of 26 |
-| controls | 29, changed: 0 |
-| cases failing | 0 |
-| concurrency isolation (H, fixed code) | NOT_RUN |
-| reproducibility (J, fixed code) | NOT_RUN |
+| regression cases | 95 |
+| product defects tested | 11 (D1, D10, D11, D12, D13, D2, D3, D4, D5, D6-D9, H chart (harness)) |
+| defect cases whose original failure reproduced | 43 of 43 |
+| defect cases passing on the fixed code | 40 of 43 |
+| controls | 33, changed: 0 |
+| cases failing | 5 |
+| concurrency isolation (H, fixed code) | PASS |
+| reproducibility (J, fixed code) | PASS |
+
+Failing cases:
+
+- D4.threads_2
+- D4.threads_5
+- D4.threads_10
+- CLEANING.plan_dirty_1000000
+- CLEANING.plan_clean_1000000
 
 ## By case
 
@@ -27,26 +35,26 @@ Original revision `2d3d52f3667b3c920859f657addca7313f21bf3f` (the code the cross
 | D1.control_numeric_mean | CONTROL | OK | OK | yes | valid before and after, same answer |
 | D1.control_numeric_median | CONTROL | OK | OK | yes | valid before and after, same answer |
 | D2.both_zero_variance_hypothesis_test | PRODUCT_DEFECT | EXCEPTION ZeroDivisionError | OK | yes | a stated 'no test' with no manufactured p-value |
-| D2.both_zero_variance_hypothesis_test_rank | PRODUCT_DEFECT | OK | OK | yes | unchanged |
+| D2.both_zero_variance_hypothesis_test_rank | PRODUCT_DEFECT | OK | OK | yes | unchanged, and a real result |
 | D2.both_zero_variance_effect_size | PRODUCT_DEFECT | EXCEPTION ZeroDivisionError | OK | yes | a stated 'no test' with no manufactured p-value |
-| D2.a_zero_variance_only_hypothesis_test | CONTROL | OK | OK | yes | unchanged |
-| D2.a_zero_variance_only_hypothesis_test_rank | CONTROL | OK | OK | yes | unchanged |
-| D2.a_zero_variance_only_effect_size | CONTROL | OK | OK | yes | unchanged |
-| D2.b_zero_variance_only_hypothesis_test | CONTROL | OK | OK | yes | unchanged |
-| D2.b_zero_variance_only_hypothesis_test_rank | CONTROL | OK | OK | yes | unchanged |
-| D2.b_zero_variance_only_effect_size | CONTROL | OK | OK | yes | unchanged |
-| D2.identical_groups_hypothesis_test | CONTROL | OK | OK | yes | unchanged |
-| D2.identical_groups_hypothesis_test_rank | CONTROL | OK | OK | yes | unchanged |
-| D2.identical_groups_effect_size | CONTROL | OK | OK | yes | unchanged |
+| D2.a_zero_variance_only_hypothesis_test | CONTROL | OK | OK | yes | unchanged, and a real result |
+| D2.a_zero_variance_only_hypothesis_test_rank | CONTROL | OK | OK | yes | unchanged, and a real result |
+| D2.a_zero_variance_only_effect_size | CONTROL | OK | OK | yes | unchanged, and a real result |
+| D2.b_zero_variance_only_hypothesis_test | CONTROL | OK | OK | yes | unchanged, and a real result |
+| D2.b_zero_variance_only_hypothesis_test_rank | CONTROL | OK | OK | yes | unchanged, and a real result |
+| D2.b_zero_variance_only_effect_size | CONTROL | OK | OK | yes | unchanged, and a real result |
+| D2.identical_groups_hypothesis_test | CONTROL | OK | OK | yes | unchanged, and a real result |
+| D2.identical_groups_hypothesis_test_rank | CONTROL | OK | OK | yes | unchanged, and a real result |
+| D2.identical_groups_effect_size | CONTROL | OK | OK | yes | unchanged, and a real result |
 | D2.constant_same_value_hypothesis_test | PRODUCT_DEFECT | EXCEPTION ZeroDivisionError | OK | yes | a stated 'no test' with no manufactured p-value |
 | D2.constant_same_value_hypothesis_test_rank | PRODUCT_DEFECT | EXCEPTION ZeroDivisionError | OK | yes | a stated 'no test' with no manufactured p-value |
 | D2.constant_same_value_effect_size | PRODUCT_DEFECT | EXCEPTION ZeroDivisionError | OK | yes | a stated 'no test' with no manufactured p-value |
-| D2.tiny_two_each_hypothesis_test | CONTROL | OK | OK | yes | unchanged |
-| D2.tiny_two_each_hypothesis_test_rank | CONTROL | OK | OK | yes | unchanged |
-| D2.tiny_two_each_effect_size | CONTROL | OK | OK | yes | unchanged |
-| D2.normal_valid_hypothesis_test | CONTROL | OK | OK | yes | unchanged |
-| D2.normal_valid_hypothesis_test_rank | CONTROL | OK | OK | yes | unchanged |
-| D2.normal_valid_effect_size | CONTROL | OK | OK | yes | unchanged |
+| D2.tiny_two_each_hypothesis_test | CONTROL | OK | OK | yes | unchanged, and a real result |
+| D2.tiny_two_each_hypothesis_test_rank | CONTROL | OK | OK | yes | unchanged, and a real result |
+| D2.tiny_two_each_effect_size | CONTROL | OK | OK | yes | unchanged, and a real result |
+| D2.normal_valid_hypothesis_test | CONTROL | OK | OK | yes | unchanged, and a real result |
+| D2.normal_valid_hypothesis_test_rank | CONTROL | OK | OK | yes | unchanged, and a real result |
+| D2.normal_valid_effect_size | CONTROL | OK | OK | yes | unchanged, and a real result |
 | D3.all_null_col_v_sum | PRODUCT_DEFECT | OK | REFUSED | yes | rejected at the contract, never reaching an analysis |
 | D3.inf_nan_v_sum | PRODUCT_DEFECT | OK | REFUSED | yes | rejected at the contract, never reaching an analysis |
 | D3.words_v_sum | PRODUCT_DEFECT | OK | REFUSED | yes | rejected at the contract, never reaching an analysis |
@@ -57,6 +65,23 @@ Original revision `2d3d52f3667b3c920859f657addca7313f21bf3f` (the code the cross
 | D3.words_w_sum | CONTROL | OK | OK | yes | accepted and analysed, before and after |
 | D3.words_w_mean | CONTROL | OK | OK | yes | accepted and analysed, before and after |
 | D3.words_w_median | CONTROL | OK | OK | yes | accepted and analysed, before and after |
+| D4.site_analysis.runs | PRODUCT_DEFECT | EXCEPTION TransactionException | OK | yes | the losing creator retries and the table exists once |
+| D4.site_clean.ledger | PRODUCT_DEFECT | EXCEPTION TransactionException | OK | yes | the losing creator retries and the table exists once |
+| D4.site_clean.plan | PRODUCT_DEFECT | EXCEPTION TransactionException | OK | yes | the losing creator retries and the table exists once |
+| D4.site_contract.store | PRODUCT_DEFECT | EXCEPTION TransactionException | OK | yes | the losing creator retries and the table exists once |
+| D4.site_profile.runs | PRODUCT_DEFECT | EXCEPTION TransactionException | OK | yes | the losing creator retries and the table exists once |
+| D4.site_validate.runs | PRODUCT_DEFECT | EXCEPTION TransactionException | OK | yes | the losing creator retries and the table exists once |
+| D4.threads_2 | PRODUCT_DEFECT | OK | OK | NO | every thread answers, one answer, one run row each |
+| D4.threads_5 | PRODUCT_DEFECT | OK | OK | NO | every thread answers, one answer, one run row each |
+| D4.threads_10 | PRODUCT_DEFECT | EXCEPTION IndexError | OK | NO | every thread answers, one answer, one run row each |
+| D5.mann_whitney_100000 | CONTROL | OK | OK | yes | matches scipy before and after |
+| D5.kruskal_wallis_100000 | CONTROL | OK | OK | yes | matches scipy before and after |
+| D5.mann_whitney_1000000 | CONTROL | OK | OK | yes | matches scipy before and after |
+| D5.kruskal_wallis_1000000 | CONTROL | OK | OK | yes | matches scipy before and after |
+| D5.mann_whitney_2300000 | PRODUCT_DEFECT | EXCEPTION OutOfRangeException | OK | yes | matches scipy's statistic and p |
+| D5.kruskal_wallis_2300000 | PRODUCT_DEFECT | EXCEPTION OutOfRangeException | OK | yes | matches scipy's statistic and p |
+| D5.mann_whitney_6000000 | PRODUCT_DEFECT | EXCEPTION OutOfRangeException | OK | yes | matches scipy's statistic and p |
+| D5.kruskal_wallis_6000000 | PRODUCT_DEFECT | EXCEPTION OutOfRangeException | OK | yes | matches scipy's statistic and p |
 | D12.parser_16_threads | PRODUCT_DEFECT | EXCEPTION IndexError | OK | yes | 16 threads, 3,200 parses, none swapped or raised |
 | RECS.dup_rows_key | PRODUCT_DEFECT | REFUSED | REFUSED | yes | names the cleaning plan, runnable |
 | RECS.correlation_one_measure | PRODUCT_DEFECT | REFUSED | REFUSED | yes | asks for a contract, not v against v |
@@ -66,6 +91,29 @@ Original revision `2d3d52f3667b3c920859f657addca7313f21bf3f` (the code the cross
 | RECS.nonexistent_dataset | CONTROL | REFUSED | REFUSED | yes | unchanged refusal and next step |
 | RECS.invalid_chart | CONTROL | REFUSED | REFUSED | yes | unchanged refusal and next step |
 | RECS.group_cap | CONTROL | REFUSED | REFUSED | yes | unchanged refusal and next step |
+| PROFILE_PERF.100000_record_id | PERFORMANCE | OK | OK | yes | faster, same reply head |
+| PROFILE_PERF.100000_region | PERFORMANCE | OK | OK | yes | faster, same reply head |
+| PROFILE_PERF.100000_net_sales | PERFORMANCE | OK | OK | yes | faster, same reply head |
+| PROFILE_PERF.100000_order_date | PERFORMANCE | OK | OK | yes | faster, same reply head |
+| PROFILE_PERF.1000000_record_id | PERFORMANCE | OK | OK | yes | faster, same reply head |
+| PROFILE_PERF.1000000_region | PERFORMANCE | OK | OK | yes | faster, same reply head |
+| PROFILE_PERF.1000000_net_sales | PERFORMANCE | OK | OK | yes | faster, same reply head |
+| PROFILE_PERF.1000000_order_date | PERFORMANCE | OK | OK | yes | faster, same reply head |
+| PROFILE_PERF.5000000_record_id | PERFORMANCE | OK | OK | yes | faster, same reply head |
+| PROFILE_PERF.5000000_region | PERFORMANCE | OK | OK | yes | faster, same reply head |
+| PROFILE_PERF.5000000_net_sales | PERFORMANCE | OK | OK | yes | faster, same reply head |
+| PROFILE_PERF.5000000_order_date | PERFORMANCE | OK | OK | yes | faster, same reply head |
+| PROFILE_PERF.10000000_record_id | PERFORMANCE | OK | OK | yes | faster, same reply head |
+| PROFILE_PERF.10000000_region | PERFORMANCE | OK | OK | yes | faster, same reply head |
+| PROFILE_PERF.10000000_net_sales | PERFORMANCE | OK | OK | yes | faster, same reply head |
+| PROFILE_PERF.10000000_order_date | PERFORMANCE | OK | OK | yes | faster, same reply head |
+| CLEANING.plan_dirty_1000000 | PERFORMANCE | OK | OK | NO | the same actions, word for word, in less time |
+| CLEANING.plan_clean_1000000 | PERFORMANCE | OK | OK | NO | the same actions, word for word, in less time |
+| PRESCREEN.prescreen | GROUND_FACT | NOT_APPLICABLE | OK | yes | 0 parseable values screened out |
+| COHORT.heatmap_1000 | PRODUCT_DEFECT | OK | OK | yes | under 8,000 characters, same points drawn |
+| COHORT.heatmap_100000 | PRODUCT_DEFECT | OK | OK | yes | under 8,000 characters, same points drawn |
+| WELCH.welch_run1 | PRODUCT_DEFECT | OK | OK | yes | the same df, written as a number |
+| WELCH.welch_run2 | PRODUCT_DEFECT | OK | OK | yes | the same df, written as a number |
 | PAGING.asked_200 | PRODUCT_DEFECT | OK | OK | yes | the same page, and the cap stated |
 | PAGING.asked_200_first | PRODUCT_DEFECT | OK | OK | yes | the same page, and the cap stated |
 | PAGING.asked_10_control | CONTROL | OK | OK | yes | unchanged, no cap note |
@@ -77,6 +125,19 @@ Original revision `2d3d52f3667b3c920859f657addca7313f21bf3f` (the code the cross
 
 | rows | before | after | speedup |
 |---:|---:|---:|---:|
+| 100,000 | 0.8944 | 0.0701 | 12.76x |
+| 1,000,000 | 4.7486 | 0.1793 | 26.48x |
+| 5,000,000 | 23.4537 | 0.6479 | 36.2x |
+| 10,000,000 | 45.2674 | 1.3394 | 33.8x |
+
+Time growth between sizes (before -> after): 100,000->1,000,000: 5.31x -> 2.56x; 1,000,000->5,000,000: 4.94x -> 3.61x; 5,000,000->10,000,000: 1.93x -> 2.07x
+
+## propose_cleaning_plan
+
+| case | before s | after s | speedup |
+|---|---:|---:|---:|
+| CLEANING.plan_dirty_1000000 | 23.0109 | 14.9440995 | 1.54x |
+| CLEANING.plan_clean_1000000 | 16.2218295 | 7.906575999999999 | 2.05x |
 
 ## Phases H and J
 
@@ -116,9 +177,133 @@ Original revision `2d3d52f3667b3c920859f657addca7313f21bf3f` (the code the cross
   },
   "H_isolation": {
    "OK": 110
-  }
+  },
+  "reproducibility": [
+   {
+    "domain": "financial",
+    "rows": 1000,
+    "status": "PASS",
+    "results_identical": 12,
+    "results_different": []
+   },
+   {
+    "domain": "financial",
+    "rows": 100000,
+    "status": "PASS",
+    "results_identical": 12,
+    "results_different": []
+   },
+   {
+    "domain": "crm",
+    "rows": 1000,
+    "status": "PASS",
+    "results_identical": 12,
+    "results_different": []
+   },
+   {
+    "domain": "crm",
+    "rows": 100000,
+    "status": "FAIL",
+    "results_identical": 9,
+    "results_different": [
+     "cross_tab_sum",
+     "group_compare_",
+     "summary_stats_"
+    ]
+   },
+   {
+    "domain": "logistics",
+    "rows": 1000,
+    "status": "PASS",
+    "results_identical": 12,
+    "results_different": []
+   },
+   {
+    "domain": "logistics",
+    "rows": 100000,
+    "status": "PASS",
+    "results_identical": 12,
+    "results_different": []
+   }
+  ]
  },
- "after": {}
+ "after": {
+  "concurrency_correctness": {
+   "PASS": 43,
+   "ORACLE_ERROR": 1
+  },
+  "isolation": {
+   "correctness": {
+    "PASS": 20
+   },
+   "reports": {
+    "PASS": 10
+   },
+   "ledgers": {
+    "PASS": 10
+   },
+   "charts": {
+    "PASS": 10
+   }
+  },
+  "concurrency_calls": {
+   "OK": 164
+  },
+  "concurrency_exceptions": [],
+  "H_repeat": {
+   "OK": 196
+  },
+  "H_traced": {
+   "OK": 36
+  },
+  "H_isolation": {
+   "OK": 110
+  },
+  "reproducibility": [
+   {
+    "domain": "financial",
+    "rows": 1000,
+    "status": "PASS",
+    "results_identical": 12,
+    "results_different": []
+   },
+   {
+    "domain": "financial",
+    "rows": 100000,
+    "status": "PASS",
+    "results_identical": 12,
+    "results_different": []
+   },
+   {
+    "domain": "crm",
+    "rows": 1000,
+    "status": "PASS",
+    "results_identical": 12,
+    "results_different": []
+   },
+   {
+    "domain": "crm",
+    "rows": 100000,
+    "status": "PASS",
+    "results_identical": 12,
+    "results_different": []
+   },
+   {
+    "domain": "logistics",
+    "rows": 1000,
+    "status": "PASS",
+    "results_identical": 12,
+    "results_different": []
+   },
+   {
+    "domain": "logistics",
+    "rows": 100000,
+    "status": "PASS",
+    "results_identical": 12,
+    "results_different": []
+   }
+  ]
+ }
 }
 ```
 
