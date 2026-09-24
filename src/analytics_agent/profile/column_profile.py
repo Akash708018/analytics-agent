@@ -299,7 +299,7 @@ def profile_column(
     disagreeing.
     """
     top_n = max(1, min(top_n, MAX_TOP_VALUES))
-    profile = table if table is not None else profile_table(con, dataset_name)
+    profile = table if table is not None else profile_table(con, dataset_name, only=column)
 
     try:
         col = profile.column(column)

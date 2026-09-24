@@ -723,9 +723,15 @@ def profile_table(
     *,
     missing_values: Sequence[str] = MISSING_VALUES,
     breakdown_cap: int = MAX_BREAKDOWN_COLUMNS,
+    only: str | None = None,
 ) -> TableProfile:
     """
     Count everything about one loaded table.
+
+    `only` restricts every per-column computation to one column, for profile_column. Each
+    column's figures are computed independently of the others, so its numbers are the same
+    ones the whole-table profile reports; the table-level duplicate count is not computed.
+    Profiling one column of a 10M-row table cost as much as profiling all of it (Step 13).
 
     Reads. Writes nothing, stores nothing, proposes nothing, changes nothing.
     A dataset that is not loaded raises `ContractRefused` from `column_stats`,
@@ -736,7 +742,7 @@ def profile_table(
     count is its own scan because `DISTINCT *` cannot ride along with
     aggregates. Which token appeared is one small query per affected column.
     """
-    stats: list[ColumnEvidence] = column_stats(con, dataset_name)
+    stats: list[ColumnEvidence] = column_stats(con, dataset_name, only=only)
     row_count = stats[0].row_count if stats else 0
 
     vocabulary = tuple(
@@ -829,7 +835,8 @@ def profile_table(
             )
         )
 
-    dupes, dupe_note = _duplicate_rows(con, dataset_name, row_count)
+    dupes, dupe_note = (_duplicate_rows(con, dataset_name, row_count)
+                        if only is None else (None, None))
     if dupe_note:
         notes.append(dupe_note)
     if flagged:

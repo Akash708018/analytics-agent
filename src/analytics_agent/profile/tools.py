@@ -117,6 +117,7 @@ def profile_column(
             missing_values=(
                 MISSING_VALUES if missing_values is None else missing_values
             ),
+            only=column,
         )
         detail = _profile_column(
             con, dataset_name, column, top_n=top_n, table=table
