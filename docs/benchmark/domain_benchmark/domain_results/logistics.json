@@ -12,6 +12,16 @@
   },
   {
    "domain": "logistics",
+   "rows": 10000,
+   "checks_attempted": 97,
+   "checks_passed": 97,
+   "checks_failed": 0,
+   "calls_verified": 4,
+   "calls_PASS": 4,
+   "correctness_percent": 100.0
+  },
+  {
+   "domain": "logistics",
    "rows": 100000,
    "checks_attempted": 21989,
    "checks_passed": 21989,
@@ -23,12 +33,11 @@
   {
    "domain": "logistics",
    "rows": 1000000,
-   "checks_attempted": 156971,
-   "checks_passed": 156971,
+   "checks_attempted": 156989,
+   "checks_passed": 156989,
    "checks_failed": 0,
    "calls_verified": 47,
-   "calls_PASS": 44,
-   "calls_ORACLE_ERROR": 3,
+   "calls_PASS": 47,
    "correctness_percent": 100.0
   },
   {
@@ -12102,127 +12111,7 @@
  ],
  "errors": [
   {
-   "error_number": 32,
-   "timestamp": null,
-   "domain": "logistics",
-   "size": 1000000,
-   "file": null,
-   "workflow_step": "analyses",
-   "tool": "compute_analysis",
-   "analysis": "hypothesis_test",
-   "supplied_arguments": {
-    "dimension": "sla_breach",
-    "measure": "delivery_time_hours"
-   },
-   "expected_behavior": "None = None",
-   "observed_behavior": "None (0 of 0 checks failed)",
-   "exception": null,
-   "stack_trace": null,
-   "severity": "MEDIUM",
-   "recovered": true,
-   "subsequent_operations_valid": true,
-   "unit": "E_logistics",
-   "kind": "oracle_error",
-   "variant": "t",
-   "klass": "VALID"
-  },
-  {
    "error_number": 33,
-   "timestamp": null,
-   "domain": "logistics",
-   "size": 1000000,
-   "file": null,
-   "workflow_step": "analyses",
-   "tool": "compute_analysis",
-   "analysis": "hypothesis_test",
-   "supplied_arguments": {
-    "dimension": "sla_breach",
-    "measure": "delivery_time_hours",
-    "method": "rank"
-   },
-   "expected_behavior": "None = None",
-   "observed_behavior": "None (0 of 0 checks failed)",
-   "exception": null,
-   "stack_trace": null,
-   "severity": "MEDIUM",
-   "recovered": true,
-   "subsequent_operations_valid": true,
-   "unit": "E_logistics",
-   "kind": "oracle_error",
-   "variant": "rank",
-   "klass": "VALID"
-  },
-  {
-   "error_number": 34,
-   "timestamp": null,
-   "domain": "logistics",
-   "size": 1000000,
-   "file": null,
-   "workflow_step": "analyses",
-   "tool": "compute_analysis",
-   "analysis": "sample_adequacy",
-   "supplied_arguments": {
-    "dimension": "sla_breach",
-    "measure": "delivery_time_hours"
-   },
-   "expected_behavior": "None = None",
-   "observed_behavior": "None (0 of 0 checks failed)",
-   "exception": null,
-   "stack_trace": null,
-   "severity": "MEDIUM",
-   "recovered": true,
-   "subsequent_operations_valid": true,
-   "unit": "E_logistics",
-   "kind": "oracle_error",
-   "variant": "",
-   "klass": "VALID"
-  },
-  {
-   "error_number": 75,
-   "timestamp": null,
-   "domain": "logistics",
-   "size": 100000,
-   "file": "frequency_20260924-170931.csv",
-   "workflow_step": "read_result",
-   "tool": "read_result_file",
-   "analysis": null,
-   "supplied_arguments": {
-    "start": 901,
-    "limit": 200
-   },
-   "expected_behavior": "100 rows",
-   "observed_behavior": "50 found",
-   "exception": null,
-   "stack_trace": null,
-   "severity": "HIGH",
-   "recovered": true,
-   "subsequent_operations_valid": true,
-   "unit": "D_logistics"
-  },
-  {
-   "error_number": 85,
-   "timestamp": null,
-   "domain": "logistics",
-   "size": 1000000,
-   "file": "frequency_20260924-181625.csv",
-   "workflow_step": "read_result",
-   "tool": "read_result_file",
-   "analysis": null,
-   "supplied_arguments": {
-    "start": 901,
-    "limit": 200
-   },
-   "expected_behavior": "100 rows",
-   "observed_behavior": "50 found",
-   "exception": null,
-   "stack_trace": null,
-   "severity": "HIGH",
-   "recovered": true,
-   "subsequent_operations_valid": true,
-   "unit": "E_logistics"
-  },
-  {
-   "error_number": 89,
    "timestamp": null,
    "domain": "logistics",
    "size": 10000000,
@@ -12244,7 +12133,7 @@
    "unit": "I_logistics_10000000"
   },
   {
-   "error_number": 90,
+   "error_number": 34,
    "timestamp": null,
    "domain": "logistics",
    "size": 2000000,
@@ -12266,7 +12155,7 @@
    "unit": "I_logistics_2000000"
   },
   {
-   "error_number": 91,
+   "error_number": 35,
    "timestamp": null,
    "domain": "logistics",
    "size": 5000000,
@@ -12286,25 +12175,6 @@
    "recovered": true,
    "subsequent_operations_valid": true,
    "unit": "I_logistics_5000000"
-  },
-  {
-   "error_number": 104,
-   "timestamp": null,
-   "domain": "logistics",
-   "size": 10000,
-   "file": null,
-   "workflow_step": "isolation",
-   "tool": "charts",
-   "analysis": null,
-   "supplied_arguments": null,
-   "expected_behavior": "only its own dataset",
-   "observed_behavior": "{\"dataset\": \"logistics\", \"names_its_measure\": false, \"names_another_dataset\": [], \"status\": \"FAIL\"}",
-   "exception": null,
-   "stack_trace": null,
-   "severity": "CRITICAL",
-   "recovered": true,
-   "subsequent_operations_valid": null,
-   "unit": "H_isolation"
   }
  ],
  "warnings": [

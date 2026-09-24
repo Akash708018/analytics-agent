@@ -6112,20 +6112,10 @@
  {
   "category": "slow_call",
   "unit": "F_formats",
-  "tool": "propose_ingest_spec",
-  "analysis": null,
-  "rows": 0,
-  "seconds": 2.0049,
-  "class": "SLOW",
-  "domain": null
- },
- {
-  "category": "slow_call",
-  "unit": "F_formats",
   "tool": "load_excel",
   "analysis": null,
   "rows": 0,
-  "seconds": 2.242993,
+  "seconds": 2.345744,
   "class": "SLOW",
   "domain": null
  },
@@ -6135,7 +6125,7 @@
   "tool": "propose_ingest_spec",
   "analysis": null,
   "rows": 0,
-  "seconds": 330.789054,
+  "seconds": 323.295691,
   "class": "SEVERE",
   "domain": null
  },
@@ -6146,6 +6136,26 @@
   "analysis": null,
   "rows": 0,
   "characters": 26542,
+  "domain": null
+ },
+ {
+  "category": "slow_call",
+  "unit": "H_repeat",
+  "tool": "propose_cleaning_plan",
+  "analysis": null,
+  "rows": 0,
+  "seconds": 2.437881,
+  "class": "SLOW",
+  "domain": null
+ },
+ {
+  "category": "slow_call",
+  "unit": "H_traced",
+  "tool": "propose_cleaning_plan",
+  "analysis": null,
+  "rows": 0,
+  "seconds": 2.507621,
+  "class": "SLOW",
   "domain": null
  },
  {
@@ -8090,6 +8100,920 @@
  },
  {
   "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "confirm_ingest_spec",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 17.905321,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_dataset",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 49.185338,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_dataset",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 51.465612,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 52.089868,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 51.319004,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 51.712922,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 48.67498,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 48.041896,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 47.499832,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 51.173064,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 48.625907,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 49.405579,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 48.163356,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 48.486029,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 47.762285,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 47.941137,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 48.429024,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 47.643168,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 49.454573,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 48.302274,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 48.689936,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 48.760624,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 48.635185,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 58.00553,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 54.384606,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 48.717323,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 45.502756,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 47.375792,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 46.206019,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 45.888964,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 47.269862,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 46.788227,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 45.408135,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 45.685449,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 45.767713,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 46.410157,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 45.536108,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 47.270909,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 56.137385,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 53.679273,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "profile_column",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 58.152553,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "propose_cleaning_plan",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 149.78497,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "propose_cleaning_plan",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 144.670949,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "apply_cleaning_plan",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 17.636997,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "propose_dataset_contract",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 15.494328,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "propose_dataset_contract",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 15.79833,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "describe_dataset",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 2.639449,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "describe_dataset",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 2.636173,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "distribution",
+  "rows": 10000000,
+  "seconds": 2.588011,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "distribution",
+  "rows": 10000000,
+  "seconds": 2.488402,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "frequency",
+  "rows": 10000000,
+  "seconds": 5.089321,
+  "class": "VERY_SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "frequency",
+  "rows": 10000000,
+  "seconds": 4.620825,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "summary_stats",
+  "rows": 10000000,
+  "seconds": 4.661196,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "summary_stats",
+  "rows": 10000000,
+  "seconds": 4.735556,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "unsupported_operation",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "pareto",
+  "variant": "",
+  "rows": 10000000,
+  "domain": "sales",
+  "class": "REQUIRED",
+  "reason_code": "ANALYSIS_NOT_POSSIBLE",
+  "why": "WHY: city has 60 group(s), NULL counted as a group, against a cap of 49. top_n on city says which of its groups matter."
+ },
+ {
+  "category": "unsupported_operation",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "concentration",
+  "variant": "",
+  "rows": 10000000,
+  "domain": "sales",
+  "class": "REQUIRED",
+  "reason_code": "ANALYSIS_NOT_POSSIBLE",
+  "why": "WHY: city has 60 group(s), NULL counted as a group, against a cap of 49. top_n on city says which of its groups matter."
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "correlation",
+  "rows": 10000000,
+  "seconds": 3.412888,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "correlation",
+  "rows": 10000000,
+  "seconds": 3.449763,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "correlation",
+  "rows": 10000000,
+  "seconds": 3.238249,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "correlation",
+  "rows": 10000000,
+  "seconds": 3.143538,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "driver_analysis",
+  "rows": 10000000,
+  "seconds": 2.962113,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "driver_analysis",
+  "rows": 10000000,
+  "seconds": 2.941215,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "outlier_detection",
+  "rows": 10000000,
+  "seconds": 2.932362,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "outlier_detection",
+  "rows": 10000000,
+  "seconds": 3.106311,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "outlier_detection",
+  "rows": 10000000,
+  "seconds": 2.46569,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "outlier_detection",
+  "rows": 10000000,
+  "seconds": 2.235675,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "repeat_behaviour",
+  "rows": 10000000,
+  "seconds": 2.555253,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "repeat_behaviour",
+  "rows": 10000000,
+  "seconds": 2.400269,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "cohort_retention",
+  "rows": 10000000,
+  "seconds": 3.129986,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "cohort_retention",
+  "rows": 10000000,
+  "seconds": 3.119538,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "propose_dataset_contract",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 15.230236,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "propose_dataset_contract",
+  "analysis": null,
+  "rows": 10000000,
+  "seconds": 15.150072,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "render_chart",
+  "analysis": "distribution",
+  "rows": 10000000,
+  "seconds": 2.718114,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "render_chart",
+  "analysis": "distribution",
+  "rows": 10000000,
+  "seconds": 2.668984,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "render_chart",
+  "analysis": "correlation",
+  "rows": 10000000,
+  "seconds": 3.481128,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "render_chart",
+  "analysis": "correlation",
+  "rows": 10000000,
+  "seconds": 3.603704,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "render_chart",
+  "analysis": "cohort_retention",
+  "rows": 10000000,
+  "seconds": 3.483067,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "render_chart",
+  "analysis": "cohort_retention",
+  "rows": 10000000,
+  "seconds": 3.364635,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "render_chart",
+  "analysis": "group_compare",
+  "rows": 10000000,
+  "seconds": 2.092201,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "render_chart",
+  "analysis": "top_n",
+  "rows": 10000000,
+  "seconds": 9.05584,
+  "class": "VERY_SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "render_chart",
+  "analysis": "top_n",
+  "rows": 10000000,
+  "seconds": 9.727296,
+  "class": "VERY_SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "frequency",
+  "rows": 10000000,
+  "seconds": 5.662978,
+  "class": "VERY_SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "top_n",
+  "rows": 10000000,
+  "seconds": 5.031532,
+  "class": "VERY_SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "top_n",
+  "rows": 10000000,
+  "seconds": 5.856992,
+  "class": "VERY_SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "top_n",
+  "rows": 10000000,
+  "seconds": 5.220242,
+  "class": "VERY_SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "top_n",
+  "rows": 10000000,
+  "seconds": 5.742405,
+  "class": "VERY_SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "top_n",
+  "rows": 10000000,
+  "seconds": 5.527991,
+  "class": "VERY_SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "top_n",
+  "rows": 10000000,
+  "seconds": 16.214372,
+  "class": "SEVERE",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "frequency",
+  "rows": 10000000,
+  "seconds": 4.284089,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "concentration",
+  "rows": 10000000,
+  "seconds": 2.978563,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
+  "unit": "I_sales_10000000",
+  "tool": "compute_analysis",
+  "analysis": "pareto",
+  "rows": 10000000,
+  "seconds": 2.774076,
+  "class": "SLOW",
+  "domain": "sales"
+ },
+ {
+  "category": "slow_call",
   "unit": "I_sales_2000000",
   "tool": "confirm_ingest_spec",
   "analysis": null,
@@ -9267,6 +10191,46 @@
   "domain": "sales"
  },
  {
+  "category": "slow_call",
+  "unit": "J_financial_100000_r1",
+  "tool": "propose_cleaning_plan",
+  "analysis": null,
+  "rows": 0,
+  "seconds": 3.054674,
+  "class": "SLOW",
+  "domain": null
+ },
+ {
+  "category": "slow_call",
+  "unit": "J_financial_100000_r2",
+  "tool": "propose_cleaning_plan",
+  "analysis": null,
+  "rows": 0,
+  "seconds": 2.907278,
+  "class": "SLOW",
+  "domain": null
+ },
+ {
+  "category": "slow_call",
+  "unit": "J_logistics_100000_r1",
+  "tool": "propose_cleaning_plan",
+  "analysis": null,
+  "rows": 0,
+  "seconds": 2.824865,
+  "class": "SLOW",
+  "domain": null
+ },
+ {
+  "category": "slow_call",
+  "unit": "J_logistics_100000_r2",
+  "tool": "propose_cleaning_plan",
+  "analysis": null,
+  "rows": 0,
+  "seconds": 2.792961,
+  "class": "SLOW",
+  "domain": null
+ },
+ {
   "category": "irrelevant_or_unexecutable_recommendation",
   "unit": "F_formats",
   "next_step": "NEXT STEP: call propose_ingest_spec(path=\"/tmp/domain_benchmark_data/dirty/fmt_corrupt.xlsx\") -- it reads CSV and Excel alike -- or open the file in Excel and save it as .xlsx.",
@@ -9290,27 +10254,6 @@
  {
   "category": "irrelevant_or_unexecutable_recommendation",
   "unit": "G_wrong",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv\", primary_key=[...]) with a key that holds, or state the grain that matches the key you gave",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "G_wrong",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to change, and pass the whole JSON object back",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "G_wrong",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to change, and pass the whole JSON object back",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "G_wrong",
   "next_step": "NEXT STEP: call propose_ingest_spec(path=\"...\") then confirm_ingest_spec, or list_datasets() to see what is already here",
   "outcome": "NOT_EXECUTED",
   "parse": "a template with placeholders, not a call"
@@ -9318,28 +10261,42 @@
  {
   "category": "irrelevant_or_unexecutable_recommendation",
   "unit": "G_wrong",
-  "next_step": "NEXT STEP: call read_result_file(path=\"/home/user/analytics-agent/workspace/dbench_adv/results/<one of: profile_adv_20260924-184600.csv>\")",
+  "next_step": "NEXT STEP: call compute_analysis(dataset_name=\"adv\", analysis_type=\"top_n\", dimension=\"transaction_type\")",
+  "outcome": "REFUSED_SAME_REASON",
+  "parse": "executable"
+ },
+ {
+  "category": "irrelevant_or_unexecutable_recommendation",
+  "unit": "G_wrong",
+  "next_step": "NEXT STEP: call compute_analysis(dataset_name=\"adv\", analysis_type=\"ranking_shift\", dimension=\"transaction_type\", measure=\"revenue\", before_start=\"YYYY-MM-DD\", before_end=\"YYYY-MM-DD\", after_start=\"YYYY-MM-DD\", after_end=\"YYYY-MM-DD\")",
   "outcome": "NOT_EXECUTED",
   "parse": "a template with placeholders, not a call"
  },
  {
   "category": "irrelevant_or_unexecutable_recommendation",
   "unit": "G_wrong",
-  "next_step": "NEXT STEP: call read_result_file(path=\"/home/user/analytics-agent/workspace/dbench_adv/results/<one of: profile_adv_20260924-184600.csv>\")",
+  "next_step": "NEXT STEP: call compute_analysis(dataset_name=\"adv\", analysis_type=\"ranking_shift\", dimension=\"transaction_type\", measure=\"revenue\", before_start=\"YYYY-MM-DD\", before_end=\"YYYY-MM-DD\", after_start=\"YYYY-MM-DD\", after_end=\"YYYY-MM-DD\")",
   "outcome": "NOT_EXECUTED",
   "parse": "a template with placeholders, not a call"
  },
  {
   "category": "irrelevant_or_unexecutable_recommendation",
   "unit": "G_wrong",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\", primary_key=[...]) with a key that holds, or state the grain that matches the key you gave",
+  "next_step": "NEXT STEP: call compute_analysis(dataset_name=\"adv\", analysis_type=\"period_compare\", measure=\"revenue\", period=\"YYYY-MM\", baseline=\"YYYY-MM\")",
   "outcome": "NOT_EXECUTED",
   "parse": "a template with placeholders, not a call"
  },
  {
   "category": "irrelevant_or_unexecutable_recommendation",
   "unit": "G_wrong",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to change, and pass the whole JSON object back",
+  "next_step": "NEXT STEP: call read_result_file(path=\"/home/user/analytics-agent/workspace/dbench_adv/results/<one of: trend_20260924-214309.csv, trend_20260924-214308.csv, trend_20260924-214306.csv, top_n_20260924-214307_3.csv, top_n_20260924-214307_2.csv, top_n_20260924-214307.csv, profile_adv_20260924-214305.csv, distribution_20260924-214307.csv, correlation_20260924-214307.csv>\")",
+  "outcome": "NOT_EXECUTED",
+  "parse": "a template with placeholders, not a call"
+ },
+ {
+  "category": "irrelevant_or_unexecutable_recommendation",
+  "unit": "G_wrong",
+  "next_step": "NEXT STEP: call read_result_file(path=\"/home/user/analytics-agent/workspace/dbench_adv/results/<one of: trend_20260924-214309.csv, trend_20260924-214308.csv, trend_20260924-214306.csv, top_n_20260924-214307_3.csv, top_n_20260924-214307_2.csv, top_n_20260924-214307.csv, profile_adv_20260924-214305.csv, distribution_20260924-214307.csv, correlation_20260924-214307.csv>\")",
   "outcome": "NOT_EXECUTED",
   "parse": "a template with placeholders, not a call"
  },
@@ -9374,342 +10331,6 @@
  {
   "category": "irrelevant_or_unexecutable_recommendation",
   "unit": "G_wrong",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to change, and pass the whole JSON object back",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "H_isolation",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"financial\", primary_key=[...]) with a key that holds, or state the grain that matches the key you gave",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "H_isolation",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to change, and pass the whole JSON object back",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "H_isolation",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"hr\", primary_key=[...]) with a key that holds, or state the grain that matches the key you gave",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "H_isolation",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to change, and pass the whole JSON object back",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "H_isolation",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"sales\", primary_key=[...]) with a key that holds, or state the grain that matches the key you gave",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "H_isolation",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to change, and pass the whole JSON object back",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "H_isolation",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"marketing\", primary_key=[...]) with a key that holds, or state the grain that matches the key you gave",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "H_isolation",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to change, and pass the whole JSON object back",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "H_isolation",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"crm\", primary_key=[...]) with a key that holds, or state the grain that matches the key you gave",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "H_isolation",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to change, and pass the whole JSON object back",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "H_isolation",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"ecommerce\", primary_key=[...]) with a key that holds, or state the grain that matches the key you gave",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "H_isolation",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to change, and pass the whole JSON object back",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "H_isolation",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"logistics\", primary_key=[...]) with a key that holds, or state the grain that matches the key you gave",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "H_isolation",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to change, and pass the whole JSON object back",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "H_isolation",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"healthcare\", primary_key=[...]) with a key that holds, or state the grain that matches the key you gave",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "H_isolation",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to change, and pass the whole JSON object back",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "H_isolation",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"manufacturing\", primary_key=[...]) with a key that holds, or state the grain that matches the key you gave",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "H_isolation",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to change, and pass the whole JSON object back",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "H_isolation",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"education\", primary_key=[...]) with a key that holds, or state the grain that matches the key you gave",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "H_isolation",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to change, and pass the whole JSON object back",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "H_repeat",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"sales\", primary_key=[...]) with a key that holds, or state the grain that matches the key you gave",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "H_repeat",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to change, and pass the whole JSON object back",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "H_traced",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"sales\", primary_key=[...]) with a key that holds, or state the grain that matches the key you gave",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "H_traced",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to change, and pass the whole JSON object back",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "J_crm_100000_r1",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"crm\", primary_key=[...]) with a key that holds, or state the grain that matches the key you gave",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "J_crm_100000_r1",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to change, and pass the whole JSON object back",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "J_crm_100000_r2",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"crm\", primary_key=[...]) with a key that holds, or state the grain that matches the key you gave",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "J_crm_100000_r2",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to change, and pass the whole JSON object back",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "J_crm_1000_r1",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"crm\", primary_key=[...]) with a key that holds, or state the grain that matches the key you gave",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "J_crm_1000_r1",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to change, and pass the whole JSON object back",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "J_crm_1000_r2",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"crm\", primary_key=[...]) with a key that holds, or state the grain that matches the key you gave",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "J_crm_1000_r2",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to change, and pass the whole JSON object back",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "J_financial_100000_r1",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"financial\", primary_key=[...]) with a key that holds, or state the grain that matches the key you gave",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "J_financial_100000_r1",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to change, and pass the whole JSON object back",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "J_financial_100000_r2",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"financial\", primary_key=[...]) with a key that holds, or state the grain that matches the key you gave",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "J_financial_100000_r2",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to change, and pass the whole JSON object back",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "J_financial_1000_r1",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"financial\", primary_key=[...]) with a key that holds, or state the grain that matches the key you gave",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "J_financial_1000_r1",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to change, and pass the whole JSON object back",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "J_financial_1000_r2",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"financial\", primary_key=[...]) with a key that holds, or state the grain that matches the key you gave",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "J_financial_1000_r2",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to change, and pass the whole JSON object back",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "J_logistics_100000_r1",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"logistics\", primary_key=[...]) with a key that holds, or state the grain that matches the key you gave",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "J_logistics_100000_r1",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to change, and pass the whole JSON object back",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "J_logistics_100000_r2",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"logistics\", primary_key=[...]) with a key that holds, or state the grain that matches the key you gave",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "J_logistics_100000_r2",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to change, and pass the whole JSON object back",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "J_logistics_1000_r1",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"logistics\", primary_key=[...]) with a key that holds, or state the grain that matches the key you gave",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "J_logistics_1000_r1",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to change, and pass the whole JSON object back",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "J_logistics_1000_r2",
-  "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"logistics\", primary_key=[...]) with a key that holds, or state the grain that matches the key you gave",
-  "outcome": "NOT_EXECUTED",
-  "parse": "a template with placeholders, not a call"
- },
- {
-  "category": "irrelevant_or_unexecutable_recommendation",
-  "unit": "J_logistics_1000_r2",
   "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to change, and pass the whole JSON object back",
   "outcome": "NOT_EXECUTED",
   "parse": "a template with placeholders, not a call"
@@ -10067,6 +10688,20 @@
  {
   "category": "suspicious_scaling",
   "domain": "sales",
+  "tool": "profile_column",
+  "analysis": "",
+  "variant": "",
+  "from_rows": 5000000,
+  "to_rows": 10000000,
+  "DATA_GROWTH_FACTOR": 2.0,
+  "TIME_GROWTH_FACTOR": 2.054,
+  "from_seconds": 23.578168,
+  "to_seconds": 48.429024,
+  "suspicious": true
+ },
+ {
+  "category": "suspicious_scaling",
+  "domain": "sales",
   "tool": "propose_cleaning_plan",
   "analysis": "",
   "variant": "",
@@ -10090,6 +10725,20 @@
   "TIME_GROWTH_FACTOR": 2.027,
   "from_seconds": 0.37719,
   "to_seconds": 0.764399,
+  "suspicious": true
+ },
+ {
+  "category": "suspicious_scaling",
+  "domain": "sales",
+  "tool": "compute_analysis",
+  "analysis": "summary_stats",
+  "variant": "",
+  "from_rows": 5000000,
+  "to_rows": 10000000,
+  "DATA_GROWTH_FACTOR": 2.0,
+  "TIME_GROWTH_FACTOR": 2.1,
+  "from_seconds": 2.254856,
+  "to_seconds": 4.735556,
   "suspicious": true
  },
  {
@@ -10123,6 +10772,20 @@
  {
   "category": "suspicious_scaling",
   "domain": "sales",
+  "tool": "compute_analysis",
+  "analysis": "correlation",
+  "variant": "na0",
+  "from_rows": 5000000,
+  "to_rows": 10000000,
+  "DATA_GROWTH_FACTOR": 2.0,
+  "TIME_GROWTH_FACTOR": 2.037,
+  "from_seconds": 0.27342,
+  "to_seconds": 0.55696,
+  "suspicious": true
+ },
+ {
+  "category": "suspicious_scaling",
+  "domain": "sales",
   "tool": "propose_dataset_contract",
   "analysis": "",
   "variant": "follow",
@@ -10137,6 +10800,20 @@
  {
   "category": "suspicious_scaling",
   "domain": "sales",
+  "tool": "render_chart",
+  "analysis": "correlation",
+  "variant": "chart4",
+  "from_rows": 5000000,
+  "to_rows": 10000000,
+  "DATA_GROWTH_FACTOR": 2.0,
+  "TIME_GROWTH_FACTOR": 2.05,
+  "from_seconds": 1.757995,
+  "to_seconds": 3.603704,
+  "suspicious": true
+ },
+ {
+  "category": "suspicious_scaling",
+  "domain": "sales",
   "tool": "compute_analysis",
   "analysis": "top_n",
   "variant": "n10",
@@ -10146,6 +10823,20 @@
   "TIME_GROWTH_FACTOR": 2.106,
   "from_seconds": 0.562316,
   "to_seconds": 1.184106,
+  "suspicious": true
+ },
+ {
+  "category": "suspicious_scaling",
+  "domain": "sales",
+  "tool": "compute_analysis",
+  "analysis": "top_n",
+  "variant": "n10",
+  "from_rows": 5000000,
+  "to_rows": 10000000,
+  "DATA_GROWTH_FACTOR": 2.0,
+  "TIME_GROWTH_FACTOR": 2.07,
+  "from_seconds": 2.829159,
+  "to_seconds": 5.856992,
   "suspicious": true
  },
  {
@@ -10216,6 +10907,20 @@
   "TIME_GROWTH_FACTOR": 2.607,
   "from_seconds": 3.250726,
   "to_seconds": 8.473582,
+  "suspicious": true
+ },
+ {
+  "category": "suspicious_scaling",
+  "domain": "sales",
+  "tool": "compute_analysis",
+  "analysis": "concentration",
+  "variant": "hi",
+  "from_rows": 5000000,
+  "to_rows": 10000000,
+  "DATA_GROWTH_FACTOR": 2.0,
+  "TIME_GROWTH_FACTOR": 2.247,
+  "from_seconds": 1.325489,
+  "to_seconds": 2.978563,
   "suspicious": true
  },
  {
@@ -10305,6 +11010,16 @@
  {
   "category": "questionable_or_unverified_result",
   "unit": "C_manufacturing",
+  "analysis": "distribution",
+  "variant": "",
+  "status": "PASS",
+  "skipped": [
+   "distribution: bins are not equal width (5 to 8), while the method is described as equal-width"
+  ]
+ },
+ {
+  "category": "questionable_or_unverified_result",
+  "unit": "C_manufacturing",
   "analysis": "correlated_shift",
   "variant": "",
   "status": "PASS",
@@ -10364,16 +11079,6 @@
  },
  {
   "category": "questionable_or_unverified_result",
-  "unit": "D_education",
-  "analysis": "sample_adequacy",
-  "variant": "",
-  "status": "ORACLE_ERROR",
-  "skipped": [
-   "oracle raised ValueError: The function value at x=0.19736842165789467 is NaN; solver cannot continue."
-  ]
- },
- {
-  "category": "questionable_or_unverified_result",
   "unit": "D_financial",
   "analysis": "correlated_shift",
   "variant": "",
@@ -10415,6 +11120,16 @@
  {
   "category": "questionable_or_unverified_result",
   "unit": "D_manufacturing",
+  "analysis": "distribution",
+  "variant": "",
+  "status": "PASS",
+  "skipped": [
+   "distribution: bins are not equal width (7 to 11), while the method is described as equal-width"
+  ]
+ },
+ {
+  "category": "questionable_or_unverified_result",
+  "unit": "D_manufacturing",
   "analysis": "correlated_shift",
   "variant": "",
   "status": "PASS",
@@ -10444,32 +11159,12 @@
  },
  {
   "category": "questionable_or_unverified_result",
-  "unit": "D_sales",
-  "analysis": "sample_adequacy",
-  "variant": "",
-  "status": "ORACLE_ERROR",
-  "skipped": [
-   "oracle raised ValueError: The function value at x=0.5 is NaN; solver cannot continue."
-  ]
- },
- {
-  "category": "questionable_or_unverified_result",
   "unit": "E_crm",
   "analysis": "correlated_shift",
   "variant": "",
   "status": "PASS",
   "skipped": [
    "correlated_shift: breaks and separation have no closed-form reference here"
-  ]
- },
- {
-  "category": "questionable_or_unverified_result",
-  "unit": "E_crm",
-  "analysis": "hypothesis_test",
-  "variant": "rank",
-  "status": "ORACLE_ERROR",
-  "skipped": [
-   "oracle raised ValueError: could not convert string to float: '1e-300.'"
   ]
  },
  {
@@ -10484,32 +11179,12 @@
  },
  {
   "category": "questionable_or_unverified_result",
-  "unit": "E_ecommerce",
-  "analysis": "sample_adequacy",
-  "variant": "",
-  "status": "ORACLE_ERROR",
-  "skipped": [
-   "oracle raised ValueError: The function value at x=0.049342106164473626 is NaN; solver cannot continue."
-  ]
- },
- {
-  "category": "questionable_or_unverified_result",
   "unit": "E_education",
   "analysis": "correlated_shift",
   "variant": "",
   "status": "PASS",
   "skipped": [
    "correlated_shift: breaks and separation have no closed-form reference here"
-  ]
- },
- {
-  "category": "questionable_or_unverified_result",
-  "unit": "E_education",
-  "analysis": "sample_adequacy",
-  "variant": "",
-  "status": "ORACLE_ERROR",
-  "skipped": [
-   "oracle raised ValueError: The function value at x=0.09868421132894692 is NaN; solver cannot continue."
   ]
  },
  {
@@ -10534,16 +11209,6 @@
  },
  {
   "category": "questionable_or_unverified_result",
-  "unit": "E_healthcare",
-  "analysis": "hypothesis_test",
-  "variant": "rank",
-  "status": "ORACLE_ERROR",
-  "skipped": [
-   "oracle raised ValueError: could not convert string to float: '1e-300.'"
-  ]
- },
- {
-  "category": "questionable_or_unverified_result",
   "unit": "E_hr",
   "analysis": "correlated_shift",
   "variant": "",
@@ -10554,52 +11219,12 @@
  },
  {
   "category": "questionable_or_unverified_result",
-  "unit": "E_hr",
-  "analysis": "sample_adequacy",
-  "variant": "",
-  "status": "ORACLE_ERROR",
-  "skipped": [
-   "oracle raised ValueError: The function value at x=0.09868421132894703 is NaN; solver cannot continue."
-  ]
- },
- {
-  "category": "questionable_or_unverified_result",
   "unit": "E_logistics",
   "analysis": "correlated_shift",
   "variant": "",
   "status": "PASS",
   "skipped": [
    "correlated_shift: breaks and separation have no closed-form reference here"
-  ]
- },
- {
-  "category": "questionable_or_unverified_result",
-  "unit": "E_logistics",
-  "analysis": "hypothesis_test",
-  "variant": "t",
-  "status": "ORACLE_ERROR",
-  "skipped": [
-   "oracle raised ValueError: could not convert string to float: '1e-300.'"
-  ]
- },
- {
-  "category": "questionable_or_unverified_result",
-  "unit": "E_logistics",
-  "analysis": "hypothesis_test",
-  "variant": "rank",
-  "status": "ORACLE_ERROR",
-  "skipped": [
-   "oracle raised ValueError: could not convert string to float: '1e-300.'"
-  ]
- },
- {
-  "category": "questionable_or_unverified_result",
-  "unit": "E_logistics",
-  "analysis": "sample_adequacy",
-  "variant": "",
-  "status": "ORACLE_ERROR",
-  "skipped": [
-   "oracle raised ValueError: The function value at x=0.3947368423157894 is NaN; solver cannot continue."
   ]
  },
  {
@@ -10634,16 +11259,6 @@
  },
  {
   "category": "questionable_or_unverified_result",
-  "unit": "E_marketing",
-  "analysis": "sample_adequacy",
-  "variant": "",
-  "status": "ORACLE_ERROR",
-  "skipped": [
-   "oracle raised ValueError: The function value at x=0.04934210616447336 is NaN; solver cannot continue."
-  ]
- },
- {
-  "category": "questionable_or_unverified_result",
   "unit": "E_sales",
   "analysis": "correlated_shift",
   "variant": "",
@@ -10654,12 +11269,12 @@
  },
  {
   "category": "questionable_or_unverified_result",
-  "unit": "E_sales",
-  "analysis": "sample_adequacy",
-  "variant": "",
+  "unit": "H_concurrency",
+  "analysis": "top_n",
+  "variant": "shared_x10",
   "status": "ORACLE_ERROR",
   "skipped": [
-   "oracle raised ValueError: The function value at x=0.04934210616447361 is NaN; solver cannot continue."
+   "oracle raised KeyError: None"
   ]
  },
  {
@@ -11255,6 +11870,186 @@
  {
   "category": "questionable_or_unverified_result",
   "unit": "I_logistics_5000000",
+  "analysis": "cohort_retention",
+  "variant": "",
+  "status": "SKIPPED_RESOURCE_LIMIT",
+  "skipped": [
+   "the full oracle holds every row as Python objects (~1.5 KB a row measured at 1M); a streaming reference covers summary_stats, top_n and trend only"
+  ]
+ },
+ {
+  "category": "questionable_or_unverified_result",
+  "unit": "I_sales_10000000",
+  "analysis": "distribution",
+  "variant": "",
+  "status": "SKIPPED_RESOURCE_LIMIT",
+  "skipped": [
+   "the full oracle holds every row as Python objects (~1.5 KB a row measured at 1M); a streaming reference covers summary_stats, top_n and trend only"
+  ]
+ },
+ {
+  "category": "questionable_or_unverified_result",
+  "unit": "I_sales_10000000",
+  "analysis": "frequency",
+  "variant": "",
+  "status": "SKIPPED_RESOURCE_LIMIT",
+  "skipped": [
+   "the full oracle holds every row as Python objects (~1.5 KB a row measured at 1M); a streaming reference covers summary_stats, top_n and trend only"
+  ]
+ },
+ {
+  "category": "questionable_or_unverified_result",
+  "unit": "I_sales_10000000",
+  "analysis": "group_compare",
+  "variant": "",
+  "status": "SKIPPED_RESOURCE_LIMIT",
+  "skipped": [
+   "the full oracle holds every row as Python objects (~1.5 KB a row measured at 1M); a streaming reference covers summary_stats, top_n and trend only"
+  ]
+ },
+ {
+  "category": "questionable_or_unverified_result",
+  "unit": "I_sales_10000000",
+  "analysis": "ranking_shift",
+  "variant": "",
+  "status": "SKIPPED_RESOURCE_LIMIT",
+  "skipped": [
+   "the full oracle holds every row as Python objects (~1.5 KB a row measured at 1M); a streaming reference covers summary_stats, top_n and trend only"
+  ]
+ },
+ {
+  "category": "questionable_or_unverified_result",
+  "unit": "I_sales_10000000",
+  "analysis": "calendar_coverage",
+  "variant": "",
+  "status": "SKIPPED_RESOURCE_LIMIT",
+  "skipped": [
+   "the full oracle holds every row as Python objects (~1.5 KB a row measured at 1M); a streaming reference covers summary_stats, top_n and trend only"
+  ]
+ },
+ {
+  "category": "questionable_or_unverified_result",
+  "unit": "I_sales_10000000",
+  "analysis": "seasonality",
+  "variant": "",
+  "status": "SKIPPED_RESOURCE_LIMIT",
+  "skipped": [
+   "the full oracle holds every row as Python objects (~1.5 KB a row measured at 1M); a streaming reference covers summary_stats, top_n and trend only"
+  ]
+ },
+ {
+  "category": "questionable_or_unverified_result",
+  "unit": "I_sales_10000000",
+  "analysis": "period_compare",
+  "variant": "",
+  "status": "SKIPPED_RESOURCE_LIMIT",
+  "skipped": [
+   "the full oracle holds every row as Python objects (~1.5 KB a row measured at 1M); a streaming reference covers summary_stats, top_n and trend only"
+  ]
+ },
+ {
+  "category": "questionable_or_unverified_result",
+  "unit": "I_sales_10000000",
+  "analysis": "growth_decomposition",
+  "variant": "",
+  "status": "SKIPPED_RESOURCE_LIMIT",
+  "skipped": [
+   "the full oracle holds every row as Python objects (~1.5 KB a row measured at 1M); a streaming reference covers summary_stats, top_n and trend only"
+  ]
+ },
+ {
+  "category": "questionable_or_unverified_result",
+  "unit": "I_sales_10000000",
+  "analysis": "correlation",
+  "variant": "",
+  "status": "SKIPPED_RESOURCE_LIMIT",
+  "skipped": [
+   "the full oracle holds every row as Python objects (~1.5 KB a row measured at 1M); a streaming reference covers summary_stats, top_n and trend only"
+  ]
+ },
+ {
+  "category": "questionable_or_unverified_result",
+  "unit": "I_sales_10000000",
+  "analysis": "bivariate",
+  "variant": "",
+  "status": "SKIPPED_RESOURCE_LIMIT",
+  "skipped": [
+   "the full oracle holds every row as Python objects (~1.5 KB a row measured at 1M); a streaming reference covers summary_stats, top_n and trend only"
+  ]
+ },
+ {
+  "category": "questionable_or_unverified_result",
+  "unit": "I_sales_10000000",
+  "analysis": "driver_analysis",
+  "variant": "",
+  "status": "SKIPPED_RESOURCE_LIMIT",
+  "skipped": [
+   "the full oracle holds every row as Python objects (~1.5 KB a row measured at 1M); a streaming reference covers summary_stats, top_n and trend only"
+  ]
+ },
+ {
+  "category": "questionable_or_unverified_result",
+  "unit": "I_sales_10000000",
+  "analysis": "mix_shift",
+  "variant": "",
+  "status": "SKIPPED_RESOURCE_LIMIT",
+  "skipped": [
+   "the full oracle holds every row as Python objects (~1.5 KB a row measured at 1M); a streaming reference covers summary_stats, top_n and trend only"
+  ]
+ },
+ {
+  "category": "questionable_or_unverified_result",
+  "unit": "I_sales_10000000",
+  "analysis": "outlier_detection",
+  "variant": "",
+  "status": "SKIPPED_RESOURCE_LIMIT",
+  "skipped": [
+   "the full oracle holds every row as Python objects (~1.5 KB a row measured at 1M); a streaming reference covers summary_stats, top_n and trend only"
+  ]
+ },
+ {
+  "category": "questionable_or_unverified_result",
+  "unit": "I_sales_10000000",
+  "analysis": "changepoint",
+  "variant": "",
+  "status": "SKIPPED_RESOURCE_LIMIT",
+  "skipped": [
+   "the full oracle holds every row as Python objects (~1.5 KB a row measured at 1M); a streaming reference covers summary_stats, top_n and trend only"
+  ]
+ },
+ {
+  "category": "questionable_or_unverified_result",
+  "unit": "I_sales_10000000",
+  "analysis": "correlated_shift",
+  "variant": "",
+  "status": "SKIPPED_RESOURCE_LIMIT",
+  "skipped": [
+   "the full oracle holds every row as Python objects (~1.5 KB a row measured at 1M); a streaming reference covers summary_stats, top_n and trend only"
+  ]
+ },
+ {
+  "category": "questionable_or_unverified_result",
+  "unit": "I_sales_10000000",
+  "analysis": "sample_adequacy",
+  "variant": "",
+  "status": "SKIPPED_RESOURCE_LIMIT",
+  "skipped": [
+   "the full oracle holds every row as Python objects (~1.5 KB a row measured at 1M); a streaming reference covers summary_stats, top_n and trend only"
+  ]
+ },
+ {
+  "category": "questionable_or_unverified_result",
+  "unit": "I_sales_10000000",
+  "analysis": "repeat_behaviour",
+  "variant": "",
+  "status": "SKIPPED_RESOURCE_LIMIT",
+  "skipped": [
+   "the full oracle holds every row as Python objects (~1.5 KB a row measured at 1M); a streaming reference covers summary_stats, top_n and trend only"
+  ]
+ },
+ {
+  "category": "questionable_or_unverified_result",
+  "unit": "I_sales_10000000",
   "analysis": "cohort_retention",
   "variant": "",
   "status": "SKIPPED_RESOURCE_LIMIT",

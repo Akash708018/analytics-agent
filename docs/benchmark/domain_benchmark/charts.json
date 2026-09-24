@@ -52667,6 +52667,1000 @@
  },
  {
   "domain": "sales",
+  "rows": 10000000,
+  "unit": "I_sales_10000000",
+  "phase": "I",
+  "seq": 149,
+  "analysis": "trend",
+  "chart": "line",
+  "edge": false,
+  "parameters": {
+   "dataset_name": "sales",
+   "analysis_type": "trend",
+   "chart": "line",
+   "measure": "net_sales",
+   "grain": "month"
+  },
+  "status": "OK",
+  "verdict": "PASS",
+  "checks": {
+   "file_exists": true,
+   "png_signature": true,
+   "non_zero_bytes": true,
+   "has_dimensions": true,
+   "drawn_le_points": true,
+   "reply_names_the_measure": true,
+   "says_it_cannot_be_seen": true
+  },
+  "wall_time_seconds": 1.330614,
+  "file": {
+   "exists": true,
+   "path": "/home/user/analytics-agent/workspace/dbench_sales_10000000/charts/trend_20260924-223251.png",
+   "bytes": 49299,
+   "png_signature": true,
+   "width": 800,
+   "height": 450,
+   "zero_byte": false
+  },
+  "run_kind": "cold",
+  "why": null
+ },
+ {
+  "domain": "sales",
+  "rows": 10000000,
+  "unit": "I_sales_10000000",
+  "phase": "I",
+  "seq": 150,
+  "analysis": "trend",
+  "chart": "line",
+  "edge": false,
+  "parameters": {
+   "dataset_name": "sales",
+   "analysis_type": "trend",
+   "chart": "line",
+   "measure": "net_sales",
+   "grain": "month"
+  },
+  "status": "OK",
+  "verdict": "PASS",
+  "checks": {
+   "file_exists": true,
+   "png_signature": true,
+   "non_zero_bytes": true,
+   "has_dimensions": true,
+   "drawn_le_points": true,
+   "reply_names_the_measure": true,
+   "says_it_cannot_be_seen": true
+  },
+  "wall_time_seconds": 1.069852,
+  "file": {
+   "exists": true,
+   "path": "/home/user/analytics-agent/workspace/dbench_sales_10000000/charts/trend_20260924-223252.png",
+   "bytes": 49299,
+   "png_signature": true,
+   "width": 800,
+   "height": 450,
+   "zero_byte": false
+  },
+  "run_kind": "warm",
+  "why": null
+ },
+ {
+  "domain": "sales",
+  "rows": 10000000,
+  "unit": "I_sales_10000000",
+  "phase": "I",
+  "seq": 151,
+  "analysis": "top_n",
+  "chart": "bar",
+  "edge": false,
+  "parameters": {
+   "dataset_name": "sales",
+   "analysis_type": "top_n",
+   "chart": "bar",
+   "dimension": "region",
+   "measure": "net_sales"
+  },
+  "status": "OK",
+  "verdict": "PASS",
+  "checks": {
+   "file_exists": true,
+   "png_signature": true,
+   "non_zero_bytes": true,
+   "has_dimensions": true,
+   "drawn_le_points": true,
+   "reply_names_the_measure": true,
+   "says_it_cannot_be_seen": true
+  },
+  "wall_time_seconds": 0.746384,
+  "file": {
+   "exists": true,
+   "path": "/home/user/analytics-agent/workspace/dbench_sales_10000000/charts/top_n_20260924-223253.png",
+   "bytes": 16335,
+   "png_signature": true,
+   "width": 800,
+   "height": 450,
+   "zero_byte": false
+  },
+  "run_kind": "cold",
+  "why": null
+ },
+ {
+  "domain": "sales",
+  "rows": 10000000,
+  "unit": "I_sales_10000000",
+  "phase": "I",
+  "seq": 152,
+  "analysis": "top_n",
+  "chart": "bar",
+  "edge": false,
+  "parameters": {
+   "dataset_name": "sales",
+   "analysis_type": "top_n",
+   "chart": "bar",
+   "dimension": "region",
+   "measure": "net_sales"
+  },
+  "status": "OK",
+  "verdict": "PASS",
+  "checks": {
+   "file_exists": true,
+   "png_signature": true,
+   "non_zero_bytes": true,
+   "has_dimensions": true,
+   "drawn_le_points": true,
+   "reply_names_the_measure": true,
+   "says_it_cannot_be_seen": true
+  },
+  "wall_time_seconds": 0.750366,
+  "file": {
+   "exists": true,
+   "path": "/home/user/analytics-agent/workspace/dbench_sales_10000000/charts/top_n_20260924-223254.png",
+   "bytes": 16335,
+   "png_signature": true,
+   "width": 800,
+   "height": 450,
+   "zero_byte": false
+  },
+  "run_kind": "warm",
+  "why": null
+ },
+ {
+  "domain": "sales",
+  "rows": 10000000,
+  "unit": "I_sales_10000000",
+  "phase": "I",
+  "seq": 153,
+  "analysis": "distribution",
+  "chart": "histogram",
+  "edge": false,
+  "parameters": {
+   "dataset_name": "sales",
+   "analysis_type": "distribution",
+   "chart": "histogram",
+   "measure": "net_sales",
+   "y": "rows"
+  },
+  "status": "OK",
+  "verdict": "PASS",
+  "checks": {
+   "file_exists": true,
+   "png_signature": true,
+   "non_zero_bytes": true,
+   "has_dimensions": true,
+   "drawn_le_points": true,
+   "reply_names_the_measure": true,
+   "says_it_cannot_be_seen": true
+  },
+  "wall_time_seconds": 2.718114,
+  "file": {
+   "exists": true,
+   "path": "/home/user/analytics-agent/workspace/dbench_sales_10000000/charts/distribution_20260924-223257.png",
+   "bytes": 12569,
+   "png_signature": true,
+   "width": 800,
+   "height": 450,
+   "zero_byte": false
+  },
+  "run_kind": "cold",
+  "why": null
+ },
+ {
+  "domain": "sales",
+  "rows": 10000000,
+  "unit": "I_sales_10000000",
+  "phase": "I",
+  "seq": 154,
+  "analysis": "distribution",
+  "chart": "histogram",
+  "edge": false,
+  "parameters": {
+   "dataset_name": "sales",
+   "analysis_type": "distribution",
+   "chart": "histogram",
+   "measure": "net_sales",
+   "y": "rows"
+  },
+  "status": "OK",
+  "verdict": "PASS",
+  "checks": {
+   "file_exists": true,
+   "png_signature": true,
+   "non_zero_bytes": true,
+   "has_dimensions": true,
+   "drawn_le_points": true,
+   "reply_names_the_measure": true,
+   "says_it_cannot_be_seen": true
+  },
+  "wall_time_seconds": 2.668984,
+  "file": {
+   "exists": true,
+   "path": "/home/user/analytics-agent/workspace/dbench_sales_10000000/charts/distribution_20260924-223259.png",
+   "bytes": 12569,
+   "png_signature": true,
+   "width": 800,
+   "height": 450,
+   "zero_byte": false
+  },
+  "run_kind": "warm",
+  "why": null
+ },
+ {
+  "domain": "sales",
+  "rows": 10000000,
+  "unit": "I_sales_10000000",
+  "phase": "I",
+  "seq": 155,
+  "analysis": "cross_tab",
+  "chart": "heatmap",
+  "edge": false,
+  "parameters": {
+   "dataset_name": "sales",
+   "analysis_type": "cross_tab",
+   "chart": "heatmap",
+   "rows": "region",
+   "columns": "channel",
+   "measure": "net_sales"
+  },
+  "status": "OK",
+  "verdict": "PASS",
+  "checks": {
+   "file_exists": true,
+   "png_signature": true,
+   "non_zero_bytes": true,
+   "has_dimensions": true,
+   "drawn_le_points": true,
+   "reply_names_the_measure": true,
+   "says_it_cannot_be_seen": true
+  },
+  "wall_time_seconds": 1.212593,
+  "file": {
+   "exists": true,
+   "path": "/home/user/analytics-agent/workspace/dbench_sales_10000000/charts/cross_tab_20260924-223301.png",
+   "bytes": 23282,
+   "png_signature": true,
+   "width": 800,
+   "height": 450,
+   "zero_byte": false
+  },
+  "run_kind": "cold",
+  "why": null
+ },
+ {
+  "domain": "sales",
+  "rows": 10000000,
+  "unit": "I_sales_10000000",
+  "phase": "I",
+  "seq": 156,
+  "analysis": "cross_tab",
+  "chart": "heatmap",
+  "edge": false,
+  "parameters": {
+   "dataset_name": "sales",
+   "analysis_type": "cross_tab",
+   "chart": "heatmap",
+   "rows": "region",
+   "columns": "channel",
+   "measure": "net_sales"
+  },
+  "status": "OK",
+  "verdict": "PASS",
+  "checks": {
+   "file_exists": true,
+   "png_signature": true,
+   "non_zero_bytes": true,
+   "has_dimensions": true,
+   "drawn_le_points": true,
+   "reply_names_the_measure": true,
+   "says_it_cannot_be_seen": true
+  },
+  "wall_time_seconds": 1.261686,
+  "file": {
+   "exists": true,
+   "path": "/home/user/analytics-agent/workspace/dbench_sales_10000000/charts/cross_tab_20260924-223302.png",
+   "bytes": 23282,
+   "png_signature": true,
+   "width": 800,
+   "height": 450,
+   "zero_byte": false
+  },
+  "run_kind": "warm",
+  "why": null
+ },
+ {
+  "domain": "sales",
+  "rows": 10000000,
+  "unit": "I_sales_10000000",
+  "phase": "I",
+  "seq": 157,
+  "analysis": "correlation",
+  "chart": "scatter",
+  "edge": false,
+  "parameters": {
+   "dataset_name": "sales",
+   "analysis_type": "correlation",
+   "chart": "scatter",
+   "measure": "gross_sales",
+   "against": "net_sales"
+  },
+  "status": "OK",
+  "verdict": "PASS",
+  "checks": {
+   "file_exists": true,
+   "png_signature": true,
+   "non_zero_bytes": true,
+   "has_dimensions": true,
+   "drawn_le_points": true,
+   "reply_names_the_measure": true,
+   "says_it_cannot_be_seen": true
+  },
+  "wall_time_seconds": 3.481128,
+  "file": {
+   "exists": true,
+   "path": "/home/user/analytics-agent/workspace/dbench_sales_10000000/charts/correlation_20260924-223305.png",
+   "bytes": 16415,
+   "png_signature": true,
+   "width": 800,
+   "height": 450,
+   "zero_byte": false
+  },
+  "run_kind": "cold",
+  "why": null
+ },
+ {
+  "domain": "sales",
+  "rows": 10000000,
+  "unit": "I_sales_10000000",
+  "phase": "I",
+  "seq": 158,
+  "analysis": "correlation",
+  "chart": "scatter",
+  "edge": false,
+  "parameters": {
+   "dataset_name": "sales",
+   "analysis_type": "correlation",
+   "chart": "scatter",
+   "measure": "gross_sales",
+   "against": "net_sales"
+  },
+  "status": "OK",
+  "verdict": "PASS",
+  "checks": {
+   "file_exists": true,
+   "png_signature": true,
+   "non_zero_bytes": true,
+   "has_dimensions": true,
+   "drawn_le_points": true,
+   "reply_names_the_measure": true,
+   "says_it_cannot_be_seen": true
+  },
+  "wall_time_seconds": 3.603704,
+  "file": {
+   "exists": true,
+   "path": "/home/user/analytics-agent/workspace/dbench_sales_10000000/charts/correlation_20260924-223309.png",
+   "bytes": 16415,
+   "png_signature": true,
+   "width": 800,
+   "height": 450,
+   "zero_byte": false
+  },
+  "run_kind": "warm",
+  "why": null
+ },
+ {
+  "domain": "sales",
+  "rows": 10000000,
+  "unit": "I_sales_10000000",
+  "phase": "I",
+  "seq": 159,
+  "analysis": "group_compare",
+  "chart": "box",
+  "edge": false,
+  "parameters": {
+   "dataset_name": "sales",
+   "analysis_type": "group_compare",
+   "chart": "box",
+   "dimension": "region",
+   "measure": "net_sales"
+  },
+  "status": "OK",
+  "verdict": "PASS",
+  "checks": {
+   "file_exists": true,
+   "png_signature": true,
+   "non_zero_bytes": true,
+   "has_dimensions": true,
+   "drawn_le_points": true,
+   "reply_names_the_measure": true,
+   "says_it_cannot_be_seen": true
+  },
+  "wall_time_seconds": 1.976083,
+  "file": {
+   "exists": true,
+   "path": "/home/user/analytics-agent/workspace/dbench_sales_10000000/charts/group_compare_20260924-223311.png",
+   "bytes": 16856,
+   "png_signature": true,
+   "width": 800,
+   "height": 450,
+   "zero_byte": false
+  },
+  "run_kind": "cold",
+  "why": null
+ },
+ {
+  "domain": "sales",
+  "rows": 10000000,
+  "unit": "I_sales_10000000",
+  "phase": "I",
+  "seq": 160,
+  "analysis": "group_compare",
+  "chart": "box",
+  "edge": false,
+  "parameters": {
+   "dataset_name": "sales",
+   "analysis_type": "group_compare",
+   "chart": "box",
+   "dimension": "region",
+   "measure": "net_sales"
+  },
+  "status": "OK",
+  "verdict": "PASS",
+  "checks": {
+   "file_exists": true,
+   "png_signature": true,
+   "non_zero_bytes": true,
+   "has_dimensions": true,
+   "drawn_le_points": true,
+   "reply_names_the_measure": true,
+   "says_it_cannot_be_seen": true
+  },
+  "wall_time_seconds": 1.923024,
+  "file": {
+   "exists": true,
+   "path": "/home/user/analytics-agent/workspace/dbench_sales_10000000/charts/group_compare_20260924-223313.png",
+   "bytes": 16856,
+   "png_signature": true,
+   "width": 800,
+   "height": 450,
+   "zero_byte": false
+  },
+  "run_kind": "warm",
+  "why": null
+ },
+ {
+  "domain": "sales",
+  "rows": 10000000,
+  "unit": "I_sales_10000000",
+  "phase": "I",
+  "seq": 161,
+  "analysis": "mix_shift",
+  "chart": "waterfall",
+  "edge": false,
+  "parameters": {
+   "dataset_name": "sales",
+   "analysis_type": "mix_shift",
+   "chart": "waterfall",
+   "measure": "net_sales",
+   "dimension": "region",
+   "period": "2024-12",
+   "baseline": "2024-11",
+   "grain": "month",
+   "y": "contribution"
+  },
+  "status": "OK",
+  "verdict": "PASS",
+  "checks": {
+   "file_exists": true,
+   "png_signature": true,
+   "non_zero_bytes": true,
+   "has_dimensions": true,
+   "drawn_le_points": true,
+   "reply_names_the_measure": true,
+   "says_it_cannot_be_seen": true
+  },
+  "wall_time_seconds": 1.60551,
+  "file": {
+   "exists": true,
+   "path": "/home/user/analytics-agent/workspace/dbench_sales_10000000/charts/mix_shift_20260924-223315.png",
+   "bytes": 19844,
+   "png_signature": true,
+   "width": 800,
+   "height": 450,
+   "zero_byte": false
+  },
+  "run_kind": "cold",
+  "why": null
+ },
+ {
+  "domain": "sales",
+  "rows": 10000000,
+  "unit": "I_sales_10000000",
+  "phase": "I",
+  "seq": 162,
+  "analysis": "mix_shift",
+  "chart": "waterfall",
+  "edge": false,
+  "parameters": {
+   "dataset_name": "sales",
+   "analysis_type": "mix_shift",
+   "chart": "waterfall",
+   "measure": "net_sales",
+   "dimension": "region",
+   "period": "2024-12",
+   "baseline": "2024-11",
+   "grain": "month",
+   "y": "contribution"
+  },
+  "status": "OK",
+  "verdict": "PASS",
+  "checks": {
+   "file_exists": true,
+   "png_signature": true,
+   "non_zero_bytes": true,
+   "has_dimensions": true,
+   "drawn_le_points": true,
+   "reply_names_the_measure": true,
+   "says_it_cannot_be_seen": true
+  },
+  "wall_time_seconds": 1.70034,
+  "file": {
+   "exists": true,
+   "path": "/home/user/analytics-agent/workspace/dbench_sales_10000000/charts/mix_shift_20260924-223316.png",
+   "bytes": 19844,
+   "png_signature": true,
+   "width": 800,
+   "height": 450,
+   "zero_byte": false
+  },
+  "run_kind": "warm",
+  "why": null
+ },
+ {
+  "domain": "sales",
+  "rows": 10000000,
+  "unit": "I_sales_10000000",
+  "phase": "I",
+  "seq": 163,
+  "analysis": "cohort_retention",
+  "chart": "heatmap",
+  "edge": false,
+  "parameters": {
+   "dataset_name": "sales",
+   "analysis_type": "cohort_retention",
+   "chart": "heatmap",
+   "entity": "customer_id"
+  },
+  "status": "OK",
+  "verdict": "PASS",
+  "checks": {
+   "file_exists": true,
+   "png_signature": true,
+   "non_zero_bytes": true,
+   "has_dimensions": true,
+   "drawn_le_points": true,
+   "reply_names_the_measure": true,
+   "says_it_cannot_be_seen": true
+  },
+  "wall_time_seconds": 3.483067,
+  "file": {
+   "exists": true,
+   "path": "/home/user/analytics-agent/workspace/dbench_sales_10000000/charts/cohort_retention_20260924-223320.png",
+   "bytes": 44693,
+   "png_signature": true,
+   "width": 800,
+   "height": 450,
+   "zero_byte": false
+  },
+  "run_kind": "cold",
+  "why": null
+ },
+ {
+  "domain": "sales",
+  "rows": 10000000,
+  "unit": "I_sales_10000000",
+  "phase": "I",
+  "seq": 164,
+  "analysis": "cohort_retention",
+  "chart": "heatmap",
+  "edge": false,
+  "parameters": {
+   "dataset_name": "sales",
+   "analysis_type": "cohort_retention",
+   "chart": "heatmap",
+   "entity": "customer_id"
+  },
+  "status": "OK",
+  "verdict": "PASS",
+  "checks": {
+   "file_exists": true,
+   "png_signature": true,
+   "non_zero_bytes": true,
+   "has_dimensions": true,
+   "drawn_le_points": true,
+   "reply_names_the_measure": true,
+   "says_it_cannot_be_seen": true
+  },
+  "wall_time_seconds": 3.364635,
+  "file": {
+   "exists": true,
+   "path": "/home/user/analytics-agent/workspace/dbench_sales_10000000/charts/cohort_retention_20260924-223323.png",
+   "bytes": 44693,
+   "png_signature": true,
+   "width": 800,
+   "height": 450,
+   "zero_byte": false
+  },
+  "run_kind": "warm",
+  "why": null
+ },
+ {
+  "domain": "sales",
+  "rows": 10000000,
+  "unit": "I_sales_10000000",
+  "phase": "I",
+  "seq": 165,
+  "analysis": "group_compare",
+  "chart": "bar",
+  "edge": true,
+  "parameters": {
+   "dataset_name": "sales",
+   "analysis_type": "group_compare",
+   "chart": "bar",
+   "dimension": "region",
+   "measure": "net_sales"
+  },
+  "status": "REFUSED",
+  "verdict": "REFUSED",
+  "checks": {},
+  "wall_time_seconds": 1.919096,
+  "file": {
+   "exists": false
+  },
+  "run_kind": "cold",
+  "why": "WHY: a bar chart draws one measure and this result offers 8: n, nulls, total, min, max, mean, median, stddev. Name one with y."
+ },
+ {
+  "domain": "sales",
+  "rows": 10000000,
+  "unit": "I_sales_10000000",
+  "phase": "I",
+  "seq": 166,
+  "analysis": "group_compare",
+  "chart": "bar",
+  "edge": true,
+  "parameters": {
+   "dataset_name": "sales",
+   "analysis_type": "group_compare",
+   "chart": "bar",
+   "dimension": "region",
+   "measure": "net_sales"
+  },
+  "status": "REFUSED",
+  "verdict": "REFUSED",
+  "checks": {},
+  "wall_time_seconds": 2.092201,
+  "file": {
+   "exists": false
+  },
+  "run_kind": "warm",
+  "why": "WHY: a bar chart draws one measure and this result offers 8: n, nulls, total, min, max, mean, median, stddev. Name one with y."
+ },
+ {
+  "domain": "sales",
+  "rows": 10000000,
+  "unit": "I_sales_10000000",
+  "phase": "I",
+  "seq": 167,
+  "analysis": "trend",
+  "chart": "line",
+  "edge": true,
+  "parameters": {
+   "dataset_name": "sales",
+   "analysis_type": "trend",
+   "chart": "line",
+   "measure": "net_sales",
+   "grain": "month",
+   "y": "no_such_col"
+  },
+  "status": "REFUSED",
+  "verdict": "REFUSED",
+  "checks": {},
+  "wall_time_seconds": 0.817409,
+  "file": {
+   "exists": false
+  },
+  "run_kind": "cold",
+  "why": "WHY: no_such_col is not a column of this result. Columns: period, net_sales (sum), rows."
+ },
+ {
+  "domain": "sales",
+  "rows": 10000000,
+  "unit": "I_sales_10000000",
+  "phase": "I",
+  "seq": 168,
+  "analysis": "trend",
+  "chart": "line",
+  "edge": true,
+  "parameters": {
+   "dataset_name": "sales",
+   "analysis_type": "trend",
+   "chart": "line",
+   "measure": "net_sales",
+   "grain": "month",
+   "y": "no_such_col"
+  },
+  "status": "REFUSED",
+  "verdict": "REFUSED",
+  "checks": {},
+  "wall_time_seconds": 0.847389,
+  "file": {
+   "exists": false
+  },
+  "run_kind": "warm",
+  "why": "WHY: no_such_col is not a column of this result. Columns: period, net_sales (sum), rows."
+ },
+ {
+  "domain": "sales",
+  "rows": 10000000,
+  "unit": "I_sales_10000000",
+  "phase": "I",
+  "seq": 169,
+  "analysis": "frequency",
+  "chart": "bar",
+  "edge": true,
+  "parameters": {
+   "dataset_name": "sales",
+   "analysis_type": "frequency",
+   "chart": "bar",
+   "column": "region",
+   "y": "value"
+  },
+  "status": "REFUSED",
+  "verdict": "REFUSED",
+  "checks": {},
+  "wall_time_seconds": 0.596601,
+  "file": {
+   "exists": false
+  },
+  "run_kind": "cold",
+  "why": "WHY: 'north' is not a number. Only a measure column can be plotted; a dimension's members belong on the other axis."
+ },
+ {
+  "domain": "sales",
+  "rows": 10000000,
+  "unit": "I_sales_10000000",
+  "phase": "I",
+  "seq": 170,
+  "analysis": "frequency",
+  "chart": "bar",
+  "edge": true,
+  "parameters": {
+   "dataset_name": "sales",
+   "analysis_type": "frequency",
+   "chart": "bar",
+   "column": "region",
+   "y": "value"
+  },
+  "status": "REFUSED",
+  "verdict": "REFUSED",
+  "checks": {},
+  "wall_time_seconds": 0.609991,
+  "file": {
+   "exists": false
+  },
+  "run_kind": "warm",
+  "why": "WHY: 'north' is not a number. Only a measure column can be plotted; a dimension's members belong on the other axis."
+ },
+ {
+  "domain": "sales",
+  "rows": 10000000,
+  "unit": "I_sales_10000000",
+  "phase": "I",
+  "seq": 171,
+  "analysis": "trend",
+  "chart": "line",
+  "edge": true,
+  "parameters": {
+   "dataset_name": "sales",
+   "analysis_type": "trend",
+   "chart": "line",
+   "measure": "net_sales",
+   "grain": "month",
+   "y": "period"
+  },
+  "status": "REFUSED",
+  "verdict": "REFUSED",
+  "checks": {},
+  "wall_time_seconds": 0.790271,
+  "file": {
+   "exists": false
+  },
+  "run_kind": "cold",
+  "why": "WHY: '2023-01' is not a number. Only a measure column can be plotted; a dimension's members belong on the other axis."
+ },
+ {
+  "domain": "sales",
+  "rows": 10000000,
+  "unit": "I_sales_10000000",
+  "phase": "I",
+  "seq": 172,
+  "analysis": "trend",
+  "chart": "line",
+  "edge": true,
+  "parameters": {
+   "dataset_name": "sales",
+   "analysis_type": "trend",
+   "chart": "line",
+   "measure": "net_sales",
+   "grain": "month",
+   "y": "period"
+  },
+  "status": "REFUSED",
+  "verdict": "REFUSED",
+  "checks": {},
+  "wall_time_seconds": 0.784092,
+  "file": {
+   "exists": false
+  },
+  "run_kind": "warm",
+  "why": "WHY: '2023-01' is not a number. Only a measure column can be plotted; a dimension's members belong on the other axis."
+ },
+ {
+  "domain": "sales",
+  "rows": 10000000,
+  "unit": "I_sales_10000000",
+  "phase": "I",
+  "seq": 173,
+  "analysis": "top_n",
+  "chart": "bar",
+  "edge": true,
+  "parameters": {
+   "dataset_name": "sales",
+   "analysis_type": "top_n",
+   "chart": "bar",
+   "dimension": "customer_id",
+   "measure": "net_sales",
+   "n": 1000
+  },
+  "status": "OK",
+  "verdict": "PASS",
+  "checks": {
+   "file_exists": true,
+   "png_signature": true,
+   "non_zero_bytes": true,
+   "has_dimensions": true,
+   "drawn_le_points": true,
+   "reply_names_the_measure": true,
+   "says_it_cannot_be_seen": true
+  },
+  "wall_time_seconds": 9.05584,
+  "file": {
+   "exists": true,
+   "path": "/home/user/analytics-agent/workspace/dbench_sales_10000000/charts/top_n_20260924-223337.png",
+   "bytes": 19794,
+   "png_signature": true,
+   "width": 800,
+   "height": 450,
+   "zero_byte": false
+  },
+  "run_kind": "cold",
+  "why": null
+ },
+ {
+  "domain": "sales",
+  "rows": 10000000,
+  "unit": "I_sales_10000000",
+  "phase": "I",
+  "seq": 174,
+  "analysis": "top_n",
+  "chart": "bar",
+  "edge": true,
+  "parameters": {
+   "dataset_name": "sales",
+   "analysis_type": "top_n",
+   "chart": "bar",
+   "dimension": "customer_id",
+   "measure": "net_sales",
+   "n": 1000
+  },
+  "status": "OK",
+  "verdict": "PASS",
+  "checks": {
+   "file_exists": true,
+   "png_signature": true,
+   "non_zero_bytes": true,
+   "has_dimensions": true,
+   "drawn_le_points": true,
+   "reply_names_the_measure": true,
+   "says_it_cannot_be_seen": true
+  },
+  "wall_time_seconds": 9.727296,
+  "file": {
+   "exists": true,
+   "path": "/home/user/analytics-agent/workspace/dbench_sales_10000000/charts/top_n_20260924-223346.png",
+   "bytes": 19794,
+   "png_signature": true,
+   "width": 800,
+   "height": 450,
+   "zero_byte": false
+  },
+  "run_kind": "warm",
+  "why": null
+ },
+ {
+  "domain": "sales",
+  "rows": 10000000,
+  "unit": "I_sales_10000000",
+  "phase": "I",
+  "seq": 175,
+  "analysis": "trend",
+  "chart": "pie",
+  "edge": true,
+  "parameters": {
+   "dataset_name": "sales",
+   "analysis_type": "trend",
+   "chart": "pie",
+   "measure": "net_sales",
+   "grain": "month"
+  },
+  "status": "REFUSED",
+  "verdict": "REFUSED",
+  "checks": {},
+  "wall_time_seconds": 0.828556,
+  "file": {
+   "exists": false
+  },
+  "run_kind": "cold",
+  "why": "WHY: there is no chart called 'pie'. Available: line, bar, grouped_bar, scatter, histogram, box, heatmap, waterfall."
+ },
+ {
+  "domain": "sales",
+  "rows": 10000000,
+  "unit": "I_sales_10000000",
+  "phase": "I",
+  "seq": 176,
+  "analysis": "trend",
+  "chart": "pie",
+  "edge": true,
+  "parameters": {
+   "dataset_name": "sales",
+   "analysis_type": "trend",
+   "chart": "pie",
+   "measure": "net_sales",
+   "grain": "month"
+  },
+  "status": "REFUSED",
+  "verdict": "REFUSED",
+  "checks": {},
+  "wall_time_seconds": 0.803414,
+  "file": {
+   "exists": false
+  },
+  "run_kind": "warm",
+  "why": "WHY: there is no chart called 'pie'. Available: line, bar, grouped_bar, scatter, histogram, box, heatmap, waterfall."
+ },
+ {
+  "domain": "sales",
   "rows": 2000000,
   "unit": "I_sales_2000000",
   "phase": "I",

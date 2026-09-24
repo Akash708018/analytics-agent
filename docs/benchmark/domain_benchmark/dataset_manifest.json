@@ -3412,6 +3412,109 @@
  },
  {
   "domain": "sales",
+  "rows_requested": 10000000,
+  "seed": 43026352,
+  "base_seed": 20260924,
+  "path": "/tmp/domain_benchmark_data/sales_10000000.csv",
+  "bytes": 1520861287,
+  "columns": [
+   "record_id",
+   "order_id",
+   "customer_id",
+   "salesperson_id",
+   "product_id",
+   "product_category",
+   "region",
+   "city",
+   "order_date",
+   "quantity",
+   "unit_price",
+   "discount",
+   "gross_sales",
+   "net_sales",
+   "cost",
+   "profit",
+   "channel",
+   "returned_flag",
+   "shipped_at"
+  ],
+  "types": {
+   "record_id": "str",
+   "order_id": "str",
+   "customer_id": "str",
+   "salesperson_id": "str",
+   "product_id": "str",
+   "product_category": "str",
+   "region": "str",
+   "city": "str",
+   "order_date": "date",
+   "quantity": "int",
+   "unit_price": "float",
+   "discount": "float",
+   "gross_sales": "float",
+   "net_sales": "float",
+   "cost": "float",
+   "profit": "float",
+   "channel": "str",
+   "returned_flag": "bool",
+   "shipped_at": "ts"
+  },
+  "anomalies": {
+   "rows_generated": 10000000,
+   "rows_written": 10029884,
+   "duplicate_rows": 29884,
+   "duplicated_business_keys": 20064,
+   "outliers_x50": 4979,
+   "extreme_1e9": 3,
+   "nulls": {
+    "product_category": 49949,
+    "region": 30068,
+    "order_date": 49998,
+    "net_sales": 20266,
+    "discount": 99755
+   }
+  },
+  "pools": {
+   "n": 10000000,
+   "customers": 2000000,
+   "accounts": 1000000,
+   "people": 500000,
+   "small": 100000,
+   "mid": 250000
+  },
+  "window": [
+   "2023-01-01",
+   "2024-12-31"
+  ],
+  "date_column": "order_date",
+  "business_key": "order_id",
+  "anomaly_design": {
+   "duplicate_row_rate": 0.003,
+   "duplicated_business_key_rate": 0.002,
+   "outlier_x50_rate": 0.0005,
+   "extreme_positions": [
+    3333333,
+    5000000,
+    6666666
+   ],
+   "null_rates": {
+    "product_category": 0.005,
+    "region": 0.003,
+    "order_date": 0.005,
+    "net_sales": 0.002,
+    "discount": 0.01
+   },
+   "outside_window_rate": 0.01,
+   "feb29_rate": 0.001,
+   "window_edge_rate": 0.001,
+   "constant_or_near_constant": "see generator (e.g. source_system, currency, country)",
+   "rare_categories": "weights of 0.1% or less in pick() calls"
+  },
+  "generation_seconds": 360.22,
+  "sha256": "1250ab4729fde06bbb9bbb4051b1969e0c774a472f091e71b175015ea9e9f283"
+ },
+ {
+  "domain": "sales",
   "rows_requested": 2000000,
   "seed": 35026352,
   "base_seed": 20260924,

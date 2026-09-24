@@ -12,26 +12,33 @@
   },
   {
    "domain": "hr",
+   "rows": 10000,
+   "checks_attempted": 458,
+   "checks_passed": 458,
+   "checks_failed": 0,
+   "calls_verified": 8,
+   "calls_PASS": 8,
+   "correctness_percent": 100.0
+  },
+  {
+   "domain": "hr",
    "rows": 100000,
-   "checks_attempted": 37717,
-   "checks_passed": 37716,
-   "checks_failed": 1,
+   "checks_attempted": 37724,
+   "checks_passed": 37724,
+   "checks_failed": 0,
    "calls_verified": 46,
-   "calls_PASS": 45,
-   "calls_FAIL": 1,
-   "correctness_percent": 99.9973
+   "calls_PASS": 46,
+   "correctness_percent": 100.0
   },
   {
    "domain": "hr",
    "rows": 1000000,
-   "checks_attempted": 308240,
-   "checks_passed": 308239,
-   "checks_failed": 1,
+   "checks_attempted": 308249,
+   "checks_passed": 308249,
+   "checks_failed": 0,
    "calls_verified": 46,
-   "calls_PASS": 44,
-   "calls_FAIL": 1,
-   "calls_ORACLE_ERROR": 1,
-   "correctness_percent": 99.9997
+   "calls_PASS": 46,
+   "correctness_percent": 100.0
   }
  ],
  "performance": [
@@ -6266,146 +6273,7 @@
    "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
   }
  ],
- "errors": [
-  {
-   "error_number": 18,
-   "timestamp": null,
-   "domain": "hr",
-   "size": 100000,
-   "file": null,
-   "workflow_step": "analyses",
-   "tool": "compute_analysis",
-   "analysis": "hypothesis_test",
-   "supplied_arguments": {
-    "dimension": "attrition_flag",
-    "measure": "performance_score"
-   },
-   "expected_behavior": "the reply states a statistic and a p value = Test: ... p ...",
-   "observed_behavior": "  - Test: Welch's unequal-variance t-test (two-sided). Statistic -0.7679, df 1.847e+04, p 0.442539. (1 of 1 checks failed)",
-   "exception": null,
-   "stack_trace": null,
-   "severity": "CRITICAL",
-   "recovered": true,
-   "subsequent_operations_valid": true,
-   "unit": "D_hr",
-   "kind": "wrong_result",
-   "variant": "t",
-   "klass": "REQUIRED"
-  },
-  {
-   "error_number": 30,
-   "timestamp": null,
-   "domain": "hr",
-   "size": 1000000,
-   "file": null,
-   "workflow_step": "analyses",
-   "tool": "compute_analysis",
-   "analysis": "hypothesis_test",
-   "supplied_arguments": {
-    "dimension": "attrition_flag",
-    "measure": "performance_score"
-   },
-   "expected_behavior": "the reply states a statistic and a p value = Test: ... p ...",
-   "observed_behavior": "  - Test: Welch's unequal-variance t-test (two-sided). Statistic 0.4665, df 1.874e+05, p 0.640887. (1 of 1 checks failed)",
-   "exception": null,
-   "stack_trace": null,
-   "severity": "CRITICAL",
-   "recovered": true,
-   "subsequent_operations_valid": true,
-   "unit": "E_hr",
-   "kind": "wrong_result",
-   "variant": "t",
-   "klass": "REQUIRED"
-  },
-  {
-   "error_number": 31,
-   "timestamp": null,
-   "domain": "hr",
-   "size": 1000000,
-   "file": null,
-   "workflow_step": "analyses",
-   "tool": "compute_analysis",
-   "analysis": "sample_adequacy",
-   "supplied_arguments": {
-    "dimension": "attrition_flag",
-    "measure": "performance_score"
-   },
-   "expected_behavior": "None = None",
-   "observed_behavior": "None (0 of 0 checks failed)",
-   "exception": null,
-   "stack_trace": null,
-   "severity": "MEDIUM",
-   "recovered": true,
-   "subsequent_operations_valid": true,
-   "unit": "E_hr",
-   "kind": "oracle_error",
-   "variant": "",
-   "klass": "VALID"
-  },
-  {
-   "error_number": 74,
-   "timestamp": null,
-   "domain": "hr",
-   "size": 100000,
-   "file": "frequency_20260924-164907.csv",
-   "workflow_step": "read_result",
-   "tool": "read_result_file",
-   "analysis": null,
-   "supplied_arguments": {
-    "start": 901,
-    "limit": 200
-   },
-   "expected_behavior": "100 rows",
-   "observed_behavior": "50 found",
-   "exception": null,
-   "stack_trace": null,
-   "severity": "HIGH",
-   "recovered": true,
-   "subsequent_operations_valid": true,
-   "unit": "D_hr"
-  },
-  {
-   "error_number": 84,
-   "timestamp": null,
-   "domain": "hr",
-   "size": 1000000,
-   "file": "frequency_20260924-173414.csv",
-   "workflow_step": "read_result",
-   "tool": "read_result_file",
-   "analysis": null,
-   "supplied_arguments": {
-    "start": 901,
-    "limit": 200
-   },
-   "expected_behavior": "100 rows",
-   "observed_behavior": "50 found",
-   "exception": null,
-   "stack_trace": null,
-   "severity": "HIGH",
-   "recovered": true,
-   "subsequent_operations_valid": true,
-   "unit": "E_hr"
-  },
-  {
-   "error_number": 99,
-   "timestamp": null,
-   "domain": "hr",
-   "size": 10000,
-   "file": null,
-   "workflow_step": "isolation",
-   "tool": "charts",
-   "analysis": null,
-   "supplied_arguments": null,
-   "expected_behavior": "only its own dataset",
-   "observed_behavior": "{\"dataset\": \"hr\", \"names_its_measure\": false, \"names_another_dataset\": [], \"status\": \"FAIL\"}",
-   "exception": null,
-   "stack_trace": null,
-   "severity": "CRITICAL",
-   "recovered": true,
-   "subsequent_operations_valid": null,
-   "unit": "H_isolation"
-  }
- ],
+ "errors": [],
  "warnings": [
   {
    "category": "unsupported_operation",

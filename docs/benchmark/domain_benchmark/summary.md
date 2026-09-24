@@ -8,56 +8,29 @@ Generated from `benchmark.json` and the files beside it by `scripts/domain_bench
 |---|---|
 | domains | 10 / 10 |
 | principal datasets | 30 |
-| stress datasets run | 5 |
-| calls executed | 12,840 |
-| correctness checks attempted | 6,157,413 |
-| checks passed | 6,157,385 |
-| checks failed | 28 |
-| verified calls skipped (no oracle / resource) | 96 |
+| stress datasets run | 6 |
+| calls executed | 12,763 |
+| correctness checks attempted | 6,159,473 |
+| checks passed | 6,159,473 |
+| checks failed | 0 |
+| verified calls skipped (no oracle / resource) | 114 |
 | known-answer checks passed | 50 / 50 |
-| warnings | 1,166 |
-| errors | 107 |
+| warnings | 1,228 |
+| errors | 37 |
 | worker crashes | 0 |
-| exceptions escaping a tool | 11 |
+| exceptions escaping a tool | 18 |
 | timeouts | 0 |
-| total benchmark runtime (s) | 8,404.200 |
-| peak worker memory (MiB) | 3,627.200 |
-| largest workspace (MiB) | 1,225.490 |
+| total benchmark runtime (s) | 11,966.600 |
+| peak worker memory (MiB) | 4,240.900 |
+| largest workspace (MiB) | 1,361.970 |
 
 Machine: Intel(R) Xeon(R) Processor @ 2.80GHz x 4, 16095 MiB RAM, SwapTotal:             0 kB; Linux-6.18.44-fc-v37-x86_64-with-glibc2.39; Python 3.12.3; commit 2d3d52f3667b on claude/trusting-edison-en0jnk.
 
-Defects by severity: CRITICAL 26, HIGH 49, MEDIUM 32, LOW 0
+Defects by severity: CRITICAL 0, HIGH 35, MEDIUM 2, LOW 0
 
 ### Wrong answers (worse than crashes)
 
-| # | domain | rows | analysis | expected | observed |
-|---|---|---|---|---|---|
-| 12 | ecommerce | 1,000 | sample_adequacy  | minimum detectable d = 0.4206504714341478 | 0.4206 (1 of 2 checks failed) |
-| 13 | manufacturing | 1,000 | distribution  | bin 4 rows = 189 | 211 (6 of 13 checks failed) |
-| 14 | crm | 100,000 | hypothesis_test t | the reply states a statistic and a p value = Test: ... p ... |   - Test: Welch's unequal-variance t-test (two-sided). Statistic 15.2604, df 1.569e+04, p  |
-| 15 | education | 100,000 | hypothesis_test t | the reply states a statistic and a p value = Test: ... p ... |   - Test: Welch's unequal-variance t-test (two-sided). Statistic -1.8539, df 2.634e+04, p  |
-| 17 | healthcare | 100,000 | hypothesis_test t | the reply states a statistic and a p value = Test: ... p ... |   - Test: Welch's unequal-variance t-test (two-sided). Statistic -23.859, df 9.686e+04, p  |
-| 18 | hr | 100,000 | hypothesis_test t | the reply states a statistic and a p value = Test: ... p ... |   - Test: Welch's unequal-variance t-test (two-sided). Statistic -0.7679, df 1.847e+04, p  |
-| 19 | manufacturing | 100,000 | distribution  | bin 3 rows = 30636 | 32,771 (8 of 13 checks failed) |
-| 20 | marketing | 100,000 | hypothesis_test t | the reply states a statistic and a p value = Test: ... p ... |   - Test: Welch's unequal-variance t-test (two-sided). Statistic -0.7413, df 5.555e+04, p  |
-| 22 | crm | 1,000,000 | hypothesis_test t | the reply states a statistic and a p value = Test: ... p ... |   - Test: Welch's unequal-variance t-test (two-sided). Statistic 43.8571, df 1.594e+05, p  |
-| 24 | ecommerce | 1,000,000 | hypothesis_test t | the reply states a statistic and a p value = Test: ... p ... |   - Test: Welch's unequal-variance t-test (two-sided). Statistic 0.1578, df 4.675e+04, p 0 |
-| 26 | education | 1,000,000 | hypothesis_test t | the reply states a statistic and a p value = Test: ... p ... |   - Test: Welch's unequal-variance t-test (two-sided). Statistic 0.2756, df 2.603e+05, p 0 |
-| 28 | healthcare | 1,000,000 | hypothesis_test t | the reply states a statistic and a p value = Test: ... p ... |   - Test: Welch's unequal-variance t-test (two-sided). Statistic -78.4531, df 9.637e+05, p |
-| 30 | hr | 1,000,000 | hypothesis_test t | the reply states a statistic and a p value = Test: ... p ... |   - Test: Welch's unequal-variance t-test (two-sided). Statistic 0.4665, df 1.874e+05, p 0 |
-| 35 | manufacturing | 1,000,000 | hypothesis_test t | the reply states a statistic and a p value = Test: ... p ... |   - Test: Welch's unequal-variance t-test (two-sided). Statistic -1.0274, df 9.334e+04, p  |
-| 36 | marketing | 1,000,000 | hypothesis_test t | the reply states a statistic and a p value = Test: ... p ... |   - Test: Welch's unequal-variance t-test (two-sided). Statistic 0.1435, df 5.591e+05, p 0 |
-| 38 | sales | 1,000,000 | hypothesis_test t | the reply states a statistic and a p value = Test: ... p ... |   - Test: Welch's unequal-variance t-test (two-sided). Statistic -0.2691, df 5.366e+04, p  |
-| 98 | financial | 10,000 | None  | only its own dataset | {"dataset": "financial", "names_its_measure": false, "names_another_dataset": [], "status" |
-| 99 | hr | 10,000 | None  | only its own dataset | {"dataset": "hr", "names_its_measure": false, "names_another_dataset": [], "status": "FAIL |
-| 100 | sales | 10,000 | None  | only its own dataset | {"dataset": "sales", "names_its_measure": false, "names_another_dataset": [], "status": "F |
-| 101 | marketing | 10,000 | None  | only its own dataset | {"dataset": "marketing", "names_its_measure": false, "names_another_dataset": [], "status" |
-| 102 | crm | 10,000 | None  | only its own dataset | {"dataset": "crm", "names_its_measure": false, "names_another_dataset": [], "status": "FAI |
-| 103 | ecommerce | 10,000 | None  | only its own dataset | {"dataset": "ecommerce", "names_its_measure": false, "names_another_dataset": [], "status" |
-| 104 | logistics | 10,000 | None  | only its own dataset | {"dataset": "logistics", "names_its_measure": false, "names_another_dataset": [], "status" |
-| 105 | healthcare | 10,000 | None  | only its own dataset | {"dataset": "healthcare", "names_its_measure": false, "names_another_dataset": [], "status |
-| 106 | manufacturing | 10,000 | None  | only its own dataset | {"dataset": "manufacturing", "names_its_measure": false, "names_another_dataset": [], "sta |
-| 107 | education | 10,000 | None  | only its own dataset | {"dataset": "education", "names_its_measure": false, "names_another_dataset": [], "status" |
+None observed.
 
 ## Correctness
 
@@ -66,44 +39,55 @@ By domain and scale (a skipped check is not a pass):
 | domain | rows | calls verified | checks | passed | failed | calls skipped | correct % |
 |---|---|---|---|---|---|---|---|
 | crm | 1,000 | 47 | 9,524 | 9,524 | 0 | 0 | 100.000 |
-| crm | 100,000 | 47 | 301,391 | 301,390 | 1 | 0 | 100.000 |
-| crm | 1,000,000 | 47 | 2,954,834 | 2,954,833 | 1 | 0 | 100.000 |
-| ecommerce | 1,000 | 47 | 3,539 | 3,538 | 1 | 0 | 99.972 |
+| crm | 10,000 | 6 | 113 | 113 | 0 | 0 | 100.000 |
+| crm | 100,000 | 47 | 301,398 | 301,398 | 0 | 0 | 100.000 |
+| crm | 1,000,000 | 47 | 2,954,849 | 2,954,849 | 0 | 0 | 100.000 |
+| ecommerce | 1,000 | 47 | 3,539 | 3,539 | 0 | 0 | 100.000 |
+| ecommerce | 10,000 | 4 | 133 | 133 | 0 | 0 | 100.000 |
 | ecommerce | 100,000 | 47 | 66,581 | 66,581 | 0 | 0 | 100.000 |
-| ecommerce | 1,000,000 | 47 | 602,569 | 602,568 | 1 | 0 | 100.000 |
+| ecommerce | 1,000,000 | 47 | 602,578 | 602,578 | 0 | 0 | 100.000 |
 | education | 1,000 | 50 | 2,148 | 2,148 | 0 | 0 | 100.000 |
-| education | 100,000 | 47 | 15,567 | 15,566 | 1 | 0 | 99.994 |
-| education | 1,000,000 | 47 | 83,068 | 83,067 | 1 | 0 | 99.999 |
+| education | 10,000 | 4 | 172 | 172 | 0 | 0 | 100.000 |
+| education | 100,000 | 47 | 15,576 | 15,576 | 0 | 0 | 100.000 |
+| education | 1,000,000 | 47 | 83,077 | 83,077 | 0 | 0 | 100.000 |
 | financial | 1,000 | 47 | 3,640 | 3,640 | 0 | 0 | 100.000 |
+| financial | 10,000 | 16 | 334 | 334 | 0 | 0 | 100.000 |
 | financial | 100,000 | 47 | 66,567 | 66,567 | 0 | 0 | 100.000 |
 | financial | 1,000,000 | 47 | 601,543 | 601,543 | 0 | 0 | 100.000 |
 | healthcare | 1,000 | 50 | 1,678 | 1,678 | 0 | 0 | 100.000 |
-| healthcare | 100,000 | 47 | 10,165 | 10,164 | 1 | 0 | 99.990 |
-| healthcare | 1,000,000 | 47 | 37,157 | 37,156 | 1 | 0 | 99.997 |
+| healthcare | 10,000 | 4 | 142 | 142 | 0 | 0 | 100.000 |
+| healthcare | 100,000 | 47 | 10,172 | 10,172 | 0 | 0 | 100.000 |
+| healthcare | 1,000,000 | 47 | 37,172 | 37,172 | 0 | 0 | 100.000 |
 | hr | 1,000 | 43 | 2,885 | 2,885 | 0 | 0 | 100.000 |
-| hr | 100,000 | 46 | 37,717 | 37,716 | 1 | 0 | 99.997 |
-| hr | 1,000,000 | 46 | 308,240 | 308,239 | 1 | 0 | 100.000 |
+| hr | 10,000 | 8 | 458 | 458 | 0 | 0 | 100.000 |
+| hr | 100,000 | 46 | 37,724 | 37,724 | 0 | 0 | 100.000 |
+| hr | 1,000,000 | 46 | 308,249 | 308,249 | 0 | 0 | 100.000 |
 | logistics | 1,000 | 47 | 1,690 | 1,690 | 0 | 0 | 100.000 |
+| logistics | 10,000 | 4 | 97 | 97 | 0 | 0 | 100.000 |
 | logistics | 100,000 | 47 | 21,989 | 21,989 | 0 | 0 | 100.000 |
-| logistics | 1,000,000 | 47 | 156,971 | 156,971 | 0 | 0 | 100.000 |
+| logistics | 1,000,000 | 47 | 156,989 | 156,989 | 0 | 0 | 100.000 |
 | logistics | 2,000,000 | 23 | 61 | 61 | 0 | 20 | 100.000 |
 | logistics | 5,000,000 | 23 | 61 | 61 | 0 | 20 | 100.000 |
 | logistics | 10,000,000 | 23 | 61 | 61 | 0 | 20 | 100.000 |
-| manufacturing | 1,000 | 50 | 1,522 | 1,516 | 6 | 0 | 99.606 |
-| manufacturing | 100,000 | 47 | 14,312 | 14,304 | 8 | 0 | 99.944 |
-| manufacturing | 1,000,000 | 47 | 81,825 | 81,824 | 1 | 0 | 99.999 |
+| manufacturing | 1,000 | 50 | 1,522 | 1,522 | 0 | 0 | 100.000 |
+| manufacturing | 10,000 | 4 | 106 | 106 | 0 | 0 | 100.000 |
+| manufacturing | 100,000 | 47 | 14,312 | 14,312 | 0 | 0 | 100.000 |
+| manufacturing | 1,000,000 | 47 | 81,832 | 81,832 | 0 | 0 | 100.000 |
 | marketing | 1,000 | 50 | 1,490 | 1,490 | 0 | 0 | 100.000 |
-| marketing | 100,000 | 47 | 14,294 | 14,293 | 1 | 0 | 99.993 |
-| marketing | 1,000,000 | 47 | 81,833 | 81,832 | 1 | 0 | 99.999 |
+| marketing | 10,000 | 6 | 159 | 159 | 0 | 0 | 100.000 |
+| marketing | 100,000 | 47 | 14,301 | 14,301 | 0 | 0 | 100.000 |
+| marketing | 1,000,000 | 47 | 81,842 | 81,842 | 0 | 0 | 100.000 |
 | sales | 1,000 | 45 | 3,372 | 3,372 | 0 | 0 | 100.000 |
-| sales | 100,000 | 45 | 66,466 | 66,466 | 0 | 0 | 100.000 |
-| sales | 1,000,000 | 45 | 602,527 | 602,526 | 1 | 0 | 100.000 |
+| sales | 10,000 | 6 | 144 | 144 | 0 | 0 | 100.000 |
+| sales | 100,000 | 45 | 66,468 | 66,468 | 0 | 0 | 100.000 |
+| sales | 1,000,000 | 45 | 602,536 | 602,536 | 0 | 0 | 100.000 |
 | sales | 2,000,000 | 21 | 63 | 63 | 0 | 18 | 100.000 |
 | sales | 5,000,000 | 21 | 63 | 63 | 0 | 18 | 100.000 |
+| sales | 10,000,000 | 21 | 63 | 63 | 0 | 18 | 100.000 |
 
-Total: 6,157,385 of 6,157,413 checks passed, 28 failed, 96 verified calls skipped.
+Total: 6,159,473 of 6,159,473 checks passed, 0 failed, 114 verified calls skipped.
 
-Analyses with correctness failures: hypothesis_test (13), distribution (2), sample_adequacy (1)
+Analyses with correctness failures: none
 
 Known-answer fixtures: 50 of 50 passed.
 
@@ -370,52 +354,52 @@ Sorted vs shuffled input (identical tables required): trend_day PASS, trend_week
 
 | tool / analysis | fastest domain | median domain | slowest domain | groups |
 |---|---|---|---|---|
-| propose_cleaning_plan | 143.384 | 143.384 | 143.384 | 1 |
-| profile_dataset | 52.176 | 52.176 | 52.176 | 1 |
-| profile_column | 52.004 | 52.004 | 52.004 | 1 |
-| propose_dataset_contract | 23.728 | 23.819 | 23.909 | 2 |
-| apply_cleaning_plan | 21.964 | 21.964 | 21.964 | 1 |
-| confirm_ingest_spec | 20.683 | 20.683 | 20.683 | 1 |
-| render_chart | 0.556 | 1.392 | 6.491 | 14 |
-| compute_analysis:top_n | 0.600 | 1.950 | 4.559 | 8 |
-| compute_analysis:correlation | 0.511 | 2.930 | 3.481 | 3 |
-| compute_analysis:driver_analysis | 3.287 | 3.287 | 3.287 | 1 |
-| compute_analysis:summary_stats | 3.259 | 3.259 | 3.259 | 1 |
-| compute_analysis:cohort_retention | 3.191 | 3.191 | 3.191 | 1 |
-| compute_analysis:outlier_detection | 2.533 | 2.718 | 2.903 | 2 |
-| compute_analysis:repeat_behaviour | 2.605 | 2.605 | 2.605 | 1 |
-| describe_dataset | 2.562 | 2.562 | 2.562 | 1 |
-| compute_analysis:frequency | 0.579 | 1.763 | 2.207 | 3 |
-| compute_analysis:hypothesis_test | 0.631 | 0.930 | 2.111 | 4 |
-| compute_analysis:distribution | 2.044 | 2.044 | 2.044 | 1 |
-| compute_analysis:group_compare | 0.774 | 1.566 | 2.023 | 3 |
-| compute_analysis:mix_shift | 1.536 | 1.536 | 1.536 | 1 |
-| compute_analysis:growth_decomposition | 1.464 | 1.464 | 1.464 | 1 |
-| validate_dataset | 1.353 | 1.353 | 1.353 | 1 |
-| compute_analysis:pareto | 0.650 | 0.957 | 1.265 | 2 |
-| compute_analysis:concentration | 0.676 | 0.955 | 1.234 | 2 |
-| compute_analysis:bivariate | 1.126 | 1.126 | 1.126 | 1 |
-| compute_analysis:effect_size | 0.663 | 0.953 | 1.001 | 3 |
-| compute_analysis:confidence_interval | 0.922 | 0.959 | 0.995 | 2 |
-| compute_analysis:sample_adequacy | 0.944 | 0.944 | 0.944 | 1 |
-| compute_analysis:cross_tab | 0.923 | 0.931 | 0.939 | 2 |
-| compute_analysis:correlated_shift | 0.933 | 0.933 | 0.933 | 1 |
-| compute_analysis:period_compare | 0.900 | 0.900 | 0.900 | 1 |
-| compute_analysis:trend | 0.865 | 0.868 | 0.870 | 2 |
-| compute_analysis:changepoint | 0.869 | 0.869 | 0.869 | 1 |
-| compute_analysis:seasonality | 0.834 | 0.834 | 0.834 | 1 |
-| compute_analysis:calendar_coverage | 0.828 | 0.828 | 0.828 | 1 |
-| compute_analysis:ranking_shift | 0.791 | 0.791 | 0.791 | 1 |
-| run_analysis | 0.436 | 0.436 | 0.436 | 1 |
-| get_workflow_state | 0.422 | 0.422 | 0.422 | 1 |
-| confirm_dataset_contract | 0.065 | 0.065 | 0.065 | 1 |
-| build_report | 0.047 | 0.047 | 0.047 | 1 |
-| get_cleaning_ledger | 0.033 | 0.033 | 0.033 | 1 |
-| list_datasets | 0.024 | 0.024 | 0.024 | 1 |
-| propose_ingest_spec | 0.006 | 0.006 | 0.006 | 1 |
-| read_result_file | 0.001 | 0.001 | 0.001 | 1 |
-| preview_file | 0.000 | 0.000 | 0.000 | 1 |
-| check_file | 0.000 | 0.000 | 0.000 | 1 |
+| propose_cleaning_plan | 143.384 | 144.027 | 144.671 | 2 |
+| profile_dataset | 51.466 | 51.821 | 52.176 | 2 |
+| profile_column | 48.429 | 50.217 | 52.004 | 2 |
+| propose_dataset_contract | 15.190 | 19.687 | 23.909 | 4 |
+| apply_cleaning_plan | 17.637 | 19.800 | 21.964 | 2 |
+| confirm_ingest_spec | 17.905 | 19.294 | 20.683 | 2 |
+| compute_analysis:top_n | 0.488 | 2.059 | 16.214 | 17 |
+| render_chart | 0.556 | 1.394 | 9.727 | 28 |
+| compute_analysis:frequency | 0.579 | 1.985 | 5.663 | 6 |
+| compute_analysis:summary_stats | 3.259 | 3.997 | 4.736 | 2 |
+| compute_analysis:correlation | 0.511 | 3.037 | 3.481 | 6 |
+| compute_analysis:driver_analysis | 2.941 | 3.114 | 3.287 | 2 |
+| compute_analysis:cohort_retention | 3.120 | 3.155 | 3.191 | 2 |
+| compute_analysis:outlier_detection | 2.236 | 2.718 | 3.106 | 4 |
+| compute_analysis:concentration | 0.578 | 0.955 | 2.979 | 4 |
+| compute_analysis:pareto | 0.558 | 0.957 | 2.774 | 4 |
+| describe_dataset | 2.562 | 2.599 | 2.636 | 2 |
+| compute_analysis:repeat_behaviour | 2.400 | 2.503 | 2.605 | 2 |
+| compute_analysis:distribution | 2.044 | 2.266 | 2.488 | 2 |
+| compute_analysis:hypothesis_test | 0.631 | 0.920 | 2.111 | 8 |
+| compute_analysis:group_compare | 0.774 | 1.529 | 2.023 | 6 |
+| compute_analysis:mix_shift | 1.510 | 1.523 | 1.536 | 2 |
+| compute_analysis:growth_decomposition | 1.464 | 1.487 | 1.510 | 2 |
+| validate_dataset | 1.261 | 1.307 | 1.353 | 2 |
+| compute_analysis:bivariate | 1.126 | 1.177 | 1.227 | 2 |
+| compute_analysis:cross_tab | 0.923 | 1.006 | 1.102 | 4 |
+| compute_analysis:effect_size | 0.663 | 0.929 | 1.001 | 6 |
+| compute_analysis:confidence_interval | 0.857 | 0.915 | 0.995 | 4 |
+| compute_analysis:sample_adequacy | 0.944 | 0.958 | 0.972 | 2 |
+| compute_analysis:correlated_shift | 0.888 | 0.911 | 0.933 | 2 |
+| compute_analysis:period_compare | 0.821 | 0.861 | 0.900 | 2 |
+| compute_analysis:trend | 0.836 | 0.868 | 0.894 | 4 |
+| compute_analysis:changepoint | 0.847 | 0.858 | 0.869 | 2 |
+| compute_analysis:ranking_shift | 0.791 | 0.816 | 0.841 | 2 |
+| compute_analysis:seasonality | 0.809 | 0.822 | 0.834 | 2 |
+| compute_analysis:calendar_coverage | 0.828 | 0.830 | 0.832 | 2 |
+| get_workflow_state | 0.422 | 0.443 | 0.464 | 2 |
+| run_analysis | 0.436 | 0.437 | 0.437 | 2 |
+| confirm_dataset_contract | 0.065 | 0.073 | 0.081 | 2 |
+| build_report | 0.043 | 0.045 | 0.047 | 2 |
+| get_cleaning_ledger | 0.033 | 0.033 | 0.034 | 2 |
+| list_datasets | 0.024 | 0.024 | 0.024 | 2 |
+| propose_ingest_spec | 0.005 | 0.005 | 0.006 | 2 |
+| read_result_file | 0.001 | 0.001 | 0.001 | 2 |
+| preview_file | 0.000 | 0.000 | 0.000 | 2 |
+| check_file | 0.000 | 0.000 | 0.000 | 2 |
 
 ### The same analysis across domains at 1,000,000 rows (median seconds)
 
@@ -512,7 +496,7 @@ Median time growth over every tool and analysis measured at both sizes:
 | 100000->1000000 | 10.000 | 1.804 |
 | 1000000->2000000 | 2.000 | 1.518 |
 | 2000000->5000000 | 2.500 | 2.055 |
-| 5000000->10000000 | 2.000 | 1.813 |
+| 5000000->10000000 | 2.000 | 1.807 |
 
 Ten worst scaling (time growth relative to data growth):
 
@@ -524,10 +508,10 @@ Ten worst scaling (time growth relative to data growth):
 | logistics | compute_analysis | top_n n1000 | 1,000,000->2,000,000 | 2.000 | 2.337 | 0.216 | 0.504 |
 | logistics | compute_analysis | correlation indep | 2,000,000->5,000,000 | 2.500 | 2.903 | 0.625 | 1.814 |
 | sales | compute_analysis | top_n n1000 | 1,000,000->2,000,000 | 2.000 | 2.306 | 0.535 | 1.233 |
+| sales | compute_analysis | concentration hi | 5,000,000->10,000,000 | 2.000 | 2.247 | 1.325 | 2.979 |
 | logistics | compute_analysis | group_compare mean | 5,000,000->10,000,000 | 2.000 | 2.243 | 0.902 | 2.023 |
 | logistics | compute_analysis | correlation  | 2,000,000->5,000,000 | 2.500 | 2.772 | 0.576 | 1.596 |
 | logistics | confirm_ingest_spec |   | 5,000,000->10,000,000 | 2.000 | 2.197 | 9.416 | 20.683 |
-| logistics | compute_analysis | outlier_detection mean | 5,000,000->10,000,000 | 2.000 | 2.192 | 1.325 | 2.903 |
 
 ## Memory
 
@@ -536,12 +520,13 @@ Ten worst scaling (time growth relative to data growth):
 - 1,000,000 rows: worker peak RSS median 1,118 MiB, max 1,413 MiB over 10 worker run(s)
 - 2,000,000 rows: worker peak RSS median 1,518 MiB, max 1,697 MiB over 2 worker run(s)
 - 5,000,000 rows: worker peak RSS median 2,349 MiB, max 2,512 MiB over 2 worker run(s)
-- 10,000,000 rows: worker peak RSS median 3,627 MiB, max 3,627 MiB over 1 worker run(s)
+- 10,000,000 rows: worker peak RSS median 3,934 MiB, max 4,241 MiB over 2 worker run(s)
 
 RSS growth from the first to the last call of a worker (accumulation):
 
 | unit | calls | first MiB | last MiB | max MiB | growth MiB |
 |---|---|---|---|---|---|
+| I_sales_10000000 | 197 | 246.450 | 506.320 | 517.780 | 259.870 |
 | D_hr | 376 | 246.580 | 503.130 | 519.020 | 256.550 |
 | I_logistics_10000000 | 199 | 246.660 | 501.850 | 510.830 | 255.190 |
 | I_sales_5000000 | 197 | 246.570 | 499.340 | 511.080 | 252.770 |
@@ -551,113 +536,105 @@ RSS growth from the first to the last call of a worker (accumulation):
 | I_sales_2000000 | 197 | 246.550 | 467.250 | 478.880 | 220.700 |
 | I_logistics_2000000 | 199 | 246.620 | 462.900 | 477.710 | 216.280 |
 | E_healthcare | 319 | 246.520 | 450.750 | 452.370 | 204.230 |
-| E_logistics | 323 | 246.570 | 443.940 | 458.710 | 197.370 |
 
-Python-tracked allocations (tracemalloc, repeated mixed analyses): peak per call min 0.08 MiB, max 1.13 MiB over 64 calls.
+Python-tracked allocations (tracemalloc, repeated mixed analyses): peak per call min 0.08 MiB, max 3.88 MiB over 36 calls.
 
 ## Errors
 
 | severity | tool | what | count |
 |---|---|---|---|
-| CRITICAL | compute_analysis | wrong_result | 16 |
-| CRITICAL | charts | {"dataset": "financial", "names_its_meas | 1 |
-| CRITICAL | charts | {"dataset": "hr", "names_its_measure": f | 1 |
-| CRITICAL | charts | {"dataset": "sales", "names_its_measure" | 1 |
-| CRITICAL | charts | {"dataset": "marketing", "names_its_meas | 1 |
-| CRITICAL | charts | {"dataset": "crm", "names_its_measure":  | 1 |
-| CRITICAL | charts | {"dataset": "ecommerce", "names_its_meas | 1 |
-| CRITICAL | charts | {"dataset": "logistics", "names_its_meas | 1 |
-| CRITICAL | charts | {"dataset": "healthcare", "names_its_mea | 1 |
-| CRITICAL | charts | {"dataset": "manufacturing", "names_its_ | 1 |
-| CRITICAL | charts | {"dataset": "education", "names_its_meas | 1 |
-| HIGH | read_result_file | 50 found | 26 |
-| HIGH | compute_analysis | FAIL_EXCEPTION:  | 8 |
-| HIGH | compute_analysis | BinderException: Binder Error: No functi | 7 |
-| HIGH | compute_analysis | OutOfRangeException: Out of Range Error: | 2 |
-| HIGH | propose_cleaning_plan | dangerous: removes 18 exact duplicate(s) | 2 |
+| HIGH | compute_analysis | FAIL_EXCEPTION:  | 12 |
+| HIGH | compute_analysis | BinderException: Binder Error: No functi | 11 |
+| HIGH | read_result_file | 50 found | 5 |
+| HIGH | compute_analysis | OutOfRangeException: Out of Range Error: | 4 |
+| HIGH | compute_analysis | IndexError: list index out of range | 2 |
 | HIGH | compute_analysis | ZeroDivisionError: both groups have zero | 1 |
-| HIGH | compute_analysis | TransactionException: TransactionContext | 1 |
-| HIGH | propose_cleaning_plan | dangerous: removes 3 exact duplicate(s); | 1 |
-| HIGH | propose_cleaning_plan | dangerous: removes 6 exact duplicate(s); | 1 |
-| MEDIUM | compute_analysis | FAIL_MISLEADING_RESPONSE: BLOCKED: analy | 18 |
-| MEDIUM | compute_analysis | oracle_error | 12 |
-| MEDIUM | render_chart | FAIL_MISLEADING_RESPONSE: BLOCKED: analy | 1 |
-| MEDIUM | compute_analysis | FAIL_UNNECESSARY_REJECTION: BLOCKED: ana | 1 |
+| MEDIUM | compute_analysis | oracle_error | 1 |
+| MEDIUM | apply_cleaning_plan | FAIL_MISLEADING_RESPONSE: BLOCKED: the p | 1 |
 
 ## Crashes
 
 | # | domain | rows | tool | analysis | exception |
 |---|---|---|---|---|---|
 | 1 | - | 0 | compute_analysis | hypothesis_test | ZeroDivisionError: both groups have zero variance |
-| 2 | - | 0 | compute_analysis | summary_stats | BinderException: Binder Error: No function matches the given name and argument types 'sum(VARCHAR)'. You might |
+| 2 | - | 0 | compute_analysis | mix_shift | BinderException: Binder Error: No function matches the given name and argument types 'avg(VARCHAR)'. You might |
 | 3 | - | 0 | compute_analysis | outlier_detection | BinderException: Binder Error: No function matches the given name and argument types 'quantile_cont(VARCHAR, D |
-| 4 | - | 0 | compute_analysis | trend | BinderException: Binder Error: No function matches the given name and argument types 'sum(VARCHAR)'. You might |
-| 5 | - | 0 | compute_analysis | correlation | BinderException: Binder Error: No function matches the given name and argument types 'corr(BIGINT, VARCHAR)'.  |
+| 4 | - | 0 | compute_analysis | correlation | BinderException: Binder Error: No function matches the given name and argument types 'corr(DOUBLE, VARCHAR)'.  |
+| 5 | - | 0 | compute_analysis | driver_analysis | BinderException: Binder Error: No function matches the given name and argument types 'avg(VARCHAR)'. You might |
 | 6 | - | 0 | compute_analysis | summary_stats | BinderException: Binder Error: No function matches the given name and argument types 'sum(VARCHAR)'. You might |
 | 7 | - | 0 | compute_analysis | outlier_detection | BinderException: Binder Error: No function matches the given name and argument types 'quantile_cont(VARCHAR, D |
 | 8 | - | 0 | compute_analysis | trend | BinderException: Binder Error: No function matches the given name and argument types 'sum(VARCHAR)'. You might |
-| 9 | - | 0 | compute_analysis | top_n | TransactionException: TransactionContext Error: Catalog write-write conflict on create with "Schema\0main\0mai |
-| 10 | sales | 5,000,000 | compute_analysis | hypothesis_test | OutOfRangeException: Out of Range Error: Overflow in multiplication of INT64 (8569190673124 * 2927318)! |
-| 11 | sales | 5,000,000 | compute_analysis | hypothesis_test | OutOfRangeException: Out of Range Error: Overflow in multiplication of INT64 (8569190673124 * 2927318)! |
-| 40 | - | 0 | compute_analysis | hypothesis_test | FAIL_EXCEPTION:  |
-| 58 | - | 0 | compute_analysis | summary_stats | FAIL_EXCEPTION:  |
-| 59 | - | 0 | compute_analysis | outlier_detection | FAIL_EXCEPTION:  |
-| 60 | - | 0 | compute_analysis | trend | FAIL_EXCEPTION:  |
-| 61 | - | 0 | compute_analysis | correlation | FAIL_EXCEPTION:  |
-| 62 | - | 0 | compute_analysis | summary_stats | FAIL_EXCEPTION:  |
-| 63 | - | 0 | compute_analysis | outlier_detection | FAIL_EXCEPTION:  |
-| 64 | - | 0 | compute_analysis | trend | FAIL_EXCEPTION:  |
+| 9 | - | 0 | compute_analysis | correlation | BinderException: Binder Error: No function matches the given name and argument types 'corr(BIGINT, VARCHAR)'.  |
+| 10 | - | 0 | compute_analysis | summary_stats | BinderException: Binder Error: No function matches the given name and argument types 'sum(VARCHAR)'. You might |
+| 11 | - | 0 | compute_analysis | outlier_detection | BinderException: Binder Error: No function matches the given name and argument types 'quantile_cont(VARCHAR, D |
+| 12 | - | 0 | compute_analysis | trend | BinderException: Binder Error: No function matches the given name and argument types 'sum(VARCHAR)'. You might |
+| 13 | - | 0 | compute_analysis | top_n | IndexError: list index out of range |
+| 14 | - | 0 | compute_analysis | top_n | IndexError: list index out of range |
+| 15 | sales | 10,000,000 | compute_analysis | hypothesis_test | OutOfRangeException: Out of Range Error: Overflow in multiplication of INT64 (34236401011344 * 5851188)! |
+| 16 | sales | 10,000,000 | compute_analysis | hypothesis_test | OutOfRangeException: Out of Range Error: Overflow in multiplication of INT64 (34236401011344 * 5851188)! |
+| 17 | sales | 5,000,000 | compute_analysis | hypothesis_test | OutOfRangeException: Out of Range Error: Overflow in multiplication of INT64 (8569190673124 * 2927318)! |
+| 18 | sales | 5,000,000 | compute_analysis | hypothesis_test | OutOfRangeException: Out of Range Error: Overflow in multiplication of INT64 (8569190673124 * 2927318)! |
+| 20 | - | 0 | compute_analysis | hypothesis_test | FAIL_EXCEPTION:  |
+| 22 | - | 0 | compute_analysis | mix_shift | FAIL_EXCEPTION:  |
+| 23 | - | 0 | compute_analysis | outlier_detection | FAIL_EXCEPTION:  |
+| 24 | - | 0 | compute_analysis | correlation | FAIL_EXCEPTION:  |
+| 25 | - | 0 | compute_analysis | driver_analysis | FAIL_EXCEPTION:  |
+| 26 | - | 0 | compute_analysis | summary_stats | FAIL_EXCEPTION:  |
+| 27 | - | 0 | compute_analysis | outlier_detection | FAIL_EXCEPTION:  |
+| 28 | - | 0 | compute_analysis | trend | FAIL_EXCEPTION:  |
+| 29 | - | 0 | compute_analysis | correlation | FAIL_EXCEPTION:  |
+| 30 | - | 0 | compute_analysis | summary_stats | FAIL_EXCEPTION:  |
+| 31 | - | 0 | compute_analysis | outlier_detection | FAIL_EXCEPTION:  |
+| 32 | - | 0 | compute_analysis | trend | FAIL_EXCEPTION:  |
 
 ## Warnings
 
 | category | count |
 |---|---|
-| slow_call | 885 |
-| questionable_or_unverified_result | 139 |
-| irrelevant_or_unexecutable_recommendation | 64 |
-| suspicious_scaling | 37 |
+| slow_call | 979 |
+| questionable_or_unverified_result | 148 |
+| suspicious_scaling | 43 |
 | excessive_response_size | 25 |
-| unsupported_operation | 16 |
+| unsupported_operation | 18 |
+| irrelevant_or_unexecutable_recommendation | 15 |
 
 ## Behaviour under wrong and edge calls
 
 | classification | calls |
 |---|---|
-| FAIL_EXCEPTION | 8 |
-| FAIL_MISLEADING_RESPONSE | 19 |
-| FAIL_UNNECESSARY_REJECTION | 1 |
-| PASS_ACCEPTED | 25 |
-| PASS_AUTOCORRECTED | 54 |
-| PASS_SAFE_REJECTION | 147 |
-| PASS_USEFUL_WARNING | 18 |
+| FAIL_EXCEPTION | 12 |
+| FAIL_MISLEADING_RESPONSE | 1 |
+| PASS_ACCEPTED | 21 |
+| PASS_AUTOCORRECTED | 61 |
+| PASS_SAFE_REJECTION | 154 |
+| PASS_USEFUL_WARNING | 16 |
 
 By family:
 
 | family | classes |
 |---|---|
 | file_format | PASS_SAFE_REJECTION 10, PASS_AUTOCORRECTED 4, PASS_ACCEPTED 3 |
-| not_applicable | PASS_SAFE_REJECTION 56, PASS_AUTOCORRECTED 2 |
-| other | PASS_SAFE_REJECTION 35, PASS_ACCEPTED 8, PASS_AUTOCORRECTED 6, PASS_USEFUL_WARNING 6 |
+| not_applicable | PASS_SAFE_REJECTION 58, PASS_AUTOCORRECTED 2 |
+| other | PASS_SAFE_REJECTION 35, PASS_AUTOCORRECTED 4, PASS_ACCEPTED 4, PASS_USEFUL_WARNING 3 |
 | statistical | PASS_USEFUL_WARNING 6, PASS_ACCEPTED 6, PASS_AUTOCORRECTED 2, FAIL_EXCEPTION 1, PASS_SAFE_REJECTION 1 |
 | temporal | PASS_AUTOCORRECTED 26, PASS_ACCEPTED 4, PASS_USEFUL_WARNING 3 |
-| wrong_call | PASS_SAFE_REJECTION 45, FAIL_MISLEADING_RESPONSE 19, PASS_AUTOCORRECTED 14, FAIL_EXCEPTION 7, PASS_ACCEPTED 4, PASS_USEFUL_WARNING 3, FAIL_UNNECESSARY_REJECTION 1 |
+| wrong_call | PASS_SAFE_REJECTION 50, PASS_AUTOCORRECTED 23, FAIL_EXCEPTION 11, PASS_ACCEPTED 4, PASS_USEFUL_WARNING 4, FAIL_MISLEADING_RESPONSE 1 |
 
-Refusal message quality over 167 refusals: identifies the problem 167, names the parameter 28 (of 47 with a named parameter), explains what was expected 80, suggests a correction 167; NEXT STEP followed: WORKED 111, not followed 33, NOT_EXECUTED 22, REFUSED_SAME_REASON 1
+Refusal message quality over 155 refusals: identifies the problem 155, names the parameter 49 (of 50 with a named parameter), explains what was expected 102, suggests a correction 155; NEXT STEP followed: WORKED 96, not followed 34, NOT_EXECUTED 23, REFUSED_SAME_REASON 2
 
 ## Charts
 
 | verdict | count |
 |---|---|
-| PASS | 1,118 |
-| REFUSED | 354 |
+| PASS | 1,136 |
+| REFUSED | 364 |
 
 ## Cleaning plans
 
 | verdict | actions |
 |---|---|
-| valid | 40 |
+| valid | 45 |
 | unnecessary | 4 |
-| dangerous | 4 |
 - dirty variant format_noise: expected accept; actions 7; injected defects with no action: risk score %
 - dirty variant bad_dates: expected warn; actions 1; injected defects with no action: none
 - dirty variant duplicate_columns: expected either; actions 1; injected defects with no action: none
@@ -666,133 +643,107 @@ Refusal message quality over 167 refusals: identifies the problem 167, names the
 
 ## Concurrency and state isolation
 
-- separate x2: statuses {'REFUSED': 2}; distinct result files 0 of 0
-- shared x2: statuses {'EXCEPTION': 1, 'REFUSED': 1}; distinct result files 0 of 0
-- separate x5: statuses {'REFUSED': 5}; distinct result files 0 of 0
-- shared x5: statuses {'REFUSED': 5}; distinct result files 0 of 0
-- separate x10: statuses {'REFUSED': 10}; distinct result files 0 of 0
-- shared x10: statuses {'REFUSED': 10}; distinct result files 0 of 0
-- same_dataset x10: statuses {'REFUSED': 10}; distinct result files 0 of 0
+- separate x2: statuses {'OK': 2}; distinct result files 2 of 2
+- shared x2: statuses {'OK': 2}; distinct result files 2 of 2
+- separate x5: statuses {'OK': 5}; distinct result files 5 of 5
+- shared x5: statuses {'OK': 5}; distinct result files 5 of 5
+- separate x10: statuses {'OK': 10}; distinct result files 10 of 10
+- shared x10: statuses {'OK': 10}; distinct result files 9 of 10
+- same_dataset x10: statuses {'OK': 8, 'EXCEPTION': 2}; distinct result files 7 of 8
 - isolation reports: 10 of 10 pass
 - isolation ledgers: 10 of 10 pass
-- isolation charts: 0 of 10 pass
-- isolation correctness: 0 of 0 verified calls pass
+- isolation charts: 10 of 10 pass
+- isolation correctness: 20 of 20 verified calls pass
 
 ## Reproducibility
 
 | domain | rows | dataset identical | results identical | differ | status |
 |---|---|---|---|---|---|
-| financial | 1,000 | True | 0 | 0 | PASS |
-| financial | 100,000 | True | 0 | 0 | PASS |
-| crm | 1,000 | True | 0 | 0 | PASS |
-| crm | 100,000 | True | 0 | 0 | PASS |
-| logistics | 1,000 | True | 0 | 0 | PASS |
-| logistics | 100,000 | True | 0 | 0 | PASS |
+| financial | 1,000 | True | 12 | 0 | PASS |
+| financial | 100,000 | True | 12 | 0 | PASS |
+| crm | 1,000 | True | 12 | 0 | PASS |
+| crm | 100,000 | True | 9 | 3 | FAIL |
+| logistics | 1,000 | True | 12 | 0 | PASS |
+| logistics | 100,000 | True | 12 | 0 | PASS |
 
 ## Domain observations
 
 ### Financial
 
 - 1,000 rows: 3,640 of 3,640 checks pass, 0 fail
+- 10,000 rows: 334 of 334 checks pass, 0 fail
 - 100,000 rows: 66,567 of 66,567 checks pass, 0 fail
 - 1,000,000 rows: 601,543 of 601,543 checks pass, 0 fail
-- errors: 3 (HIGH 2, CRITICAL 1)
-  - HIGH read_result_file  100000: 50 found
-  - HIGH read_result_file  1000000: 50 found
-  - CRITICAL charts  10000: {"dataset": "financial", "names_its_measure": false, "names_another_dataset": [], "status": "FAIL"}
+- errors: 0 ()
 - slowest at 1M rows: propose_cleaning_plan  16.04s; profile_dataset  6.93s; profile_column  5.97s
 
 ### HR
 
 - 1,000 rows: 2,885 of 2,885 checks pass, 0 fail
-- 100,000 rows: 37,716 of 37,717 checks pass, 1 fail
-- 1,000,000 rows: 308,239 of 308,240 checks pass, 1 fail
-- errors: 6 (CRITICAL 3, HIGH 2, MEDIUM 1)
-  - CRITICAL compute_analysis hypothesis_test 100000:   - Test: Welch's unequal-variance t-test (two-sided). Statistic -0.7679, df 1.847e+04, p 0.442539. (1 of 1 checks failed)
-  - CRITICAL compute_analysis hypothesis_test 1000000:   - Test: Welch's unequal-variance t-test (two-sided). Statistic 0.4665, df 1.874e+05, p 0.640887. (1 of 1 checks failed)
-  - MEDIUM compute_analysis sample_adequacy 1000000: None (0 of 0 checks failed)
-  - HIGH read_result_file  100000: 50 found
-  - HIGH read_result_file  1000000: 50 found
-  - CRITICAL charts  10000: {"dataset": "hr", "names_its_measure": false, "names_another_dataset": [], "status": "FAIL"}
+- 10,000 rows: 458 of 458 checks pass, 0 fail
+- 100,000 rows: 37,724 of 37,724 checks pass, 0 fail
+- 1,000,000 rows: 308,249 of 308,249 checks pass, 0 fail
+- errors: 0 ()
 - slowest at 1M rows: propose_cleaning_plan  12.13s; profile_column  5.02s; profile_dataset  4.99s
 - refused although classed REQUIRED/VALID/EDGE: pareto (VALID), concentration (VALID), repeat_behaviour (EDGE_CASE), cohort_retention (EDGE_CASE)
 
 ### Sales
 
 - 1,000 rows: 3,372 of 3,372 checks pass, 0 fail
-- 100,000 rows: 66,466 of 66,466 checks pass, 0 fail
-- 1,000,000 rows: 602,526 of 602,527 checks pass, 1 fail
+- 10,000 rows: 144 of 144 checks pass, 0 fail
+- 100,000 rows: 66,468 of 66,468 checks pass, 0 fail
+- 1,000,000 rows: 602,536 of 602,536 checks pass, 0 fail
 - 2,000,000 rows: 63 of 63 checks pass, 0 fail
 - 5,000,000 rows: 63 of 63 checks pass, 0 fail
-- errors: 10 (HIGH 6, MEDIUM 2, CRITICAL 2)
+- 10,000,000 rows: 63 of 63 checks pass, 0 fail
+- errors: 6 (HIGH 6)
+  - HIGH compute_analysis hypothesis_test 10000000: OutOfRangeException: Out of Range Error: Overflow in multiplication of INT64 (34236401011344 * 5851188)!
+  - HIGH compute_analysis hypothesis_test 10000000: OutOfRangeException: Out of Range Error: Overflow in multiplication of INT64 (34236401011344 * 5851188)!
   - HIGH compute_analysis hypothesis_test 5000000: OutOfRangeException: Out of Range Error: Overflow in multiplication of INT64 (8569190673124 * 2927318)!
   - HIGH compute_analysis hypothesis_test 5000000: OutOfRangeException: Out of Range Error: Overflow in multiplication of INT64 (8569190673124 * 2927318)!
-  - MEDIUM compute_analysis sample_adequacy 100000: None (0 of 0 checks failed)
-  - CRITICAL compute_analysis hypothesis_test 1000000:   - Test: Welch's unequal-variance t-test (two-sided). Statistic -0.2691, df 5.366e+04, p 0.787831. (1 of 1 checks failed)
-  - MEDIUM compute_analysis sample_adequacy 1000000: None (0 of 0 checks failed)
-  - HIGH read_result_file  100000: 50 found
-  - HIGH read_result_file  1000000: 50 found
   - HIGH read_result_file  2000000: 50 found
+  - HIGH read_result_file  5000000: 50 found
 - slowest at 1M rows: propose_cleaning_plan  15.71s; profile_dataset  5.58s; render_chart top_n 5.01s
 - refused although classed REQUIRED/VALID/EDGE: pareto (REQUIRED), concentration (REQUIRED)
 
 ### Marketing
 
 - 1,000 rows: 1,490 of 1,490 checks pass, 0 fail
-- 100,000 rows: 14,293 of 14,294 checks pass, 1 fail
-- 1,000,000 rows: 81,832 of 81,833 checks pass, 1 fail
-- errors: 6 (CRITICAL 3, HIGH 2, MEDIUM 1)
-  - CRITICAL compute_analysis hypothesis_test 100000:   - Test: Welch's unequal-variance t-test (two-sided). Statistic -0.7413, df 5.555e+04, p 0.458505. (1 of 1 checks failed)
-  - CRITICAL compute_analysis hypothesis_test 1000000:   - Test: Welch's unequal-variance t-test (two-sided). Statistic 0.1435, df 5.591e+05, p 0.885919. (1 of 1 checks failed)
-  - MEDIUM compute_analysis sample_adequacy 1000000: None (0 of 0 checks failed)
-  - HIGH read_result_file  100000: 50 found
-  - HIGH read_result_file  1000000: 50 found
-  - CRITICAL charts  10000: {"dataset": "marketing", "names_its_measure": false, "names_another_dataset": [], "status": "FAIL"}
+- 10,000 rows: 159 of 159 checks pass, 0 fail
+- 100,000 rows: 14,301 of 14,301 checks pass, 0 fail
+- 1,000,000 rows: 81,842 of 81,842 checks pass, 0 fail
+- errors: 0 ()
 - slowest at 1M rows: propose_cleaning_plan  10.40s; profile_column  5.03s; profile_dataset  5.02s
 
 ### CRM
 
 - 1,000 rows: 9,524 of 9,524 checks pass, 0 fail
-- 100,000 rows: 301,390 of 301,391 checks pass, 1 fail
-- 1,000,000 rows: 2,954,833 of 2,954,834 checks pass, 1 fail
-- errors: 7 (CRITICAL 3, HIGH 3, MEDIUM 1)
-  - CRITICAL compute_analysis hypothesis_test 100000:   - Test: Welch's unequal-variance t-test (two-sided). Statistic 15.2604, df 1.569e+04, p 3.33014e-52. (1 of 1 checks failed)
-  - CRITICAL compute_analysis hypothesis_test 1000000:   - Test: Welch's unequal-variance t-test (two-sided). Statistic 43.8571, df 1.594e+05, p < 1e-300. (1 of 1 checks failed)
-  - MEDIUM compute_analysis hypothesis_test 1000000: None (0 of 0 checks failed)
-  - HIGH read_result_file  1000: 50 found
-  - HIGH read_result_file  100000: 50 found
-  - HIGH read_result_file  1000000: 50 found
-  - CRITICAL charts  10000: {"dataset": "crm", "names_its_measure": false, "names_another_dataset": [], "status": "FAIL"}
+- 10,000 rows: 113 of 113 checks pass, 0 fail
+- 100,000 rows: 301,398 of 301,398 checks pass, 0 fail
+- 1,000,000 rows: 2,954,849 of 2,954,849 checks pass, 0 fail
+- errors: 1 (MEDIUM 1)
+  - MEDIUM compute_analysis top_n 10000: None (0 of 0 checks failed)
 - slowest at 1M rows: compute_analysis top_n 8.13s; propose_cleaning_plan  7.95s; render_chart top_n 7.64s
 
 ### E-commerce
 
-- 1,000 rows: 3,538 of 3,539 checks pass, 1 fail
+- 1,000 rows: 3,539 of 3,539 checks pass, 0 fail
+- 10,000 rows: 133 of 133 checks pass, 0 fail
 - 100,000 rows: 66,581 of 66,581 checks pass, 0 fail
-- 1,000,000 rows: 602,568 of 602,569 checks pass, 1 fail
-- errors: 6 (CRITICAL 3, HIGH 2, MEDIUM 1)
-  - CRITICAL compute_analysis sample_adequacy 1000: 0.4206 (1 of 2 checks failed)
-  - CRITICAL compute_analysis hypothesis_test 1000000:   - Test: Welch's unequal-variance t-test (two-sided). Statistic 0.1578, df 4.675e+04, p 0.874595. (1 of 1 checks failed)
-  - MEDIUM compute_analysis sample_adequacy 1000000: None (0 of 0 checks failed)
-  - HIGH read_result_file  100000: 50 found
-  - HIGH read_result_file  1000000: 50 found
-  - CRITICAL charts  10000: {"dataset": "ecommerce", "names_its_measure": false, "names_another_dataset": [], "status": "FAIL"}
+- 1,000,000 rows: 602,578 of 602,578 checks pass, 0 fail
+- errors: 0 ()
 - slowest at 1M rows: propose_cleaning_plan  15.72s; render_chart top_n 5.56s; profile_column  4.44s
 
 ### Logistics
 
 - 1,000 rows: 1,690 of 1,690 checks pass, 0 fail
+- 10,000 rows: 97 of 97 checks pass, 0 fail
 - 100,000 rows: 21,989 of 21,989 checks pass, 0 fail
-- 1,000,000 rows: 156,971 of 156,971 checks pass, 0 fail
+- 1,000,000 rows: 156,989 of 156,989 checks pass, 0 fail
 - 2,000,000 rows: 61 of 61 checks pass, 0 fail
 - 5,000,000 rows: 61 of 61 checks pass, 0 fail
 - 10,000,000 rows: 61 of 61 checks pass, 0 fail
-- errors: 9 (HIGH 5, MEDIUM 3, CRITICAL 1)
-  - MEDIUM compute_analysis hypothesis_test 1000000: None (0 of 0 checks failed)
-  - MEDIUM compute_analysis hypothesis_test 1000000: None (0 of 0 checks failed)
-  - MEDIUM compute_analysis sample_adequacy 1000000: None (0 of 0 checks failed)
-  - HIGH read_result_file  100000: 50 found
-  - HIGH read_result_file  1000000: 50 found
+- errors: 3 (HIGH 3)
   - HIGH read_result_file  10000000: 50 found
   - HIGH read_result_file  2000000: 50 found
   - HIGH read_result_file  5000000: 50 found
@@ -801,44 +752,28 @@ Refusal message quality over 167 refusals: identifies the problem 167, names the
 ### Healthcare (synthetic)
 
 - 1,000 rows: 1,678 of 1,678 checks pass, 0 fail
-- 100,000 rows: 10,164 of 10,165 checks pass, 1 fail
-- 1,000,000 rows: 37,156 of 37,157 checks pass, 1 fail
-- errors: 6 (CRITICAL 3, HIGH 2, MEDIUM 1)
-  - CRITICAL compute_analysis hypothesis_test 100000:   - Test: Welch's unequal-variance t-test (two-sided). Statistic -23.859, df 9.686e+04, p 1.88274e-125. (1 of 1 checks failed)
-  - CRITICAL compute_analysis hypothesis_test 1000000:   - Test: Welch's unequal-variance t-test (two-sided). Statistic -78.4531, df 9.637e+05, p < 1e-300. (1 of 1 checks failed)
-  - MEDIUM compute_analysis hypothesis_test 1000000: None (0 of 0 checks failed)
-  - HIGH read_result_file  100000: 50 found
-  - HIGH read_result_file  1000000: 50 found
-  - CRITICAL charts  10000: {"dataset": "healthcare", "names_its_measure": false, "names_another_dataset": [], "status": "FAIL"}
+- 10,000 rows: 142 of 142 checks pass, 0 fail
+- 100,000 rows: 10,172 of 10,172 checks pass, 0 fail
+- 1,000,000 rows: 37,172 of 37,172 checks pass, 0 fail
+- errors: 0 ()
 - slowest at 1M rows: propose_cleaning_plan  10.53s; render_chart top_n 4.83s; profile_column  4.06s
 
 ### Manufacturing
 
-- 1,000 rows: 1,516 of 1,522 checks pass, 6 fail
-- 100,000 rows: 14,304 of 14,312 checks pass, 8 fail
-- 1,000,000 rows: 81,824 of 81,825 checks pass, 1 fail
-- errors: 6 (CRITICAL 4, HIGH 2)
-  - CRITICAL compute_analysis distribution 1000: 211 (6 of 13 checks failed)
-  - CRITICAL compute_analysis distribution 100000: 32,771 (8 of 13 checks failed)
-  - CRITICAL compute_analysis hypothesis_test 1000000:   - Test: Welch's unequal-variance t-test (two-sided). Statistic -1.0274, df 9.334e+04, p 0.304252. (1 of 1 checks failed)
-  - HIGH read_result_file  100000: 50 found
-  - HIGH read_result_file  1000000: 50 found
-  - CRITICAL charts  10000: {"dataset": "manufacturing", "names_its_measure": false, "names_another_dataset": [], "status": "FAIL"}
+- 1,000 rows: 1,522 of 1,522 checks pass, 0 fail
+- 10,000 rows: 106 of 106 checks pass, 0 fail
+- 100,000 rows: 14,312 of 14,312 checks pass, 0 fail
+- 1,000,000 rows: 81,832 of 81,832 checks pass, 0 fail
+- errors: 0 ()
 - slowest at 1M rows: propose_cleaning_plan  12.50s; profile_dataset  5.28s; profile_column  5.24s
 
 ### Education
 
 - 1,000 rows: 2,148 of 2,148 checks pass, 0 fail
-- 100,000 rows: 15,566 of 15,567 checks pass, 1 fail
-- 1,000,000 rows: 83,067 of 83,068 checks pass, 1 fail
-- errors: 7 (CRITICAL 3, MEDIUM 2, HIGH 2)
-  - CRITICAL compute_analysis hypothesis_test 100000:   - Test: Welch's unequal-variance t-test (two-sided). Statistic -1.8539, df 2.634e+04, p 0.0637616. (1 of 1 checks failed)
-  - MEDIUM compute_analysis sample_adequacy 100000: None (0 of 0 checks failed)
-  - CRITICAL compute_analysis hypothesis_test 1000000:   - Test: Welch's unequal-variance t-test (two-sided). Statistic 0.2756, df 2.603e+05, p 0.782847. (1 of 1 checks failed)
-  - MEDIUM compute_analysis sample_adequacy 1000000: None (0 of 0 checks failed)
-  - HIGH read_result_file  100000: 50 found
-  - HIGH read_result_file  1000000: 50 found
-  - CRITICAL charts  10000: {"dataset": "education", "names_its_measure": false, "names_another_dataset": [], "status": "FAIL"}
+- 10,000 rows: 172 of 172 checks pass, 0 fail
+- 100,000 rows: 15,576 of 15,576 checks pass, 0 fail
+- 1,000,000 rows: 83,077 of 83,077 checks pass, 0 fail
+- errors: 0 ()
 - slowest at 1M rows: propose_cleaning_plan  14.66s; apply_cleaning_plan  5.91s; profile_column  5.23s
 
 ## Bottlenecks (measured)
@@ -847,16 +782,16 @@ Ten slowest calls:
 
 | seconds | tool | analysis | domain | rows |
 |---|---|---|---|---|
-| 330.789 | propose_ingest_spec |  | - | 0 |
+| 323.296 | propose_ingest_spec |  | - | 0 |
+| 149.785 | propose_cleaning_plan |  | sales | 10,000,000 |
+| 144.671 | propose_cleaning_plan |  | sales | 10,000,000 |
 | 143.384 | propose_cleaning_plan |  | logistics | 10,000,000 |
 | 142.383 | propose_cleaning_plan |  | logistics | 10,000,000 |
 | 75.051 | propose_cleaning_plan |  | sales | 5,000,000 |
 | 74.077 | propose_cleaning_plan |  | sales | 5,000,000 |
 | 71.161 | propose_cleaning_plan |  | logistics | 5,000,000 |
 | 71.089 | propose_cleaning_plan |  | logistics | 5,000,000 |
-| 54.918 | profile_column |  | logistics | 10,000,000 |
-| 54.890 | profile_dataset |  | logistics | 10,000,000 |
-| 54.873 | profile_column |  | logistics | 10,000,000 |
+| 58.153 | profile_column |  | sales | 10,000,000 |
 
 Ten largest responses:
 
@@ -877,37 +812,39 @@ Ten largest per-call memory peaks:
 
 | peak MiB | tool | analysis | unit | rows |
 |---|---|---|---|---|
-| 3,627.240 | apply_cleaning_plan |  | I_logistics_10000000 | 10,000,000 |
-| 3,199.510 | profile_column |  | I_logistics_10000000 | 10,000,000 |
-| 3,193.140 | profile_column |  | I_logistics_10000000 | 10,000,000 |
-| 3,170.120 | propose_cleaning_plan |  | I_logistics_10000000 | 10,000,000 |
-| 3,164.970 | profile_column |  | I_logistics_10000000 | 10,000,000 |
-| 3,159.280 | profile_column |  | I_logistics_10000000 | 10,000,000 |
-| 3,154.540 | propose_cleaning_plan |  | I_logistics_10000000 | 10,000,000 |
-| 3,138.650 | profile_column |  | I_logistics_10000000 | 10,000,000 |
-| 3,125.180 | profile_column |  | I_logistics_10000000 | 10,000,000 |
-| 3,102.790 | profile_column |  | I_logistics_10000000 | 10,000,000 |
+| 4,240.930 | profile_column |  | I_sales_10000000 | 10,000,000 |
+| 4,214.460 | profile_column |  | I_sales_10000000 | 10,000,000 |
+| 4,174.250 | profile_column |  | I_sales_10000000 | 10,000,000 |
+| 4,172.780 | profile_column |  | I_sales_10000000 | 10,000,000 |
+| 4,149.410 | profile_column |  | I_sales_10000000 | 10,000,000 |
+| 4,103.510 | profile_column |  | I_sales_10000000 | 10,000,000 |
+| 4,097.360 | profile_column |  | I_sales_10000000 | 10,000,000 |
+| 4,083.060 | profile_column |  | I_sales_10000000 | 10,000,000 |
+| 4,027.740 | profile_column |  | I_sales_10000000 | 10,000,000 |
+| 4,013.980 | profile_column |  | I_sales_10000000 | 10,000,000 |
 
-Tools with most errors: compute_analysis 66, read_result_file 26, charts 10, propose_cleaning_plan 4, render_chart 1
-Domains with most errors: None 41, sales 10, logistics 9, crm 7, education 7, ecommerce 6, manufacturing 6, healthcare 6
-Tools with most warnings: profile_column 610, compute_analysis 91, render_chart 82, propose_cleaning_plan 66, profile_dataset 42, propose_dataset_contract 32, confirm_ingest_spec 16, apply_cleaning_plan 16
+Tools with most errors: compute_analysis 31, read_result_file 5, apply_cleaning_plan 1
+Domains with most errors: None 27, sales 6, logistics 3, crm 1
+Tools with most warnings: profile_column 649, compute_analysis 127, render_chart 92, propose_cleaning_plan 74, profile_dataset 44, propose_dataset_contract 36, confirm_ingest_spec 17, apply_cleaning_plan 17
 
 ## Regression candidates
 
 Every case below failed or guards a property the benchmark measured; each is small enough to run in the suite:
 
-- [CRITICAL] compute_analysis sample_adequacy (analyses): 0.4206 (1 of 2 checks failed)
-- [CRITICAL] compute_analysis distribution (analyses): 211 (6 of 13 checks failed)
-- [CRITICAL] compute_analysis hypothesis_test (analyses):   - Test: Welch's unequal-variance t-test (two-sided). Statistic 15.2604, df 1.569e+04, p 3.33014e-52. (1 of 1 checks fa
-- [CRITICAL] charts  (isolation): {"dataset": "financial", "names_its_measure": false, "names_another_dataset": [], "status": "FAIL"}
 - [HIGH] compute_analysis hypothesis_test (stat_edges): ZeroDivisionError: both groups have zero variance
-- [HIGH] compute_analysis summary_stats (wrong_calls): BinderException: Binder Error: No function matches the given name and argument types 'sum(VARCHAR)'. You might need to a
+- [HIGH] compute_analysis mix_shift (wrong_calls): BinderException: Binder Error: No function matches the given name and argument types 'avg(VARCHAR)'. You might need to a
 - [HIGH] compute_analysis outlier_detection (wrong_calls): BinderException: Binder Error: No function matches the given name and argument types 'quantile_cont(VARCHAR, DECIMAL(3,2
+- [HIGH] compute_analysis correlation (wrong_calls): BinderException: Binder Error: No function matches the given name and argument types 'corr(DOUBLE, VARCHAR)'. You might 
+- [HIGH] compute_analysis driver_analysis (wrong_calls): BinderException: Binder Error: No function matches the given name and argument types 'avg(VARCHAR)'. You might need to a
+- [HIGH] compute_analysis summary_stats (wrong_calls): BinderException: Binder Error: No function matches the given name and argument types 'sum(VARCHAR)'. You might need to a
 - [HIGH] compute_analysis trend (wrong_calls): BinderException: Binder Error: No function matches the given name and argument types 'sum(VARCHAR)'. You might need to a
-- [HIGH] compute_analysis correlation (wrong_calls): BinderException: Binder Error: No function matches the given name and argument types 'corr(BIGINT, VARCHAR)'. You might 
-- [HIGH] compute_analysis top_n (concurrency): TransactionException: TransactionContext Error: Catalog write-write conflict on create with "Schema\0main\0main\0Table\0
-- [HIGH] compute_analysis hypothesis_test (analyses): OutOfRangeException: Out of Range Error: Overflow in multiplication of INT64 (8569190673124 * 2927318)!
+- [HIGH] compute_analysis top_n (concurrency): IndexError: list index out of range
+- [HIGH] compute_analysis hypothesis_test (analyses): OutOfRangeException: Out of Range Error: Overflow in multiplication of INT64 (34236401011344 * 5851188)!
 - [HIGH] compute_analysis hypothesis_test (zero_variance_t): FAIL_EXCEPTION: 
+- [HIGH] compute_analysis mix_shift (cd_mix_shift): FAIL_EXCEPTION: 
+- [HIGH] compute_analysis outlier_detection (cd_outlier_detection): FAIL_EXCEPTION: 
+- [HIGH] compute_analysis correlation (cd_correlation): FAIL_EXCEPTION: 
+- [HIGH] compute_analysis driver_analysis (cd_driver_analysis): FAIL_EXCEPTION: 
 - [HIGH] compute_analysis summary_stats (t_all_null_col_summary): FAIL_EXCEPTION: 
 - [HIGH] compute_analysis outlier_detection (t_all_null_col_outliers): FAIL_EXCEPTION: 
 - [HIGH] compute_analysis trend (t_all_null_col_trend): FAIL_EXCEPTION: 
@@ -916,49 +853,9 @@ Every case below failed or guards a property the benchmark measured; each is sma
 - [HIGH] compute_analysis outlier_detection (t_inf_nan_outliers): FAIL_EXCEPTION: 
 - [HIGH] compute_analysis trend (t_inf_nan_trend): FAIL_EXCEPTION: 
 - [HIGH] read_result_file  (read_result): 50 found
-- [HIGH] propose_cleaning_plan  (clean): dangerous: removes 3 exact duplicate(s); the generator inserted 0 -- keep one of each of the 3 exactly duplicated row(s)
-- [MEDIUM] compute_analysis sample_adequacy (analyses): None (0 of 0 checks failed)
-- [MEDIUM] compute_analysis hypothesis_test (analyses): None (0 of 0 checks failed)
-- [MEDIUM] compute_analysis top_n (nonexistent_column): FAIL_MISLEADING_RESPONSE: BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.
-WHY: without on
-- [MEDIUM] compute_analysis top_n (misspelled_column): FAIL_MISLEADING_RESPONSE: BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.
-WHY: without on
-- [MEDIUM] compute_analysis distribution (wrong_type_measure): FAIL_MISLEADING_RESPONSE: BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.
-WHY: without on
-- [MEDIUM] compute_analysis top_n (empty_parameter): FAIL_MISLEADING_RESPONSE: BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.
-WHY: without on
-- [MEDIUM] compute_analysis top_n (null_parameter): FAIL_MISLEADING_RESPONSE: BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.
-WHY: without on
-- [MEDIUM] compute_analysis trend (incorrect_enum): FAIL_MISLEADING_RESPONSE: BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.
-WHY: without on
-- [MEDIUM] compute_analysis ranking_shift (invalid_date_range): FAIL_MISLEADING_RESPONSE: BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.
-WHY: without on
-- [MEDIUM] compute_analysis ranking_shift (start_after_end): FAIL_MISLEADING_RESPONSE: BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.
-WHY: without on
-- [MEDIUM] compute_analysis group_compare (groupby_id): FAIL_MISLEADING_RESPONSE: BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.
-WHY: without on
-- [MEDIUM] compute_analysis correlation (corr_same_column): FAIL_MISLEADING_RESPONSE: BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.
-WHY: without on
-- [MEDIUM] compute_analysis hypothesis_test (invalid_stat_group): FAIL_MISLEADING_RESPONSE: BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.
-WHY: without on
-- [MEDIUM] compute_analysis distribution (bins_zero): FAIL_MISLEADING_RESPONSE: BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.
-WHY: without on
-- [MEDIUM] compute_analysis confidence_interval (confidence_out_of_range): FAIL_MISLEADING_RESPONSE: BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.
-WHY: without on
-- [MEDIUM] compute_analysis hypothesis_test (unknown_method): FAIL_MISLEADING_RESPONSE: BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.
-WHY: without on
-- [MEDIUM] compute_analysis regression (unknown_analysis): FAIL_MISLEADING_RESPONSE: BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.
-WHY: without on
-- [MEDIUM] compute_analysis period_compare (period_outside_window): FAIL_MISLEADING_RESPONSE: BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.
-WHY: without on
-- [MEDIUM] render_chart  (chart_unsupported): FAIL_MISLEADING_RESPONSE: BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.
-WHY: without on
-- [MEDIUM] compute_analysis summary_stats (t_dup_ids_summary): FAIL_UNNECESSARY_REJECTION: BLOCKED: analysis of 'dup_ids' requires a confirmed Dataset Contract. None exists.
-WHY: with
-- [MEDIUM] compute_analysis confidence_interval (t_dup_ids_ci): FAIL_MISLEADING_RESPONSE: BLOCKED: analysis of 'dup_ids' requires a confirmed Dataset Contract. None exists.
-WHY: withou
-- [MEDIUM] compute_analysis correlation (t_dup_ids_corr): FAIL_MISLEADING_RESPONSE: BLOCKED: analysis of 'dup_ids' requires a confirmed Dataset Contract. None exists.
-WHY: withou
+- [MEDIUM] compute_analysis top_n (analyses): None (0 of 0 checks failed)
+- [MEDIUM] apply_cleaning_plan  (apply_unknown_id): FAIL_MISLEADING_RESPONSE: BLOCKED: the plan for adv is out of date.
+WHY: the table has lost 7 row(s) since this plan was
 - [guard] the known-answer fixture (perfect +1/-1/0 correlation, arithmetic trend, changepoint, 80/20 Pareto, ranking, retention grid, identical and separated groups, imbalance, 10% missing, 4 duplicates)
 - [guard] sorted vs shuffled input gives identical tables for every temporal analysis
 
@@ -966,10 +863,10 @@ WHY: withou
 
 Generated from the figures above; what they mean is discussed in docs/steps/phase14_step13_domain_benchmark.md.
 
-- Correctness: 6,157,385 of 6,157,413 independent checks passed; 28 failed (hypothesis_test 13, distribution 2, sample_adequacy 1).
-- Defects: CRITICAL 26, HIGH 49, MEDIUM 32, LOW 0.
+- Correctness: 6,159,473 of 6,159,473 independent checks passed; 0 failed (none).
+- Defects: CRITICAL 0, HIGH 35, MEDIUM 2, LOW 0.
 - Largest dataset processed to completion on this machine: 10,000,000 rows
-- Stress tiers skipped for resources: I_sales_10000000 (needed ~16227 MiB, had 14563 MiB)
+- Stress tiers skipped for resources: none
 - Median time growth 100k -> 1M: 1.80x for 10x rows.
-- Peak worker memory: 3627.2 MiB.
+- Peak worker memory: 4240.9 MiB.
 

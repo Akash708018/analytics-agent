@@ -185,109 +185,114 @@
     "unit": "I_logistics_10000000",
     "child_peak_rss_mb": 3627.24,
     "wait4_ru_maxrss_mb_inherited": 722.9
+   },
+   {
+    "unit": "I_sales_10000000",
+    "child_peak_rss_mb": 4240.93,
+    "wait4_ru_maxrss_mb_inherited": 510.9
    }
   ]
  },
  "top_calls_by_peak": [
   {
-   "unit": "I_logistics_10000000",
-   "tool": "apply_cleaning_plan",
-   "analysis": null,
-   "variant": "",
-   "rows": 10000000,
-   "peak_memory_mb": 3627.24,
-   "memory_before_mb": 449.63,
-   "memory_after_mb": 447.24
-  },
-  {
-   "unit": "I_logistics_10000000",
+   "unit": "I_sales_10000000",
    "tool": "profile_column",
    "analysis": null,
    "variant": "",
    "rows": 10000000,
-   "peak_memory_mb": 3199.51,
-   "memory_before_mb": 425.01,
-   "memory_after_mb": 441.86
+   "peak_memory_mb": 4240.93,
+   "memory_before_mb": 437.93,
+   "memory_after_mb": 438.5
   },
   {
-   "unit": "I_logistics_10000000",
+   "unit": "I_sales_10000000",
    "tool": "profile_column",
    "analysis": null,
    "variant": "",
    "rows": 10000000,
-   "peak_memory_mb": 3193.14,
-   "memory_before_mb": 366.62,
-   "memory_after_mb": 455.12
+   "peak_memory_mb": 4214.46,
+   "memory_before_mb": 377.88,
+   "memory_after_mb": 394.88
   },
   {
-   "unit": "I_logistics_10000000",
-   "tool": "propose_cleaning_plan",
-   "analysis": null,
-   "variant": "",
-   "rows": 10000000,
-   "peak_memory_mb": 3170.12,
-   "memory_before_mb": 441.41,
-   "memory_after_mb": 425.71
-  },
-  {
-   "unit": "I_logistics_10000000",
+   "unit": "I_sales_10000000",
    "tool": "profile_column",
    "analysis": null,
    "variant": "",
    "rows": 10000000,
-   "peak_memory_mb": 3164.97,
-   "memory_before_mb": 340.88,
-   "memory_after_mb": 434.15
+   "peak_memory_mb": 4174.25,
+   "memory_before_mb": 424.62,
+   "memory_after_mb": 416.89
   },
   {
-   "unit": "I_logistics_10000000",
+   "unit": "I_sales_10000000",
    "tool": "profile_column",
    "analysis": null,
    "variant": "",
    "rows": 10000000,
-   "peak_memory_mb": 3159.28,
-   "memory_before_mb": 314.33,
-   "memory_after_mb": 405.06
+   "peak_memory_mb": 4172.78,
+   "memory_before_mb": 438.66,
+   "memory_after_mb": 454.63
   },
   {
-   "unit": "I_logistics_10000000",
-   "tool": "propose_cleaning_plan",
-   "analysis": null,
-   "variant": "",
-   "rows": 10000000,
-   "peak_memory_mb": 3154.54,
-   "memory_before_mb": 425.71,
-   "memory_after_mb": 449.63
-  },
-  {
-   "unit": "I_logistics_10000000",
+   "unit": "I_sales_10000000",
    "tool": "profile_column",
    "analysis": null,
    "variant": "",
    "rows": 10000000,
-   "peak_memory_mb": 3138.65,
-   "memory_before_mb": 455.12,
-   "memory_after_mb": 439.24
+   "peak_memory_mb": 4149.41,
+   "memory_before_mb": 419.04,
+   "memory_after_mb": 426.76
   },
   {
-   "unit": "I_logistics_10000000",
+   "unit": "I_sales_10000000",
    "tool": "profile_column",
    "analysis": null,
    "variant": "",
    "rows": 10000000,
-   "peak_memory_mb": 3125.18,
-   "memory_before_mb": 413.68,
-   "memory_after_mb": 417.32
+   "peak_memory_mb": 4103.51,
+   "memory_before_mb": 432.97,
+   "memory_after_mb": 419.04
   },
   {
-   "unit": "I_logistics_10000000",
+   "unit": "I_sales_10000000",
    "tool": "profile_column",
    "analysis": null,
    "variant": "",
    "rows": 10000000,
-   "peak_memory_mb": 3102.79,
-   "memory_before_mb": 405.06,
-   "memory_after_mb": 413.68
+   "peak_memory_mb": 4097.36,
+   "memory_before_mb": 349.35,
+   "memory_after_mb": 419.25
+  },
+  {
+   "unit": "I_sales_10000000",
+   "tool": "profile_column",
+   "analysis": null,
+   "variant": "",
+   "rows": 10000000,
+   "peak_memory_mb": 4083.06,
+   "memory_before_mb": 410.47,
+   "memory_after_mb": 438.04
+  },
+  {
+   "unit": "I_sales_10000000",
+   "tool": "profile_column",
+   "analysis": null,
+   "variant": "",
+   "rows": 10000000,
+   "peak_memory_mb": 4027.74,
+   "memory_before_mb": 338.27,
+   "memory_after_mb": 372.32
+  },
+  {
+   "unit": "I_sales_10000000",
+   "tool": "profile_column",
+   "analysis": null,
+   "variant": "",
+   "rows": 10000000,
+   "peak_memory_mb": 4013.98,
+   "memory_before_mb": 426.76,
+   "memory_after_mb": 420.27
   }
  ],
  "rss_drift_per_worker": [
@@ -557,59 +562,59 @@
   },
   {
    "unit": "F_dirty",
-   "first_after_mb": 246.51,
-   "last_after_mb": 266.2,
-   "max_after_mb": 274.42,
-   "growth_mb": 19.69,
-   "calls": 64
+   "first_after_mb": 246.45,
+   "last_after_mb": 271.34,
+   "max_after_mb": 274.97,
+   "growth_mb": 24.89,
+   "calls": 32
   },
   {
    "unit": "F_formats",
-   "first_after_mb": 247.8,
-   "last_after_mb": 265.87,
-   "max_after_mb": 271.58,
-   "growth_mb": 18.07,
+   "first_after_mb": 247.58,
+   "last_after_mb": 265.51,
+   "max_after_mb": 272.28,
+   "growth_mb": 17.93,
    "calls": 19
   },
   {
    "unit": "G_wrong",
-   "first_after_mb": 252.66,
-   "last_after_mb": 307.38,
-   "max_after_mb": 317.44,
-   "growth_mb": 54.72,
-   "calls": 167
+   "first_after_mb": 252.49,
+   "last_after_mb": 296.38,
+   "max_after_mb": 305.15,
+   "growth_mb": 43.89,
+   "calls": 154
   },
   {
    "unit": "H_concurrency",
-   "first_after_mb": 248.11,
-   "last_after_mb": 260.84,
-   "max_after_mb": 261.12,
-   "growth_mb": 12.73,
-   "calls": 80
+   "first_after_mb": 247.86,
+   "last_after_mb": 265.0,
+   "max_after_mb": 266.96,
+   "growth_mb": 17.14,
+   "calls": 120
   },
   {
    "unit": "H_isolation",
-   "first_after_mb": 247.88,
-   "last_after_mb": 286.21,
-   "max_after_mb": 286.48,
-   "growth_mb": 38.33,
-   "calls": 131
+   "first_after_mb": 247.65,
+   "last_after_mb": 303.98,
+   "max_after_mb": 307.9,
+   "growth_mb": 56.33,
+   "calls": 110
   },
   {
    "unit": "H_repeat",
-   "first_after_mb": 247.9,
-   "last_after_mb": 393.94,
-   "max_after_mb": 395.36,
-   "growth_mb": 146.04,
-   "calls": 296
+   "first_after_mb": 247.93,
+   "last_after_mb": 415.14,
+   "max_after_mb": 428.03,
+   "growth_mb": 167.21,
+   "calls": 196
   },
   {
    "unit": "H_traced",
-   "first_after_mb": 248.81,
-   "last_after_mb": 262.71,
-   "max_after_mb": 263.32,
-   "growth_mb": 13.9,
-   "calls": 64
+   "first_after_mb": 249.02,
+   "last_after_mb": 273.59,
+   "max_after_mb": 276.4,
+   "growth_mb": 24.57,
+   "calls": 36
   },
   {
    "unit": "I_logistics_10000000",
@@ -636,6 +641,14 @@
    "calls": 199
   },
   {
+   "unit": "I_sales_10000000",
+   "first_after_mb": 246.45,
+   "last_after_mb": 506.32,
+   "max_after_mb": 517.78,
+   "growth_mb": 259.87,
+   "calls": 197
+  },
+  {
    "unit": "I_sales_2000000",
    "first_after_mb": 246.55,
    "last_after_mb": 467.25,
@@ -653,602 +666,476 @@
   },
   {
    "unit": "J_crm_100000_r1",
-   "first_after_mb": 247.85,
-   "last_after_mb": 258.59,
-   "max_after_mb": 260.19,
-   "growth_mb": 10.74,
-   "calls": 28
+   "first_after_mb": 247.57,
+   "last_after_mb": 268.8,
+   "max_after_mb": 272.72,
+   "growth_mb": 21.23,
+   "calls": 18
   },
   {
    "unit": "J_crm_100000_r2",
-   "first_after_mb": 247.64,
-   "last_after_mb": 259.31,
-   "max_after_mb": 260.54,
-   "growth_mb": 11.67,
-   "calls": 28
+   "first_after_mb": 247.69,
+   "last_after_mb": 269.16,
+   "max_after_mb": 269.21,
+   "growth_mb": 21.47,
+   "calls": 18
   },
   {
    "unit": "J_crm_1000_r1",
-   "first_after_mb": 247.79,
-   "last_after_mb": 257.62,
-   "max_after_mb": 259.3,
-   "growth_mb": 9.83,
-   "calls": 28
+   "first_after_mb": 247.59,
+   "last_after_mb": 262.3,
+   "max_after_mb": 262.3,
+   "growth_mb": 14.71,
+   "calls": 18
   },
   {
    "unit": "J_crm_1000_r2",
-   "first_after_mb": 247.58,
-   "last_after_mb": 257.24,
-   "max_after_mb": 259.0,
-   "growth_mb": 9.66,
-   "calls": 28
+   "first_after_mb": 247.59,
+   "last_after_mb": 262.07,
+   "max_after_mb": 262.17,
+   "growth_mb": 14.48,
+   "calls": 18
   },
   {
    "unit": "J_financial_100000_r1",
-   "first_after_mb": 247.86,
-   "last_after_mb": 260.77,
-   "max_after_mb": 261.76,
-   "growth_mb": 12.91,
-   "calls": 28
+   "first_after_mb": 247.88,
+   "last_after_mb": 273.4,
+   "max_after_mb": 273.4,
+   "growth_mb": 25.52,
+   "calls": 18
   },
   {
    "unit": "J_financial_100000_r2",
-   "first_after_mb": 247.85,
-   "last_after_mb": 260.77,
-   "max_after_mb": 261.91,
-   "growth_mb": 12.92,
-   "calls": 28
+   "first_after_mb": 247.46,
+   "last_after_mb": 273.29,
+   "max_after_mb": 274.34,
+   "growth_mb": 25.83,
+   "calls": 18
   },
   {
    "unit": "J_financial_1000_r1",
-   "first_after_mb": 247.98,
-   "last_after_mb": 258.09,
-   "max_after_mb": 259.92,
-   "growth_mb": 10.11,
-   "calls": 28
+   "first_after_mb": 247.79,
+   "last_after_mb": 265.62,
+   "max_after_mb": 265.79,
+   "growth_mb": 17.83,
+   "calls": 18
   },
   {
    "unit": "J_financial_1000_r2",
-   "first_after_mb": 247.93,
-   "last_after_mb": 259.21,
-   "max_after_mb": 260.96,
-   "growth_mb": 11.28,
-   "calls": 28
+   "first_after_mb": 247.72,
+   "last_after_mb": 265.28,
+   "max_after_mb": 265.29,
+   "growth_mb": 17.56,
+   "calls": 18
   },
   {
    "unit": "J_logistics_100000_r1",
-   "first_after_mb": 247.62,
-   "last_after_mb": 261.83,
-   "max_after_mb": 262.81,
-   "growth_mb": 14.21,
-   "calls": 28
+   "first_after_mb": 247.81,
+   "last_after_mb": 270.89,
+   "max_after_mb": 270.99,
+   "growth_mb": 23.08,
+   "calls": 18
   },
   {
    "unit": "J_logistics_100000_r2",
-   "first_after_mb": 247.72,
-   "last_after_mb": 261.71,
-   "max_after_mb": 262.49,
-   "growth_mb": 13.99,
-   "calls": 28
+   "first_after_mb": 247.74,
+   "last_after_mb": 266.29,
+   "max_after_mb": 266.3,
+   "growth_mb": 18.55,
+   "calls": 18
   },
   {
    "unit": "J_logistics_1000_r1",
-   "first_after_mb": 247.86,
-   "last_after_mb": 257.51,
-   "max_after_mb": 259.3,
-   "growth_mb": 9.65,
-   "calls": 28
+   "first_after_mb": 247.68,
+   "last_after_mb": 260.33,
+   "max_after_mb": 264.16,
+   "growth_mb": 12.65,
+   "calls": 18
   },
   {
    "unit": "J_logistics_1000_r2",
-   "first_after_mb": 247.75,
-   "last_after_mb": 257.67,
-   "max_after_mb": 259.42,
-   "growth_mb": 9.92,
-   "calls": 28
+   "first_after_mb": 247.82,
+   "last_after_mb": 260.11,
+   "max_after_mb": 264.01,
+   "growth_mb": 12.29,
+   "calls": 18
   }
  ],
  "repeat_series_mb": {
   "rp_pro": [
-   247.9
+   247.93
   ],
   "rp_loa": [
-   256.02
+   256.03
   ],
-  "rp_cpr": [
-   259.34
+  "rp_pla": [
+   261.33
   ],
-  "rp_cco": [
-   259.9
-  ],
-  "same50": [
-   260.2,
-   257.68,
-   259.64,
-   259.85,
-   257.55,
-   259.52,
-   259.65,
-   259.7,
-   259.44,
-   259.89,
-   260.07,
-   257.62,
-   259.61,
-   259.82,
-   257.57,
-   259.56,
-   259.68,
-   257.61,
-   259.52,
-   259.62,
-   257.59,
-   259.55,
-   259.6,
-   257.58,
-   259.41,
-   259.65,
-   257.56,
-   259.56,
-   259.58,
-   257.49,
-   259.53,
-   259.73,
-   257.6,
-   259.57,
-   259.59,
-   257.59,
-   259.51,
-   259.53,
-   257.61,
-   259.46,
-   257.55,
-   259.47,
-   259.7,
-   260.09,
-   259.57,
-   259.74,
-   259.99,
-   259.61,
-   259.85,
-   259.86
-  ],
-  "follow": [
-   259.73,
-   260.02,
-   260.13,
-   259.98,
-   260.06,
-   260.51,
-   260.7,
-   260.89,
-   261.21,
-   261.14,
-   261.07,
-   261.1,
-   261.26,
-   261.6,
-   261.27,
-   261.3,
-   261.84,
-   261.77,
-   261.59,
-   261.87,
-   261.54,
-   261.87,
-   261.5,
-   261.57,
-   261.15,
-   261.15,
-   261.29,
-   261.43,
-   261.27,
-   261.26,
-   261.2,
-   261.3,
-   261.27,
-   261.3,
-   261.35,
-   261.59,
-   262.14,
-   261.95,
-   262.01,
-   262.29,
-   262.18,
-   262.18,
-   262.29,
-   261.96,
-   262.09,
-   262.2,
-   262.2,
-   262.05,
-   262.25,
-   262.18,
-   262.17,
-   262.33,
-   262.54,
-   262.51,
-   262.55,
-   262.46,
-   262.6,
-   262.02,
-   262.43,
-   262.73,
-   262.46,
-   262.79,
-   262.68,
-   262.52,
-   262.24,
-   262.7,
-   262.4,
-   262.85,
-   262.83,
-   262.77,
-   262.81,
-   262.89,
-   262.82,
-   262.7,
-   262.79,
-   262.7,
-   262.79,
-   262.83,
-   262.72,
-   262.69,
-   262.59,
-   262.78,
-   262.9,
-   262.52,
-   262.76,
-   262.66,
-   262.69,
-   262.68,
-   262.7,
-   262.64,
-   262.63,
-   262.68,
-   262.86,
-   262.77,
-   262.81,
-   262.7,
-   262.75,
-   262.78,
-   262.72,
-   262.85,
-   262.91,
-   394.35
-  ],
-  "mix0_c": [
-   261.03,
-   261.08
-  ],
-  "mix0_d": [
-   261.18
-  ],
-  "mix0_f": [
-   260.93,
-   260.95
-  ],
-  "mix0_t": [
-   261.59,
-   261.71
-  ],
-  "mix0_s": [
-   262.06
-  ],
-  "mix0_g": [
-   262.36,
-   262.26
-  ],
-  "mix1_c": [
-   262.23,
-   262.29
-  ],
-  "mix1_d": [
-   262.58
-  ],
-  "mix1_f": [
-   262.71,
-   262.7
-  ],
-  "mix1_t": [
-   262.65,
-   262.67
-  ],
-  "mix1_s": [
-   262.77
-  ],
-  "mix1_g": [
-   262.57,
-   262.79
-  ],
-  "mix2_c": [
-   262.63,
+  "rp_ded": [
    262.78
   ],
-  "mix2_d": [
-   262.59
-  ],
-  "mix2_f": [
-   262.5,
-   262.2
-  ],
-  "mix2_t": [
-   262.22,
-   262.29
-  ],
-  "mix2_s": [
-   262.46
-  ],
-  "mix2_g": [
-   262.16,
-   262.33
-  ],
-  "mix3_c": [
-   262.31,
-   262.33
-  ],
-  "mix3_d": [
-   262.4
-  ],
-  "mix3_f": [
-   262.34,
-   262.38
-  ],
-  "mix3_t": [
-   262.71,
-   263.22
-  ],
-  "mix3_s": [
-   262.97
-  ],
-  "mix3_g": [
-   263.01,
-   263.35
-  ],
-  "mix4_c": [
-   263.27,
-   263.31
-  ],
-  "mix4_d": [
-   263.46
-  ],
-  "mix4_f": [
-   263.08,
-   263.17
-  ],
-  "mix4_t": [
-   263.31,
-   263.28
-  ],
-  "mix4_s": [
-   263.07
-  ],
-  "mix4_g": [
-   263.16,
-   263.3
-  ],
-  "mix5_c": [
-   263.41,
-   263.54
-  ],
-  "mix5_d": [
-   263.6
-  ],
-  "mix5_f": [
-   263.56,
-   263.54
-  ],
-  "mix5_t": [
-   263.66,
-   263.61
-  ],
-  "mix5_s": [
-   263.08
-  ],
-  "mix5_g": [
-   263.44,
-   263.75
-  ],
-  "mix6_c": [
-   263.52,
-   263.91
-  ],
-  "mix6_d": [
-   263.76
-  ],
-  "mix6_f": [
-   263.78,
-   263.31
-  ],
-  "mix6_t": [
-   263.72,
-   263.59
-  ],
-  "mix6_s": [
-   263.91
-  ],
-  "mix6_g": [
-   263.91,
-   263.85
-  ],
-  "mix7_c": [
-   263.88,
-   263.97
-  ],
-  "mix7_d": [
-   263.77
-  ],
-  "mix7_f": [
-   263.82,
-   263.76
-  ],
-  "mix7_t": [
-   263.83,
-   263.85
-  ],
-  "mix7_s": [
-   263.91
-  ],
-  "mix7_g": [
-   263.89,
-   263.73
-  ],
-  "mix8_c": [
-   263.88,
-   263.75
-  ],
-  "mix8_d": [
-   263.79
-  ],
-  "mix8_f": [
-   263.74,
-   263.81
-  ],
-  "mix8_t": [
-   263.75,
-   263.74
-  ],
-  "mix8_s": [
-   263.73
-  ],
-  "mix8_g": [
-   263.75,
-   263.71
-  ],
-  "mix9_c": [
-   263.74,
-   263.62
-  ],
-  "mix9_d": [
-   263.83
-  ],
-  "mix9_f": [
-   263.86,
+  "rp_cpr": [
    263.95
   ],
+  "rp_cco": [
+   266.71
+  ],
+  "same50": [
+   262.98,
+   266.95,
+   266.93,
+   263.08,
+   263.16,
+   266.88,
+   266.95,
+   263.13,
+   264.62,
+   264.57,
+   268.34,
+   268.45,
+   268.37,
+   268.28,
+   264.62,
+   268.45,
+   264.62,
+   268.39,
+   268.34,
+   264.45,
+   264.59,
+   264.5,
+   264.48,
+   268.39,
+   268.26,
+   264.5,
+   268.15,
+   264.44,
+   268.22,
+   264.43,
+   264.43,
+   268.23,
+   268.22,
+   264.45,
+   268.28,
+   264.53,
+   268.36,
+   268.2,
+   264.57,
+   268.35,
+   268.27,
+   264.6,
+   268.39,
+   264.62,
+   264.61,
+   268.45,
+   268.31,
+   264.3,
+   268.11,
+   268.11
+  ],
+  "mix0_c": [
+   264.35,
+   264.39
+  ],
+  "mix0_d": [
+   264.83
+  ],
+  "mix0_f": [
+   268.7,
+   266.28
+  ],
+  "mix0_t": [
+   270.18,
+   269.93
+  ],
+  "mix0_s": [
+   269.03
+  ],
+  "mix0_g": [
+   269.2,
+   269.21
+  ],
+  "mix1_c": [
+   269.31,
+   269.33
+  ],
+  "mix1_d": [
+   269.31
+  ],
+  "mix1_f": [
+   273.1,
+   270.28
+  ],
+  "mix1_t": [
+   274.04,
+   270.33
+  ],
+  "mix1_s": [
+   270.44
+  ],
+  "mix1_g": [
+   270.51,
+   270.52
+  ],
+  "mix2_c": [
+   270.52,
+   270.52
+  ],
+  "mix2_d": [
+   270.54
+  ],
+  "mix2_f": [
+   274.2,
+   270.56
+  ],
+  "mix2_t": [
+   274.23,
+   270.56
+  ],
+  "mix2_s": [
+   270.72
+  ],
+  "mix2_g": [
+   270.7,
+   270.66
+  ],
+  "mix3_c": [
+   270.69,
+   270.68
+  ],
+  "mix3_d": [
+   270.7
+  ],
+  "mix3_f": [
+   274.45,
+   269.7
+  ],
+  "mix3_t": [
+   273.47,
+   273.4
+  ],
+  "mix3_s": [
+   270.38
+  ],
+  "mix3_g": [
+   270.48,
+   270.41
+  ],
+  "mix4_c": [
+   270.49,
+   270.42
+  ],
+  "mix4_d": [
+   270.45
+  ],
+  "mix4_f": [
+   270.48,
+   270.52
+  ],
+  "mix4_t": [
+   270.45,
+   274.13
+  ],
+  "mix4_s": [
+   270.55
+  ],
+  "mix4_g": [
+   270.57,
+   270.59
+  ],
+  "mix5_c": [
+   270.57,
+   270.53
+  ],
+  "mix5_d": [
+   270.55
+  ],
+  "mix5_f": [
+   270.56,
+   271.54
+  ],
+  "mix5_t": [
+   275.21,
+   275.12
+  ],
+  "mix5_s": [
+   271.58
+  ],
+  "mix5_g": [
+   271.66,
+   271.55
+  ],
+  "mix6_c": [
+   271.57,
+   271.56
+  ],
+  "mix6_d": [
+   271.52
+  ],
+  "mix6_f": [
+   275.04,
+   270.57
+  ],
+  "mix6_t": [
+   270.57,
+   274.16
+  ],
+  "mix6_s": [
+   270.68
+  ],
+  "mix6_g": [
+   270.85,
+   270.67
+  ],
+  "mix7_c": [
+   270.73,
+   270.77
+  ],
+  "mix7_d": [
+   270.68
+  ],
+  "mix7_f": [
+   274.2,
+   271.73
+  ],
+  "mix7_t": [
+   271.73,
+   275.16
+  ],
+  "mix7_s": [
+   271.82
+  ],
+  "mix7_g": [
+   271.86,
+   271.95
+  ],
+  "mix8_c": [
+   271.88,
+   271.89
+  ],
+  "mix8_d": [
+   271.88
+  ],
+  "mix8_f": [
+   271.87,
+   271.87
+  ],
+  "mix8_t": [
+   275.27,
+   275.26
+  ],
+  "mix8_s": [
+   271.9
+  ],
+  "mix8_g": [
+   271.91,
+   272.02
+  ],
+  "mix9_c": [
+   272.02,
+   272.03
+  ],
+  "mix9_d": [
+   272.04
+  ],
+  "mix9_f": [
+   275.35,
+   270.95
+  ],
   "mix9_t": [
-   263.82,
-   263.77
+   274.3,
+   274.22
   ],
   "mix9_s": [
-   263.91
+   270.98
   ],
   "mix9_g": [
-   263.8,
-   263.96
+   271.02,
+   271.11
   ],
   "profil": [
-   297.95,
-   332.77,
-   367.87,
-   368.1,
-   368.42,
-   368.48,
-   369.52,
-   368.64,
-   368.54,
-   368.73
+   305.37,
+   308.64,
+   339.04,
+   373.13,
+   373.24,
+   375.91,
+   376.13,
+   376.82,
+   377.33,
+   376.64
   ],
   "chart2": [
-   392.23,
-   393.62,
-   393.66,
-   393.86,
-   392.45,
-   393.73,
-   393.84,
-   394.07,
-   393.86,
-   393.93,
-   394.07,
-   392.55,
-   393.98,
-   394.01,
-   394.26,
-   393.87,
-   393.94,
-   394.16,
-   393.86,
-   394.09
+   404.58,
+   407.52,
+   410.35,
+   413.27,
+   407.7,
+   407.84,
+   407.96,
+   408.09,
+   410.04,
+   411.99,
+   414.52,
+   417.05,
+   419.86,
+   422.59,
+   422.67,
+   422.93,
+   425.36,
+   428.03,
+   413.8,
+   415.08
   ],
   "report": [
-   395.23,
-   395.36,
-   392.41,
-   393.71,
-   393.96,
-   392.45,
-   393.71,
-   393.93,
-   393.74,
-   393.94
+   416.17,
+   415.1,
+   416.02,
+   415.07,
+   416.02,
+   416.05,
+   415.08,
+   416.02,
+   416.04,
+   415.14
   ]
  },
  "tracemalloc_peaks_mb": [
   1.134,
   0.243,
-  0.085,
-  0.077,
-  0.08,
-  0.113,
-  0.09,
-  0.119,
-  0.095,
-  0.123,
-  0.099,
-  0.127,
-  0.103,
-  0.13,
-  0.106,
-  0.134,
-  0.11,
-  0.137,
-  0.113,
-  0.141,
+  0.083,
+  0.088,
   0.116,
-  0.144,
-  0.12,
-  0.148,
-  0.123,
-  0.151,
-  0.127,
-  0.154,
-  0.13,
-  0.158,
-  0.134,
-  0.161,
-  0.137,
-  0.164,
-  0.14,
-  0.167,
-  0.143,
-  0.17,
-  0.147,
-  0.174,
-  0.15,
-  0.177,
-  0.153,
-  0.18,
-  0.156,
-  0.183,
-  0.16,
-  0.186,
-  0.162,
-  0.19,
-  0.166,
-  0.193,
-  0.169,
-  0.196,
-  0.172,
-  0.199,
-  0.175,
-  0.202,
-  0.178,
-  0.205,
-  0.181,
-  0.208,
-  0.185,
-  0.211
+  0.136,
+  0.243,
+  0.249,
+  0.254,
+  0.255,
+  3.765,
+  0.363,
+  0.365,
+  0.374,
+  0.38,
+  0.38,
+  0.384,
+  0.388,
+  0.393,
+  0.394,
+  3.84,
+  0.401,
+  0.403,
+  0.412,
+  0.418,
+  0.419,
+  0.423,
+  0.428,
+  0.433,
+  0.433,
+  3.88,
+  0.441,
+  0.443,
+  0.45,
+  0.456,
+  0.456
  ],
  "note": "peak_memory_mb is VmHWM after a reset through /proc/self/clear_refs just before each call; a worker's peak is the largest of those. wait4's ru_maxrss is kept for the record but is NOT the worker's peak: Linux carries the parent's high-water mark across fork+exec"
 }

@@ -12,27 +12,33 @@
   },
   {
    "domain": "education",
+   "rows": 10000,
+   "checks_attempted": 172,
+   "checks_passed": 172,
+   "checks_failed": 0,
+   "calls_verified": 4,
+   "calls_PASS": 4,
+   "correctness_percent": 100.0
+  },
+  {
+   "domain": "education",
    "rows": 100000,
-   "checks_attempted": 15567,
-   "checks_passed": 15566,
-   "checks_failed": 1,
+   "checks_attempted": 15576,
+   "checks_passed": 15576,
+   "checks_failed": 0,
    "calls_verified": 47,
-   "calls_PASS": 45,
-   "calls_FAIL": 1,
-   "calls_ORACLE_ERROR": 1,
-   "correctness_percent": 99.9936
+   "calls_PASS": 47,
+   "correctness_percent": 100.0
   },
   {
    "domain": "education",
    "rows": 1000000,
-   "checks_attempted": 83068,
-   "checks_passed": 83067,
-   "checks_failed": 1,
+   "checks_attempted": 83077,
+   "checks_passed": 83077,
+   "checks_failed": 0,
    "calls_verified": 47,
-   "calls_PASS": 45,
-   "calls_FAIL": 1,
-   "calls_ORACLE_ERROR": 1,
-   "correctness_percent": 99.9988
+   "calls_PASS": 47,
+   "correctness_percent": 100.0
   }
  ],
  "performance": [
@@ -6051,171 +6057,7 @@
    "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
   }
  ],
- "errors": [
-  {
-   "error_number": 15,
-   "timestamp": null,
-   "domain": "education",
-   "size": 100000,
-   "file": null,
-   "workflow_step": "analyses",
-   "tool": "compute_analysis",
-   "analysis": "hypothesis_test",
-   "supplied_arguments": {
-    "dimension": "scholarship_flag",
-    "measure": "total_score"
-   },
-   "expected_behavior": "the reply states a statistic and a p value = Test: ... p ...",
-   "observed_behavior": "  - Test: Welch's unequal-variance t-test (two-sided). Statistic -1.8539, df 2.634e+04, p 0.0637616. (1 of 1 checks failed)",
-   "exception": null,
-   "stack_trace": null,
-   "severity": "CRITICAL",
-   "recovered": true,
-   "subsequent_operations_valid": true,
-   "unit": "D_education",
-   "kind": "wrong_result",
-   "variant": "t",
-   "klass": "REQUIRED"
-  },
-  {
-   "error_number": 16,
-   "timestamp": null,
-   "domain": "education",
-   "size": 100000,
-   "file": null,
-   "workflow_step": "analyses",
-   "tool": "compute_analysis",
-   "analysis": "sample_adequacy",
-   "supplied_arguments": {
-    "dimension": "scholarship_flag",
-    "measure": "total_score"
-   },
-   "expected_behavior": "None = None",
-   "observed_behavior": "None (0 of 0 checks failed)",
-   "exception": null,
-   "stack_trace": null,
-   "severity": "MEDIUM",
-   "recovered": true,
-   "subsequent_operations_valid": true,
-   "unit": "D_education",
-   "kind": "oracle_error",
-   "variant": "",
-   "klass": "VALID"
-  },
-  {
-   "error_number": 26,
-   "timestamp": null,
-   "domain": "education",
-   "size": 1000000,
-   "file": null,
-   "workflow_step": "analyses",
-   "tool": "compute_analysis",
-   "analysis": "hypothesis_test",
-   "supplied_arguments": {
-    "dimension": "scholarship_flag",
-    "measure": "total_score"
-   },
-   "expected_behavior": "the reply states a statistic and a p value = Test: ... p ...",
-   "observed_behavior": "  - Test: Welch's unequal-variance t-test (two-sided). Statistic 0.2756, df 2.603e+05, p 0.782847. (1 of 1 checks failed)",
-   "exception": null,
-   "stack_trace": null,
-   "severity": "CRITICAL",
-   "recovered": true,
-   "subsequent_operations_valid": true,
-   "unit": "E_education",
-   "kind": "wrong_result",
-   "variant": "t",
-   "klass": "REQUIRED"
-  },
-  {
-   "error_number": 27,
-   "timestamp": null,
-   "domain": "education",
-   "size": 1000000,
-   "file": null,
-   "workflow_step": "analyses",
-   "tool": "compute_analysis",
-   "analysis": "sample_adequacy",
-   "supplied_arguments": {
-    "dimension": "scholarship_flag",
-    "measure": "total_score"
-   },
-   "expected_behavior": "None = None",
-   "observed_behavior": "None (0 of 0 checks failed)",
-   "exception": null,
-   "stack_trace": null,
-   "severity": "MEDIUM",
-   "recovered": true,
-   "subsequent_operations_valid": true,
-   "unit": "E_education",
-   "kind": "oracle_error",
-   "variant": "",
-   "klass": "VALID"
-  },
-  {
-   "error_number": 71,
-   "timestamp": null,
-   "domain": "education",
-   "size": 100000,
-   "file": "frequency_20260924-171616.csv",
-   "workflow_step": "read_result",
-   "tool": "read_result_file",
-   "analysis": null,
-   "supplied_arguments": {
-    "start": 901,
-    "limit": 200
-   },
-   "expected_behavior": "100 rows",
-   "observed_behavior": "50 found",
-   "exception": null,
-   "stack_trace": null,
-   "severity": "HIGH",
-   "recovered": true,
-   "subsequent_operations_valid": true,
-   "unit": "D_education"
-  },
-  {
-   "error_number": 81,
-   "timestamp": null,
-   "domain": "education",
-   "size": 1000000,
-   "file": "frequency_20260924-183813.csv",
-   "workflow_step": "read_result",
-   "tool": "read_result_file",
-   "analysis": null,
-   "supplied_arguments": {
-    "start": 901,
-    "limit": 200
-   },
-   "expected_behavior": "100 rows",
-   "observed_behavior": "50 found",
-   "exception": null,
-   "stack_trace": null,
-   "severity": "HIGH",
-   "recovered": true,
-   "subsequent_operations_valid": true,
-   "unit": "E_education"
-  },
-  {
-   "error_number": 107,
-   "timestamp": null,
-   "domain": "education",
-   "size": 10000,
-   "file": null,
-   "workflow_step": "isolation",
-   "tool": "charts",
-   "analysis": null,
-   "supplied_arguments": null,
-   "expected_behavior": "only its own dataset",
-   "observed_behavior": "{\"dataset\": \"education\", \"names_its_measure\": false, \"names_another_dataset\": [], \"status\": \"FAIL\"}",
-   "exception": null,
-   "stack_trace": null,
-   "severity": "CRITICAL",
-   "recovered": true,
-   "subsequent_operations_valid": null,
-   "unit": "H_isolation"
-  }
- ],
+ "errors": [],
  "warnings": [
   {
    "category": "excessive_response_size",

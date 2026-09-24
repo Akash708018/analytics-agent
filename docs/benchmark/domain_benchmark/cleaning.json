@@ -523,14 +523,15 @@
      "branch": "unicode labels",
      "notes": "an empty column"
     },
+    "duplicate_rows_in_file": 3,
     "actions": [
      {
       "id": "C001",
       "kind": "DROP_DUPLICATE_ROWS",
       "column": null,
       "text": "keep one of each of the 3 exactly duplicated row(s) (3 row(s)). 3 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"FIN000001796\",\"transaction_id\":\"T00001796\",\"account_id\":\"A0000012\",\"customer_id\":\"C0000300\",\"transaction_date\":\"2023-08-02\",\"posted_at\":\"2023-08-02 02:40:1",
-      "verdict": "dangerous",
-      "why": "removes 3 exact duplicate(s); the generator inserted 0",
+      "verdict": "valid",
+      "why": "removes 3 exact duplicate(s); the generator inserted 3",
       "rows_affected": 3
      },
      {
@@ -555,7 +556,7 @@
       "id": "C004",
       "kind": "NORMALISE_CASE",
       "column": "payment_method",
-      "text": "fold payment_method to one case, merging 10 distinct value(s) into others (3,368 row(s)). 10 distinct value(s) will be discarded and are not declared missing anywhere: 'Card', 'WIRE', 'cash'. That is information, not absence -- approve this only if you mean to lose it.",
+      "text": "fold payment_method to one case, merging 10 distinct value(s) into others (3,368 row(s)). 10 distinct value(s) will be discarded and are not declared missing anywhere: 'Card', 'WIRE', 'Wire'. That is information, not absence -- approve this only if you mean to lose it.",
       "verdict": "valid",
       "why": "fixes the inserted defect: inconsistent capitalisation",
       "rows_affected": 3368
@@ -597,14 +598,15 @@
     "injected": {
      "transaction_date": "malformed, impossible and mixed-format dates"
     },
+    "duplicate_rows_in_file": 6,
     "actions": [
      {
       "id": "C001",
       "kind": "DROP_DUPLICATE_ROWS",
       "column": null,
       "text": "keep one of each of the 6 exactly duplicated row(s) (6 row(s)). 6 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"FIN000003035\",\"transaction_id\":\"T00003035\",\"account_id\":\"A0000356\",\"customer_id\":\"C0000731\",\"transaction_date\":\"2023-05-07\",\"posted_at\":\"2023-05-07 11:32:2",
-      "verdict": "dangerous",
-      "why": "removes 6 exact duplicate(s); the generator inserted 0",
+      "verdict": "valid",
+      "why": "removes 6 exact duplicate(s); the generator inserted 6",
       "rows_affected": 6
      }
     ],
@@ -615,14 +617,15 @@
     "injected": {
      "category": "duplicated column name"
     },
+    "duplicate_rows_in_file": 18,
     "actions": [
      {
       "id": "C001",
       "kind": "DROP_DUPLICATE_ROWS",
       "column": null,
-      "text": "keep one of each of the 18 exactly duplicated row(s) (18 row(s)). 18 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"FIN000000219\",\"transaction_id\":\"T00000219\",\"account_id\":\"A0000239\",\"customer_id\":\"C0000887\",\"transaction_date\":\"2024-10-17\",\"posted_at\":\"2024-10-17 05:0",
-      "verdict": "dangerous",
-      "why": "removes 18 exact duplicate(s); the generator inserted 0",
+      "text": "keep one of each of the 18 exactly duplicated row(s) (18 row(s)). 18 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"FIN000000350\",\"transaction_id\":\"T00000350\",\"account_id\":\"A0000202\",\"customer_id\":\"C0000276\",\"transaction_date\":\"2023-10-11\",\"posted_at\":\"2023-10-11 04:3",
+      "verdict": "valid",
+      "why": "removes 18 exact duplicate(s); the generator inserted 18",
       "rows_affected": 18
      }
     ],
@@ -631,6 +634,7 @@
    "missing_header": {
     "expect": "warn",
     "injected": {},
+    "duplicate_rows_in_file": 18,
     "actions": [],
     "injected_without_action": []
    },
@@ -639,14 +643,15 @@
     "injected": {
      "extra": "an unexpected extra column"
     },
+    "duplicate_rows_in_file": 18,
     "actions": [
      {
       "id": "C001",
       "kind": "DROP_DUPLICATE_ROWS",
       "column": null,
-      "text": "keep one of each of the 18 exactly duplicated row(s) (18 row(s)). 18 row(s) will be discarded and are not declared missing anywhere: '{\"source_system\":\"CORE\",\"fiscal_period\":\"FY2024-Q4\",\"actual\":117.36,\"budget\":115.99,\"profit\":12.41,\"expense\":7.92,\"revenue\":20.33,\"fraud_flag\":false,\"risk_score\":0.33",
-      "verdict": "dangerous",
-      "why": "removes 18 exact duplicate(s); the generator inserted 0",
+      "text": "keep one of each of the 18 exactly duplicated row(s) (18 row(s)). 18 row(s) will be discarded and are not declared missing anywhere: '{\"source_system\":\"CORE\",\"fiscal_period\":\"FY2023-Q4\",\"actual\":489.02,\"budget\":382.52,\"profit\":12.37,\"expense\":2.95,\"revenue\":15.32,\"fraud_flag\":false,\"risk_score\":0.04",
+      "verdict": "valid",
+      "why": "removes 18 exact duplicate(s); the generator inserted 18",
       "rows_affected": 18
      }
     ],
@@ -699,6 +704,22 @@
     "verdict": "valid",
     "why": "removes 15096 exact duplicate(s); the generator inserted 15096",
     "rows_affected": 15096
+   }
+  ]
+ },
+ {
+  "unit": "I_sales_10000000",
+  "domain": "sales",
+  "rows": 10000000,
+  "plan_quality": [
+   {
+    "id": "C001",
+    "kind": "DROP_DUPLICATE_ROWS",
+    "column": null,
+    "text": "keep one of each of the 29,884 exactly duplicated row(s) (29,884 row(s)). 29,884 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"SAL000253412\",\"order_id\":\"SO00253412\",\"customer_id\":\"C0131356\",\"salesperson_id\":\"SP65405\",\"product_id\":\"P013621\",\"product_category\":\"electro",
+    "verdict": "valid",
+    "why": "removes 29884 exact duplicate(s); the generator inserted 29884",
+    "rows_affected": 29884
    }
   ]
  },

@@ -6,7 +6,20 @@
   "sha_b": "8261b02dc672120e1113f7c5f37e0a72b1981ff8b83f74d6027f97a3a279c885",
   "sha_principal": "8261b02dc672120e1113f7c5f37e0a72b1981ff8b83f74d6027f97a3a279c885",
   "dataset_identical": true,
-  "results_identical": [],
+  "results_identical": [
+   "concentration_",
+   "cross_tab_count",
+   "cross_tab_sum",
+   "distribution_",
+   "frequency_",
+   "frequency_hi",
+   "group_compare_",
+   "group_compare_mean",
+   "pareto_",
+   "summary_stats_",
+   "top_n_",
+   "top_n_mean"
+  ],
   "results_different": [],
   "status": "PASS"
  },
@@ -17,7 +30,20 @@
   "sha_b": "b1b52693d4c5208ce8ed590202caa1b70be3a0e49210830ab57c7b3cb79489a2",
   "sha_principal": "b1b52693d4c5208ce8ed590202caa1b70be3a0e49210830ab57c7b3cb79489a2",
   "dataset_identical": true,
-  "results_identical": [],
+  "results_identical": [
+   "concentration_",
+   "cross_tab_count",
+   "cross_tab_sum",
+   "distribution_",
+   "frequency_",
+   "frequency_hi",
+   "group_compare_",
+   "group_compare_mean",
+   "pareto_",
+   "summary_stats_",
+   "top_n_",
+   "top_n_mean"
+  ],
   "results_different": [],
   "status": "PASS"
  },
@@ -28,7 +54,20 @@
   "sha_b": "cdedc5973c2662b77fb428394da6c38ccf0a00c824870acc3aa599d12fe5b77d",
   "sha_principal": "cdedc5973c2662b77fb428394da6c38ccf0a00c824870acc3aa599d12fe5b77d",
   "dataset_identical": true,
-  "results_identical": [],
+  "results_identical": [
+   "concentration_",
+   "cross_tab_count",
+   "cross_tab_sum",
+   "distribution_",
+   "frequency_",
+   "frequency_hi",
+   "group_compare_",
+   "group_compare_mean",
+   "pareto_",
+   "summary_stats_",
+   "top_n_",
+   "top_n_mean"
+  ],
   "results_different": [],
   "status": "PASS"
  },
@@ -39,9 +78,23 @@
   "sha_b": "3c0ca018d7297f320d1b68e590fbef225da4170a659389266e497b937d6e6202",
   "sha_principal": "3c0ca018d7297f320d1b68e590fbef225da4170a659389266e497b937d6e6202",
   "dataset_identical": true,
-  "results_identical": [],
-  "results_different": [],
-  "status": "PASS"
+  "results_identical": [
+   "concentration_",
+   "cross_tab_count",
+   "distribution_",
+   "frequency_",
+   "frequency_hi",
+   "group_compare_mean",
+   "pareto_",
+   "top_n_",
+   "top_n_mean"
+  ],
+  "results_different": [
+   "cross_tab_sum",
+   "group_compare_",
+   "summary_stats_"
+  ],
+  "status": "FAIL"
  },
  {
   "domain": "logistics",
@@ -50,7 +103,20 @@
   "sha_b": "fe6e26e57c9e5fcdccfd8493c97aef562ca2a56c57b45097d0985febb358923a",
   "sha_principal": "fe6e26e57c9e5fcdccfd8493c97aef562ca2a56c57b45097d0985febb358923a",
   "dataset_identical": true,
-  "results_identical": [],
+  "results_identical": [
+   "concentration_",
+   "cross_tab_count",
+   "cross_tab_sum",
+   "distribution_",
+   "frequency_",
+   "frequency_hi",
+   "group_compare_",
+   "group_compare_mean",
+   "pareto_",
+   "summary_stats_",
+   "top_n_",
+   "top_n_mean"
+  ],
   "results_different": [],
   "status": "PASS"
  },
@@ -61,7 +127,20 @@
   "sha_b": "bd0e573282933701a81855818412d246458ba9afaeaef9b9129fce15bbb4f39f",
   "sha_principal": "bd0e573282933701a81855818412d246458ba9afaeaef9b9129fce15bbb4f39f",
   "dataset_identical": true,
-  "results_identical": [],
+  "results_identical": [
+   "concentration_",
+   "cross_tab_count",
+   "cross_tab_sum",
+   "distribution_",
+   "frequency_",
+   "frequency_hi",
+   "group_compare_",
+   "group_compare_mean",
+   "pareto_",
+   "summary_stats_",
+   "top_n_",
+   "top_n_mean"
+  ],
   "results_different": [],
   "status": "PASS"
  }

@@ -1,12 +1,11 @@
 {
  "classes": {
-  "FAIL_EXCEPTION": 8,
-  "PASS_AUTOCORRECTED": 54,
-  "PASS_USEFUL_WARNING": 18,
-  "PASS_ACCEPTED": 25,
-  "PASS_SAFE_REJECTION": 147,
-  "FAIL_MISLEADING_RESPONSE": 19,
-  "FAIL_UNNECESSARY_REJECTION": 1
+  "FAIL_EXCEPTION": 12,
+  "PASS_AUTOCORRECTED": 61,
+  "PASS_USEFUL_WARNING": 16,
+  "PASS_ACCEPTED": 21,
+  "PASS_SAFE_REJECTION": 154,
+  "FAIL_MISLEADING_RESPONSE": 1
  },
  "records": [
   {
@@ -4967,200 +4966,6 @@
    "message_quality": null
   },
   {
-   "unit": "F_dirty",
-   "domain": null,
-   "rows": 0,
-   "case": "format_noise",
-   "family": null,
-   "tool": "propose_ingest_spec",
-   "analysis": null,
-   "parameters": {
-    "path": "/tmp/domain_benchmark_data/dirty/dirty_format_noise.csv",
-    "dataset_name": "dirty_format_noise"
-   },
-   "expect": "accept",
-   "status": "OK",
-   "exception_type": null,
-   "message": "path           /tmp/domain_benchmark_data/dirty/dirty_format_noise.csv\ntype           csv\ndataset        dirty_format_noise\nheader rows    [1]  joined with 'space'\ndata starts    row 2  -> loader skips 1\n\n25 columns:\n| source | target | type |\n| --- | --- | --- |\n| record_id | record_id | infer |\n| transaction_id | transaction_id | infer |\n| account_id | account_id | infer |\n| customer_id | customer_id | infer |\n| transaction_date | transaction_date | infer |\n| posted_at | posted_at | infer |\n| transaction_type | transaction_type | infer |\n| category | category | infer |\n| debit | debit | infer |\n| credit | credit | infer |\n| Amount (USD) | amount_usd | infer |\n| balance | balance | infer |\n| currency | currency | infer |\n| branch | branch | infer |\n| payment_method | payment_method | infer |\n| risk score % | risk_score_pct | infer |\n| fraud_flag | fraud_flag | infer |\n| revenue | revenue | infer |\n| expense | expense | infer |\n| profit | profit | infer |\n| budget | budget | infer |\n| actual | actual | infer |\n| fiscal_period | fiscal_period | infer |\n| source_system | source_system | infer |\n| notes | notes | infer |\n\nAssumptions:\n  - Row 2 is the first row containing non-text values, so data starts there.\n  - Single header row, so the join mode has no effect.\n\nConfidence: high\nEvery assumption above is yours to overrule.\n\nNothing is loaded yet. To load exactly this, pass the JSON below back to confirm_ingest_spec. To change something, edit a field first -- the spec that comes back is the spec that runs.\n\n```json\n{\n  \"path\": \"/tmp/domain_benchmark_data/dirty/dirty_format_noise.csv\",\n  \"source_type\": \"csv\",\n  \"dataset_name\": \"dirty_format_noise\",\n  \"sheet\": null,\n  \"header_rows\": [\n    1\n  ],\n  \"data_start_row\": 2,\n  \"footer_skip_rows\": 0,\n  \"header_join\": \"space\",\n  \"na_values\": null,\n  \"delimiter\": null,\n  \"authorised_fill\": false,\n  \"columns\": [\n    {\n      \"source_name\": \"record_id\",\n      \"target_name\": \"record_id\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"transaction_id\",\n      \"target_name\": \"transaction_id\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"account_id\",\n      \"target_name\": \"account_id\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"customer_id\",\n      \"target_name\": \"customer_id\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"transaction_date\",\n      \"target_name\": \"transaction_date\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"posted_at\",\n      \"target_name\": \"posted_at\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"transaction_type\",\n      \"target_name\": \"transaction_type\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"category\",\n      \"target_name\": \"category\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"debit\",\n      \"target_name\": \"debit\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"credit\",\n      \"target_name\": \"credit\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"Amount (USD)\",\n      \"target_name\": \"amount_usd\",\n   ",
-   "classification": "PASS_ACCEPTED",
-   "message_quality": null
-  },
-  {
-   "unit": "F_dirty",
-   "domain": null,
-   "rows": 0,
-   "case": "format_noise",
-   "family": null,
-   "tool": "confirm_ingest_spec",
-   "analysis": null,
-   "parameters": {
-    "spec_json": "\n{\n  \"path\": \"/tmp/domain_benchmark_data/dirty/dirty_format_noise.csv\",\n  \"source_type\": \"csv\",\n  \"dataset_name\": \"dirty_format_noise\",\n  \"sheet\": null,\n  \"header_rows\": [\n    1\n  ],\n  \"data_start_row\": 2,\n  \"footer_skip_rows\": 0,\n  \"header_join\": \"space\",\n  \"na_values\": null,\n  \"delimiter\": null,\n  \"authorised_fill\": false,\n  \"columns\": [\n    {\n      \"source_name\": \"record_id\",\n      \"target_name\": \"record_id\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"transaction_id\",\n      \"target_name\": \"transaction_id\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"account_id\",\n      \"target_name\": \"account_id\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"customer_id\",\n      \"target_name\": \"customer_id\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"transaction_date\",\n      \"target_name\": \"transaction_date\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"posted_at\",\n      \"target_name\": \"posted_at\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"transaction_type\",\n      \"target_name\": \"transaction_type\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"category\",\n      \"target_name\": \"category\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"debit\",\n      \"target_name\": \"debit\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"credit\",\n      \"target_name\": \"credit\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"Amount (USD)\",\n      \"target_name\": \"amount_usd\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"balance\",\n      \"target_name\": \"balance\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"currency\",\n      \"target_name\": \"currency\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"branch\",\n      \"target_name\": \"branch\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"payment_method\",\n      \"target_name\": \"payment_method\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"risk score %\",\n      \"target_name\": \"risk_score_pct\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"fraud_flag\",\n      \"target_name\": \"fraud_flag\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"revenue\",\n      \"target_name\": \"revenue\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"expense\",\n      \"target_name\": \"expense\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"profit\",\n      \"target_name\": \"profit\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"budget\",\n      \"target_name\": \"budget\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"actual\",\n      \"target_name\": \"actual\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"fiscal_period\",\n      \"target_name\": \"fiscal_period\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"source_system\",\n      \"target_name\": \"source_system\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"notes\",\n      \"target_name\": \"notes\",\n      \"dtype\": null\n    }\n  ],\n  \"assumptions\": [\n    \"Row 2 is the first row containing non-text values, so data starts there.\",\n    \"Single header row, so the join mode has no effect.\"\n  ],\n  \"questions\": [],\n  \"unresolved\": []\n}\n"
-   },
-   "expect": "accept",
-   "status": "OK",
-   "exception_type": null,
-   "message": "Loaded dirty_format_noise: 5,018 rows, 25 columns.\n\n| column | type |\n| --- | --- |\n| record_id | VARCHAR |\n| transaction_id | VARCHAR |\n| account_id | VARCHAR |\n| customer_id | VARCHAR |\n| transaction_date | DATE |\n| posted_at | TIMESTAMP |\n| transaction_type | VARCHAR |\n| category | VARCHAR |\n| debit | DOUBLE |\n| credit | DOUBLE |\n| amount_usd | DOUBLE |\n| balance | VARCHAR |\n| currency | VARCHAR |\n| branch | VARCHAR |\n| payment_method | VARCHAR |\n| risk_score_pct | VARCHAR |\n| fraud_flag | BOOLEAN |\n| revenue | VARCHAR |\n| expense | VARCHAR |\n| profit | DOUBLE |\n| budget | DOUBLE |\n| actual | DOUBLE |\n| fiscal_period | VARCHAR |\n| source_system | VARCHAR |\n| notes | VARCHAR |",
-   "classification": "PASS_ACCEPTED",
-   "message_quality": null
-  },
-  {
-   "unit": "F_dirty",
-   "domain": null,
-   "rows": 0,
-   "case": "bad_dates",
-   "family": null,
-   "tool": "propose_ingest_spec",
-   "analysis": null,
-   "parameters": {
-    "path": "/tmp/domain_benchmark_data/dirty/dirty_bad_dates.csv",
-    "dataset_name": "dirty_bad_dates"
-   },
-   "expect": "warn",
-   "status": "OK",
-   "exception_type": null,
-   "message": "path           /tmp/domain_benchmark_data/dirty/dirty_bad_dates.csv\ntype           csv\ndataset        dirty_bad_dates\nheader rows    [1]  joined with 'space'\ndata starts    row 2  -> loader skips 1\n\n24 columns:\n| source | target | type |\n| --- | --- | --- |\n| record_id | record_id | infer |\n| transaction_id | transaction_id | infer |\n| account_id | account_id | infer |\n| customer_id | customer_id | infer |\n| transaction_date | transaction_date | infer |\n| posted_at | posted_at | infer |\n| transaction_type | transaction_type | infer |\n| category | category | infer |\n| debit | debit | infer |\n| credit | credit | infer |\n| amount | amount | infer |\n| balance | balance | infer |\n| currency | currency | infer |\n| branch | branch | infer |\n| payment_method | payment_method | infer |\n| risk_score | risk_score | infer |\n| fraud_flag | fraud_flag | infer |\n| revenue | revenue | infer |\n| expense | expense | infer |\n| profit | profit | infer |\n| budget | budget | infer |\n| actual | actual | infer |\n| fiscal_period | fiscal_period | infer |\n| source_system | source_system | infer |\n\nAssumptions:\n  - Row 2 is the first row containing non-text values, so data starts there.\n  - Single header row, so the join mode has no effect.\n\nConfidence: high\nEvery assumption above is yours to overrule.\n\nNothing is loaded yet. To load exactly this, pass the JSON below back to confirm_ingest_spec. To change something, edit a field first -- the spec that comes back is the spec that runs.\n\n```json\n{\n  \"path\": \"/tmp/domain_benchmark_data/dirty/dirty_bad_dates.csv\",\n  \"source_type\": \"csv\",\n  \"dataset_name\": \"dirty_bad_dates\",\n  \"sheet\": null,\n  \"header_rows\": [\n    1\n  ],\n  \"data_start_row\": 2,\n  \"footer_skip_rows\": 0,\n  \"header_join\": \"space\",\n  \"na_values\": null,\n  \"delimiter\": null,\n  \"authorised_fill\": false,\n  \"columns\": [\n    {\n      \"source_name\": \"record_id\",\n      \"target_name\": \"record_id\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"transaction_id\",\n      \"target_name\": \"transaction_id\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"account_id\",\n      \"target_name\": \"account_id\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"customer_id\",\n      \"target_name\": \"customer_id\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"transaction_date\",\n      \"target_name\": \"transaction_date\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"posted_at\",\n      \"target_name\": \"posted_at\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"transaction_type\",\n      \"target_name\": \"transaction_type\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"category\",\n      \"target_name\": \"category\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"debit\",\n      \"target_name\": \"debit\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"credit\",\n      \"target_name\": \"credit\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"amount\",\n      \"target_name\": \"amount\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"balance\",\n  ",
-   "classification": "PASS_USEFUL_WARNING",
-   "message_quality": null
-  },
-  {
-   "unit": "F_dirty",
-   "domain": null,
-   "rows": 0,
-   "case": "bad_dates",
-   "family": null,
-   "tool": "confirm_ingest_spec",
-   "analysis": null,
-   "parameters": {
-    "spec_json": "\n{\n  \"path\": \"/tmp/domain_benchmark_data/dirty/dirty_bad_dates.csv\",\n  \"source_type\": \"csv\",\n  \"dataset_name\": \"dirty_bad_dates\",\n  \"sheet\": null,\n  \"header_rows\": [\n    1\n  ],\n  \"data_start_row\": 2,\n  \"footer_skip_rows\": 0,\n  \"header_join\": \"space\",\n  \"na_values\": null,\n  \"delimiter\": null,\n  \"authorised_fill\": false,\n  \"columns\": [\n    {\n      \"source_name\": \"record_id\",\n      \"target_name\": \"record_id\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"transaction_id\",\n      \"target_name\": \"transaction_id\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"account_id\",\n      \"target_name\": \"account_id\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"customer_id\",\n      \"target_name\": \"customer_id\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"transaction_date\",\n      \"target_name\": \"transaction_date\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"posted_at\",\n      \"target_name\": \"posted_at\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"transaction_type\",\n      \"target_name\": \"transaction_type\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"category\",\n      \"target_name\": \"category\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"debit\",\n      \"target_name\": \"debit\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"credit\",\n      \"target_name\": \"credit\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"amount\",\n      \"target_name\": \"amount\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"balance\",\n      \"target_name\": \"balance\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"currency\",\n      \"target_name\": \"currency\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"branch\",\n      \"target_name\": \"branch\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"payment_method\",\n      \"target_name\": \"payment_method\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"risk_score\",\n      \"target_name\": \"risk_score\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"fraud_flag\",\n      \"target_name\": \"fraud_flag\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"revenue\",\n      \"target_name\": \"revenue\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"expense\",\n      \"target_name\": \"expense\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"profit\",\n      \"target_name\": \"profit\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"budget\",\n      \"target_name\": \"budget\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"actual\",\n      \"target_name\": \"actual\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"fiscal_period\",\n      \"target_name\": \"fiscal_period\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"source_system\",\n      \"target_name\": \"source_system\",\n      \"dtype\": null\n    }\n  ],\n  \"assumptions\": [\n    \"Row 2 is the first row containing non-text values, so data starts there.\",\n    \"Single header row, so the join mode has no effect.\"\n  ],\n  \"questions\": [],\n  \"unresolved\": []\n}\n"
-   },
-   "expect": "warn",
-   "status": "OK",
-   "exception_type": null,
-   "message": "Loaded dirty_bad_dates: 5,018 rows, 24 columns.\n\n| column | type |\n| --- | --- |\n| record_id | VARCHAR |\n| transaction_id | VARCHAR |\n| account_id | VARCHAR |\n| customer_id | VARCHAR |\n| transaction_date | VARCHAR |\n| posted_at | TIMESTAMP |\n| transaction_type | VARCHAR |\n| category | VARCHAR |\n| debit | DOUBLE |\n| credit | DOUBLE |\n| amount | DOUBLE |\n| balance | DOUBLE |\n| currency | VARCHAR |\n| branch | VARCHAR |\n| payment_method | VARCHAR |\n| risk_score | DOUBLE |\n| fraud_flag | BOOLEAN |\n| revenue | DOUBLE |\n| expense | DOUBLE |\n| profit | DOUBLE |\n| budget | DOUBLE |\n| actual | DOUBLE |\n| fiscal_period | VARCHAR |\n| source_system | VARCHAR |",
-   "classification": "PASS_USEFUL_WARNING",
-   "message_quality": null
-  },
-  {
-   "unit": "F_dirty",
-   "domain": null,
-   "rows": 0,
-   "case": "duplicate_columns",
-   "family": null,
-   "tool": "propose_ingest_spec",
-   "analysis": null,
-   "parameters": {
-    "path": "/tmp/domain_benchmark_data/dirty/dirty_duplicate_columns.csv",
-    "dataset_name": "dirty_duplicate_columns"
-   },
-   "expect": "either",
-   "status": "OK",
-   "exception_type": null,
-   "message": "path           /tmp/domain_benchmark_data/dirty/dirty_duplicate_columns.csv\ntype           csv\ndataset        dirty_duplicate_columns\nheader rows    [1]  joined with 'space'\ndata starts    row 2  -> loader skips 1\n\n24 columns:\n| source | target | type |\n| --- | --- | --- |\n| record_id | record_id | infer |\n| transaction_id | transaction_id | infer |\n| account_id | account_id | infer |\n| customer_id | customer_id | infer |\n| transaction_date | transaction_date | infer |\n| posted_at | posted_at | infer |\n| transaction_type | transaction_type | infer |\n| category | category | infer |\n| debit | debit | infer |\n| credit | credit | infer |\n| amount | amount | infer |\n| balance | balance | infer |\n| currency | currency | infer |\n| branch | branch | infer |\n| payment_method | payment_method | infer |\n| risk_score | risk_score | infer |\n| fraud_flag | fraud_flag | infer |\n| revenue | revenue | infer |\n| category_2 | category_2 | infer |\n| profit | profit | infer |\n| budget | budget | infer |\n| actual | actual | infer |\n| fiscal_period | fiscal_period | infer |\n| source_system | source_system | infer |\n\nAssumptions:\n  - Row 2 is the first row containing non-text values, so data starts there.\n  - Single header row, so the join mode has no effect.\n  - Duplicate names were suffixed: category -> category_2.\n\nConfidence: high\nEvery assumption above is yours to overrule.\n\nNothing is loaded yet. To load exactly this, pass the JSON below back to confirm_ingest_spec. To change something, edit a field first -- the spec that comes back is the spec that runs.\n\n```json\n{\n  \"path\": \"/tmp/domain_benchmark_data/dirty/dirty_duplicate_columns.csv\",\n  \"source_type\": \"csv\",\n  \"dataset_name\": \"dirty_duplicate_columns\",\n  \"sheet\": null,\n  \"header_rows\": [\n    1\n  ],\n  \"data_start_row\": 2,\n  \"footer_skip_rows\": 0,\n  \"header_join\": \"space\",\n  \"na_values\": null,\n  \"delimiter\": null,\n  \"authorised_fill\": false,\n  \"columns\": [\n    {\n      \"source_name\": \"record_id\",\n      \"target_name\": \"record_id\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"transaction_id\",\n      \"target_name\": \"transaction_id\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"account_id\",\n      \"target_name\": \"account_id\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"customer_id\",\n      \"target_name\": \"customer_id\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"transaction_date\",\n      \"target_name\": \"transaction_date\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"posted_at\",\n      \"target_name\": \"posted_at\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"transaction_type\",\n      \"target_name\": \"transaction_type\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"category\",\n      \"target_name\": \"category\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"debit\",\n      \"target_name\": \"debit\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"credit\",\n      \"target_name\": \"credit\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"amount\",\n ",
-   "classification": "PASS_AUTOCORRECTED",
-   "message_quality": null
-  },
-  {
-   "unit": "F_dirty",
-   "domain": null,
-   "rows": 0,
-   "case": "duplicate_columns",
-   "family": null,
-   "tool": "confirm_ingest_spec",
-   "analysis": null,
-   "parameters": {
-    "spec_json": "\n{\n  \"path\": \"/tmp/domain_benchmark_data/dirty/dirty_duplicate_columns.csv\",\n  \"source_type\": \"csv\",\n  \"dataset_name\": \"dirty_duplicate_columns\",\n  \"sheet\": null,\n  \"header_rows\": [\n    1\n  ],\n  \"data_start_row\": 2,\n  \"footer_skip_rows\": 0,\n  \"header_join\": \"space\",\n  \"na_values\": null,\n  \"delimiter\": null,\n  \"authorised_fill\": false,\n  \"columns\": [\n    {\n      \"source_name\": \"record_id\",\n      \"target_name\": \"record_id\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"transaction_id\",\n      \"target_name\": \"transaction_id\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"account_id\",\n      \"target_name\": \"account_id\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"customer_id\",\n      \"target_name\": \"customer_id\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"transaction_date\",\n      \"target_name\": \"transaction_date\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"posted_at\",\n      \"target_name\": \"posted_at\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"transaction_type\",\n      \"target_name\": \"transaction_type\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"category\",\n      \"target_name\": \"category\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"debit\",\n      \"target_name\": \"debit\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"credit\",\n      \"target_name\": \"credit\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"amount\",\n      \"target_name\": \"amount\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"balance\",\n      \"target_name\": \"balance\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"currency\",\n      \"target_name\": \"currency\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"branch\",\n      \"target_name\": \"branch\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"payment_method\",\n      \"target_name\": \"payment_method\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"risk_score\",\n      \"target_name\": \"risk_score\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"fraud_flag\",\n      \"target_name\": \"fraud_flag\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"revenue\",\n      \"target_name\": \"revenue\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"category_2\",\n      \"target_name\": \"category_2\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"profit\",\n      \"target_name\": \"profit\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"budget\",\n      \"target_name\": \"budget\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"actual\",\n      \"target_name\": \"actual\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"fiscal_period\",\n      \"target_name\": \"fiscal_period\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"source_system\",\n      \"target_name\": \"source_system\",\n      \"dtype\": null\n    }\n  ],\n  \"assumptions\": [\n    \"Row 2 is the first row containing non-text values, so data starts there.\",\n    \"Single header row, so the join mode has no effect.\",\n    \"Duplicate names were suffixed: category -> category_2.\"\n  ],\n  \"questions\": [],\n  \"unresolved\": []\n}\n"
-   },
-   "expect": "either",
-   "status": "OK",
-   "exception_type": null,
-   "message": "Loaded dirty_duplicate_columns: 5,018 rows, 24 columns.\n\n| column | type |\n| --- | --- |\n| record_id | VARCHAR |\n| transaction_id | VARCHAR |\n| account_id | VARCHAR |\n| customer_id | VARCHAR |\n| transaction_date | DATE |\n| posted_at | TIMESTAMP |\n| transaction_type | VARCHAR |\n| category | VARCHAR |\n| debit | DOUBLE |\n| credit | DOUBLE |\n| amount | DOUBLE |\n| balance | DOUBLE |\n| currency | VARCHAR |\n| branch | VARCHAR |\n| payment_method | VARCHAR |\n| risk_score | DOUBLE |\n| fraud_flag | BOOLEAN |\n| revenue | DOUBLE |\n| category_2 | DOUBLE |\n| profit | DOUBLE |\n| budget | DOUBLE |\n| actual | DOUBLE |\n| fiscal_period | VARCHAR |\n| source_system | VARCHAR |",
-   "classification": "PASS_AUTOCORRECTED",
-   "message_quality": null
-  },
-  {
-   "unit": "F_dirty",
-   "domain": null,
-   "rows": 0,
-   "case": "missing_header",
-   "family": null,
-   "tool": "propose_ingest_spec",
-   "analysis": null,
-   "parameters": {
-    "path": "/tmp/domain_benchmark_data/dirty/dirty_missing_header.csv",
-    "dataset_name": "dirty_missing_header"
-   },
-   "expect": "warn",
-   "status": "OK",
-   "exception_type": null,
-   "message": "No spec proposed -- this file is ambiguous.\n\nWhat was worked out:\n  - Row 1 already contains non-text values, so there is no header.\n\nWhat has to be settled first:\n  - This file looks headerless. Supply column names?\n\nAnswer and I will build the spec. Nothing has been loaded and nothing has been assumed.",
-   "classification": "PASS_USEFUL_WARNING",
-   "message_quality": null
-  },
-  {
-   "unit": "F_dirty",
-   "domain": null,
-   "rows": 0,
-   "case": "missing_header",
-   "family": null,
-   "tool": "confirm_ingest_spec",
-   "analysis": null,
-   "parameters": {
-    "spec_json": ""
-   },
-   "expect": "warn",
-   "status": "REFUSED",
-   "exception_type": null,
-   "message": "BLOCKED: that is not a usable ingest spec.\nDetail: 1 validation error for IngestSpec\n  Invalid JSON: EOF while parsing a value at line 1 column 0 [type=json_invalid, input_value='', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/json_invalid\nNEXT STEP: call propose_ingest_spec to get a valid one, edit the fields you want to change, and pass the whole JSON object back.",
-   "classification": "PASS_SAFE_REJECTION",
-   "message_quality": {
-    "identifies_problem": true,
-    "names_offending_parameter": null,
-    "explains_expected": true,
-    "suggests_correction": true,
-    "next_step": "NEXT STEP: call propose_ingest_spec to get a valid one, edit the fields you want to change, and pass the whole JSON object back.",
-    "next_step_outcome": "NOT_EXECUTED",
-    "next_step_parse": "names a tool without arguments",
-    "avoids_irrelevant_next_step": true
-   }
-  },
-  {
-   "unit": "F_dirty",
-   "domain": null,
-   "rows": 0,
-   "case": "reordered_extra",
-   "family": null,
-   "tool": "propose_ingest_spec",
-   "analysis": null,
-   "parameters": {
-    "path": "/tmp/domain_benchmark_data/dirty/dirty_reordered_extra.csv",
-    "dataset_name": "dirty_reordered_extra"
-   },
-   "expect": "accept",
-   "status": "OK",
-   "exception_type": null,
-   "message": "path           /tmp/domain_benchmark_data/dirty/dirty_reordered_extra.csv\ntype           csv\ndataset        dirty_reordered_extra\nheader rows    [1]  joined with 'space'\ndata starts    row 2  -> loader skips 1\n\n25 columns:\n| source | target | type |\n| --- | --- | --- |\n| source_system | source_system | infer |\n| fiscal_period | fiscal_period | infer |\n| actual | actual | infer |\n| budget | budget | infer |\n| profit | profit | infer |\n| expense | expense | infer |\n| revenue | revenue | infer |\n| fraud_flag | fraud_flag | infer |\n| risk_score | risk_score | infer |\n| payment_method | payment_method | infer |\n| branch | branch | infer |\n| currency | currency | infer |\n| balance | balance | infer |\n| amount | amount | infer |\n| credit | credit | infer |\n| debit | debit | infer |\n| category | category | infer |\n| transaction_type | transaction_type | infer |\n| posted_at | posted_at | infer |\n| transaction_date | transaction_date | infer |\n| customer_id | customer_id | infer |\n| account_id | account_id | infer |\n| transaction_id | transaction_id | infer |\n| record_id | record_id | infer |\n| extra | extra | infer |\n\nAssumptions:\n  - Row 2 is the first row containing non-text values, so data starts there.\n  - Single header row, so the join mode has no effect.\n\nConfidence: high\nEvery assumption above is yours to overrule.\n\nNothing is loaded yet. To load exactly this, pass the JSON below back to confirm_ingest_spec. To change something, edit a field first -- the spec that comes back is the spec that runs.\n\n```json\n{\n  \"path\": \"/tmp/domain_benchmark_data/dirty/dirty_reordered_extra.csv\",\n  \"source_type\": \"csv\",\n  \"dataset_name\": \"dirty_reordered_extra\",\n  \"sheet\": null,\n  \"header_rows\": [\n    1\n  ],\n  \"data_start_row\": 2,\n  \"footer_skip_rows\": 0,\n  \"header_join\": \"space\",\n  \"na_values\": null,\n  \"delimiter\": null,\n  \"authorised_fill\": false,\n  \"columns\": [\n    {\n      \"source_name\": \"source_system\",\n      \"target_name\": \"source_system\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"fiscal_period\",\n      \"target_name\": \"fiscal_period\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"actual\",\n      \"target_name\": \"actual\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"budget\",\n      \"target_name\": \"budget\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"profit\",\n      \"target_name\": \"profit\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"expense\",\n      \"target_name\": \"expense\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"revenue\",\n      \"target_name\": \"revenue\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"fraud_flag\",\n      \"target_name\": \"fraud_flag\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"risk_score\",\n      \"target_name\": \"risk_score\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"payment_method\",\n      \"target_name\": \"payment_method\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"branch\",\n      \"target_name\": \"branch\",\n      \"dtype\": null\n    },\n    {\n      \"s",
-   "classification": "PASS_ACCEPTED",
-   "message_quality": null
-  },
-  {
-   "unit": "F_dirty",
-   "domain": null,
-   "rows": 0,
-   "case": "reordered_extra",
-   "family": null,
-   "tool": "confirm_ingest_spec",
-   "analysis": null,
-   "parameters": {
-    "spec_json": "\n{\n  \"path\": \"/tmp/domain_benchmark_data/dirty/dirty_reordered_extra.csv\",\n  \"source_type\": \"csv\",\n  \"dataset_name\": \"dirty_reordered_extra\",\n  \"sheet\": null,\n  \"header_rows\": [\n    1\n  ],\n  \"data_start_row\": 2,\n  \"footer_skip_rows\": 0,\n  \"header_join\": \"space\",\n  \"na_values\": null,\n  \"delimiter\": null,\n  \"authorised_fill\": false,\n  \"columns\": [\n    {\n      \"source_name\": \"source_system\",\n      \"target_name\": \"source_system\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"fiscal_period\",\n      \"target_name\": \"fiscal_period\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"actual\",\n      \"target_name\": \"actual\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"budget\",\n      \"target_name\": \"budget\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"profit\",\n      \"target_name\": \"profit\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"expense\",\n      \"target_name\": \"expense\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"revenue\",\n      \"target_name\": \"revenue\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"fraud_flag\",\n      \"target_name\": \"fraud_flag\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"risk_score\",\n      \"target_name\": \"risk_score\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"payment_method\",\n      \"target_name\": \"payment_method\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"branch\",\n      \"target_name\": \"branch\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"currency\",\n      \"target_name\": \"currency\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"balance\",\n      \"target_name\": \"balance\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"amount\",\n      \"target_name\": \"amount\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"credit\",\n      \"target_name\": \"credit\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"debit\",\n      \"target_name\": \"debit\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"category\",\n      \"target_name\": \"category\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"transaction_type\",\n      \"target_name\": \"transaction_type\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"posted_at\",\n      \"target_name\": \"posted_at\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"transaction_date\",\n      \"target_name\": \"transaction_date\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"customer_id\",\n      \"target_name\": \"customer_id\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"account_id\",\n      \"target_name\": \"account_id\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"transaction_id\",\n      \"target_name\": \"transaction_id\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"record_id\",\n      \"target_name\": \"record_id\",\n      \"dtype\": null\n    },\n    {\n      \"source_name\": \"extra\",\n      \"target_name\": \"extra\",\n      \"dtype\": null\n    }\n  ],\n  \"assumptions\": [\n    \"Row 2 is the first row containing non-text values, so data starts there.\",\n    \"Single header row, so the join mode has no effect.\"\n  ],\n  \"questions\": [],\n  \"unresolved\": []\n}\n"
-   },
-   "expect": "accept",
-   "status": "OK",
-   "exception_type": null,
-   "message": "Loaded dirty_reordered_extra: 5,018 rows, 25 columns.\n\n| column | type |\n| --- | --- |\n| source_system | VARCHAR |\n| fiscal_period | VARCHAR |\n| actual | DOUBLE |\n| budget | DOUBLE |\n| profit | DOUBLE |\n| expense | DOUBLE |\n| revenue | DOUBLE |\n| fraud_flag | BOOLEAN |\n| risk_score | DOUBLE |\n| payment_method | VARCHAR |\n| branch | VARCHAR |\n| currency | VARCHAR |\n| balance | DOUBLE |\n| amount | DOUBLE |\n| credit | DOUBLE |\n| debit | DOUBLE |\n| category | VARCHAR |\n| transaction_type | VARCHAR |\n| posted_at | TIMESTAMP |\n| transaction_date | DATE |\n| customer_id | VARCHAR |\n| account_id | VARCHAR |\n| transaction_id | VARCHAR |\n| record_id | VARCHAR |\n| extra | VARCHAR |",
-   "classification": "PASS_ACCEPTED",
-   "message_quality": null
-  },
-  {
    "unit": "F_formats",
    "domain": null,
    "rows": 0,
@@ -5657,7 +5462,7 @@
    "expect": "accept",
    "status": "OK",
    "exception_type": null,
-   "message": "Profile of adv: 2,007 rows, 24 columns.\n\n24 columns is too many to describe one line each, so what follows is the profile table itself.\n\n24 rows x 24 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/profile_adv_20260924-184600.csv\nfrom dataset   adv\ncreated        2026-09-24 18:46:00\n\nWhat this shows:\n  - 2,007 rows, 24 columns.\n  - 7 row(s) are exact duplicates of another row (0.3%), identical including their nulls.\n  - 7 measure(s) have values outside Tukey IQR fences, k=1.5: debit (149), amount (189), balance (12), risk_score (24), revenue (150), expense (157), profit (161). Outside a fence is not the same as wrong.\n  - 1 numeric column(s) got no outlier count: credit (the quartiles are both 0, so the fences collapse to a point and every other value would be flagged).\n  - 1 column(s) hold one value or none and cannot be grouped by: source_system.\n\nFirst 20 of 24 rows:\n\n| column | dtype | role | nulls | null_pct | blank | reads_missing | missing_pct | distinct | distinct_pct | min | max |\n|---|---|---|---|---|---|---|---|---|---|---|---|\n| record_id | VARCHAR | identifier | 0 | 0.0 | 0 | 0 | 0.0 | 2000 | 99.7 | FIN000000000 | FIN000001999 |\n| transaction_id | VARCHAR | identifier | 0 | 0.0 | 0 | 0 | 0.0 | 1997 | 99.5 | T00000000 | T00001999 |\n| account_id | VARCHAR | identifier | 0 | 0.0 | 0 | 0 | 0.0 | 200 | 10.0 | A0000000 | A0000199 |\n| customer_id | VARCHAR | identifier | 0 | 0.0 | 0 | 0 | 0.0 | 398 | 19.8 | C0000000 | C0000399 |\n| transaction_date | DATE | date | 11 | 0.5 | 0 | 0 | 0.5 | 699 | 34.8 | 2023-01-01 | 2025-01-27 |\n| posted_at | TIMESTAMP | date | 0 | 0.0 | 0 | 0 | 0.0 | 2000 | 99.7 | 2023-01-01 00:59:01 | 2025-01-27 05:48:30 |\n| transaction_type | VARCHAR | dimension | 0 | 0.0 | 0 | 0 | 0.0 | 5 | 0.2 | fee | transfer |\n| category | VARCHAR | dimension | 23 | 1.1 | 0 | 0 | 1.1 | 11 | 0.5 | dining | utilities |\n| debit | DOUBLE | measure | 0 | 0.0 | 0 | 0 | 0.0 | 1752 | 87.3 | 0.0 | 2857.4 |\n| credit | DOUBLE | measure | 0 | 0.0 | 0 | 0 | 0.0 | 160 | 8.0 | 0.0 | 753.02 |\n| amount | DOUBLE | measure | 0 | 0.0 | 0 | 0 | 0.0 | 1910 | 95.2 | -753.02 | 2857.4 |\n| balance | DOUBLE | measure | 0 | 0.0 | 0 | 0 | 0.0 | 1997 | 99.5 | -12736.82 | 17987.96 |\n| currency | VARCHAR | dimension | 0 | 0.0 | 0 | 0 | 0.0 | 2 | 0.1 | EUR | USD |\n| branch | VARCHAR | dimension | 5 | 0.2 | 0 | 0 | 0.2 | 40 | 2.0 | BR00 | BR39 |\n| payment_method | VARCHAR | dimension | 6 | 0.3 | 0 | 0 | 0.3 | 5 | 0.2 | ach | wire |\n| risk_score | DOUBLE | measure | 24 | 1.2 | 0 | 0 | 1.2 | 1560 | 77.7 | 0.0018 | 0.6432 |\n| fraud_flag | BOOLEAN | flag | 0 | 0.0 | 0 | 0 | 0.0 | 2 | 0.1 | false | true |\n| revenue | DOUBLE | measure | 11 | 0.5 | 0 | 0 | 0.5 | 1879 | 93.6 | 0.93 | 1000000000.0 |\n| expense | DOUBLE | measure | 0 | 0.0 | 0 | 0 | 0.0 | 1812 | 90.3 | -12.3 | 1492.48 |\n| profit | DOUBLE | measure | 0 | 0.0 | 0 | 0 | 0.0 | 1768 | 88.1 | -9.88 | 1364.92 |\nShowing 12 of 24 columns. The file has all of them: column, dtype, role, nulls, n",
+   "message": "Profile of adv: 2,007 rows, 24 columns.\n\n24 columns is too many to describe one line each, so what follows is the profile table itself.\n\n24 rows x 24 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/profile_adv_20260924-214305.csv\nfrom dataset   adv\ncreated        2026-09-24 21:43:05\n\nWhat this shows:\n  - 2,007 rows, 24 columns.\n  - 7 row(s) are exact duplicates of another row (0.3%), identical including their nulls.\n  - 7 measure(s) have values outside Tukey IQR fences, k=1.5: debit (149), amount (189), balance (12), risk_score (24), revenue (150), expense (157), profit (161). Outside a fence is not the same as wrong.\n  - 1 numeric column(s) got no outlier count: credit (the quartiles are both 0, so the fences collapse to a point and every other value would be flagged).\n  - 1 column(s) hold one value or none and cannot be grouped by: source_system.\n\nFirst 20 of 24 rows:\n\n| column | dtype | role | nulls | null_pct | blank | reads_missing | missing_pct | distinct | distinct_pct | min | max |\n|---|---|---|---|---|---|---|---|---|---|---|---|\n| record_id | VARCHAR | identifier | 0 | 0.0 | 0 | 0 | 0.0 | 2000 | 99.7 | FIN000000000 | FIN000001999 |\n| transaction_id | VARCHAR | identifier | 0 | 0.0 | 0 | 0 | 0.0 | 1997 | 99.5 | T00000000 | T00001999 |\n| account_id | VARCHAR | identifier | 0 | 0.0 | 0 | 0 | 0.0 | 200 | 10.0 | A0000000 | A0000199 |\n| customer_id | VARCHAR | identifier | 0 | 0.0 | 0 | 0 | 0.0 | 398 | 19.8 | C0000000 | C0000399 |\n| transaction_date | DATE | date | 11 | 0.5 | 0 | 0 | 0.5 | 699 | 34.8 | 2023-01-01 | 2025-01-27 |\n| posted_at | TIMESTAMP | date | 0 | 0.0 | 0 | 0 | 0.0 | 2000 | 99.7 | 2023-01-01 00:59:01 | 2025-01-27 05:48:30 |\n| transaction_type | VARCHAR | dimension | 0 | 0.0 | 0 | 0 | 0.0 | 5 | 0.2 | fee | transfer |\n| category | VARCHAR | dimension | 23 | 1.1 | 0 | 0 | 1.1 | 11 | 0.5 | dining | utilities |\n| debit | DOUBLE | measure | 0 | 0.0 | 0 | 0 | 0.0 | 1752 | 87.3 | 0.0 | 2857.4 |\n| credit | DOUBLE | measure | 0 | 0.0 | 0 | 0 | 0.0 | 160 | 8.0 | 0.0 | 753.02 |\n| amount | DOUBLE | measure | 0 | 0.0 | 0 | 0 | 0.0 | 1910 | 95.2 | -753.02 | 2857.4 |\n| balance | DOUBLE | measure | 0 | 0.0 | 0 | 0 | 0.0 | 1997 | 99.5 | -12736.82 | 17987.96 |\n| currency | VARCHAR | dimension | 0 | 0.0 | 0 | 0 | 0.0 | 2 | 0.1 | EUR | USD |\n| branch | VARCHAR | dimension | 5 | 0.2 | 0 | 0 | 0.2 | 40 | 2.0 | BR00 | BR39 |\n| payment_method | VARCHAR | dimension | 6 | 0.3 | 0 | 0 | 0.3 | 5 | 0.2 | ach | wire |\n| risk_score | DOUBLE | measure | 24 | 1.2 | 0 | 0 | 1.2 | 1560 | 77.7 | 0.0018 | 0.6432 |\n| fraud_flag | BOOLEAN | flag | 0 | 0.0 | 0 | 0 | 0.0 | 2 | 0.1 | false | true |\n| revenue | DOUBLE | measure | 11 | 0.5 | 0 | 0 | 0.5 | 1879 | 93.6 | 0.93 | 1000000000.0 |\n| expense | DOUBLE | measure | 0 | 0.0 | 0 | 0 | 0.0 | 1812 | 90.3 | -12.3 | 1492.48 |\n| profit | DOUBLE | measure | 0 | 0.0 | 0 | 0 | 0.0 | 1768 | 88.1 | -9.88 | 1364.92 |\nShowing 12 of 24 columns. The file has all of them: column, dtype, role, nulls, n",
    "classification": "PASS_ACCEPTED",
    "message_quality": null
   },
@@ -5706,7 +5511,7 @@
    "expect": "either",
    "status": "OK",
    "exception_type": null,
-   "message": "Report written: /home/user/analytics-agent/workspace/dbench_adv/reports/adv_20260924-184600.md\n\nadv, 9 section(s), 0 analysis run(s), 0 chart(s).\n\nContents:\n  1. The question asked\n  2. Dataset and grain\n  3. Data quality\n  4. Cleaning ledger\n  5. Validation results\n  6. Findings\n  7. Method notes\n  8. Caveats and exclusions\n  9. Reproduction appendix\n\nKey findings:\n  - (no analysis has been run)\n\nSections present with nothing to report, which is a finding of its own:\n  - Dataset and grain\n  - Cleaning ledger\n  - Validation results\n  - Findings\n  - Method notes\n  - Caveats and exclusions\n  - Reproduction appendix",
+   "message": "Report written: /home/user/analytics-agent/workspace/dbench_adv/reports/adv_20260924-214305.md\n\nadv, 9 section(s), 0 analysis run(s), 0 chart(s).\n\nContents:\n  1. The question asked\n  2. Dataset and grain\n  3. Data quality\n  4. Cleaning ledger\n  5. Validation results\n  6. Findings\n  7. Method notes\n  8. Caveats and exclusions\n  9. Reproduction appendix\n\nKey findings:\n  - (no analysis has been run)\n\nSections present with nothing to report, which is a finding of its own:\n  - Dataset and grain\n  - Cleaning ledger\n  - Validation results\n  - Findings\n  - Method notes\n  - Caveats and exclusions\n  - Reproduction appendix",
    "classification": "PASS_AUTOCORRECTED",
    "message_quality": null
   },
@@ -5773,23 +5578,14 @@
    "tool": "confirm_dataset_contract",
    "analysis": null,
    "parameters": {
-    "contract_json": ""
+    "contract_json": "\n{\n  \"dataset_name\": \"adv\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"record_id\"\n  ],\n  \"date_column\": \"transaction_date\",\n  \"analysis_window\": {\n    \"start\": \"2023-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"revenue\",\n      \"agg\": \"sum\",\n      \"definition\": \"revenue\",\n      \"unit\": null\n    },\n    {\n      \"name\": \"expense\",\n      \"agg\": \"sum\",\n      \"definition\": \"expense\",\n      \"unit\": null\n    },\n    {\n      \"name\": \"profit\",\n      \"agg\": \"sum\",\n      \"definition\": \"profit\",\n      \"unit\": null\n    },\n    {\n      \"name\": \"amount\",\n      \"agg\": \"sum\",\n      \"definition\": \"amount\",\n      \"unit\": null\n    },\n    {\n      \"name\": \"budget\",\n      \"agg\": \"sum\",\n      \"definition\": \"budget\",\n      \"unit\": null\n    },\n    {\n      \"name\": \"actual\",\n      \"agg\": \"sum\",\n      \"definition\": \"actual\",\n      \"unit\": null\n    },\n    {\n      \"name\": \"debit\",\n      \"agg\": \"sum\",\n      \"definition\": \"debit\",\n      \"unit\": null\n    },\n    {\n      \"name\": \"credit\",\n      \"agg\": \"sum\",\n      \"definition\": \"credit\",\n      \"unit\": null\n    },\n    {\n      \"name\": \"risk_score\",\n      \"agg\": \"mean\",\n      \"definition\": \"risk_score\",\n      \"unit\": null\n    },\n    {\n      \"name\": \"balance\",\n      \"agg\": \"none\",\n      \"definition\": \"balance\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"transaction_type\",\n    \"category\",\n    \"payment_method\",\n    \"branch\",\n    \"currency\",\n    \"fraud_flag\",\n    \"fiscal_period\",\n    \"customer_id\",\n    \"account_id\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"excluded_columns\": [],\n  \"foreign_keys\": [],\n  \"domains\": {},\n  \"bound_to\": {\n    \"columns\": [\n      {\n        \"name\": \"record_id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"transaction_id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"account_id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"customer_id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"transaction_date\",\n        \"dtype\": \"DATE\"\n      },\n      {\n        \"name\": \"posted_at\",\n        \"dtype\": \"TIMESTAMP\"\n      },\n      {\n        \"name\": \"transaction_type\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"category\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"debit\",\n        \"dtype\": \"DOUBLE\"\n      },\n      {\n        \"name\": \"credit\",\n        \"dtype\": \"DOUBLE\"\n      },\n      {\n        \"name\": \"amount\",\n        \"dtype\": \"DOUBLE\"\n      },\n      {\n        \"name\": \"balance\",\n        \"dtype\": \"DOUBLE\"\n      },\n      {\n        \"name\": \"currency\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"branch\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"payment_method\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"risk_score\",\n        \"dtype\": \"DOUBLE\"\n      },\n      {\n        \"name\": \"fraud_flag\",\n        \"dtype\": \"BOOLEAN\"\n      },\n      {\n        \"name\": \"revenue\",\n        \"dtype\": \"DOUBLE\"\n      },\n      {\n        \"name\": \"expense\",\n        \"dtype\": \"DOUBLE\"\n      },\n      {\n        \"name\": \"profit\",\n        \"dtype\": \"DOUBLE\"\n      },\n      {\n        \"name\": \"budget\",\n        \"dtype\": \"DOUBLE\"\n      },\n      {\n        \"name\": \"actual\",\n        \"dtype\": \"DOUBLE\"\n      },\n      {\n        \"name\": \"fiscal_period\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"source_system\",\n        \"dtype\": \"VARCHAR\"\n      }\n    ],\n    \"row_count\": 2000,\n    \"loaded_at\": \"2026-09-24T21:43:05.127186\"\n  },\n  \"questions\": [],\n  \"unresolved\": [],\n  \"version\": 0,\n  \"confirmed_at\": null\n}\n"
    },
    "expect": "either",
-   "status": "REFUSED",
+   "status": "OK",
    "exception_type": null,
-   "message": "BLOCKED: that is not a usable dataset contract.\nWHY: it did not validate, so it was not stored.\nDETAIL: 1 validation error for DatasetContract\n  Invalid JSON: EOF while parsing a value at line 1 column 0 [type=json_invalid, input_value='', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/json_invalid\nNEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to change, and pass the whole JSON object back\n\nreason: CONTRACT_INVALID",
-   "classification": "PASS_SAFE_REJECTION",
-   "message_quality": {
-    "identifies_problem": true,
-    "names_offending_parameter": null,
-    "explains_expected": true,
-    "suggests_correction": true,
-    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to change, and pass the whole JSON object back",
-    "next_step_outcome": "NOT_EXECUTED",
-    "next_step_parse": "a template with placeholders, not a call",
-    "avoids_irrelevant_next_step": true
-   }
+   "message": "Contract stored for adv, version 1.\n\ndataset        adv\ngrain          one row\nprimary key    record_id\ndate column    transaction_date\nwindow         2023-01-01 to 2024-12-31\nbound to       24 columns, 2,000 rows, fingerprint 1626a5e85866\nversion        1\n\n10 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| revenue | sum | - | revenue |\n| expense | sum | - | expense |\n| profit | sum | - | profit |\n| amount | sum | - | amount |\n| budget | sum | - | budget |\n| actual | sum | - | actual |\n| debit | sum | - | debit |\n| credit | sum | - | credit |\n| risk_score | mean | - | risk_score |\n| balance | none | - | balance |\n\ndimensions     transaction_type, category, payment_method, branch, currency, fraud_flag, fiscal_period, customer_id, account_id\n\nBound to fingerprint 1626a5e85866 at 2,000 rows. Reloading this dataset with different columns will be detected; more rows will be noted rather than blocking.\nExported to /tmp/domain_benchmark_data/exports/G_wrong/dbench_adv/adv.yaml for version control.",
+   "classification": "PASS_AUTOCORRECTED",
+   "message_quality": null
   },
   {
    "unit": "G_wrong",
@@ -5836,14 +5632,14 @@
    "expect": "reject",
    "status": "REFUSED",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")\n\nreason: NO_CONTRACT",
-   "classification": "FAIL_MISLEADING_RESPONSE",
+   "message": "BLOCKED: top_n cannot answer that under this contract.\nWHY: 'zzz' is not a declared dimension of adv. Declared: transaction_type, category, payment_method, branch, currency, fraud_flag, fiscal_period, customer_id, account_id. profile_dataset describes any column without a contract; this analysis reports the ones the contract names.\nCURRENT STATE: contract v1 for adv\nNEXT STEP: call describe_dataset(dataset_name=\"adv\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
+   "classification": "PASS_SAFE_REJECTION",
    "message_quality": {
     "identifies_problem": true,
-    "names_offending_parameter": false,
-    "explains_expected": false,
+    "names_offending_parameter": true,
+    "explains_expected": true,
     "suggests_correction": true,
-    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")",
+    "next_step": "NEXT STEP: call describe_dataset(dataset_name=\"adv\")",
     "next_step_outcome": "WORKED",
     "next_step_parse": "executable",
     "avoids_irrelevant_next_step": true
@@ -5866,14 +5662,14 @@
    "expect": "reject",
    "status": "REFUSED",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")\n\nreason: NO_CONTRACT",
-   "classification": "FAIL_MISLEADING_RESPONSE",
+   "message": "BLOCKED: top_n cannot answer that under this contract.\nWHY: 'revnue' is not a declared measure of adv. Declared: actual, amount, balance, budget, credit, debit, expense, profit, revenue, risk_score.\nCURRENT STATE: contract v1 for adv\nNEXT STEP: call describe_dataset(dataset_name=\"adv\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
+   "classification": "PASS_SAFE_REJECTION",
    "message_quality": {
     "identifies_problem": true,
-    "names_offending_parameter": false,
-    "explains_expected": false,
+    "names_offending_parameter": true,
+    "explains_expected": true,
     "suggests_correction": true,
-    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")",
+    "next_step": "NEXT STEP: call describe_dataset(dataset_name=\"adv\")",
     "next_step_outcome": "WORKED",
     "next_step_parse": "executable",
     "avoids_irrelevant_next_step": true
@@ -5895,12 +5691,12 @@
    "expect": "reject",
    "status": "REFUSED",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")\n\nreason: NO_CONTRACT",
-   "classification": "FAIL_MISLEADING_RESPONSE",
+   "message": "BLOCKED: distribution cannot answer that under this contract.\nWHY: 'category' is not a declared measure of adv. Declared: actual, amount, balance, budget, credit, debit, expense, profit, revenue, risk_score.\nCURRENT STATE: contract v1 for adv\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
+   "classification": "PASS_SAFE_REJECTION",
    "message_quality": {
     "identifies_problem": true,
-    "names_offending_parameter": false,
-    "explains_expected": false,
+    "names_offending_parameter": true,
+    "explains_expected": true,
     "suggests_correction": true,
     "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")",
     "next_step_outcome": "WORKED",
@@ -5925,12 +5721,12 @@
    "expect": "reject",
    "status": "REFUSED",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")\n\nreason: NO_CONTRACT",
-   "classification": "FAIL_MISLEADING_RESPONSE",
+   "message": "BLOCKED: top_n cannot answer that under this contract.\nWHY: '' is not a declared dimension of adv. Declared: transaction_type, category, payment_method, branch, currency, fraud_flag, fiscal_period, customer_id, account_id. profile_dataset describes any column without a contract; this analysis reports the ones the contract names.\nCURRENT STATE: contract v1 for adv\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
+   "classification": "PASS_SAFE_REJECTION",
    "message_quality": {
     "identifies_problem": true,
-    "names_offending_parameter": false,
-    "explains_expected": false,
+    "names_offending_parameter": true,
+    "explains_expected": true,
     "suggests_correction": true,
     "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")",
     "next_step_outcome": "WORKED",
@@ -5954,17 +5750,17 @@
    "expect": "reject",
    "status": "REFUSED",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")\n\nreason: NO_CONTRACT",
-   "classification": "FAIL_MISLEADING_RESPONSE",
+   "message": "BLOCKED: top_n was called without dimension.\nWHY: top_n needs dimension, and it was not given.\nCURRENT STATE: declared measures: revenue, expense, profit, amount, budget, actual, debit, credit, risk_score, balance; declared dimensions: transaction_type, category, payment_method, branch, currency, fraud_flag, fiscal_period, customer_id, account_id\nNEXT STEP: call compute_analysis(dataset_name=\"adv\", analysis_type=\"top_n\", dimension=\"transaction_type\")\n\nreason: ANALYSIS_PARAMS_INVALID",
+   "classification": "PASS_SAFE_REJECTION",
    "message_quality": {
     "identifies_problem": true,
-    "names_offending_parameter": false,
-    "explains_expected": false,
+    "names_offending_parameter": true,
+    "explains_expected": true,
     "suggests_correction": true,
-    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")",
-    "next_step_outcome": "WORKED",
+    "next_step": "NEXT STEP: call compute_analysis(dataset_name=\"adv\", analysis_type=\"top_n\", dimension=\"transaction_type\")",
+    "next_step_outcome": "REFUSED_SAME_REASON",
     "next_step_parse": "executable",
-    "avoids_irrelevant_next_step": true
+    "avoids_irrelevant_next_step": false
    }
   },
   {
@@ -5984,14 +5780,14 @@
    "expect": "reject",
    "status": "REFUSED",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")\n\nreason: NO_CONTRACT",
-   "classification": "FAIL_MISLEADING_RESPONSE",
+   "message": "BLOCKED: trend was called with arguments it cannot take.\nWHY: grain must be one of day, month, quarter, week, year; got 'fortnight'.\nCURRENT STATE: trend: One declared measure per period, over a calendar that includes the periods holding no rows, with the gaps named and the direction read from the first and last periods that do.\nNEXT STEP: call compute_analysis(dataset_name=\"adv\", analysis_type=\"trend\", measure=\"revenue\")\n\nreason: ANALYSIS_PARAMS_INVALID",
+   "classification": "PASS_SAFE_REJECTION",
    "message_quality": {
     "identifies_problem": true,
-    "names_offending_parameter": false,
-    "explains_expected": false,
+    "names_offending_parameter": true,
+    "explains_expected": true,
     "suggests_correction": true,
-    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")",
+    "next_step": "NEXT STEP: call compute_analysis(dataset_name=\"adv\", analysis_type=\"trend\", measure=\"revenue\")",
     "next_step_outcome": "WORKED",
     "next_step_parse": "executable",
     "avoids_irrelevant_next_step": true
@@ -6018,16 +5814,16 @@
    "expect": "reject",
    "status": "REFUSED",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")\n\nreason: NO_CONTRACT",
-   "classification": "FAIL_MISLEADING_RESPONSE",
+   "message": "BLOCKED: ranking_shift was called with arguments it cannot take.\nWHY: the before period needs two ISO dates (YYYY-MM-DD); got '2024-13-01' and '2024-06-30' -- month must be in 1..12\nCURRENT STATE: ranking_shift: How the ranking of a declared dimension by a declared measure changed between two periods, with groups that arrived or left named rather than scored.\nNEXT STEP: call compute_analysis(dataset_name=\"adv\", analysis_type=\"ranking_shift\", dimension=\"transaction_type\", measure=\"revenue\", before_start=\"YYYY-MM-DD\", before_end=\"YYYY-MM-DD\", after_start=\"YYYY-MM-DD\", after_end=\"YYYY-MM-DD\")\n\nreason: ANALYSIS_PARAMS_INVALID",
+   "classification": "PASS_SAFE_REJECTION",
    "message_quality": {
     "identifies_problem": true,
-    "names_offending_parameter": false,
-    "explains_expected": false,
+    "names_offending_parameter": true,
+    "explains_expected": true,
     "suggests_correction": true,
-    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")",
-    "next_step_outcome": "WORKED",
-    "next_step_parse": "executable",
+    "next_step": "NEXT STEP: call compute_analysis(dataset_name=\"adv\", analysis_type=\"ranking_shift\", dimension=\"transaction_type\", measure=\"revenue\", before_start=\"YYYY-MM-DD\", before_end=\"YYYY-MM-DD\", after_start=\"YYYY-MM-DD\", after_end=\"YYYY-MM-DD\")",
+    "next_step_outcome": "NOT_EXECUTED",
+    "next_step_parse": "a template with placeholders, not a call",
     "avoids_irrelevant_next_step": true
    }
   },
@@ -6052,16 +5848,16 @@
    "expect": "reject",
    "status": "REFUSED",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")\n\nreason: NO_CONTRACT",
-   "classification": "FAIL_MISLEADING_RESPONSE",
+   "message": "BLOCKED: ranking_shift was called with arguments it cannot take.\nWHY: the before period ends 2024-01-01 which is before it starts 2024-06-30.\nCURRENT STATE: ranking_shift: How the ranking of a declared dimension by a declared measure changed between two periods, with groups that arrived or left named rather than scored.\nNEXT STEP: call compute_analysis(dataset_name=\"adv\", analysis_type=\"ranking_shift\", dimension=\"transaction_type\", measure=\"revenue\", before_start=\"YYYY-MM-DD\", before_end=\"YYYY-MM-DD\", after_start=\"YYYY-MM-DD\", after_end=\"YYYY-MM-DD\")\n\nreason: ANALYSIS_PARAMS_INVALID",
+   "classification": "PASS_SAFE_REJECTION",
    "message_quality": {
     "identifies_problem": true,
-    "names_offending_parameter": false,
-    "explains_expected": false,
+    "names_offending_parameter": true,
+    "explains_expected": true,
     "suggests_correction": true,
-    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")",
-    "next_step_outcome": "WORKED",
-    "next_step_parse": "executable",
+    "next_step": "NEXT STEP: call compute_analysis(dataset_name=\"adv\", analysis_type=\"ranking_shift\", dimension=\"transaction_type\", measure=\"revenue\", before_start=\"YYYY-MM-DD\", before_end=\"YYYY-MM-DD\", after_start=\"YYYY-MM-DD\", after_end=\"YYYY-MM-DD\")",
+    "next_step_outcome": "NOT_EXECUTED",
+    "next_step_parse": "a template with placeholders, not a call",
     "avoids_irrelevant_next_step": true
    }
   },
@@ -6083,14 +5879,14 @@
    "expect": "reject",
    "status": "REFUSED",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")\n\nreason: NO_CONTRACT",
+   "message": "BLOCKED: top_n was called with arguments it cannot take.\nWHY: n must be at least 1; got 0.\nCURRENT STATE: top_n: The largest groups of a declared dimension by a declared measure, with the number tied at the cut stated.\nNEXT STEP: call compute_analysis(dataset_name=\"adv\", analysis_type=\"top_n\", dimension=\"transaction_type\", measure=\"revenue\")\n\nreason: ANALYSIS_PARAMS_INVALID",
    "classification": "PASS_SAFE_REJECTION",
    "message_quality": {
     "identifies_problem": true,
     "names_offending_parameter": true,
-    "explains_expected": false,
+    "explains_expected": true,
     "suggests_correction": true,
-    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")",
+    "next_step": "NEXT STEP: call compute_analysis(dataset_name=\"adv\", analysis_type=\"top_n\", dimension=\"transaction_type\", measure=\"revenue\")",
     "next_step_outcome": "WORKED",
     "next_step_parse": "executable",
     "avoids_irrelevant_next_step": true
@@ -6114,14 +5910,14 @@
    "expect": "reject",
    "status": "REFUSED",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")\n\nreason: NO_CONTRACT",
+   "message": "BLOCKED: top_n was called with arguments it cannot take.\nWHY: n must be at least 1; got -1.\nCURRENT STATE: top_n: The largest groups of a declared dimension by a declared measure, with the number tied at the cut stated.\nNEXT STEP: call compute_analysis(dataset_name=\"adv\", analysis_type=\"top_n\", dimension=\"transaction_type\", measure=\"revenue\")\n\nreason: ANALYSIS_PARAMS_INVALID",
    "classification": "PASS_SAFE_REJECTION",
    "message_quality": {
     "identifies_problem": true,
     "names_offending_parameter": true,
-    "explains_expected": false,
+    "explains_expected": true,
     "suggests_correction": true,
-    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")",
+    "next_step": "NEXT STEP: call compute_analysis(dataset_name=\"adv\", analysis_type=\"top_n\", dimension=\"transaction_type\", measure=\"revenue\")",
     "next_step_outcome": "WORKED",
     "next_step_parse": "executable",
     "avoids_irrelevant_next_step": true
@@ -6143,20 +5939,11 @@
     "n": 1000000000
    },
    "expect": "either",
-   "status": "REFUSED",
+   "status": "OK",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")\n\nreason: NO_CONTRACT",
-   "classification": "PASS_SAFE_REJECTION",
-   "message_quality": {
-    "identifies_problem": true,
-    "names_offending_parameter": null,
-    "explains_expected": false,
-    "suggests_correction": true,
-    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")",
-    "next_step_outcome": "WORKED",
-    "next_step_parse": "executable",
-    "avoids_irrelevant_next_step": true
-   }
+   "message": "Under contract v1 for adv: one row.\n\n6 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/top_n_20260924-214307_3.csv\nfrom dataset   adv\ncreated        2026-09-24 21:43:07\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - 6 group(s) of payment_method; the 6 largest by sum of revenue shown.\n  - Share is of 3,000,202,097.67, the sum of revenue across all 6 group(s).\n\nFirst 6 of 6 rows:\n\n| value | revenue (sum) | rows | share |\n|---|---|---|---|\n| card | 1,000,117,986.37 | 1,073 | 33.3% |\n| ach | 1,000,046,119.56 | 492 | 33.3% |\n| wire | 1,000,016,334.94 | 157 | 33.3% |\n| cash | 17,114.28 | 195 | 0.0% |\n| cheque | 4,086.21 | 45 | 0.0% |\n| (null) | 456.31 | 6 | 0.0% |",
+   "classification": "PASS_AUTOCORRECTED",
+   "message_quality": null
   },
   {
    "unit": "G_wrong",
@@ -6175,12 +5962,12 @@
    "expect": "reject",
    "status": "REFUSED",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")\n\nreason: NO_CONTRACT",
-   "classification": "FAIL_MISLEADING_RESPONSE",
+   "message": "BLOCKED: group_compare cannot answer that under this contract.\nWHY: 'record_id' is not a declared dimension of adv. Declared: transaction_type, category, payment_method, branch, currency, fraud_flag, fiscal_period, customer_id, account_id. profile_dataset describes any column without a contract; this analysis reports the ones the contract names.\nCURRENT STATE: contract v1 for adv\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
+   "classification": "PASS_SAFE_REJECTION",
    "message_quality": {
     "identifies_problem": true,
-    "names_offending_parameter": false,
-    "explains_expected": false,
+    "names_offending_parameter": true,
+    "explains_expected": true,
     "suggests_correction": true,
     "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")",
     "next_step_outcome": "WORKED",
@@ -6205,14 +5992,14 @@
    "expect": "reject",
    "status": "REFUSED",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")\n\nreason: NO_CONTRACT",
-   "classification": "FAIL_MISLEADING_RESPONSE",
+   "message": "BLOCKED: correlation was called with arguments it cannot take.\nWHY: measure and against are both 'revenue'. A column correlates with itself at 1.000 by construction, which is a fact about arithmetic and not about adv.\nCURRENT STATE: correlation: Two declared measures against each other, Pearson and Spearman side by side over the rows holding both values, with the pair count and the disagreement between the two coefficients named.\nNEXT STEP: call compute_analysis(dataset_name=\"adv\", analysis_type=\"correlation\", measure=\"revenue\", against=\"expense\")\n\nreason: ANALYSIS_PARAMS_INVALID",
+   "classification": "PASS_SAFE_REJECTION",
    "message_quality": {
     "identifies_problem": true,
-    "names_offending_parameter": false,
-    "explains_expected": false,
+    "names_offending_parameter": true,
+    "explains_expected": true,
     "suggests_correction": true,
-    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")",
+    "next_step": "NEXT STEP: call compute_analysis(dataset_name=\"adv\", analysis_type=\"correlation\", measure=\"revenue\", against=\"expense\")",
     "next_step_outcome": "WORKED",
     "next_step_parse": "executable",
     "avoids_irrelevant_next_step": true
@@ -6235,12 +6022,12 @@
    "expect": "reject",
    "status": "REFUSED",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")\n\nreason: NO_CONTRACT",
-   "classification": "FAIL_MISLEADING_RESPONSE",
+   "message": "BLOCKED: hypothesis_test cannot answer that under this contract.\nWHY: 'category' is not a declared measure of adv. Declared: actual, amount, balance, budget, credit, debit, expense, profit, revenue, risk_score.\nCURRENT STATE: contract v1 for adv\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
+   "classification": "PASS_SAFE_REJECTION",
    "message_quality": {
     "identifies_problem": true,
-    "names_offending_parameter": false,
-    "explains_expected": false,
+    "names_offending_parameter": true,
+    "explains_expected": true,
     "suggests_correction": true,
     "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")",
     "next_step_outcome": "WORKED",
@@ -6265,14 +6052,14 @@
    "expect": "reject",
    "status": "REFUSED",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")\n\nreason: NO_CONTRACT",
-   "classification": "FAIL_MISLEADING_RESPONSE",
+   "message": "BLOCKED: distribution was called with arguments it cannot take.\nWHY: bins must be a whole number from 2 to 50; got 0.\nCURRENT STATE: distribution: The shape of one declared measure over the contract's rows: equal-width bins with counts and shares, and its quantiles.\nNEXT STEP: call compute_analysis(dataset_name=\"adv\", analysis_type=\"distribution\", measure=\"revenue\")\n\nreason: ANALYSIS_PARAMS_INVALID",
+   "classification": "PASS_SAFE_REJECTION",
    "message_quality": {
     "identifies_problem": true,
-    "names_offending_parameter": false,
-    "explains_expected": false,
+    "names_offending_parameter": true,
+    "explains_expected": true,
     "suggests_correction": true,
-    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")",
+    "next_step": "NEXT STEP: call compute_analysis(dataset_name=\"adv\", analysis_type=\"distribution\", measure=\"revenue\")",
     "next_step_outcome": "WORKED",
     "next_step_parse": "executable",
     "avoids_irrelevant_next_step": true
@@ -6295,12 +6082,12 @@
    "expect": "reject",
    "status": "REFUSED",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")\n\nreason: NO_CONTRACT",
-   "classification": "FAIL_MISLEADING_RESPONSE",
+   "message": "BLOCKED: confidence_interval cannot answer that under this contract.\nWHY: confidence=1.5 is outside [0.5, 1.0). 0.95 is the convention; below 0.5 the interval is narrower than a coin toss and above 1.0 it is everything.\nCURRENT STATE: contract v1 for adv\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
+   "classification": "PASS_SAFE_REJECTION",
    "message_quality": {
     "identifies_problem": true,
-    "names_offending_parameter": false,
-    "explains_expected": false,
+    "names_offending_parameter": true,
+    "explains_expected": true,
     "suggests_correction": true,
     "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")",
     "next_step_outcome": "WORKED",
@@ -6326,12 +6113,12 @@
    "expect": "reject",
    "status": "REFUSED",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")\n\nreason: NO_CONTRACT",
-   "classification": "FAIL_MISLEADING_RESPONSE",
+   "message": "BLOCKED: hypothesis_test cannot answer that under this contract.\nWHY: method='bayes' is not one of auto, parametric, rank.\nCURRENT STATE: contract v1 for adv\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
+   "classification": "PASS_SAFE_REJECTION",
    "message_quality": {
     "identifies_problem": true,
-    "names_offending_parameter": false,
-    "explains_expected": false,
+    "names_offending_parameter": true,
+    "explains_expected": true,
     "suggests_correction": true,
     "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")",
     "next_step_outcome": "WORKED",
@@ -6354,14 +6141,14 @@
    "expect": "reject",
    "status": "REFUSED",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")\n\nreason: NO_CONTRACT",
-   "classification": "FAIL_MISLEADING_RESPONSE",
+   "message": "BLOCKED: there is no analysis called 'regression'. Available: cross_tab, distribution, frequency, top_n, summary_stats, group_compare, pareto, concentration, ranking_shift, calendar_coverage, trend, seasonality, period_compare, growth_decomposition, correlation, bivariate, driver_analysis, mix_shift, outlier_detection, changepoint, correlated_shift, hypothesis_test, confidence_interval, effect_size, sample_adequacy, repeat_behaviour, cohort_retention.\nWHY: an analysis is looked up by name, and a name nobody registered cannot be guessed at -- running something adjacent would answer a question that was not asked.\nCURRENT STATE: available: cross_tab (tier 1); distribution (tier 1); frequency (tier 1); summary_stats (tier 1); top_n (tier 1); concentration (tier 2); group_compare (tier 2); pareto (tier 2); ranking_shift (tier 2); calendar_coverage (tier 3); growth_decomposition (tier 3); period_compare (tier 3); seasonality (tier 3); trend (tier 3); bivariate (tier 4); correlation (tier 4); driver_analysis (tier 4); mix_shift (tier 4); changepoint (tier 5); correlated_shift (tier 5); outlier_detection (tier 5); confidence_interval (tier 6); effect_size (tier 6); hypothesis_test (tier 6); sample_adequacy (tier 6); cohort_retention (tier 7); repeat_behaviour (tier 7)\nNEXT STEP: call run_analysis(dataset_name=\"adv\")\n\nreason: ANALYSIS_NOT_FOUND",
+   "classification": "PASS_SAFE_REJECTION",
    "message_quality": {
     "identifies_problem": true,
-    "names_offending_parameter": false,
-    "explains_expected": false,
+    "names_offending_parameter": true,
+    "explains_expected": true,
     "suggests_correction": true,
-    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")",
+    "next_step": "NEXT STEP: call run_analysis(dataset_name=\"adv\")",
     "next_step_outcome": "WORKED",
     "next_step_parse": "executable",
     "avoids_irrelevant_next_step": true
@@ -6385,16 +6172,16 @@
    "expect": "reject",
    "status": "REFUSED",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")\n\nreason: NO_CONTRACT",
-   "classification": "FAIL_MISLEADING_RESPONSE",
+   "message": "BLOCKED: period_compare was called with arguments it cannot take.\nWHY: '2025-12', '2026-01' is not a month in this calendar. It runs 2023-01 to 2024-12, 24 month(s), labelled: 2023-01, 2023-02, 2023-03, 2023-04, 2023-05, 2023-06, 2023-07, 2023-08, 2023-09, 2023-10, 2023-11, 2023-12, and 12 more.\nCURRENT STATE: period_compare: One declared measure in two named periods, with the difference between them, the rows and the days behind each, and no change computed from a period that holds no rows.\nNEXT STEP: call compute_analysis(dataset_name=\"adv\", analysis_type=\"period_compare\", measure=\"revenue\", period=\"YYYY-MM\", baseline=\"YYYY-MM\")\n\nreason: ANALYSIS_PARAMS_INVALID",
+   "classification": "PASS_SAFE_REJECTION",
    "message_quality": {
     "identifies_problem": true,
-    "names_offending_parameter": false,
-    "explains_expected": false,
+    "names_offending_parameter": true,
+    "explains_expected": true,
     "suggests_correction": true,
-    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")",
-    "next_step_outcome": "WORKED",
-    "next_step_parse": "executable",
+    "next_step": "NEXT STEP: call compute_analysis(dataset_name=\"adv\", analysis_type=\"period_compare\", measure=\"revenue\", period=\"YYYY-MM\", baseline=\"YYYY-MM\")",
+    "next_step_outcome": "NOT_EXECUTED",
+    "next_step_parse": "a template with placeholders, not a call",
     "avoids_irrelevant_next_step": true
    }
   },
@@ -6414,14 +6201,14 @@
    "expect": "reject",
    "status": "REFUSED",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")\n\nreason: NO_CONTRACT",
+   "message": "BLOCKED: trend was called without measure.\nWHY: trend needs measure, and it was not given.\nCURRENT STATE: declared measures: revenue, expense, profit, amount, budget, actual, debit, credit, risk_score, balance; declared dimensions: transaction_type, category, payment_method, branch, currency, fraud_flag, fiscal_period, customer_id, account_id\nNEXT STEP: call compute_analysis(dataset_name=\"adv\", analysis_type=\"trend\", measure=\"revenue\")\n\nreason: ANALYSIS_PARAMS_INVALID",
    "classification": "PASS_SAFE_REJECTION",
    "message_quality": {
     "identifies_problem": true,
     "names_offending_parameter": true,
-    "explains_expected": false,
+    "explains_expected": true,
     "suggests_correction": true,
-    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")",
+    "next_step": "NEXT STEP: call compute_analysis(dataset_name=\"adv\", analysis_type=\"trend\", measure=\"revenue\")",
     "next_step_outcome": "WORKED",
     "next_step_parse": "executable",
     "avoids_irrelevant_next_step": true
@@ -6444,14 +6231,14 @@
    "expect": "reject",
    "status": "REFUSED",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")\n\nreason: NO_CONTRACT",
-   "classification": "FAIL_MISLEADING_RESPONSE",
+   "message": "BLOCKED: trend was computed and cannot be drawn as a 'pie' chart.\nWHY: there is no chart called 'pie'. Available: line, bar, grouped_bar, scatter, histogram, box, heatmap, waterfall.\nDETAIL: The numbers are not in question -- the analysis ran. This is about the shape a chart needs, which is not the shape this result has. Nothing was written.\nCURRENT STATE: contract v1 for adv\nNEXT STEP: call compute_analysis(dataset_name=\"adv\", analysis_type=\"trend\", measure=\"revenue\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
+   "classification": "PASS_SAFE_REJECTION",
    "message_quality": {
     "identifies_problem": true,
-    "names_offending_parameter": false,
-    "explains_expected": false,
+    "names_offending_parameter": true,
+    "explains_expected": true,
     "suggests_correction": true,
-    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv\")",
+    "next_step": "NEXT STEP: call compute_analysis(dataset_name=\"adv\", analysis_type=\"trend\", measure=\"revenue\")",
     "next_step_outcome": "WORKED",
     "next_step_parse": "executable",
     "avoids_irrelevant_next_step": true
@@ -6471,14 +6258,14 @@
    "expect": "reject",
    "status": "REFUSED",
    "exception_type": null,
-   "message": "BLOCKED: '/home/user/analytics-agent/workspace/adv_bench/results/none.csv' is not a result file in this workspace.\nWHY: results are read from the workspace's own results directory and nowhere else. A path that resolves outside it is refused whether or not it exists, because a tool that reads any path on request is a tool that can be asked to read anything.\nCURRENT STATE: results directory: /home/user/analytics-agent/workspace/dbench_adv/results\nNEXT STEP: call read_result_file(path=\"/home/user/analytics-agent/workspace/dbench_adv/results/<one of: profile_adv_20260924-184600.csv>\")\n\nreason: RESULT_OUT_OF_SCOPE",
+   "message": "BLOCKED: '/home/user/analytics-agent/workspace/adv_bench/results/none.csv' is not a result file in this workspace.\nWHY: results are read from the workspace's own results directory and nowhere else. A path that resolves outside it is refused whether or not it exists, because a tool that reads any path on request is a tool that can be asked to read anything.\nCURRENT STATE: results directory: /home/user/analytics-agent/workspace/dbench_adv/results\nNEXT STEP: call read_result_file(path=\"/home/user/analytics-agent/workspace/dbench_adv/results/<one of: trend_20260924-214309.csv, trend_20260924-214308.csv, trend_20260924-214306.csv, top_n_20260924-214307_3.csv, top_n_20260924-214307_2.csv, top_n_20260924-214307.csv, profile_adv_20260924-214305.csv, distribution_20260924-214307.csv, correlation_20260924-214307.csv>\")\n\nreason: RESULT_OUT_OF_SCOPE",
    "classification": "PASS_SAFE_REJECTION",
    "message_quality": {
     "identifies_problem": true,
     "names_offending_parameter": null,
     "explains_expected": true,
     "suggests_correction": true,
-    "next_step": "NEXT STEP: call read_result_file(path=\"/home/user/analytics-agent/workspace/dbench_adv/results/<one of: profile_adv_20260924-184600.csv>\")",
+    "next_step": "NEXT STEP: call read_result_file(path=\"/home/user/analytics-agent/workspace/dbench_adv/results/<one of: trend_20260924-214309.csv, trend_20260924-214308.csv, trend_20260924-214306.csv, top_n_20260924-214307_3.csv, top_n_20260924-214307_2.csv, top_n_20260924-214307.csv, profile_adv_20260924-214305.csv, distribution_20260924-214307.csv, correlation_20260924-214307.csv>\")",
     "next_step_outcome": "NOT_EXECUTED",
     "next_step_parse": "a template with placeholders, not a call",
     "avoids_irrelevant_next_step": true
@@ -6498,14 +6285,14 @@
    "expect": "reject",
    "status": "REFUSED",
    "exception_type": null,
-   "message": "BLOCKED: '../../etc/passwd' is not a result file in this workspace.\nWHY: results are read from the workspace's own results directory and nowhere else. A path that resolves outside it is refused whether or not it exists, because a tool that reads any path on request is a tool that can be asked to read anything.\nCURRENT STATE: results directory: /home/user/analytics-agent/workspace/dbench_adv/results\nNEXT STEP: call read_result_file(path=\"/home/user/analytics-agent/workspace/dbench_adv/results/<one of: profile_adv_20260924-184600.csv>\")\n\nreason: RESULT_OUT_OF_SCOPE",
+   "message": "BLOCKED: '../../etc/passwd' is not a result file in this workspace.\nWHY: results are read from the workspace's own results directory and nowhere else. A path that resolves outside it is refused whether or not it exists, because a tool that reads any path on request is a tool that can be asked to read anything.\nCURRENT STATE: results directory: /home/user/analytics-agent/workspace/dbench_adv/results\nNEXT STEP: call read_result_file(path=\"/home/user/analytics-agent/workspace/dbench_adv/results/<one of: trend_20260924-214309.csv, trend_20260924-214308.csv, trend_20260924-214306.csv, top_n_20260924-214307_3.csv, top_n_20260924-214307_2.csv, top_n_20260924-214307.csv, profile_adv_20260924-214305.csv, distribution_20260924-214307.csv, correlation_20260924-214307.csv>\")\n\nreason: RESULT_OUT_OF_SCOPE",
    "classification": "PASS_SAFE_REJECTION",
    "message_quality": {
     "identifies_problem": true,
     "names_offending_parameter": null,
     "explains_expected": true,
     "suggests_correction": true,
-    "next_step": "NEXT STEP: call read_result_file(path=\"/home/user/analytics-agent/workspace/dbench_adv/results/<one of: profile_adv_20260924-184600.csv>\")",
+    "next_step": "NEXT STEP: call read_result_file(path=\"/home/user/analytics-agent/workspace/dbench_adv/results/<one of: trend_20260924-214309.csv, trend_20260924-214308.csv, trend_20260924-214306.csv, top_n_20260924-214307_3.csv, top_n_20260924-214307_2.csv, top_n_20260924-214307.csv, profile_adv_20260924-214305.csv, distribution_20260924-214307.csv, correlation_20260924-214307.csv>\")",
     "next_step_outcome": "NOT_EXECUTED",
     "next_step_parse": "a template with placeholders, not a call",
     "avoids_irrelevant_next_step": true
@@ -6556,12 +6343,12 @@
    "expect": "reject",
    "status": "REFUSED",
    "exception_type": null,
-   "message": "BLOCKED: C999 is not in the plan for adv.\nWHY: an id that is not in the plan cannot be run, and running the rest without saying so would be worse.\nCURRENT STATE: in the plan: C001\nNEXT STEP: call propose_cleaning_plan(dataset_name=\"adv\")\n\nreason: ACTION_NOT_IN_PLAN",
-   "classification": "PASS_SAFE_REJECTION",
+   "message": "BLOCKED: the plan for adv is out of date.\nWHY: the table has lost 7 row(s) since this plan was made (2,007 then, 2,000 now), so the counts below are old. Re-run propose_cleaning_plan(dataset_name=\"adv\")\nCURRENT STATE: proposed just now (2026-09-24 21:43), 1 action(s)\nNEXT STEP: call propose_cleaning_plan(dataset_name=\"adv\")\n\nreason: CLEANING_PLAN_STALE",
+   "classification": "FAIL_MISLEADING_RESPONSE",
    "message_quality": {
     "identifies_problem": true,
-    "names_offending_parameter": true,
-    "explains_expected": true,
+    "names_offending_parameter": false,
+    "explains_expected": false,
     "suggests_correction": true,
     "next_step": "NEXT STEP: call propose_cleaning_plan(dataset_name=\"adv\")",
     "next_step_outcome": "WORKED",
@@ -6613,20 +6400,11 @@
     "baseline": "2024-11"
    },
    "expect": "either",
-   "status": "REFUSED",
-   "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv_cd' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")\n\nreason: NO_CONTRACT",
-   "classification": "PASS_SAFE_REJECTION",
-   "message_quality": {
-    "identifies_problem": true,
-    "names_offending_parameter": null,
-    "explains_expected": false,
-    "suggests_correction": true,
-    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")",
-    "next_step_outcome": "WORKED",
-    "next_step_parse": "executable",
-    "avoids_irrelevant_next_step": true
-   }
+   "status": "EXCEPTION",
+   "exception_type": "BinderException",
+   "message": "",
+   "classification": "FAIL_EXCEPTION",
+   "message_quality": null
   },
   {
    "unit": "G_wrong",
@@ -6643,20 +6421,11 @@
     "grain": "month"
    },
    "expect": "either",
-   "status": "REFUSED",
+   "status": "OK",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv_cd' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")\n\nreason: NO_CONTRACT",
-   "classification": "PASS_SAFE_REJECTION",
-   "message_quality": {
-    "identifies_problem": true,
-    "names_offending_parameter": null,
-    "explains_expected": false,
-    "suggests_correction": true,
-    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")",
-    "next_step_outcome": "WORKED",
-    "next_step_parse": "executable",
-    "avoids_irrelevant_next_step": true
-   }
+   "message": "Under contract v1 for adv_cd: one row.\n\n24 rows x 3 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/trend_20260924-214311.csv\nfrom dataset   adv_cd\ncreated        2026-09-24 21:43:11\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - 24 month(s) between 2023-01 and 2024-12, generated from the declared analysis window, 2023-01-01 to 2024-12-31 and truncated to the month.\n  - From 62 in 2023-01 to 78 in 2024-12. That is two endpoints, not a fitted line.\n\nFirst 20 of 24 rows:\n\n| period | customer_id (count_distinct) | rows |\n|---|---|---|\n| 2023-01 | 62 | 67 |\n| 2023-02 | 63 | 68 |\n| 2023-03 | 77 | 82 |\n| 2023-04 | 86 | 99 |\n| 2023-05 | 64 | 71 |\n| 2023-06 | 70 | 81 |\n| 2023-07 | 68 | 75 |\n| 2023-08 | 81 | 86 |\n| 2023-09 | 77 | 86 |\n| 2023-10 | 66 | 76 |\n| 2023-11 | 71 | 80 |\n| 2023-12 | 51 | 57 |\n| 2024-01 | 73 | 80 |\n| 2024-02 | 80 | 97 |\n| 2024-03 | 78 | 86 |\n| 2024-04 | 80 | 91 |\n| 2024-05 | 76 | 84 |\n| 2024-06 | 75 | 80 |\n| 2024-07 | 64 | 71 |\n| 2024-08 | 81 | 91 |\n\n4 more rows are in the file and are NOT shown above. Read them before describing them:\n  read_result_file(path=\"/home/user/analytics-agent/workspace/dbench_adv/results/trend_20260924-214311.csv\", start=21, limit=50)",
+   "classification": "PASS_AUTOCORRECTED",
+   "message_quality": null
   },
   {
    "unit": "G_wrong",
@@ -6673,20 +6442,11 @@
     "dimension": "payment_method"
    },
    "expect": "either",
-   "status": "REFUSED",
+   "status": "OK",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv_cd' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")\n\nreason: NO_CONTRACT",
-   "classification": "PASS_SAFE_REJECTION",
-   "message_quality": {
-    "identifies_problem": true,
-    "names_offending_parameter": null,
-    "explains_expected": false,
-    "suggests_correction": true,
-    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")",
-    "next_step_outcome": "WORKED",
-    "next_step_parse": "executable",
-    "avoids_irrelevant_next_step": true
-   }
+   "message": "Under contract v1 for adv_cd: one row.\n\n6 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/top_n_20260924-214311.csv\nfrom dataset   adv_cd\ncreated        2026-09-24 21:43:11\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - 6 group(s) of payment_method; the 6 largest by count_distinct of customer_id shown.\n  - No share column: count_distinct does not add up across groups, so there is no total for a group to be a share of.\n\nFirst 6 of 6 rows:\n\n| value | customer_id (count_distinct) | rows | share |\n|---|---|---|---|\n| card | 377 | 1,073 |  |\n| ach | 273 | 492 |  |\n| cash | 151 | 195 |  |\n| wire | 130 | 157 |  |\n| cheque | 42 | 45 |  |\n| (null) | 6 | 6 |  |",
+   "classification": "PASS_AUTOCORRECTED",
+   "message_quality": null
   },
   {
    "unit": "G_wrong",
@@ -6703,20 +6463,11 @@
     "dimension": "payment_method"
    },
    "expect": "either",
-   "status": "REFUSED",
+   "status": "OK",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv_cd' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")\n\nreason: NO_CONTRACT",
-   "classification": "PASS_SAFE_REJECTION",
-   "message_quality": {
-    "identifies_problem": true,
-    "names_offending_parameter": null,
-    "explains_expected": false,
-    "suggests_correction": true,
-    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")",
-    "next_step_outcome": "WORKED",
-    "next_step_parse": "executable",
-    "avoids_irrelevant_next_step": true
-   }
+   "message": "Under contract v1 for adv_cd: one row.\n\n7 rows x 9 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/group_compare_20260924-214311.csv\nfrom dataset   adv_cd\ncreated        2026-09-24 21:43:11\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - The total column is count_distinct of customer_id. No share column: count_distinct does not add up across groups, so there is no total for a group to be a share of.\n  - The (all) row is computed over the analysed rows, not from the group rows above it: a mean of group means is not the mean.\n  - 6 analysed row(s) have no payment_method and are the (null) group -- not dropped, and not the empty string, which would be a different value.\n  - A blank spread is not zero: stddev is the sample standard deviation and one row has none.\n\nFirst 7 of 7 rows:\n\n| payment_method | n | nulls | total | min | max | mean | median | stddev |\n|---|---|---|---|---|---|---|---|---|\n| ach | 492 | 0 | 273 | C0000000 | C0000399 |  |  |  |\n| card | 1,073 | 0 | 377 | C0000000 | C0000399 |  |  |  |\n| cash | 195 | 0 | 151 | C0000001 | C0000399 |  |  |  |\n| cheque | 45 | 0 | 42 | C0000000 | C0000398 |  |  |  |\n| wire | 157 | 0 | 130 | C0000000 | C0000396 |  |  |  |\n| (null) | 6 | 0 | 6 | C0000003 | C0000356 |  |  |  |\n| (all) | 1,968 | 0 | 398 | C0000000 | C0000399 |  |  |  |",
+   "classification": "PASS_AUTOCORRECTED",
+   "message_quality": null
   },
   {
    "unit": "G_wrong",
@@ -6732,20 +6483,11 @@
     "measure": "customer_id"
    },
    "expect": "either",
-   "status": "REFUSED",
+   "status": "OK",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv_cd' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")\n\nreason: NO_CONTRACT",
-   "classification": "PASS_SAFE_REJECTION",
-   "message_quality": {
-    "identifies_problem": true,
-    "names_offending_parameter": null,
-    "explains_expected": false,
-    "suggests_correction": true,
-    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")",
-    "next_step_outcome": "WORKED",
-    "next_step_parse": "executable",
-    "avoids_irrelevant_next_step": true
-   }
+   "message": "Under contract v1 for adv_cd: one row.\n\n12 rows x 6 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/seasonality_20260924-214311.csv\nfrom dataset   adv_cd\ncreated        2026-09-24 21:43:11\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - 24 month(s) from the declared analysis window, 2023-01-01 to 2024-12-31, folded onto the 12 position(s) of the year the calendar reaches.\n  - A position is the mean of its own months, so every year weighs the same however many rows it held. A month with no rows is left out of that mean rather than entering it as a zero.\n  - The index is a position's mean over 73.5417, the mean of every month that holds rows, so 1.00 is an average month. It is a ratio of means and not a decomposition: growth_decomposition is where a change is split into its parts.\n\nFirst 12 of 12 rows:\n\n| position | mean customer_id per month | index | months observed | months absent | rows |\n|---|---|---|---|---|---|\n| Jan | 67.5 | 0.92 | 2 | 0 | 147 |\n| Feb | 71.5 | 0.97 | 2 | 0 | 165 |\n| Mar | 77.5 | 1.05 | 2 | 0 | 168 |\n| Apr | 83 | 1.13 | 2 | 0 | 190 |\n| May | 70 | 0.95 | 2 | 0 | 155 |\n| Jun | 72.5 | 0.99 | 2 | 0 | 161 |\n| Jul | 66 | 0.90 | 2 | 0 | 146 |\n| Aug | 81 | 1.10 | 2 | 0 | 177 |\n| Sep | 78.5 | 1.07 | 2 | 0 | 175 |\n| Oct | 75 | 1.02 | 2 | 0 | 172 |\n| Nov | 75.5 | 1.03 | 2 | 0 | 170 |\n| Dec | 64.5 | 0.88 | 2 | 0 | 142 |",
+   "classification": "PASS_AUTOCORRECTED",
+   "message_quality": null
   },
   {
    "unit": "G_wrong",
@@ -6761,20 +6503,11 @@
     "measure": "customer_id"
    },
    "expect": "either",
-   "status": "REFUSED",
+   "status": "OK",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv_cd' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")\n\nreason: NO_CONTRACT",
-   "classification": "PASS_SAFE_REJECTION",
-   "message_quality": {
-    "identifies_problem": true,
-    "names_offending_parameter": null,
-    "explains_expected": false,
-    "suggests_correction": true,
-    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")",
-    "next_step_outcome": "WORKED",
-    "next_step_parse": "executable",
-    "avoids_irrelevant_next_step": true
-   }
+   "message": "Under contract v1 for adv_cd: one row.\n\n19 rows x 6 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/changepoint_20260924-214311.csv\nfrom dataset   adv_cd\ncreated        2026-09-24 21:43:11\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - 24 month(s) between 2023-01 and 2024-12, generated from the declared analysis window, 2023-01-01 to 2024-12-31, of which 24 hold rows.\n  - The largest difference in level falls after 2024-07: 71.6842 across 19 month(s) before and 80.6000 across 5 after, a change of +8.9158.\n  - The difference spans only 1.1 times the variation inside the two segments (7.8082), so the best split is the best of a set that all look alike rather than a break. Every series has a best split, and the whole table is above so that this is visible instead of hidden behind one answer.\n  - No significance is claimed for any of this. There is no test here and no p-value: a test needs assumptions about how customer_id is distributed that nothing in the contract states. What is reported is the size of each difference and how many month(s) stand behind each side of it.\n\nFirst 19 of 19 rows:\n\n| split after | months before | months after | mean before | mean after | difference |\n|---|---|---|---|---|---|\n| 2024-07 | 19 | 5 | 71.6842 | 80.6 | +8.9158 |\n| 2024-08 | 20 | 4 | 72.15 | 80.5 | +8.35 |\n| 2024-09 | 21 | 3 | 72.5238 | 80.6667 | +8.1429 |\n| 2024-01 | 13 | 11 | 69.9231 | 77.8182 | +7.8951 |\n| 2023-12 | 12 | 12 | 69.6667 | 77.4167 | +7.75 |\n| 2023-03 | 3 | 21 | 67.3333 | 74.4286 | +7.0952 |\n| 2024-02 | 14 | 10 | 70.6429 | 77.6 | +6.9571 |\n| 2024-03 | 15 | 9 | 71.1333 | 77.5556 | +6.4222 |\n| 2024-06 | 18 | 6 | 72.1111 | 77.8333 | +5.7222 |\n| 2024-04 | 16 | 8 | 71.6875 | 77.25 | +5.5625 |\n| 2024-05 | 17 | 7 | 71.9412 | 77.4286 | +5.4874 |\n| 2023-07 | 7 | 17 | 70 | 75 | +5 |\n| 2023-06 | 6 | 18 | 70.3333 | 74.6111 | +4.2778 |\n| 2023-11 | 11 | 13 | 71.3636 | 75.3846 | +4.021 |\n| 2023-05 | 5 | 19 | 70.4 | 74.3684 | +3.9684 |\n| 2023-10 | 10 | 14 | 71.4 | 75.0714 | +3.6714 |\n| 2023-08 | 8 | 16 | 71.375 | 74.625 | +3.25 |\n| 2023-09 | 9 | 15 | 72 | 74.4667 | +2.4667 |\n| 2023-04 | 4 | 20 | 72 | 73.85 | +1.85 |",
+   "classification": "PASS_USEFUL_WARNING",
+   "message_quality": null
   },
   {
    "unit": "G_wrong",
@@ -6792,20 +6525,11 @@
     "baseline": "2024-11"
    },
    "expect": "either",
-   "status": "REFUSED",
+   "status": "OK",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv_cd' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")\n\nreason: NO_CONTRACT",
-   "classification": "PASS_SAFE_REJECTION",
-   "message_quality": {
-    "identifies_problem": true,
-    "names_offending_parameter": null,
-    "explains_expected": false,
-    "suggests_correction": true,
-    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")",
-    "next_step_outcome": "WORKED",
-    "next_step_parse": "executable",
-    "avoids_irrelevant_next_step": true
-   }
+   "message": "Under contract v1 for adv_cd: one row.\n\n2 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/period_compare_20260924-214311.csv\nfrom dataset   adv_cd\ncreated        2026-09-24 21:43:11\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - Both months were taken from the calendar generated from the declared analysis window, 2023-01-01 to 2024-12-31, which is why a month holding no rows is a row here rather than a lookup that found nothing.\n  - customer_id (count_distinct) was 80 in 2024-11 and 78 in 2024-12: down by 2. That is -2.5% of the baseline.\n\nFirst 2 of 2 rows:\n\n| period | customer_id (count_distinct) | rows | days |\n|---|---|---|---|\n| 2024-11 | 80 | 90 | 30 |\n| 2024-12 | 78 | 85 | 31 |",
+   "classification": "PASS_AUTOCORRECTED",
+   "message_quality": null
   },
   {
    "unit": "G_wrong",
@@ -6821,20 +6545,11 @@
     "measure": "customer_id"
    },
    "expect": "either",
-   "status": "REFUSED",
-   "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv_cd' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")\n\nreason: NO_CONTRACT",
-   "classification": "PASS_SAFE_REJECTION",
-   "message_quality": {
-    "identifies_problem": true,
-    "names_offending_parameter": null,
-    "explains_expected": false,
-    "suggests_correction": true,
-    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")",
-    "next_step_outcome": "WORKED",
-    "next_step_parse": "executable",
-    "avoids_irrelevant_next_step": true
-   }
+   "status": "EXCEPTION",
+   "exception_type": "BinderException",
+   "message": "",
+   "classification": "FAIL_EXCEPTION",
+   "message_quality": null
   },
   {
    "unit": "G_wrong",
@@ -6852,12 +6567,12 @@
    "expect": "either",
    "status": "REFUSED",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv_cd' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")\n\nreason: NO_CONTRACT",
+   "message": "BLOCKED: distribution cannot answer that under this contract.\nWHY: 'customer_id' has type VARCHAR, not numeric, so there is nothing to bin. profile_column describes any column without a contract.\nCURRENT STATE: contract v1 for adv_cd\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
    "classification": "PASS_SAFE_REJECTION",
    "message_quality": {
     "identifies_problem": true,
     "names_offending_parameter": null,
-    "explains_expected": false,
+    "explains_expected": true,
     "suggests_correction": true,
     "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")",
     "next_step_outcome": "WORKED",
@@ -6880,20 +6595,11 @@
     "against": "revenue"
    },
    "expect": "either",
-   "status": "REFUSED",
-   "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv_cd' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")\n\nreason: NO_CONTRACT",
-   "classification": "PASS_SAFE_REJECTION",
-   "message_quality": {
-    "identifies_problem": true,
-    "names_offending_parameter": null,
-    "explains_expected": false,
-    "suggests_correction": true,
-    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")",
-    "next_step_outcome": "WORKED",
-    "next_step_parse": "executable",
-    "avoids_irrelevant_next_step": true
-   }
+   "status": "EXCEPTION",
+   "exception_type": "BinderException",
+   "message": "",
+   "classification": "FAIL_EXCEPTION",
+   "message_quality": null
   },
   {
    "unit": "G_wrong",
@@ -6910,20 +6616,11 @@
     "against": "revenue"
    },
    "expect": "either",
-   "status": "REFUSED",
+   "status": "OK",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv_cd' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")\n\nreason: NO_CONTRACT",
-   "classification": "PASS_SAFE_REJECTION",
-   "message_quality": {
-    "identifies_problem": true,
-    "names_offending_parameter": null,
-    "explains_expected": false,
-    "suggests_correction": true,
-    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")",
-    "next_step_outcome": "WORKED",
-    "next_step_parse": "executable",
-    "avoids_irrelevant_next_step": true
-   }
+   "message": "Under contract v1 for adv_cd: one row.\n\n10 rows x 6 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/bivariate_20260924-214312.csv\nfrom dataset   adv_cd\ncreated        2026-09-24 21:43:12\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - 1,957 of 1,968 analysed row(s) hold both customer_id and revenue; 11 hold one or neither and are in no bin above.\n  - The bins are ranges of customer_id, not slices of rows: the distinct values were divided and every row joined onto its own value's bin, so two rows sharing a customer_id always share a bin. Dividing the rows instead would split them and hand back bins whose ranges overlap.\n  - Bins hold between 173 and 222 row(s). Equal ranges of value are not equal counts of row, and the spread is a fact about how customer_id is distributed rather than a defect in the binning. A bin resting on 173 row(s) carries less than one resting on 222.\n  - Mean revenue changes direction 4 time(s) across the bins, so no single coefficient describes this: correlation asks whether one line fits and the answer here is that 5 would be needed. The turns are counted and the curve is not named -- naming one would be fitting one, and nothing here is fitted.\n  - 10 bin(s) have a mean more than a tenth away from their median, so revenue is lopsided inside them and the mean is being carried by the far end of the bin rather than by its middle.\n\nFirst 10 of 10 rows:\n\n| bin | customer_id from | customer_id to | rows | mean revenue | median revenue |\n|---|---|---|---|---|---|\n| 1 | C0000000 | C0000039 | 216 | 101.1575 | 58.08 |\n| 2 | C0000040 | C0000080 | 184 | 97.4827 | 48 |\n| 3 | C0000081 | C0000120 | 194 | 97.204 | 54.425 |\n| 4 | C0000121 | C0000160 | 187 | 10,695,276.9496 | 49.13 |\n| 5 | C0000161 | C0000200 | 211 | 96.0617 | 51.35 |\n| 6 | C0000201 | C0000240 | 210 | 97.3876 | 53.89 |\n| 7 | C0000241 | C0000280 | 185 | 103.3009 | 62.77 |\n| 8 | C0000281 | C0000320 | 222 | 4,504,614.0934 | 60.95 |\n| 9 | C0000321 | C0000359 | 175 | 123.2471 | 53.47 |\n| 10 | C0000360 | C0000399 | 173 | 121.0151 | 59.66 |",
+   "classification": "PASS_AUTOCORRECTED",
+   "message_quality": null
   },
   {
    "unit": "G_wrong",
@@ -6939,20 +6636,11 @@
     "measure": "customer_id"
    },
    "expect": "either",
-   "status": "REFUSED",
-   "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv_cd' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")\n\nreason: NO_CONTRACT",
-   "classification": "PASS_SAFE_REJECTION",
-   "message_quality": {
-    "identifies_problem": true,
-    "names_offending_parameter": null,
-    "explains_expected": false,
-    "suggests_correction": true,
-    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")",
-    "next_step_outcome": "WORKED",
-    "next_step_parse": "executable",
-    "avoids_irrelevant_next_step": true
-   }
+   "status": "EXCEPTION",
+   "exception_type": "BinderException",
+   "message": "",
+   "classification": "FAIL_EXCEPTION",
+   "message_quality": null
   },
   {
    "unit": "G_wrong",
@@ -6970,12 +6658,12 @@
    "expect": "either",
    "status": "REFUSED",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv_cd' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")\n\nreason: NO_CONTRACT",
+   "message": "BLOCKED: confidence_interval cannot answer that under this contract.\nWHY: confidence_interval bounds a numeric measure; 'customer_id' is not one.\nCURRENT STATE: contract v1 for adv_cd\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
    "classification": "PASS_SAFE_REJECTION",
    "message_quality": {
     "identifies_problem": true,
     "names_offending_parameter": null,
-    "explains_expected": false,
+    "explains_expected": true,
     "suggests_correction": true,
     "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")",
     "next_step_outcome": "WORKED",
@@ -7000,12 +6688,12 @@
    "expect": "either",
    "status": "REFUSED",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv_cd' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")\n\nreason: NO_CONTRACT",
+   "message": "BLOCKED: hypothesis_test cannot answer that under this contract.\nWHY: hypothesis_test compares a numeric measure; 'customer_id' is not one. cross_tab or a second dimension is how two categorical columns are compared.\nCURRENT STATE: contract v1 for adv_cd\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
    "classification": "PASS_SAFE_REJECTION",
    "message_quality": {
     "identifies_problem": true,
     "names_offending_parameter": null,
-    "explains_expected": false,
+    "explains_expected": true,
     "suggests_correction": true,
     "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")",
     "next_step_outcome": "WORKED",
@@ -7032,20 +6720,11 @@
     "after_end": "2024-12-31"
    },
    "expect": "either",
-   "status": "REFUSED",
+   "status": "OK",
    "exception_type": null,
-   "message": "BLOCKED: analysis of 'adv_cd' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (2,007 rows, 24 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")\n\nreason: NO_CONTRACT",
-   "classification": "PASS_SAFE_REJECTION",
-   "message_quality": {
-    "identifies_problem": true,
-    "names_offending_parameter": null,
-    "explains_expected": false,
-    "suggests_correction": true,
-    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"adv_cd\")",
-    "next_step_outcome": "WORKED",
-    "next_step_parse": "executable",
-    "avoids_irrelevant_next_step": true
-   }
+   "message": "Under contract v1 for adv_cd: one row.\n\n6 rows x 6 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/ranking_shift_20260924-214312.csv\nfrom dataset   adv_cd\ncreated        2026-09-24 21:43:12\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - Ranked by count_distinct of customer_id. Before is 2023-01-01 to 2023-12-31 and holds 928 analysed row(s); after is 2024-01-01 to 2024-12-31 and holds 1,040.\n\nFirst 6 of 6 rows:\n\n| payment_method | customer_id before | rank before | customer_id after | rank after | change |\n|---|---|---|---|---|---|\n| card | 295 | 1 | 300 | 1 | 0 |\n| ach | 170 | 2 | 182 | 2 | 0 |\n| cash | 81 | 3 | 89 | 3 | 0 |\n| wire | 64 | 4 | 79 | 4 | 0 |\n| cheque | 21 | 5 | 23 | 5 | 0 |\n| (null) | 3 | 6 | 3 | 6 | 0 |",
+   "classification": "PASS_AUTOCORRECTED",
+   "message_quality": null
   },
   {
    "unit": "G_wrong",
@@ -7080,7 +6759,7 @@
    "expect": "either",
    "status": "OK",
    "exception_type": null,
-   "message": "dataset        one_row\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       4 columns, 1 rows, fingerprint 7973c9a32f2f\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| v | sum | - | v |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 1 of 1 rows, with no nulls.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"one_row\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"sum\",\n      \"definition\": \"v\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"excluded_columns\": [],\n  \"foreign_keys\": [],\n  \"domains\": {},\n  \"bound_to\": {\n    \"columns\": [\n      {\n        \"name\": \"id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"d\",\n        \"dtype\": \"DATE\"\n      },\n      {\n        \"name\": \"g\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"v\",\n        \"dtype\": \"BIGINT\"\n      }\n    ],\n    \"row_count\": 1,\n    \"loaded_at\": \"2026-09-24T18:46:09.667815\"\n  },\n  \"questions\": [],\n  \"unresolved\": [],\n  \"version\": 0,\n  \"confirmed_at\": null\n}\n```",
+   "message": "dataset        one_row\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       4 columns, 1 rows, fingerprint 7973c9a32f2f\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| v | sum | - | v |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 1 of 1 rows, with no nulls.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"one_row\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"sum\",\n      \"definition\": \"v\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"excluded_columns\": [],\n  \"foreign_keys\": [],\n  \"domains\": {},\n  \"bound_to\": {\n    \"columns\": [\n      {\n        \"name\": \"id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"d\",\n        \"dtype\": \"DATE\"\n      },\n      {\n        \"name\": \"g\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"v\",\n        \"dtype\": \"BIGINT\"\n      }\n    ],\n    \"row_count\": 1,\n    \"loaded_at\": \"2026-09-24T21:43:12.688822\"\n  },\n  \"questions\": [],\n  \"unresolved\": [],\n  \"version\": 0,\n  \"confirmed_at\": null\n}\n```",
    "classification": "PASS_AUTOCORRECTED",
    "message_quality": null
   },
@@ -7093,7 +6772,7 @@
    "tool": "confirm_dataset_contract",
    "analysis": null,
    "parameters": {
-    "contract_json": "\n{\n  \"dataset_name\": \"one_row\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"sum\",\n      \"definition\": \"v\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"excluded_columns\": [],\n  \"foreign_keys\": [],\n  \"domains\": {},\n  \"bound_to\": {\n    \"columns\": [\n      {\n        \"name\": \"id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"d\",\n        \"dtype\": \"DATE\"\n      },\n      {\n        \"name\": \"g\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"v\",\n        \"dtype\": \"BIGINT\"\n      }\n    ],\n    \"row_count\": 1,\n    \"loaded_at\": \"2026-09-24T18:46:09.667815\"\n  },\n  \"questions\": [],\n  \"unresolved\": [],\n  \"version\": 0,\n  \"confirmed_at\": null\n}\n"
+    "contract_json": "\n{\n  \"dataset_name\": \"one_row\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"sum\",\n      \"definition\": \"v\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"excluded_columns\": [],\n  \"foreign_keys\": [],\n  \"domains\": {},\n  \"bound_to\": {\n    \"columns\": [\n      {\n        \"name\": \"id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"d\",\n        \"dtype\": \"DATE\"\n      },\n      {\n        \"name\": \"g\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"v\",\n        \"dtype\": \"BIGINT\"\n      }\n    ],\n    \"row_count\": 1,\n    \"loaded_at\": \"2026-09-24T21:43:12.688822\"\n  },\n  \"questions\": [],\n  \"unresolved\": [],\n  \"version\": 0,\n  \"confirmed_at\": null\n}\n"
    },
    "expect": "either",
    "status": "OK",
@@ -7117,7 +6796,7 @@
    "expect": "accept",
    "status": "OK",
    "exception_type": null,
-   "message": "Under contract v1 for one_row: one row.\n\n1 rows x 11 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/summary_stats_20260924-184609.csv\nfrom dataset   one_row\ncreated        2026-09-24 18:46:09\n\nWhat this shows:\n  - 1 of 1 row(s) analysed.\n  - Not summarised: key column(s) id. A column is summarised here when the contract declares it as a measure; profile_dataset describes every column without one.\n  - A blank spread is not zero: stddev is the sample standard deviation and one row has none.\n\nFirst 1 of 1 rows:\n\n| measure | agg | unit | n | nulls | total | min | max | mean | median | stddev |\n|---|---|---|---|---|---|---|---|---|---|---|\n| v | sum |  | 1 | 0 | 3 | 3 | 3 | 3 | 3 |  |",
+   "message": "Under contract v1 for one_row: one row.\n\n1 rows x 11 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/summary_stats_20260924-214312.csv\nfrom dataset   one_row\ncreated        2026-09-24 21:43:12\n\nWhat this shows:\n  - 1 of 1 row(s) analysed.\n  - Not summarised: key column(s) id. A column is summarised here when the contract declares it as a measure; profile_dataset describes every column without one.\n  - A blank spread is not zero: stddev is the sample standard deviation and one row has none.\n\nFirst 1 of 1 rows:\n\n| measure | agg | unit | n | nulls | total | min | max | mean | median | stddev |\n|---|---|---|---|---|---|---|---|---|---|---|\n| v | sum |  | 1 | 0 | 3 | 3 | 3 | 3 | 3 |  |",
    "classification": "PASS_ACCEPTED",
    "message_quality": null
   },
@@ -7138,7 +6817,7 @@
    "expect": "reject",
    "status": "OK",
    "exception_type": null,
-   "message": "Under contract v1 for one_row: one row.\n\n1 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/hypothesis_test_20260924-184609.csv\nfrom dataset   one_row\ncreated        2026-09-24 18:46:09\n\nWhat this shows:\n  - 1 of 1 row(s) analysed.\n  - No test: g has 1 group(s) among the analysed rows, and a comparison needs two. The counts above are still true.\n\nFirst 1 of 1 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| x | 1 | 3 |  |  |",
+   "message": "Under contract v1 for one_row: one row.\n\n1 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/hypothesis_test_20260924-214312.csv\nfrom dataset   one_row\ncreated        2026-09-24 21:43:12\n\nWhat this shows:\n  - 1 of 1 row(s) analysed.\n  - No test: g has 1 group(s) among the analysed rows, and a comparison needs two. The counts above are still true.\n\nFirst 1 of 1 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| x | 1 | 3 |  |  |",
    "classification": "PASS_USEFUL_WARNING",
    "message_quality": null
   },
@@ -7158,7 +6837,7 @@
    "expect": "reject",
    "status": "OK",
    "exception_type": null,
-   "message": "Under contract v1 for one_row: one row.\n\n1 rows x 6 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/confidence_interval_20260924-184610.csv\nfrom dataset   one_row\ncreated        2026-09-24 18:46:10\n\nWhat this shows:\n  - 1 of 1 row(s) analysed.\n  - Interval: Student's t on n - 1 degrees of freedom, 95%. Not the normal interval \u2014 P10-D16 measured the two differing by 15% at ten rows and by 0.1% at a thousand, so the t form costs nothing where the difference is invisible.\n  - 1 group(s) have fewer than two rows and so have no spread and no interval. The mean is still shown: one row does produce a mean, it just produces no evidence about what the next row would be.\n  - A 95% interval means the procedure that built it captures the true mean 95% of the time across repeated samples. It is not a 95% probability that this particular interval contains it.\n  - Excluded and shown: 0 with no v. The counts add back to the 1 row(s) in scope.\n\nFirst 1 of 1 rows:\n\n| group | n | mean | low (95%) | high (95%) | half-width |\n|---|---|---|---|---|---|\n| (all) | 1 | 3 |  |  |  |",
+   "message": "Under contract v1 for one_row: one row.\n\n1 rows x 6 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/confidence_interval_20260924-214312.csv\nfrom dataset   one_row\ncreated        2026-09-24 21:43:12\n\nWhat this shows:\n  - 1 of 1 row(s) analysed.\n  - Interval: Student's t on n - 1 degrees of freedom, 95%. Not the normal interval \u2014 P10-D16 measured the two differing by 15% at ten rows and by 0.1% at a thousand, so the t form costs nothing where the difference is invisible.\n  - 1 group(s) have fewer than two rows and so have no spread and no interval. The mean is still shown: one row does produce a mean, it just produces no evidence about what the next row would be.\n  - A 95% interval means the procedure that built it captures the true mean 95% of the time across repeated samples. It is not a 95% probability that this particular interval contains it.\n  - Excluded and shown: 0 with no v. The counts add back to the 1 row(s) in scope.\n\nFirst 1 of 1 rows:\n\n| group | n | mean | low (95%) | high (95%) | half-width |\n|---|---|---|---|---|---|\n| (all) | 1 | 3 |  |  |  |",
    "classification": "PASS_USEFUL_WARNING",
    "message_quality": null
   },
@@ -7178,7 +6857,7 @@
    "expect": "either",
    "status": "OK",
    "exception_type": null,
-   "message": "Under contract v1 for one_row: one row.\n\n0 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/outlier_detection_20260924-184610.csv\nfrom dataset   one_row\ncreated        2026-09-24 18:46:10\n\nWhat this shows:\n  - 1 of 1 row(s) analysed.\n  - 1 of 1 analysed row(s) hold a finite v; 0 do not and are in no method below.\n  - 1 value(s) is below 8, so no method is reported. A quartile needs a distribution to sit in, and at this count every bound would be decided by one or two rows.",
+   "message": "Under contract v1 for one_row: one row.\n\n0 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/outlier_detection_20260924-214313.csv\nfrom dataset   one_row\ncreated        2026-09-24 21:43:13\n\nWhat this shows:\n  - 1 of 1 row(s) analysed.\n  - 1 of 1 analysed row(s) hold a finite v; 0 do not and are in no method below.\n  - 1 value(s) is below 8, so no method is reported. A quartile needs a distribution to sit in, and at this count every bound would be decided by one or two rows.",
    "classification": "PASS_AUTOCORRECTED",
    "message_quality": null
   },
@@ -7199,7 +6878,7 @@
    "expect": "either",
    "status": "OK",
    "exception_type": null,
-   "message": "Under contract v1 for one_row: one row.\n\n12 rows x 3 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/trend_20260924-184610.csv\nfrom dataset   one_row\ncreated        2026-09-24 18:46:10\n\nWhat this shows:\n  - 1 of 1 row(s) analysed.\n  - 12 month(s) between 2024-01 and 2024-12, generated from the declared analysis window, 2024-01-01 to 2024-12-31 and truncated to the month.\n  - 11 month(s) hold no rows and are blank above, not zero: 2024-02, 2024-03, 2024-04, 2024-05, 2024-06, 2024-07, 2024-08, 2024-09, 2024-10, 2024-11, 2024-12.\n  - The longest unbroken gap is 11 month(s). A line drawn through these points crosses those periods without stopping, and nothing here says whether the business paused or the feed did.\n  - Only 2024-01 holds rows, so there is no direction to read.\n\nFirst 12 of 12 rows:\n\n| period | v (sum) | rows |\n|---|---|---|\n| 2024-01 | 3 | 1 |\n| 2024-02 |  | 0 |\n| 2024-03 |  | 0 |\n| 2024-04 |  | 0 |\n| 2024-05 |  | 0 |\n| 2024-06 |  | 0 |\n| 2024-07 |  | 0 |\n| 2024-08 |  | 0 |\n| 2024-09 |  | 0 |\n| 2024-10 |  | 0 |\n| 2024-11 |  | 0 |\n| 2024-12 |  | 0 |",
+   "message": "Under contract v1 for one_row: one row.\n\n12 rows x 3 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/trend_20260924-214313.csv\nfrom dataset   one_row\ncreated        2026-09-24 21:43:13\n\nWhat this shows:\n  - 1 of 1 row(s) analysed.\n  - 12 month(s) between 2024-01 and 2024-12, generated from the declared analysis window, 2024-01-01 to 2024-12-31 and truncated to the month.\n  - 11 month(s) hold no rows and are blank above, not zero: 2024-02, 2024-03, 2024-04, 2024-05, 2024-06, 2024-07, 2024-08, 2024-09, 2024-10, 2024-11, 2024-12.\n  - The longest unbroken gap is 11 month(s). A line drawn through these points crosses those periods without stopping, and nothing here says whether the business paused or the feed did.\n  - Only 2024-01 holds rows, so there is no direction to read.\n\nFirst 12 of 12 rows:\n\n| period | v (sum) | rows |\n|---|---|---|\n| 2024-01 | 3 | 1 |\n| 2024-02 |  | 0 |\n| 2024-03 |  | 0 |\n| 2024-04 |  | 0 |\n| 2024-05 |  | 0 |\n| 2024-06 |  | 0 |\n| 2024-07 |  | 0 |\n| 2024-08 |  | 0 |\n| 2024-09 |  | 0 |\n| 2024-10 |  | 0 |\n| 2024-11 |  | 0 |\n| 2024-12 |  | 0 |",
    "classification": "PASS_AUTOCORRECTED",
    "message_quality": null
   },
@@ -7266,7 +6945,7 @@
    "expect": "either",
    "status": "OK",
    "exception_type": null,
-   "message": "dataset        two_rows\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       4 columns, 2 rows, fingerprint 7973c9a32f2f\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| v | sum | - | v |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 2 of 2 rows, with no nulls.\n  - 6 pair(s) containing d, g, id, v were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"two_rows\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"sum\",\n      \"definition\": \"v\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"excluded_columns\": [],\n  \"foreign_keys\": [],\n  \"domains\": {},\n  \"bound_to\": {\n    \"columns\": [\n      {\n        \"name\": \"id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"d\",\n        \"dtype\": \"DATE\"\n      },\n      {\n        \"name\": \"g\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"v\",\n        \"dtype\": \"BIGINT\"\n      }\n    ],\n    \"row_count\": 2,\n    \"loaded_at\": \"2026-09-24T18:46:10.271196\"\n  },\n  \"questions\": [],\n  \"unresolved\": [],\n  \"version\": 0,\n  \"confirmed_at\": null\n}\n```",
+   "message": "dataset        two_rows\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       4 columns, 2 rows, fingerprint 7973c9a32f2f\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| v | sum | - | v |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 2 of 2 rows, with no nulls.\n  - 6 pair(s) containing d, g, id, v were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"two_rows\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"sum\",\n      \"definition\": \"v\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"excluded_columns\": [],\n  \"foreign_keys\": [],\n  \"domains\": {},\n  \"bound_to\": {\n    \"columns\": [\n      {\n        \"name\": \"id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"d\",\n        \"dtype\": \"DATE\"\n      },\n      {\n        \"name\": \"g\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"v\",\n        \"dtype\": \"BIGINT\"\n      }\n    ],\n    \"row_count\": 2,\n    \"loaded_at\": \"2026-09-24T21:43:13.244014\"\n  },\n  \"questions\": [],\n  \"unresolved\": [],\n  \"version\": 0,\n  \"confirmed_at\": null\n}\n```",
    "classification": "PASS_AUTOCORRECTED",
    "message_quality": null
   },
@@ -7279,7 +6958,7 @@
    "tool": "confirm_dataset_contract",
    "analysis": null,
    "parameters": {
-    "contract_json": "\n{\n  \"dataset_name\": \"two_rows\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"sum\",\n      \"definition\": \"v\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"excluded_columns\": [],\n  \"foreign_keys\": [],\n  \"domains\": {},\n  \"bound_to\": {\n    \"columns\": [\n      {\n        \"name\": \"id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"d\",\n        \"dtype\": \"DATE\"\n      },\n      {\n        \"name\": \"g\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"v\",\n        \"dtype\": \"BIGINT\"\n      }\n    ],\n    \"row_count\": 2,\n    \"loaded_at\": \"2026-09-24T18:46:10.271196\"\n  },\n  \"questions\": [],\n  \"unresolved\": [],\n  \"version\": 0,\n  \"confirmed_at\": null\n}\n"
+    "contract_json": "\n{\n  \"dataset_name\": \"two_rows\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"sum\",\n      \"definition\": \"v\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"excluded_columns\": [],\n  \"foreign_keys\": [],\n  \"domains\": {},\n  \"bound_to\": {\n    \"columns\": [\n      {\n        \"name\": \"id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"d\",\n        \"dtype\": \"DATE\"\n      },\n      {\n        \"name\": \"g\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"v\",\n        \"dtype\": \"BIGINT\"\n      }\n    ],\n    \"row_count\": 2,\n    \"loaded_at\": \"2026-09-24T21:43:13.244014\"\n  },\n  \"questions\": [],\n  \"unresolved\": [],\n  \"version\": 0,\n  \"confirmed_at\": null\n}\n"
    },
    "expect": "either",
    "status": "OK",
@@ -7303,7 +6982,7 @@
    "expect": "accept",
    "status": "OK",
    "exception_type": null,
-   "message": "Under contract v1 for two_rows: one row.\n\n1 rows x 11 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/summary_stats_20260924-184610.csv\nfrom dataset   two_rows\ncreated        2026-09-24 18:46:10\n\nWhat this shows:\n  - 2 of 2 row(s) analysed.\n  - Not summarised: key column(s) id. A column is summarised here when the contract declares it as a measure; profile_dataset describes every column without one.\n\nFirst 1 of 1 rows:\n\n| measure | agg | unit | n | nulls | total | min | max | mean | median | stddev |\n|---|---|---|---|---|---|---|---|---|---|---|\n| v | sum |  | 2 | 0 | 7 | 3 | 4 | 3.5 | 3.5 | 0.7071 |",
+   "message": "Under contract v1 for two_rows: one row.\n\n1 rows x 11 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/summary_stats_20260924-214313.csv\nfrom dataset   two_rows\ncreated        2026-09-24 21:43:13\n\nWhat this shows:\n  - 2 of 2 row(s) analysed.\n  - Not summarised: key column(s) id. A column is summarised here when the contract declares it as a measure; profile_dataset describes every column without one.\n\nFirst 1 of 1 rows:\n\n| measure | agg | unit | n | nulls | total | min | max | mean | median | stddev |\n|---|---|---|---|---|---|---|---|---|---|---|\n| v | sum |  | 2 | 0 | 7 | 3 | 4 | 3.5 | 3.5 | 0.7071 |",
    "classification": "PASS_ACCEPTED",
    "message_quality": null
   },
@@ -7324,7 +7003,7 @@
    "expect": "reject",
    "status": "OK",
    "exception_type": null,
-   "message": "Under contract v1 for two_rows: one row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/hypothesis_test_20260924-184610.csv\nfrom dataset   two_rows\ncreated        2026-09-24 18:46:10\n\nWhat this shows:\n  - 2 of 2 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 0, df n/a, p 1.\n  - Tests whether a draw from 'x' tends to exceed one from 'y'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Method chosen, not requested: 'x', 'y' holds one row and therefore has no spread, so the parametric test has no denominator. The rank test needs no variance. Pass method='parametric' to see the refusal instead.\n  - Assumption reported, not judged: smallest group 1 row(s).\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 2 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| x | 1 | 3 |  |  |\n| y | 1 | 4 |  |  |",
+   "message": "Under contract v1 for two_rows: one row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/hypothesis_test_20260924-214313.csv\nfrom dataset   two_rows\ncreated        2026-09-24 21:43:13\n\nWhat this shows:\n  - 2 of 2 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 0, df n/a, p 1.\n  - Tests whether a draw from 'x' tends to exceed one from 'y'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Method chosen, not requested: 'x', 'y' holds one row and therefore has no spread, so the parametric test has no denominator. The rank test needs no variance. Pass method='parametric' to see the refusal instead.\n  - Assumption reported, not judged: smallest group 1 row(s).\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 2 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| x | 1 | 3 |  |  |\n| y | 1 | 4 |  |  |",
    "classification": "PASS_USEFUL_WARNING",
    "message_quality": null
   },
@@ -7344,7 +7023,7 @@
    "expect": "either",
    "status": "OK",
    "exception_type": null,
-   "message": "Under contract v1 for two_rows: one row.\n\n1 rows x 6 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/confidence_interval_20260924-184610_2.csv\nfrom dataset   two_rows\ncreated        2026-09-24 18:46:10\n\nWhat this shows:\n  - 2 of 2 row(s) analysed.\n  - Interval: Student's t on n - 1 degrees of freedom, 95%. Not the normal interval \u2014 P10-D16 measured the two differing by 15% at ten rows and by 0.1% at a thousand, so the t form costs nothing where the difference is invisible.\n  - A 95% interval means the procedure that built it captures the true mean 95% of the time across repeated samples. It is not a 95% probability that this particular interval contains it.\n  - Excluded and shown: 0 with no v. The counts add back to the 2 row(s) in scope.\n\nFirst 1 of 1 rows:\n\n| group | n | mean | low (95%) | high (95%) | half-width |\n|---|---|---|---|---|---|\n| (all) | 2 | 3.5 | -2.8531 | 9.8531 | 6.3531 |",
+   "message": "Under contract v1 for two_rows: one row.\n\n1 rows x 6 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/confidence_interval_20260924-214313.csv\nfrom dataset   two_rows\ncreated        2026-09-24 21:43:13\n\nWhat this shows:\n  - 2 of 2 row(s) analysed.\n  - Interval: Student's t on n - 1 degrees of freedom, 95%. Not the normal interval \u2014 P10-D16 measured the two differing by 15% at ten rows and by 0.1% at a thousand, so the t form costs nothing where the difference is invisible.\n  - A 95% interval means the procedure that built it captures the true mean 95% of the time across repeated samples. It is not a 95% probability that this particular interval contains it.\n  - Excluded and shown: 0 with no v. The counts add back to the 2 row(s) in scope.\n\nFirst 1 of 1 rows:\n\n| group | n | mean | low (95%) | high (95%) | half-width |\n|---|---|---|---|---|---|\n| (all) | 2 | 3.5 | -2.8531 | 9.8531 | 6.3531 |",
    "classification": "PASS_AUTOCORRECTED",
    "message_quality": null
   },
@@ -7364,7 +7043,7 @@
    "expect": "either",
    "status": "OK",
    "exception_type": null,
-   "message": "Under contract v1 for two_rows: one row.\n\n0 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/outlier_detection_20260924-184610_2.csv\nfrom dataset   two_rows\ncreated        2026-09-24 18:46:10\n\nWhat this shows:\n  - 2 of 2 row(s) analysed.\n  - 2 of 2 analysed row(s) hold a finite v; 0 do not and are in no method below.\n  - 2 value(s) is below 8, so no method is reported. A quartile needs a distribution to sit in, and at this count every bound would be decided by one or two rows.",
+   "message": "Under contract v1 for two_rows: one row.\n\n0 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/outlier_detection_20260924-214313_2.csv\nfrom dataset   two_rows\ncreated        2026-09-24 21:43:13\n\nWhat this shows:\n  - 2 of 2 row(s) analysed.\n  - 2 of 2 analysed row(s) hold a finite v; 0 do not and are in no method below.\n  - 2 value(s) is below 8, so no method is reported. A quartile needs a distribution to sit in, and at this count every bound would be decided by one or two rows.",
    "classification": "PASS_AUTOCORRECTED",
    "message_quality": null
   },
@@ -7385,7 +7064,7 @@
    "expect": "either",
    "status": "OK",
    "exception_type": null,
-   "message": "Under contract v1 for two_rows: one row.\n\n12 rows x 3 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/trend_20260924-184610_2.csv\nfrom dataset   two_rows\ncreated        2026-09-24 18:46:10\n\nWhat this shows:\n  - 2 of 2 row(s) analysed.\n  - 12 month(s) between 2024-01 and 2024-12, generated from the declared analysis window, 2024-01-01 to 2024-12-31 and truncated to the month.\n  - 10 month(s) hold no rows and are blank above, not zero: 2024-03, 2024-04, 2024-05, 2024-06, 2024-07, 2024-08, 2024-09, 2024-10, 2024-11, 2024-12.\n  - The longest unbroken gap is 10 month(s). A line drawn through these points crosses those periods without stopping, and nothing here says whether the business paused or the feed did.\n  - From 3 in 2024-01 to 4 in 2024-02. That is two endpoints and the periods between them, not a fitted line -- with 10 month(s) absent, a fit would be interpolating over them.\n\nFirst 12 of 12 rows:\n\n| period | v (sum) | rows |\n|---|---|---|\n| 2024-01 | 3 | 1 |\n| 2024-02 | 4 | 1 |\n| 2024-03 |  | 0 |\n| 2024-04 |  | 0 |\n| 2024-05 |  | 0 |\n| 2024-06 |  | 0 |\n| 2024-07 |  | 0 |\n| 2024-08 |  | 0 |\n| 2024-09 |  | 0 |\n| 2024-10 |  | 0 |\n| 2024-11 |  | 0 |\n| 2024-12 |  | 0 |",
+   "message": "Under contract v1 for two_rows: one row.\n\n12 rows x 3 columns, written to\n  /home/user/analytics-agent/workspace/dbench_adv/results/trend_20260924-214313_2.csv\nfrom dataset   two_rows\ncreated        2026-09-24 21:43:13\n\nWhat this shows:\n  - 2 of 2 row(s) analysed.\n  - 12 month(s) between 2024-01 and 2024-12, generated from the declared analysis window, 2024-01-01 to 2024-12-31 and truncated to the month.\n  - 10 month(s) hold no rows and are blank above, not zero: 2024-03, 2024-04, 2024-05, 2024-06, 2024-07, 2024-08, 2024-09, 2024-10, 2024-11, 2024-12.\n  - The longest unbroken gap is 10 month(s). A line drawn through these points crosses those periods without stopping, and nothing here says whether the business paused or the feed did.\n  - From 3 in 2024-01 to 4 in 2024-02. That is two endpoints and the periods between them, not a fitted line -- with 10 month(s) absent, a fit would be interpolating over them.\n\nFirst 12 of 12 rows:\n\n| period | v (sum) | rows |\n|---|---|---|\n| 2024-01 | 3 | 1 |\n| 2024-02 | 4 | 1 |\n| 2024-03 |  | 0 |\n| 2024-04 |  | 0 |\n| 2024-05 |  | 0 |\n| 2024-06 |  | 0 |\n| 2024-07 |  | 0 |\n| 2024-08 |  | 0 |\n| 2024-09 |  | 0 |\n| 2024-10 |  | 0 |\n| 2024-11 |  | 0 |\n| 2024-12 |  | 0 |",
    "classification": "PASS_AUTOCORRECTED",
    "message_quality": null
   },
@@ -7455,7 +7134,7 @@
    "expect": "either",
    "status": "OK",
    "exception_type": null,
-   "message": "dataset        all_null_col\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       5 columns, 20 rows, fingerprint 6b7556f5d151\n\n2 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| v | sum | - | v |\n| w | sum | - | w |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 20 of 20 rows, with no nulls.\n  - w were not paired: their suggested role is measure or free text, and a key is made of columns that name a row rather than measure one. A near-continuous number is unique alongside almost anything, which says nothing.\n  - 1 pair(s) containing d, id, w were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"all_null_col\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"sum\",\n      \"definition\": \"v\",\n      \"unit\": null\n    },\n    {\n      \"name\": \"w\",\n      \"agg\": \"sum\",\n      \"definition\": \"w\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"excluded_columns\": [],\n  \"foreign_keys\": [],\n  \"domains\": {},\n  \"bound_to\": {\n    \"columns\": [\n      {\n        \"name\": \"id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"d\",\n        \"dtype\": \"DATE\"\n      },\n      {\n        \"name\": \"g\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"v\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"w\",\n        \"dtype\": \"BIGINT\"\n      }\n    ],\n    \"row_count\": 20,\n    \"loaded_at\": \"2026-09-24T18:46:10.881480\"\n  },\n  \"questions\": [],\n  \"unresolved\": [],\n  \"version\": 0,\n  \"confirmed_at\": null\n}\n```",
+   "message": "dataset        all_null_col\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       5 columns, 20 rows, fingerprint 6b7556f5d151\n\n2 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| v | sum | - | v |\n| w | sum | - | w |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 20 of 20 rows, with no nulls.\n  - w were not paired: their suggested role is measure or free text, and a key is made of columns that name a row rather than measure one. A near-continuous number is unique alongside almost anything, which says nothing.\n  - 1 pair(s) containing d, id, w were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"all_null_col\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"sum\",\n      \"definition\": \"v\",\n      \"unit\": null\n    },\n    {\n      \"name\": \"w\",\n      \"agg\": \"sum\",\n      \"definition\": \"w\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"excluded_columns\": [],\n  \"foreign_keys\": [],\n  \"domains\": {},\n  \"bound_to\": {\n    \"columns\": [\n      {\n        \"name\": \"id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"d\",\n        \"dtype\": \"DATE\"\n      },\n      {\n        \"name\": \"g\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"v\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"w\",\n        \"dtype\": \"BIGINT\"\n      }\n    ],\n    \"row_count\": 20,\n    \"loaded_at\": \"2026-09-24T21:43:13.807379\"\n  },\n  \"questions\": [],\n  \"unresolved\": [],\n  \"version\": 0,\n  \"confirmed_at\": null\n}\n```",
    "classification": "PASS_AUTOCORRECTED",
    "message_quality": null
   },
@@ -7468,7 +7147,7 @@
    "tool": "confirm_dataset_contract",
    "analysis": null,
    "parameters": {
-    "contract_json": "\n{\n  \"dataset_name\": \"all_null_col\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"sum\",\n      \"definition\": \"v\",\n      \"unit\": null\n    },\n    {\n      \"name\": \"w\",\n      \"agg\": \"sum\",\n      \"definition\": \"w\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"excluded_columns\": [],\n  \"foreign_keys\": [],\n  \"domains\": {},\n  \"bound_to\": {\n    \"columns\": [\n      {\n        \"name\": \"id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"d\",\n        \"dtype\": \"DATE\"\n      },\n      {\n        \"name\": \"g\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"v\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"w\",\n        \"dtype\": \"BIGINT\"\n      }\n    ],\n    \"row_count\": 20,\n    \"loaded_at\": \"2026-09-24T18:46:10.881480\"\n  },\n  \"questions\": [],\n  \"unresolved\": [],\n  \"version\": 0,\n  \"confirmed_at\": null\n}\n"
+    "contract_json": "\n{\n  \"dataset_name\": \"all_null_col\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"sum\",\n      \"definition\": \"v\",\n      \"unit\": null\n    },\n    {\n      \"name\": \"w\",\n      \"agg\": \"sum\",\n      \"definition\": \"w\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"excluded_columns\": [],\n  \"foreign_keys\": [],\n  \"domains\": {},\n  \"bound_to\": {\n    \"columns\": [\n      {\n        \"name\": \"id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"d\",\n        \"dtype\": \"DATE\"\n      },\n      {\n        \"name\": \"g\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"v\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"w\",\n        \"dtype\": \"BIGINT\"\n      }\n    ],\n    \"row_count\": 20,\n    \"loaded_at\": \"2026-09-24T21:43:13.807379\"\n  },\n  \"questions\": [],\n  \"unresolved\": [],\n  \"version\": 0,\n  \"confirmed_at\": null\n}\n"
    },
    "expect": "either",
    "status": "OK",
@@ -7650,7 +7329,7 @@
    "expect": "either",
    "status": "OK",
    "exception_type": null,
-   "message": "dataset        inf_nan\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       4 columns, 40 rows, fingerprint b04e92ed5b12\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| v | sum | - | v |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 40 of 40 rows, with no nulls.\n  - g holds 2 distinct value(s): x, y. Declare domains={\"g\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - v holds 12 distinct value(s): -inf, 14, 19, 24, 29, 34, 39, 4, 9, NaN, inf, nan. Declare domains={\"v\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - 3 pair(s) containing id were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"inf_nan\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"sum\",\n      \"definition\": \"v\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"excluded_columns\": [],\n  \"foreign_keys\": [],\n  \"domains\": {},\n  \"bound_to\": {\n    \"columns\": [\n      {\n        \"name\": \"id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"d\",\n        \"dtype\": \"DATE\"\n      },\n      {\n        \"name\": \"g\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"v\",\n        \"dtype\": \"VARCHAR\"\n      }\n    ],\n    \"row_count\": 40,\n    \"loaded_at\": \"2026-09-24T18:46:11.464585\"\n  },\n  \"questions\": [],\n  \"unresolved\": [],\n  \"version\": 0,\n  \"confirmed_at\": null\n}\n```",
+   "message": "dataset        inf_nan\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       4 columns, 40 rows, fingerprint b04e92ed5b12\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| v | sum | - | v |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 40 of 40 rows, with no nulls.\n  - g holds 2 distinct value(s): x, y. Declare domains={\"g\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - v holds 12 distinct value(s): -inf, 14, 19, 24, 29, 34, 39, 4, 9, NaN, inf, nan. Declare domains={\"v\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - 3 pair(s) containing id were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"inf_nan\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"sum\",\n      \"definition\": \"v\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"excluded_columns\": [],\n  \"foreign_keys\": [],\n  \"domains\": {},\n  \"bound_to\": {\n    \"columns\": [\n      {\n        \"name\": \"id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"d\",\n        \"dtype\": \"DATE\"\n      },\n      {\n        \"name\": \"g\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"v\",\n        \"dtype\": \"VARCHAR\"\n      }\n    ],\n    \"row_count\": 40,\n    \"loaded_at\": \"2026-09-24T21:43:14.389176\"\n  },\n  \"questions\": [],\n  \"unresolved\": [],\n  \"version\": 0,\n  \"confirmed_at\": null\n}\n```",
    "classification": "PASS_AUTOCORRECTED",
    "message_quality": null
   },
@@ -7663,7 +7342,7 @@
    "tool": "confirm_dataset_contract",
    "analysis": null,
    "parameters": {
-    "contract_json": "\n{\n  \"dataset_name\": \"inf_nan\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"sum\",\n      \"definition\": \"v\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"excluded_columns\": [],\n  \"foreign_keys\": [],\n  \"domains\": {},\n  \"bound_to\": {\n    \"columns\": [\n      {\n        \"name\": \"id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"d\",\n        \"dtype\": \"DATE\"\n      },\n      {\n        \"name\": \"g\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"v\",\n        \"dtype\": \"VARCHAR\"\n      }\n    ],\n    \"row_count\": 40,\n    \"loaded_at\": \"2026-09-24T18:46:11.464585\"\n  },\n  \"questions\": [],\n  \"unresolved\": [],\n  \"version\": 0,\n  \"confirmed_at\": null\n}\n"
+    "contract_json": "\n{\n  \"dataset_name\": \"inf_nan\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"sum\",\n      \"definition\": \"v\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"excluded_columns\": [],\n  \"foreign_keys\": [],\n  \"domains\": {},\n  \"bound_to\": {\n    \"columns\": [\n      {\n        \"name\": \"id\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"d\",\n        \"dtype\": \"DATE\"\n      },\n      {\n        \"name\": \"g\",\n        \"dtype\": \"VARCHAR\"\n      },\n      {\n        \"name\": \"v\",\n        \"dtype\": \"VARCHAR\"\n      }\n    ],\n    \"row_count\": 40,\n    \"loaded_at\": \"2026-09-24T21:43:14.389176\"\n  },\n  \"questions\": [],\n  \"unresolved\": [],\n  \"version\": 0,\n  \"confirmed_at\": null\n}\n"
    },
    "expect": "either",
    "status": "OK",
@@ -7906,14 +7585,14 @@
     "dataset_name": "dup_ids",
     "analysis_type": "summary_stats"
    },
-   "expect": "accept",
+   "expect": "reject",
    "status": "REFUSED",
    "exception_type": null,
    "message": "BLOCKED: analysis of 'dup_ids' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (20 rows, 4 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"dup_ids\")\n\nreason: NO_CONTRACT",
-   "classification": "FAIL_UNNECESSARY_REJECTION",
+   "classification": "PASS_SAFE_REJECTION",
    "message_quality": {
     "identifies_problem": true,
-    "names_offending_parameter": null,
+    "names_offending_parameter": true,
     "explains_expected": false,
     "suggests_correction": true,
     "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"dup_ids\")",
@@ -7965,14 +7644,14 @@
     "analysis_type": "confidence_interval",
     "measure": "v"
    },
-   "expect": "either",
+   "expect": "reject",
    "status": "REFUSED",
    "exception_type": null,
    "message": "BLOCKED: analysis of 'dup_ids' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (20 rows, 4 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"dup_ids\")\n\nreason: NO_CONTRACT",
-   "classification": "FAIL_MISLEADING_RESPONSE",
+   "classification": "PASS_SAFE_REJECTION",
    "message_quality": {
     "identifies_problem": true,
-    "names_offending_parameter": false,
+    "names_offending_parameter": true,
     "explains_expected": false,
     "suggests_correction": true,
     "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"dup_ids\")",
@@ -7994,14 +7673,14 @@
     "analysis_type": "outlier_detection",
     "measure": "v"
    },
-   "expect": "either",
+   "expect": "reject",
    "status": "REFUSED",
    "exception_type": null,
    "message": "BLOCKED: analysis of 'dup_ids' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (20 rows, 4 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"dup_ids\")\n\nreason: NO_CONTRACT",
    "classification": "PASS_SAFE_REJECTION",
    "message_quality": {
     "identifies_problem": true,
-    "names_offending_parameter": null,
+    "names_offending_parameter": true,
     "explains_expected": false,
     "suggests_correction": true,
     "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"dup_ids\")",
@@ -8024,14 +7703,14 @@
     "measure": "v",
     "grain": "month"
    },
-   "expect": "either",
+   "expect": "reject",
    "status": "REFUSED",
    "exception_type": null,
    "message": "BLOCKED: analysis of 'dup_ids' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (20 rows, 4 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"dup_ids\")\n\nreason: NO_CONTRACT",
    "classification": "PASS_SAFE_REJECTION",
    "message_quality": {
     "identifies_problem": true,
-    "names_offending_parameter": null,
+    "names_offending_parameter": true,
     "explains_expected": false,
     "suggests_correction": true,
     "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"dup_ids\")",
@@ -8058,10 +7737,10 @@
    "status": "REFUSED",
    "exception_type": null,
    "message": "BLOCKED: analysis of 'dup_ids' requires a confirmed Dataset Contract. None exists.\nWHY: without one there is no agreed grain, so nothing can say whether summing a column double-counts, and no measure has a definition any number could be traced back to.\nDETAIL: Show the draft to the user, answer its questions, then call confirm_dataset_contract once they agree.\nCURRENT STATE: loaded (20 rows, 4 columns), no contract\nNEXT STEP: call propose_dataset_contract(dataset_name=\"dup_ids\")\n\nreason: NO_CONTRACT",
-   "classification": "FAIL_MISLEADING_RESPONSE",
+   "classification": "PASS_SAFE_REJECTION",
    "message_quality": {
     "identifies_problem": true,
-    "names_offending_parameter": false,
+    "names_offending_parameter": true,
     "explains_expected": false,
     "suggests_correction": true,
     "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"dup_ids\")",
@@ -8413,6 +8092,138 @@
     "explains_expected": true,
     "suggests_correction": true,
     "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"logistics\")",
+    "next_step_outcome": "WORKED",
+    "next_step_parse": "executable",
+    "avoids_irrelevant_next_step": true
+   }
+  },
+  {
+   "unit": "I_sales_10000000",
+   "domain": "sales",
+   "rows": 10000000,
+   "case": "",
+   "family": null,
+   "tool": "propose_dataset_contract",
+   "analysis": null,
+   "parameters": {
+    "dataset_name": "sales",
+    "grain": "one row = one sales record",
+    "primary_key": [
+     "order_id"
+    ],
+    "date_column": "order_date",
+    "measures": [
+     "quantity",
+     "gross_sales",
+     "net_sales",
+     "cost",
+     "profit",
+     "discount",
+     "unit_price"
+    ],
+    "dimensions": [
+     "product_category",
+     "region",
+     "city",
+     "channel",
+     "returned_flag",
+     "customer_id",
+     "salesperson_id",
+     "product_id"
+    ],
+    "aggregations": {
+     "quantity": "sum",
+     "gross_sales": "sum",
+     "net_sales": "sum",
+     "cost": "sum",
+     "profit": "sum",
+     "discount": "mean",
+     "unit_price": "none"
+    },
+    "measure_definitions": {
+     "quantity": "quantity as recorded",
+     "gross_sales": "gross_sales as recorded",
+     "net_sales": "net_sales as recorded",
+     "cost": "cost as recorded",
+     "profit": "profit as recorded",
+     "discount": "discount as recorded",
+     "unit_price": "unit_price as recorded"
+    },
+    "analysis_window_start": "2023-01-01",
+    "analysis_window_end": "2024-12-31",
+    "known_exclusions": null
+   },
+   "expect": "reject: the business key is duplicated by construction",
+   "status": "REFUSED",
+   "exception_type": null,
+   "message": "BLOCKED: the primary key stated for 'sales' (order_id) does not identify a row.\nWHY: the grain of every later number depends on this. If the key repeats, a join or a sum over it double-counts, and nothing downstream can tell that it did.\nDETAIL: order_id does not identify a row: 9,979,936 distinct value(s) across 10,000,000 keyed row(s), so 20,064 row(s) repeat a key that is meant to be unique. validate_dataset(dataset_name=\"sales\") reports this and everything else that disagrees with the contract, rather than stopping at the key.\nNEXT STEP: call propose_dataset_contract(dataset_name=\"sales\", ",
+   "classification": "PASS_SAFE_REJECTION",
+   "message_quality": {
+    "identifies_problem": true,
+    "names_offending_parameter": null,
+    "explains_expected": false,
+    "suggests_correction": true,
+    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"sales\", primary_key=[...]) with a key that holds, or state the grain that matches the key you gave",
+    "next_step_outcome": null,
+    "next_step_parse": null,
+    "avoids_irrelevant_next_step": true
+   }
+  },
+  {
+   "unit": "I_sales_10000000",
+   "domain": "sales",
+   "rows": 10000000,
+   "case": "na0",
+   "family": "not_applicable",
+   "tool": "compute_analysis",
+   "analysis": "correlation",
+   "parameters": {
+    "dataset_name": "sales",
+    "analysis_type": "correlation",
+    "measure": "net_sales",
+    "against": "region"
+   },
+   "expect": "reject",
+   "status": "REFUSED",
+   "exception_type": null,
+   "message": "BLOCKED: correlation cannot answer that under this contract.\nWHY: 'region' is not a declared measure of sales. Declared: cost, discount, gross_sales, net_sales, profit, quantity, unit_price.\nCURRENT STATE: contract v1 for sales\nNEXT STEP: call propose_dataset_contract(dataset_name=\"sales\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
+   "classification": "PASS_SAFE_REJECTION",
+   "message_quality": {
+    "identifies_problem": true,
+    "names_offending_parameter": null,
+    "explains_expected": true,
+    "suggests_correction": true,
+    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"sales\")",
+    "next_step_outcome": "WORKED",
+    "next_step_parse": "executable",
+    "avoids_irrelevant_next_step": true
+   }
+  },
+  {
+   "unit": "I_sales_10000000",
+   "domain": "sales",
+   "rows": 10000000,
+   "case": "na1",
+   "family": "not_applicable",
+   "tool": "compute_analysis",
+   "analysis": "top_n",
+   "parameters": {
+    "dataset_name": "sales",
+    "analysis_type": "top_n",
+    "dimension": "region",
+    "measure": "unit_price"
+   },
+   "expect": "reject",
+   "status": "REFUSED",
+   "exception_type": null,
+   "message": "BLOCKED: top_n cannot answer that under this contract.\nWHY: measure 'unit_price' is declared non-additive, so ranking groups by its total would produce an order built from a number the contract says is not meaningful.\nCURRENT STATE: contract v1 for sales\nNEXT STEP: call propose_dataset_contract(dataset_name=\"sales\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
+   "classification": "PASS_SAFE_REJECTION",
+   "message_quality": {
+    "identifies_problem": true,
+    "names_offending_parameter": null,
+    "explains_expected": true,
+    "suggests_correction": true,
+    "next_step": "NEXT STEP: call propose_dataset_contract(dataset_name=\"sales\")",
     "next_step_outcome": "WORKED",
     "next_step_parse": "executable",
     "avoids_irrelevant_next_step": true

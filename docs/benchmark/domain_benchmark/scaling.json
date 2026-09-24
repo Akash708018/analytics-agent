@@ -23220,6 +23220,19 @@
   },
   {
    "domain": "sales",
+   "tool": "check_file",
+   "analysis": "",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 0.955,
+   "from_seconds": 6.7e-05,
+   "to_seconds": 6.4e-05,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
    "tool": "preview_file",
    "analysis": "",
    "variant": "",
@@ -23268,6 +23281,19 @@
    "TIME_GROWTH_FACTOR": 0.979,
    "from_seconds": 0.000141,
    "to_seconds": 0.000138,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "preview_file",
+   "analysis": "",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.058,
+   "from_seconds": 0.000138,
+   "to_seconds": 0.000146,
    "suspicious": false
   },
   {
@@ -23324,6 +23350,19 @@
   },
   {
    "domain": "sales",
+   "tool": "propose_ingest_spec",
+   "analysis": "",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 0.978,
+   "from_seconds": 0.005052,
+   "to_seconds": 0.00494,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
    "tool": "confirm_ingest_spec",
    "analysis": "",
    "variant": "",
@@ -23372,6 +23411,19 @@
    "TIME_GROWTH_FACTOR": 1.717,
    "from_seconds": 6.815155,
    "to_seconds": 11.704267,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "confirm_ingest_spec",
+   "analysis": "",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.53,
+   "from_seconds": 11.704267,
+   "to_seconds": 17.905321,
    "suspicious": false
   },
   {
@@ -23428,6 +23480,19 @@
   },
   {
    "domain": "sales",
+   "tool": "profile_dataset",
+   "analysis": "",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.856,
+   "from_seconds": 27.724133,
+   "to_seconds": 51.465612,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
    "tool": "profile_column",
    "analysis": "",
    "variant": "",
@@ -23477,6 +23542,19 @@
    "from_seconds": 9.545369,
    "to_seconds": 23.578168,
    "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "profile_column",
+   "analysis": "",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 2.054,
+   "from_seconds": 23.578168,
+   "to_seconds": 48.429024,
+   "suspicious": true
   },
   {
    "domain": "sales",
@@ -23532,6 +23610,19 @@
   },
   {
    "domain": "sales",
+   "tool": "propose_cleaning_plan",
+   "analysis": "",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.928,
+   "from_seconds": 75.051443,
+   "to_seconds": 144.670949,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
    "tool": "apply_cleaning_plan",
    "analysis": "",
    "variant": "",
@@ -23580,6 +23671,19 @@
    "TIME_GROWTH_FACTOR": 1.288,
    "from_seconds": 6.955892,
    "to_seconds": 8.956727,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "apply_cleaning_plan",
+   "analysis": "",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.969,
+   "from_seconds": 8.956727,
+   "to_seconds": 17.636997,
    "suspicious": false
   },
   {
@@ -23636,6 +23740,19 @@
   },
   {
    "domain": "sales",
+   "tool": "get_cleaning_ledger",
+   "analysis": "",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.201,
+   "from_seconds": 0.028667,
+   "to_seconds": 0.03443,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
    "tool": "propose_dataset_contract",
    "analysis": "",
    "variant": "",
@@ -23684,6 +23801,19 @@
    "TIME_GROWTH_FACTOR": 2.451,
    "from_seconds": 3.5613085,
    "to_seconds": 8.7297785,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "propose_dataset_contract",
+   "analysis": "",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.792,
+   "from_seconds": 8.7297785,
+   "to_seconds": 15.646329,
    "suspicious": false
   },
   {
@@ -23740,6 +23870,19 @@
   },
   {
    "domain": "sales",
+   "tool": "confirm_dataset_contract",
+   "analysis": "",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.615,
+   "from_seconds": 0.050157,
+   "to_seconds": 0.081024,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
    "tool": "list_datasets",
    "analysis": "",
    "variant": "",
@@ -23788,6 +23931,19 @@
    "TIME_GROWTH_FACTOR": 0.879,
    "from_seconds": 0.025068,
    "to_seconds": 0.022024,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "list_datasets",
+   "analysis": "",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.076,
+   "from_seconds": 0.022024,
+   "to_seconds": 0.023694,
    "suspicious": false
   },
   {
@@ -23844,6 +24000,19 @@
   },
   {
    "domain": "sales",
+   "tool": "describe_dataset",
+   "analysis": "",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.683,
+   "from_seconds": 1.56601,
+   "to_seconds": 2.636173,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
    "tool": "get_workflow_state",
    "analysis": "",
    "variant": "",
@@ -23892,6 +24061,19 @@
    "TIME_GROWTH_FACTOR": 1.728,
    "from_seconds": 0.141593,
    "to_seconds": 0.244711,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "get_workflow_state",
+   "analysis": "",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.897,
+   "from_seconds": 0.244711,
+   "to_seconds": 0.464112,
    "suspicious": false
   },
   {
@@ -23948,6 +24130,19 @@
   },
   {
    "domain": "sales",
+   "tool": "validate_dataset",
+   "analysis": "",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.798,
+   "from_seconds": 0.70103,
+   "to_seconds": 1.260515,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
    "tool": "run_analysis",
    "analysis": "",
    "variant": "",
@@ -23996,6 +24191,19 @@
    "TIME_GROWTH_FACTOR": 1.856,
    "from_seconds": 0.132057,
    "to_seconds": 0.245093,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "run_analysis",
+   "analysis": "",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.784,
+   "from_seconds": 0.245093,
+   "to_seconds": 0.437325,
    "suspicious": false
   },
   {
@@ -24054,6 +24262,19 @@
    "domain": "sales",
    "tool": "compute_analysis",
    "analysis": "cross_tab",
+   "variant": "count",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.825,
+   "from_seconds": 0.587792,
+   "to_seconds": 1.072495,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "cross_tab",
    "variant": "sum",
    "from_rows": 1000,
    "to_rows": 100000,
@@ -24100,6 +24321,19 @@
    "TIME_GROWTH_FACTOR": 1.78,
    "from_seconds": 0.353839,
    "to_seconds": 0.629756,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "cross_tab",
+   "variant": "sum",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.75,
+   "from_seconds": 0.629756,
+   "to_seconds": 1.101962,
    "suspicious": false
   },
   {
@@ -24152,6 +24386,19 @@
    "TIME_GROWTH_FACTOR": 2.35,
    "from_seconds": 0.56958,
    "to_seconds": 1.338521,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "distribution",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.859,
+   "from_seconds": 1.338521,
+   "to_seconds": 2.488402,
    "suspicious": false
   },
   {
@@ -24210,6 +24457,19 @@
    "domain": "sales",
    "tool": "compute_analysis",
    "analysis": "frequency",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.689,
+   "from_seconds": 0.369741,
+   "to_seconds": 0.62462,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "frequency",
    "variant": "hi",
    "from_rows": 1000,
    "to_rows": 100000,
@@ -24256,6 +24516,19 @@
    "TIME_GROWTH_FACTOR": 2.278,
    "from_seconds": 1.0345215,
    "to_seconds": 2.356729,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "frequency",
+   "variant": "hi",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.889,
+   "from_seconds": 2.356729,
+   "to_seconds": 4.452457,
    "suspicious": false
   },
   {
@@ -24314,6 +24587,19 @@
    "domain": "sales",
    "tool": "compute_analysis",
    "analysis": "top_n",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.834,
+   "from_seconds": 0.362161,
+   "to_seconds": 0.664097,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "top_n",
    "variant": "mean",
    "from_rows": 1000,
    "to_rows": 100000,
@@ -24360,6 +24646,19 @@
    "TIME_GROWTH_FACTOR": 2.116,
    "from_seconds": 0.171182,
    "to_seconds": 0.36221,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "top_n",
+   "variant": "mean",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.674,
+   "from_seconds": 0.36221,
+   "to_seconds": 0.606264,
    "suspicious": false
   },
   {
@@ -24417,6 +24716,19 @@
   {
    "domain": "sales",
    "tool": "compute_analysis",
+   "analysis": "summary_stats",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 2.1,
+   "from_seconds": 2.254856,
+   "to_seconds": 4.735556,
+   "suspicious": true
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
    "analysis": "group_compare",
    "variant": "",
    "from_rows": 1000,
@@ -24464,6 +24776,19 @@
    "TIME_GROWTH_FACTOR": 2.224,
    "from_seconds": 0.464543,
    "to_seconds": 1.033179,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "group_compare",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.782,
+   "from_seconds": 1.033179,
+   "to_seconds": 1.840941,
    "suspicious": false
   },
   {
@@ -24521,6 +24846,19 @@
   {
    "domain": "sales",
    "tool": "compute_analysis",
+   "analysis": "group_compare",
+   "variant": "mean",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.81,
+   "from_seconds": 0.825003,
+   "to_seconds": 1.493303,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
    "analysis": "pareto",
    "variant": "",
    "from_rows": 1000,
@@ -24568,6 +24906,19 @@
    "TIME_GROWTH_FACTOR": 1.869,
    "from_seconds": 0.168678,
    "to_seconds": 0.315198,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "pareto",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.77,
+   "from_seconds": 0.315198,
+   "to_seconds": 0.557756,
    "suspicious": false
   },
   {
@@ -24625,6 +24976,19 @@
   {
    "domain": "sales",
    "tool": "compute_analysis",
+   "analysis": "concentration",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.813,
+   "from_seconds": 0.318562,
+   "to_seconds": 0.577684,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
    "analysis": "ranking_shift",
    "variant": "",
    "from_rows": 1000,
@@ -24677,6 +25041,19 @@
   {
    "domain": "sales",
    "tool": "compute_analysis",
+   "analysis": "ranking_shift",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.85,
+   "from_seconds": 0.454562,
+   "to_seconds": 0.841038,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
    "analysis": "calendar_coverage",
    "variant": "",
    "from_rows": 1000,
@@ -24724,6 +25101,19 @@
    "TIME_GROWTH_FACTOR": 1.97,
    "from_seconds": 0.243348,
    "to_seconds": 0.479502,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "calendar_coverage",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.735,
+   "from_seconds": 0.479502,
+   "to_seconds": 0.831764,
    "suspicious": false
   },
   {
@@ -24782,6 +25172,19 @@
    "domain": "sales",
    "tool": "compute_analysis",
    "analysis": "trend",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.895,
+   "from_seconds": 0.471882,
+   "to_seconds": 0.894118,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "trend",
    "variant": "mean",
    "from_rows": 1000,
    "to_rows": 100000,
@@ -24828,6 +25231,19 @@
    "TIME_GROWTH_FACTOR": 1.938,
    "from_seconds": 0.249219,
    "to_seconds": 0.482873,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "trend",
+   "variant": "mean",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.732,
+   "from_seconds": 0.482873,
+   "to_seconds": 0.836224,
    "suspicious": false
   },
   {
@@ -24885,6 +25301,19 @@
   {
    "domain": "sales",
    "tool": "compute_analysis",
+   "analysis": "seasonality",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.665,
+   "from_seconds": 0.48625,
+   "to_seconds": 0.809452,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
    "analysis": "period_compare",
    "variant": "",
    "from_rows": 1000,
@@ -24937,6 +25366,19 @@
   {
    "domain": "sales",
    "tool": "compute_analysis",
+   "analysis": "period_compare",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.802,
+   "from_seconds": 0.455848,
+   "to_seconds": 0.821498,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
    "analysis": "growth_decomposition",
    "variant": "",
    "from_rows": 1000,
@@ -24984,6 +25426,19 @@
    "TIME_GROWTH_FACTOR": 2.143,
    "from_seconds": 0.372096,
    "to_seconds": 0.797353,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "growth_decomposition",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.894,
+   "from_seconds": 0.797353,
+   "to_seconds": 1.510065,
    "suspicious": false
   },
   {
@@ -25042,6 +25497,19 @@
    "domain": "sales",
    "tool": "compute_analysis",
    "analysis": "correlation",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.93,
+   "from_seconds": 1.787073,
+   "to_seconds": 3.449763,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "correlation",
    "variant": "indep",
    "from_rows": 1000,
    "to_rows": 100000,
@@ -25088,6 +25556,19 @@
    "TIME_GROWTH_FACTOR": 2.46,
    "from_seconds": 0.663555,
    "to_seconds": 1.632342,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "correlation",
+   "variant": "indep",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.926,
+   "from_seconds": 1.632342,
+   "to_seconds": 3.143538,
    "suspicious": false
   },
   {
@@ -25145,6 +25626,19 @@
   {
    "domain": "sales",
    "tool": "compute_analysis",
+   "analysis": "bivariate",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.729,
+   "from_seconds": 0.709902,
+   "to_seconds": 1.227497,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
    "analysis": "driver_analysis",
    "variant": "",
    "from_rows": 1000,
@@ -25197,6 +25691,19 @@
   {
    "domain": "sales",
    "tool": "compute_analysis",
+   "analysis": "driver_analysis",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.838,
+   "from_seconds": 1.599831,
+   "to_seconds": 2.941215,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
    "analysis": "mix_shift",
    "variant": "",
    "from_rows": 1000,
@@ -25244,6 +25751,19 @@
    "TIME_GROWTH_FACTOR": 2.216,
    "from_seconds": 0.391308,
    "to_seconds": 0.867255,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "mix_shift",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.741,
+   "from_seconds": 0.867255,
+   "to_seconds": 1.510242,
    "suspicious": false
   },
   {
@@ -25302,6 +25822,19 @@
    "domain": "sales",
    "tool": "compute_analysis",
    "analysis": "outlier_detection",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.902,
+   "from_seconds": 1.633095,
+   "to_seconds": 3.106311,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "outlier_detection",
    "variant": "mean",
    "from_rows": 1000,
    "to_rows": 100000,
@@ -25348,6 +25881,19 @@
    "TIME_GROWTH_FACTOR": 2.289,
    "from_seconds": 0.525769,
    "to_seconds": 1.203699,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "outlier_detection",
+   "variant": "mean",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.857,
+   "from_seconds": 1.203699,
+   "to_seconds": 2.235675,
    "suspicious": false
   },
   {
@@ -25405,6 +25951,19 @@
   {
    "domain": "sales",
    "tool": "compute_analysis",
+   "analysis": "changepoint",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.901,
+   "from_seconds": 0.445713,
+   "to_seconds": 0.84727,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
    "analysis": "correlated_shift",
    "variant": "",
    "from_rows": 1000,
@@ -25452,6 +26011,19 @@
    "TIME_GROWTH_FACTOR": 1.906,
    "from_seconds": 0.272192,
    "to_seconds": 0.518849,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "correlated_shift",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.712,
+   "from_seconds": 0.518849,
+   "to_seconds": 0.888139,
    "suspicious": false
   },
   {
@@ -25510,6 +26082,19 @@
    "domain": "sales",
    "tool": "compute_analysis",
    "analysis": "hypothesis_test",
+   "variant": "t",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.832,
+   "from_seconds": 0.490326,
+   "to_seconds": 0.898164,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "hypothesis_test",
    "variant": "anova",
    "from_rows": 1000,
    "to_rows": 100000,
@@ -25556,6 +26141,19 @@
    "TIME_GROWTH_FACTOR": 1.998,
    "from_seconds": 0.268238,
    "to_seconds": 0.535879,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "hypothesis_test",
+   "variant": "anova",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.758,
+   "from_seconds": 0.535879,
+   "to_seconds": 0.941865,
    "suspicious": false
   },
   {
@@ -25614,6 +26212,19 @@
    "domain": "sales",
    "tool": "compute_analysis",
    "analysis": "hypothesis_test",
+   "variant": "chi2",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.789,
+   "from_seconds": 0.401586,
+   "to_seconds": 0.718478,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "hypothesis_test",
    "variant": "rank",
    "from_rows": 1000,
    "to_rows": 100000,
@@ -25660,6 +26271,19 @@
    "TIME_GROWTH_FACTOR": 2.156,
    "from_seconds": 0.475285,
    "to_seconds": 1.024648,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "hypothesis_test",
+   "variant": "rank",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.879,
+   "from_seconds": 1.024648,
+   "to_seconds": 1.924985,
    "suspicious": false
   },
   {
@@ -25718,6 +26342,19 @@
    "domain": "sales",
    "tool": "compute_analysis",
    "analysis": "confidence_interval",
+   "variant": "all",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.913,
+   "from_seconds": 0.447946,
+   "to_seconds": 0.856998,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "confidence_interval",
    "variant": "by",
    "from_rows": 1000,
    "to_rows": 100000,
@@ -25764,6 +26401,19 @@
    "TIME_GROWTH_FACTOR": 2.041,
    "from_seconds": 0.249201,
    "to_seconds": 0.508511,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "confidence_interval",
+   "variant": "by",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.785,
+   "from_seconds": 0.508511,
+   "to_seconds": 0.907851,
    "suspicious": false
   },
   {
@@ -25822,6 +26472,19 @@
    "domain": "sales",
    "tool": "compute_analysis",
    "analysis": "effect_size",
+   "variant": "g",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.779,
+   "from_seconds": 0.508463,
+   "to_seconds": 0.904325,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "effect_size",
    "variant": "anova",
    "from_rows": 1000,
    "to_rows": 100000,
@@ -25868,6 +26531,19 @@
    "TIME_GROWTH_FACTOR": 1.887,
    "from_seconds": 0.270522,
    "to_seconds": 0.510536,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "effect_size",
+   "variant": "anova",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.873,
+   "from_seconds": 0.510536,
+   "to_seconds": 0.956143,
    "suspicious": false
   },
   {
@@ -25925,6 +26601,19 @@
   {
    "domain": "sales",
    "tool": "compute_analysis",
+   "analysis": "effect_size",
+   "variant": "v",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.832,
+   "from_seconds": 0.408969,
+   "to_seconds": 0.749266,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
    "analysis": "sample_adequacy",
    "variant": "",
    "from_rows": 1000,
@@ -25972,6 +26661,19 @@
    "TIME_GROWTH_FACTOR": 1.919,
    "from_seconds": 0.261093,
    "to_seconds": 0.501056,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "sample_adequacy",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.939,
+   "from_seconds": 0.501056,
+   "to_seconds": 0.971679,
    "suspicious": false
   },
   {
@@ -26029,6 +26731,19 @@
   {
    "domain": "sales",
    "tool": "compute_analysis",
+   "analysis": "repeat_behaviour",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.849,
+   "from_seconds": 1.298386,
+   "to_seconds": 2.400269,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
    "analysis": "cohort_retention",
    "variant": "",
    "from_rows": 1000,
@@ -26076,6 +26791,19 @@
    "TIME_GROWTH_FACTOR": 2.439,
    "from_seconds": 0.683964,
    "to_seconds": 1.668456,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "cohort_retention",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.87,
+   "from_seconds": 1.668456,
+   "to_seconds": 3.119538,
    "suspicious": false
   },
   {
@@ -26132,6 +26860,19 @@
   },
   {
    "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "correlation",
+   "variant": "na0",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 2.037,
+   "from_seconds": 0.27342,
+   "to_seconds": 0.55696,
+   "suspicious": true
+  },
+  {
+   "domain": "sales",
    "tool": "propose_dataset_contract",
    "analysis": "",
    "variant": "follow",
@@ -26184,6 +26925,19 @@
   },
   {
    "domain": "sales",
+   "tool": "propose_dataset_contract",
+   "analysis": "",
+   "variant": "follow",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.725,
+   "from_seconds": 8.807228,
+   "to_seconds": 15.190154,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
    "tool": "compute_analysis",
    "analysis": "top_n",
    "variant": "na1",
@@ -26232,6 +26986,19 @@
    "TIME_GROWTH_FACTOR": 1.946,
    "from_seconds": 0.146803,
    "to_seconds": 0.285652,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "top_n",
+   "variant": "na1",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.708,
+   "from_seconds": 0.285652,
+   "to_seconds": 0.487816,
    "suspicious": false
   },
   {
@@ -26289,6 +27056,19 @@
   {
    "domain": "sales",
    "tool": "render_chart",
+   "analysis": "trend",
+   "variant": "chart0",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.361,
+   "from_seconds": 0.785843,
+   "to_seconds": 1.069852,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "render_chart",
    "analysis": "top_n",
    "variant": "chart1",
    "from_rows": 1000,
@@ -26336,6 +27116,19 @@
    "TIME_GROWTH_FACTOR": 1.764,
    "from_seconds": 0.303549,
    "to_seconds": 0.535582,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "render_chart",
+   "analysis": "top_n",
+   "variant": "chart1",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.401,
+   "from_seconds": 0.535582,
+   "to_seconds": 0.750366,
    "suspicious": false
   },
   {
@@ -26393,6 +27186,19 @@
   {
    "domain": "sales",
    "tool": "render_chart",
+   "analysis": "distribution",
+   "variant": "chart2",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.86,
+   "from_seconds": 1.435025,
+   "to_seconds": 2.668984,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "render_chart",
    "analysis": "cross_tab",
    "variant": "chart3",
    "from_rows": 1000,
@@ -26440,6 +27246,19 @@
    "TIME_GROWTH_FACTOR": 1.544,
    "from_seconds": 0.524308,
    "to_seconds": 0.809722,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "render_chart",
+   "analysis": "cross_tab",
+   "variant": "chart3",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.558,
+   "from_seconds": 0.809722,
+   "to_seconds": 1.261686,
    "suspicious": false
   },
   {
@@ -26497,6 +27316,19 @@
   {
    "domain": "sales",
    "tool": "render_chart",
+   "analysis": "correlation",
+   "variant": "chart4",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 2.05,
+   "from_seconds": 1.757995,
+   "to_seconds": 3.603704,
+   "suspicious": true
+  },
+  {
+   "domain": "sales",
+   "tool": "render_chart",
    "analysis": "group_compare",
    "variant": "chart5",
    "from_rows": 1000,
@@ -26544,6 +27376,19 @@
    "TIME_GROWTH_FACTOR": 2.028,
    "from_seconds": 0.560095,
    "to_seconds": 1.135984,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "render_chart",
+   "analysis": "group_compare",
+   "variant": "chart5",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.693,
+   "from_seconds": 1.135984,
+   "to_seconds": 1.923024,
    "suspicious": false
   },
   {
@@ -26601,6 +27446,19 @@
   {
    "domain": "sales",
    "tool": "render_chart",
+   "analysis": "mix_shift",
+   "variant": "chart6",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.823,
+   "from_seconds": 0.932776,
+   "to_seconds": 1.70034,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "render_chart",
    "analysis": "cohort_retention",
    "variant": "chart7",
    "from_rows": 1000,
@@ -26648,6 +27506,19 @@
    "TIME_GROWTH_FACTOR": 1.983,
    "from_seconds": 0.957966,
    "to_seconds": 1.899322,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "render_chart",
+   "analysis": "cohort_retention",
+   "variant": "chart7",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.771,
+   "from_seconds": 1.899322,
+   "to_seconds": 3.364635,
    "suspicious": false
   },
   {
@@ -26705,6 +27576,19 @@
   {
    "domain": "sales",
    "tool": "render_chart",
+   "analysis": "group_compare",
+   "variant": "chart8",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.973,
+   "from_seconds": 1.060637,
+   "to_seconds": 2.092201,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "render_chart",
    "analysis": "trend",
    "variant": "chart9",
    "from_rows": 1000,
@@ -26752,6 +27636,19 @@
    "TIME_GROWTH_FACTOR": 2.17,
    "from_seconds": 0.215399,
    "to_seconds": 0.467458,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "render_chart",
+   "analysis": "trend",
+   "variant": "chart9",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.813,
+   "from_seconds": 0.467458,
+   "to_seconds": 0.847389,
    "suspicious": false
   },
   {
@@ -26809,6 +27706,19 @@
   {
    "domain": "sales",
    "tool": "render_chart",
+   "analysis": "frequency",
+   "variant": "chart10",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.817,
+   "from_seconds": 0.335751,
+   "to_seconds": 0.609991,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "render_chart",
    "analysis": "trend",
    "variant": "chart11",
    "from_rows": 1000,
@@ -26856,6 +27766,19 @@
    "TIME_GROWTH_FACTOR": 2.13,
    "from_seconds": 0.209705,
    "to_seconds": 0.44664,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "render_chart",
+   "analysis": "trend",
+   "variant": "chart11",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.756,
+   "from_seconds": 0.44664,
+   "to_seconds": 0.784092,
    "suspicious": false
   },
   {
@@ -26913,6 +27836,19 @@
   {
    "domain": "sales",
    "tool": "render_chart",
+   "analysis": "top_n",
+   "variant": "chart12",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.267,
+   "from_seconds": 7.676298,
+   "to_seconds": 9.727296,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "render_chart",
    "analysis": "trend",
    "variant": "chart14",
    "from_rows": 1000,
@@ -26960,6 +27896,19 @@
    "TIME_GROWTH_FACTOR": 2.003,
    "from_seconds": 0.237978,
    "to_seconds": 0.476745,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "render_chart",
+   "analysis": "trend",
+   "variant": "chart14",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.685,
+   "from_seconds": 0.476745,
+   "to_seconds": 0.803414,
    "suspicious": false
   },
   {
@@ -27016,6 +27965,19 @@
   },
   {
    "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "frequency",
+   "variant": "for_paging",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.806,
+   "from_seconds": 3.135394,
+   "to_seconds": 5.662978,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
    "tool": "read_result_file",
    "analysis": "",
    "variant": "",
@@ -27064,6 +28026,19 @@
    "TIME_GROWTH_FACTOR": 1.045,
    "from_seconds": 0.000547,
    "to_seconds": 0.0005715,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "read_result_file",
+   "analysis": "",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 0.96,
+   "from_seconds": 0.0005715,
+   "to_seconds": 0.0005484999999999999,
    "suspicious": false
   },
   {
@@ -27122,6 +28097,19 @@
    "domain": "sales",
    "tool": "compute_analysis",
    "analysis": "top_n",
+   "variant": "n5",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.807,
+   "from_seconds": 2.784124,
+   "to_seconds": 5.031532,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "top_n",
    "variant": "n10",
    "from_rows": 1000,
    "to_rows": 100000,
@@ -27169,6 +28157,19 @@
    "from_seconds": 1.184106,
    "to_seconds": 2.829159,
    "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "top_n",
+   "variant": "n10",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 2.07,
+   "from_seconds": 2.829159,
+   "to_seconds": 5.856992,
+   "suspicious": true
   },
   {
    "domain": "sales",
@@ -27226,6 +28227,19 @@
    "domain": "sales",
    "tool": "compute_analysis",
    "analysis": "top_n",
+   "variant": "n100",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.72,
+   "from_seconds": 3.034228,
+   "to_seconds": 5.220242,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "top_n",
    "variant": "n200",
    "from_rows": 1000,
    "to_rows": 100000,
@@ -27273,6 +28287,19 @@
    "from_seconds": 1.179663,
    "to_seconds": 2.954679,
    "suspicious": true
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "top_n",
+   "variant": "n200",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.943,
+   "from_seconds": 2.954679,
+   "to_seconds": 5.742405,
+   "suspicious": false
   },
   {
    "domain": "sales",
@@ -27330,6 +28357,19 @@
    "domain": "sales",
    "tool": "compute_analysis",
    "analysis": "top_n",
+   "variant": "n1000",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.777,
+   "from_seconds": 3.11051,
+   "to_seconds": 5.527991,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "top_n",
    "variant": "n10000000",
    "from_rows": 1000,
    "to_rows": 100000,
@@ -27377,6 +28417,19 @@
    "from_seconds": 3.250726,
    "to_seconds": 8.473582,
    "suspicious": true
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "top_n",
+   "variant": "n10000000",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.914,
+   "from_seconds": 8.473582,
+   "to_seconds": 16.214372,
+   "suspicious": false
   },
   {
    "domain": "sales",
@@ -27433,6 +28486,19 @@
   {
    "domain": "sales",
    "tool": "compute_analysis",
+   "analysis": "concentration",
+   "variant": "hi",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 2.247,
+   "from_seconds": 1.325489,
+   "to_seconds": 2.978563,
+   "suspicious": true
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
    "analysis": "pareto",
    "variant": "hi",
    "from_rows": 1000,
@@ -27481,6 +28547,19 @@
    "from_seconds": 0.523799,
    "to_seconds": 1.396748,
    "suspicious": true
+  },
+  {
+   "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "pareto",
+   "variant": "hi",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.986,
+   "from_seconds": 1.396748,
+   "to_seconds": 2.774076,
+   "suspicious": false
   },
   {
    "domain": "sales",
@@ -27536,6 +28615,19 @@
   },
   {
    "domain": "sales",
+   "tool": "compute_analysis",
+   "analysis": "group_compare",
+   "variant": "hi",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 1.712,
+   "from_seconds": 0.467134,
+   "to_seconds": 0.799913,
+   "suspicious": false
+  },
+  {
+   "domain": "sales",
    "tool": "build_report",
    "analysis": "",
    "variant": "",
@@ -27585,6 +28677,19 @@
    "from_seconds": 0.042653,
    "to_seconds": 0.04493,
    "suspicious": false
+  },
+  {
+   "domain": "sales",
+   "tool": "build_report",
+   "analysis": "",
+   "variant": "",
+   "from_rows": 5000000,
+   "to_rows": 10000000,
+   "DATA_GROWTH_FACTOR": 2.0,
+   "TIME_GROWTH_FACTOR": 0.953,
+   "from_seconds": 0.04493,
+   "to_seconds": 0.042829,
+   "suspicious": false
   }
  ],
  "median_time_growth": {
@@ -27592,6 +28697,6 @@
   "100000->1000000": 1.8045,
   "1000000->2000000": 1.518,
   "2000000->5000000": 2.055,
-  "5000000->10000000": 1.8135
+  "5000000->10000000": 1.807
  }
 }

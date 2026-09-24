@@ -12,26 +12,33 @@
   },
   {
    "domain": "marketing",
+   "rows": 10000,
+   "checks_attempted": 159,
+   "checks_passed": 159,
+   "checks_failed": 0,
+   "calls_verified": 6,
+   "calls_PASS": 6,
+   "correctness_percent": 100.0
+  },
+  {
+   "domain": "marketing",
    "rows": 100000,
-   "checks_attempted": 14294,
-   "checks_passed": 14293,
-   "checks_failed": 1,
+   "checks_attempted": 14301,
+   "checks_passed": 14301,
+   "checks_failed": 0,
    "calls_verified": 47,
-   "calls_PASS": 46,
-   "calls_FAIL": 1,
-   "correctness_percent": 99.993
+   "calls_PASS": 47,
+   "correctness_percent": 100.0
   },
   {
    "domain": "marketing",
    "rows": 1000000,
-   "checks_attempted": 81833,
-   "checks_passed": 81832,
-   "checks_failed": 1,
+   "checks_attempted": 81842,
+   "checks_passed": 81842,
+   "checks_failed": 0,
    "calls_verified": 47,
-   "calls_PASS": 45,
-   "calls_FAIL": 1,
-   "calls_ORACLE_ERROR": 1,
-   "correctness_percent": 99.9988
+   "calls_PASS": 47,
+   "correctness_percent": 100.0
   }
  ],
  "performance": [
@@ -6123,146 +6130,7 @@
    "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
   }
  ],
- "errors": [
-  {
-   "error_number": 20,
-   "timestamp": null,
-   "domain": "marketing",
-   "size": 100000,
-   "file": null,
-   "workflow_step": "analyses",
-   "tool": "compute_analysis",
-   "analysis": "hypothesis_test",
-   "supplied_arguments": {
-    "dimension": "retargeting_flag",
-    "measure": "ctr"
-   },
-   "expected_behavior": "the reply states a statistic and a p value = Test: ... p ...",
-   "observed_behavior": "  - Test: Welch's unequal-variance t-test (two-sided). Statistic -0.7413, df 5.555e+04, p 0.458505. (1 of 1 checks failed)",
-   "exception": null,
-   "stack_trace": null,
-   "severity": "CRITICAL",
-   "recovered": true,
-   "subsequent_operations_valid": true,
-   "unit": "D_marketing",
-   "kind": "wrong_result",
-   "variant": "t",
-   "klass": "REQUIRED"
-  },
-  {
-   "error_number": 36,
-   "timestamp": null,
-   "domain": "marketing",
-   "size": 1000000,
-   "file": null,
-   "workflow_step": "analyses",
-   "tool": "compute_analysis",
-   "analysis": "hypothesis_test",
-   "supplied_arguments": {
-    "dimension": "retargeting_flag",
-    "measure": "ctr"
-   },
-   "expected_behavior": "the reply states a statistic and a p value = Test: ... p ...",
-   "observed_behavior": "  - Test: Welch's unequal-variance t-test (two-sided). Statistic 0.1435, df 5.591e+05, p 0.885919. (1 of 1 checks failed)",
-   "exception": null,
-   "stack_trace": null,
-   "severity": "CRITICAL",
-   "recovered": true,
-   "subsequent_operations_valid": true,
-   "unit": "E_marketing",
-   "kind": "wrong_result",
-   "variant": "t",
-   "klass": "REQUIRED"
-  },
-  {
-   "error_number": 37,
-   "timestamp": null,
-   "domain": "marketing",
-   "size": 1000000,
-   "file": null,
-   "workflow_step": "analyses",
-   "tool": "compute_analysis",
-   "analysis": "sample_adequacy",
-   "supplied_arguments": {
-    "dimension": "retargeting_flag",
-    "measure": "ctr"
-   },
-   "expected_behavior": "None = None",
-   "observed_behavior": "None (0 of 0 checks failed)",
-   "exception": null,
-   "stack_trace": null,
-   "severity": "MEDIUM",
-   "recovered": true,
-   "subsequent_operations_valid": true,
-   "unit": "E_marketing",
-   "kind": "oracle_error",
-   "variant": "",
-   "klass": "VALID"
-  },
-  {
-   "error_number": 77,
-   "timestamp": null,
-   "domain": "marketing",
-   "size": 100000,
-   "file": "frequency_20260924-165431.csv",
-   "workflow_step": "read_result",
-   "tool": "read_result_file",
-   "analysis": null,
-   "supplied_arguments": {
-    "start": 901,
-    "limit": 200
-   },
-   "expected_behavior": "100 rows",
-   "observed_behavior": "50 found",
-   "exception": null,
-   "stack_trace": null,
-   "severity": "HIGH",
-   "recovered": true,
-   "subsequent_operations_valid": true,
-   "unit": "D_marketing"
-  },
-  {
-   "error_number": 87,
-   "timestamp": null,
-   "domain": "marketing",
-   "size": 1000000,
-   "file": "frequency_20260924-175053.csv",
-   "workflow_step": "read_result",
-   "tool": "read_result_file",
-   "analysis": null,
-   "supplied_arguments": {
-    "start": 901,
-    "limit": 200
-   },
-   "expected_behavior": "100 rows",
-   "observed_behavior": "50 found",
-   "exception": null,
-   "stack_trace": null,
-   "severity": "HIGH",
-   "recovered": true,
-   "subsequent_operations_valid": true,
-   "unit": "E_marketing"
-  },
-  {
-   "error_number": 101,
-   "timestamp": null,
-   "domain": "marketing",
-   "size": 10000,
-   "file": null,
-   "workflow_step": "isolation",
-   "tool": "charts",
-   "analysis": null,
-   "supplied_arguments": null,
-   "expected_behavior": "only its own dataset",
-   "observed_behavior": "{\"dataset\": \"marketing\", \"names_its_measure\": false, \"names_another_dataset\": [], \"status\": \"FAIL\"}",
-   "exception": null,
-   "stack_trace": null,
-   "severity": "CRITICAL",
-   "recovered": true,
-   "subsequent_operations_valid": null,
-   "unit": "H_isolation"
-  }
- ],
+ "errors": [],
  "warnings": [
   {
    "category": "slow_call",

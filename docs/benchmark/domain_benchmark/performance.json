@@ -66885,6 +66885,2035 @@
   },
   {
    "domain": "sales",
+   "rows": 10000000,
+   "tool": "check_file",
+   "analysis": "",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 6.4e-05,
+    "median": 6.4e-05,
+    "mean": 6.4e-05,
+    "max": 6.4e-05,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 9.3e-05,
+   "median_seconds": 6.4e-05,
+   "speed_class": "FAST",
+   "max_response_characters": 161,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "preview_file",
+   "analysis": "",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 0.000146,
+    "median": 0.000146,
+    "mean": 0.000146,
+    "max": 0.000146,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.00025,
+   "median_seconds": 0.000146,
+   "speed_class": "FAST",
+   "max_response_characters": 2399,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "propose_ingest_spec",
+   "analysis": "",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 0.00494,
+    "median": 0.00494,
+    "mean": 0.00494,
+    "max": 0.00494,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.00737,
+   "median_seconds": 0.00494,
+   "speed_class": "FAST",
+   "max_response_characters": 3748,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "confirm_ingest_spec",
+   "analysis": "",
+   "variant": "",
+   "measured": {
+    "n": 0
+   },
+   "cold_seconds": 17.905321,
+   "median_seconds": 17.905321,
+   "speed_class": "SEVERE",
+   "max_response_characters": 687,
+   "statuses": {
+    "OK": 1
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "profile_dataset",
+   "analysis": "",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 51.465612,
+    "median": 51.465612,
+    "mean": 51.465612,
+    "max": 51.465612,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 49.185338,
+   "median_seconds": 51.465612,
+   "speed_class": "SEVERE",
+   "max_response_characters": 3774,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "profile_column",
+   "analysis": "",
+   "variant": "",
+   "measured": {
+    "n": 19,
+    "min": 45.408135,
+    "median": 48.429024,
+    "mean": 49.032590473684216,
+    "max": 58.152553,
+    "p95": 58.152553,
+    "stdev": 3.597306824096332
+   },
+   "cold_seconds": 52.089868,
+   "median_seconds": 48.429024,
+   "speed_class": "SEVERE",
+   "max_response_characters": 1429,
+   "statuses": {
+    "OK": 38
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "propose_cleaning_plan",
+   "analysis": "",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 144.670949,
+    "median": 144.670949,
+    "mean": 144.670949,
+    "max": 144.670949,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 149.78497,
+   "median_seconds": 144.670949,
+   "speed_class": "SEVERE",
+   "max_response_characters": 2034,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "apply_cleaning_plan",
+   "analysis": "",
+   "variant": "",
+   "measured": {
+    "n": 0
+   },
+   "cold_seconds": 17.636997,
+   "median_seconds": 17.636997,
+   "speed_class": "SEVERE",
+   "max_response_characters": 269,
+   "statuses": {
+    "OK": 1
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "get_cleaning_ledger",
+   "analysis": "",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 0.03443,
+    "median": 0.03443,
+    "mean": 0.03443,
+    "max": 0.03443,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": null,
+   "median_seconds": 0.03443,
+   "speed_class": "FAST",
+   "max_response_characters": 313,
+   "statuses": {
+    "OK": 1
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "propose_dataset_contract",
+   "analysis": "",
+   "variant": "",
+   "measured": {
+    "n": 2,
+    "min": 15.494328,
+    "median": 15.646329,
+    "mean": 15.646329,
+    "max": 15.79833,
+    "p95": null,
+    "stdev": 0.21496187569427322
+   },
+   "cold_seconds": null,
+   "median_seconds": 15.646329,
+   "speed_class": "SEVERE",
+   "max_response_characters": 5083,
+   "statuses": {
+    "REFUSED": 1,
+    "OK": 1
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "confirm_dataset_contract",
+   "analysis": "",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 0.081024,
+    "median": 0.081024,
+    "mean": 0.081024,
+    "max": 0.081024,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": null,
+   "median_seconds": 0.081024,
+   "speed_class": "FAST",
+   "max_response_characters": 1075,
+   "statuses": {
+    "OK": 1
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "list_datasets",
+   "analysis": "",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 0.023694,
+    "median": 0.023694,
+    "mean": 0.023694,
+    "max": 0.023694,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.03185,
+   "median_seconds": 0.023694,
+   "speed_class": "FAST",
+   "max_response_characters": 183,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "describe_dataset",
+   "analysis": "",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 2.636173,
+    "median": 2.636173,
+    "mean": 2.636173,
+    "max": 2.636173,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 2.639449,
+   "median_seconds": 2.636173,
+   "speed_class": "SLOW",
+   "max_response_characters": 2242,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "get_workflow_state",
+   "analysis": "",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 0.464112,
+    "median": 0.464112,
+    "mean": 0.464112,
+    "max": 0.464112,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.477217,
+   "median_seconds": 0.464112,
+   "speed_class": "FAST",
+   "max_response_characters": 987,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "validate_dataset",
+   "analysis": "",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 1.260515,
+    "median": 1.260515,
+    "mean": 1.260515,
+    "max": 1.260515,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 1.280817,
+   "median_seconds": 1.260515,
+   "speed_class": "MODERATE",
+   "max_response_characters": 2337,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "run_analysis",
+   "analysis": "",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 0.437325,
+    "median": 0.437325,
+    "mean": 0.437325,
+    "max": 0.437325,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.447493,
+   "median_seconds": 0.437325,
+   "speed_class": "FAST",
+   "max_response_characters": 6786,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "cross_tab",
+   "variant": "count",
+   "measured": {
+    "n": 1,
+    "min": 1.072495,
+    "median": 1.072495,
+    "mean": 1.072495,
+    "max": 1.072495,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 1.136007,
+   "median_seconds": 1.072495,
+   "speed_class": "MODERATE",
+   "max_response_characters": 1065,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "cross_tab",
+   "variant": "sum",
+   "measured": {
+    "n": 1,
+    "min": 1.101962,
+    "median": 1.101962,
+    "mean": 1.101962,
+    "max": 1.101962,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 1.118703,
+   "median_seconds": 1.101962,
+   "speed_class": "MODERATE",
+   "max_response_characters": 1334,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "distribution",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 2.488402,
+    "median": 2.488402,
+    "mean": 2.488402,
+    "max": 2.488402,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 2.588011,
+   "median_seconds": 2.488402,
+   "speed_class": "SLOW",
+   "max_response_characters": 1510,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "frequency",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 0.62462,
+    "median": 0.62462,
+    "mean": 0.62462,
+    "max": 0.62462,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.639499,
+   "median_seconds": 0.62462,
+   "speed_class": "MODERATE",
+   "max_response_characters": 864,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "frequency",
+   "variant": "hi",
+   "measured": {
+    "n": 2,
+    "min": 4.284089,
+    "median": 4.452457,
+    "mean": 4.452457,
+    "max": 4.620825,
+    "p95": null,
+    "stdev": 0.23810830906963337
+   },
+   "cold_seconds": 5.089321,
+   "median_seconds": 4.452457,
+   "speed_class": "SLOW",
+   "max_response_characters": 1456,
+   "statuses": {
+    "OK": 3
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "top_n",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 0.664097,
+    "median": 0.664097,
+    "mean": 0.664097,
+    "max": 0.664097,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.682274,
+   "median_seconds": 0.664097,
+   "speed_class": "MODERATE",
+   "max_response_characters": 897,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "top_n",
+   "variant": "mean",
+   "measured": {
+    "n": 1,
+    "min": 0.606264,
+    "median": 0.606264,
+    "mean": 0.606264,
+    "max": 0.606264,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.58553,
+   "median_seconds": 0.606264,
+   "speed_class": "MODERATE",
+   "max_response_characters": 748,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "summary_stats",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 4.735556,
+    "median": 4.735556,
+    "mean": 4.735556,
+    "max": 4.735556,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 4.661196,
+   "median_seconds": 4.735556,
+   "speed_class": "SLOW",
+   "max_response_characters": 1418,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "group_compare",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 1.840941,
+    "median": 1.840941,
+    "mean": 1.840941,
+    "max": 1.840941,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 1.878932,
+   "median_seconds": 1.840941,
+   "speed_class": "MODERATE",
+   "max_response_characters": 1658,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "group_compare",
+   "variant": "mean",
+   "measured": {
+    "n": 1,
+    "min": 1.493303,
+    "median": 1.493303,
+    "mean": 1.493303,
+    "max": 1.493303,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 1.528159,
+   "median_seconds": 1.493303,
+   "speed_class": "MODERATE",
+   "max_response_characters": 1076,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "pareto",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 0.557756,
+    "median": 0.557756,
+    "mean": 0.557756,
+    "max": 0.557756,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.561217,
+   "median_seconds": 0.557756,
+   "speed_class": "MODERATE",
+   "max_response_characters": 360,
+   "statuses": {
+    "REFUSED": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "concentration",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 0.577684,
+    "median": 0.577684,
+    "mean": 0.577684,
+    "max": 0.577684,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.571877,
+   "median_seconds": 0.577684,
+   "speed_class": "MODERATE",
+   "max_response_characters": 367,
+   "statuses": {
+    "REFUSED": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "ranking_shift",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 0.841038,
+    "median": 0.841038,
+    "mean": 0.841038,
+    "max": 0.841038,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.856529,
+   "median_seconds": 0.841038,
+   "speed_class": "MODERATE",
+   "max_response_characters": 1026,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "calendar_coverage",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 0.831764,
+    "median": 0.831764,
+    "mean": 0.831764,
+    "max": 0.831764,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.845302,
+   "median_seconds": 0.831764,
+   "speed_class": "MODERATE",
+   "max_response_characters": 1467,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "trend",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 0.894118,
+    "median": 0.894118,
+    "mean": 0.894118,
+    "max": 0.894118,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.881586,
+   "median_seconds": 0.894118,
+   "speed_class": "MODERATE",
+   "max_response_characters": 1712,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "trend",
+   "variant": "mean",
+   "measured": {
+    "n": 1,
+    "min": 0.836224,
+    "median": 0.836224,
+    "mean": 0.836224,
+    "max": 0.836224,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.863418,
+   "median_seconds": 0.836224,
+   "speed_class": "MODERATE",
+   "max_response_characters": 1539,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "seasonality",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 0.809452,
+    "median": 0.809452,
+    "mean": 0.809452,
+    "max": 0.809452,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.827884,
+   "median_seconds": 0.809452,
+   "speed_class": "MODERATE",
+   "max_response_characters": 1697,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "period_compare",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 0.821498,
+    "median": 0.821498,
+    "mean": 0.821498,
+    "max": 0.821498,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.787983,
+   "median_seconds": 0.821498,
+   "speed_class": "MODERATE",
+   "max_response_characters": 1088,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "growth_decomposition",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 1.510065,
+    "median": 1.510065,
+    "mean": 1.510065,
+    "max": 1.510065,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 1.49387,
+   "median_seconds": 1.510065,
+   "speed_class": "MODERATE",
+   "max_response_characters": 2003,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "correlation",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 3.449763,
+    "median": 3.449763,
+    "mean": 3.449763,
+    "max": 3.449763,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 3.412888,
+   "median_seconds": 3.449763,
+   "speed_class": "SLOW",
+   "max_response_characters": 1620,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "correlation",
+   "variant": "indep",
+   "measured": {
+    "n": 1,
+    "min": 3.143538,
+    "median": 3.143538,
+    "mean": 3.143538,
+    "max": 3.143538,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 3.238249,
+   "median_seconds": 3.143538,
+   "speed_class": "SLOW",
+   "max_response_characters": 1610,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "bivariate",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 1.227497,
+    "median": 1.227497,
+    "mean": 1.227497,
+    "max": 1.227497,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 1.168383,
+   "median_seconds": 1.227497,
+   "speed_class": "MODERATE",
+   "max_response_characters": 2276,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "driver_analysis",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 2.941215,
+    "median": 2.941215,
+    "mean": 2.941215,
+    "max": 2.941215,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 2.962113,
+   "median_seconds": 2.941215,
+   "speed_class": "SLOW",
+   "max_response_characters": 2242,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "mix_shift",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 1.510242,
+    "median": 1.510242,
+    "mean": 1.510242,
+    "max": 1.510242,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 1.517579,
+   "median_seconds": 1.510242,
+   "speed_class": "MODERATE",
+   "max_response_characters": 1580,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "outlier_detection",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 3.106311,
+    "median": 3.106311,
+    "mean": 3.106311,
+    "max": 3.106311,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 2.932362,
+   "median_seconds": 3.106311,
+   "speed_class": "SLOW",
+   "max_response_characters": 2040,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "outlier_detection",
+   "variant": "mean",
+   "measured": {
+    "n": 1,
+    "min": 2.235675,
+    "median": 2.235675,
+    "mean": 2.235675,
+    "max": 2.235675,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 2.46569,
+   "median_seconds": 2.235675,
+   "speed_class": "SLOW",
+   "max_response_characters": 1533,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "changepoint",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 0.84727,
+    "median": 0.84727,
+    "mean": 0.84727,
+    "max": 0.84727,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.873708,
+   "median_seconds": 0.84727,
+   "speed_class": "MODERATE",
+   "max_response_characters": 2893,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "correlated_shift",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 0.888139,
+    "median": 0.888139,
+    "mean": 0.888139,
+    "max": 0.888139,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.890775,
+   "median_seconds": 0.888139,
+   "speed_class": "MODERATE",
+   "max_response_characters": 1681,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "hypothesis_test",
+   "variant": "t",
+   "measured": {
+    "n": 1,
+    "min": 0.898164,
+    "median": 0.898164,
+    "mean": 0.898164,
+    "max": 0.898164,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.916995,
+   "median_seconds": 0.898164,
+   "speed_class": "MODERATE",
+   "max_response_characters": 1541,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "hypothesis_test",
+   "variant": "anova",
+   "measured": {
+    "n": 1,
+    "min": 0.941865,
+    "median": 0.941865,
+    "mean": 0.941865,
+    "max": 0.941865,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.920703,
+   "median_seconds": 0.941865,
+   "speed_class": "MODERATE",
+   "max_response_characters": 1674,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "hypothesis_test",
+   "variant": "chi2",
+   "measured": {
+    "n": 1,
+    "min": 0.718478,
+    "median": 0.718478,
+    "mean": 0.718478,
+    "max": 0.718478,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.743387,
+   "median_seconds": 0.718478,
+   "speed_class": "MODERATE",
+   "max_response_characters": 1261,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "hypothesis_test",
+   "variant": "rank",
+   "measured": {
+    "n": 1,
+    "min": 1.924985,
+    "median": 1.924985,
+    "mean": 1.924985,
+    "max": 1.924985,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 1.886644,
+   "median_seconds": 1.924985,
+   "speed_class": "MODERATE",
+   "max_response_characters": 0,
+   "statuses": {
+    "EXCEPTION": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "confidence_interval",
+   "variant": "all",
+   "measured": {
+    "n": 1,
+    "min": 0.856998,
+    "median": 0.856998,
+    "mean": 0.856998,
+    "max": 0.856998,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.85638,
+   "median_seconds": 0.856998,
+   "speed_class": "MODERATE",
+   "max_response_characters": 1127,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "confidence_interval",
+   "variant": "by",
+   "measured": {
+    "n": 1,
+    "min": 0.907851,
+    "median": 0.907851,
+    "mean": 0.907851,
+    "max": 0.907851,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.896624,
+   "median_seconds": 0.907851,
+   "speed_class": "MODERATE",
+   "max_response_characters": 1207,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "effect_size",
+   "variant": "g",
+   "measured": {
+    "n": 1,
+    "min": 0.904325,
+    "median": 0.904325,
+    "mean": 0.904325,
+    "max": 0.904325,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.876144,
+   "median_seconds": 0.904325,
+   "speed_class": "MODERATE",
+   "max_response_characters": 1309,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "effect_size",
+   "variant": "anova",
+   "measured": {
+    "n": 1,
+    "min": 0.956143,
+    "median": 0.956143,
+    "mean": 0.956143,
+    "max": 0.956143,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.913031,
+   "median_seconds": 0.956143,
+   "speed_class": "MODERATE",
+   "max_response_characters": 1306,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "effect_size",
+   "variant": "v",
+   "measured": {
+    "n": 1,
+    "min": 0.749266,
+    "median": 0.749266,
+    "mean": 0.749266,
+    "max": 0.749266,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.717082,
+   "median_seconds": 0.749266,
+   "speed_class": "MODERATE",
+   "max_response_characters": 1221,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "sample_adequacy",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 0.971679,
+    "median": 0.971679,
+    "mean": 0.971679,
+    "max": 0.971679,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.920856,
+   "median_seconds": 0.971679,
+   "speed_class": "MODERATE",
+   "max_response_characters": 1465,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "repeat_behaviour",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 2.400269,
+    "median": 2.400269,
+    "mean": 2.400269,
+    "max": 2.400269,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 2.555253,
+   "median_seconds": 2.400269,
+   "speed_class": "SLOW",
+   "max_response_characters": 1395,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "cohort_retention",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 3.119538,
+    "median": 3.119538,
+    "mean": 3.119538,
+    "max": 3.119538,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 3.129986,
+   "median_seconds": 3.119538,
+   "speed_class": "SLOW",
+   "max_response_characters": 3851,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "correlation",
+   "variant": "na0",
+   "measured": {
+    "n": 1,
+    "min": 0.55696,
+    "median": 0.55696,
+    "mean": 0.55696,
+    "max": 0.55696,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": null,
+   "median_seconds": 0.55696,
+   "speed_class": "MODERATE",
+   "max_response_characters": 321,
+   "statuses": {
+    "REFUSED": 1
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "propose_dataset_contract",
+   "analysis": "",
+   "variant": "follow",
+   "measured": {
+    "n": 2,
+    "min": 15.150072,
+    "median": 15.190154,
+    "mean": 15.190154,
+    "max": 15.230236,
+    "p95": null,
+    "stdev": 0.05668450800703833
+   },
+   "cold_seconds": null,
+   "median_seconds": 15.190154,
+   "speed_class": "SEVERE",
+   "max_response_characters": 5760,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "top_n",
+   "variant": "na1",
+   "measured": {
+    "n": 1,
+    "min": 0.487816,
+    "median": 0.487816,
+    "mean": 0.487816,
+    "max": 0.487816,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": null,
+   "median_seconds": 0.487816,
+   "speed_class": "FAST",
+   "max_response_characters": 348,
+   "statuses": {
+    "REFUSED": 1
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "render_chart",
+   "analysis": "trend",
+   "variant": "chart0",
+   "measured": {
+    "n": 1,
+    "min": 1.069852,
+    "median": 1.069852,
+    "mean": 1.069852,
+    "max": 1.069852,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 1.330614,
+   "median_seconds": 1.069852,
+   "speed_class": "MODERATE",
+   "max_response_characters": 860,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "render_chart",
+   "analysis": "top_n",
+   "variant": "chart1",
+   "measured": {
+    "n": 1,
+    "min": 0.750366,
+    "median": 0.750366,
+    "mean": 0.750366,
+    "max": 0.750366,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.746384,
+   "median_seconds": 0.750366,
+   "speed_class": "MODERATE",
+   "max_response_characters": 745,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "render_chart",
+   "analysis": "distribution",
+   "variant": "chart2",
+   "measured": {
+    "n": 1,
+    "min": 2.668984,
+    "median": 2.668984,
+    "mean": 2.668984,
+    "max": 2.668984,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 2.718114,
+   "median_seconds": 2.668984,
+   "speed_class": "SLOW",
+   "max_response_characters": 1033,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "render_chart",
+   "analysis": "cross_tab",
+   "variant": "chart3",
+   "measured": {
+    "n": 1,
+    "min": 1.261686,
+    "median": 1.261686,
+    "mean": 1.261686,
+    "max": 1.261686,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 1.212593,
+   "median_seconds": 1.261686,
+   "speed_class": "MODERATE",
+   "max_response_characters": 1259,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "render_chart",
+   "analysis": "correlation",
+   "variant": "chart4",
+   "measured": {
+    "n": 1,
+    "min": 3.603704,
+    "median": 3.603704,
+    "mean": 3.603704,
+    "max": 3.603704,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 3.481128,
+   "median_seconds": 3.603704,
+   "speed_class": "SLOW",
+   "max_response_characters": 2025,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "render_chart",
+   "analysis": "group_compare",
+   "variant": "chart5",
+   "measured": {
+    "n": 1,
+    "min": 1.923024,
+    "median": 1.923024,
+    "mean": 1.923024,
+    "max": 1.923024,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 1.976083,
+   "median_seconds": 1.923024,
+   "speed_class": "MODERATE",
+   "max_response_characters": 1793,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "render_chart",
+   "analysis": "mix_shift",
+   "variant": "chart6",
+   "measured": {
+    "n": 1,
+    "min": 1.70034,
+    "median": 1.70034,
+    "mean": 1.70034,
+    "max": 1.70034,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 1.60551,
+   "median_seconds": 1.70034,
+   "speed_class": "MODERATE",
+   "max_response_characters": 1075,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "render_chart",
+   "analysis": "cohort_retention",
+   "variant": "chart7",
+   "measured": {
+    "n": 1,
+    "min": 3.364635,
+    "median": 3.364635,
+    "mean": 3.364635,
+    "max": 3.364635,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 3.483067,
+   "median_seconds": 3.364635,
+   "speed_class": "SLOW",
+   "max_response_characters": 6472,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "render_chart",
+   "analysis": "group_compare",
+   "variant": "chart8",
+   "measured": {
+    "n": 1,
+    "min": 2.092201,
+    "median": 2.092201,
+    "mean": 2.092201,
+    "max": 2.092201,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 1.919096,
+   "median_seconds": 2.092201,
+   "speed_class": "SLOW",
+   "max_response_characters": 689,
+   "statuses": {
+    "REFUSED": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "render_chart",
+   "analysis": "trend",
+   "variant": "chart9",
+   "measured": {
+    "n": 1,
+    "min": 0.847389,
+    "median": 0.847389,
+    "mean": 0.847389,
+    "max": 0.847389,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.817409,
+   "median_seconds": 0.847389,
+   "speed_class": "MODERATE",
+   "max_response_characters": 498,
+   "statuses": {
+    "REFUSED": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "render_chart",
+   "analysis": "frequency",
+   "variant": "chart10",
+   "measured": {
+    "n": 1,
+    "min": 0.609991,
+    "median": 0.609991,
+    "mean": 0.609991,
+    "max": 0.609991,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.596601,
+   "median_seconds": 0.609991,
+   "speed_class": "MODERATE",
+   "max_response_characters": 513,
+   "statuses": {
+    "REFUSED": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "render_chart",
+   "analysis": "trend",
+   "variant": "chart11",
+   "measured": {
+    "n": 1,
+    "min": 0.784092,
+    "median": 0.784092,
+    "mean": 0.784092,
+    "max": 0.784092,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.790271,
+   "median_seconds": 0.784092,
+   "speed_class": "MODERATE",
+   "max_response_characters": 527,
+   "statuses": {
+    "REFUSED": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "render_chart",
+   "analysis": "top_n",
+   "variant": "chart12",
+   "measured": {
+    "n": 1,
+    "min": 9.727296,
+    "median": 9.727296,
+    "mean": 9.727296,
+    "max": 9.727296,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 9.05584,
+   "median_seconds": 9.727296,
+   "speed_class": "VERY_SLOW",
+   "max_response_characters": 774,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "render_chart",
+   "analysis": "trend",
+   "variant": "chart14",
+   "measured": {
+    "n": 1,
+    "min": 0.803414,
+    "median": 0.803414,
+    "mean": 0.803414,
+    "max": 0.803414,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.828556,
+   "median_seconds": 0.803414,
+   "speed_class": "MODERATE",
+   "max_response_characters": 525,
+   "statuses": {
+    "REFUSED": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "frequency",
+   "variant": "for_paging",
+   "measured": {
+    "n": 1,
+    "min": 5.662978,
+    "median": 5.662978,
+    "mean": 5.662978,
+    "max": 5.662978,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": null,
+   "median_seconds": 5.662978,
+   "speed_class": "VERY_SLOW",
+   "max_response_characters": 1456,
+   "statuses": {
+    "OK": 1
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "read_result_file",
+   "analysis": "",
+   "variant": "",
+   "measured": {
+    "n": 4,
+    "min": 0.000479,
+    "median": 0.0005484999999999999,
+    "mean": 0.000542,
+    "max": 0.000592,
+    "p95": null,
+    "stdev": 4.864154602806122e-05
+   },
+   "cold_seconds": 0.000672,
+   "median_seconds": 0.0005484999999999999,
+   "speed_class": "FAST",
+   "max_response_characters": 1538,
+   "statuses": {
+    "OK": 8
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "top_n",
+   "variant": "n5",
+   "measured": {
+    "n": 1,
+    "min": 5.031532,
+    "median": 5.031532,
+    "mean": 5.031532,
+    "max": 5.031532,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": null,
+   "median_seconds": 5.031532,
+   "speed_class": "VERY_SLOW",
+   "max_response_characters": 845,
+   "statuses": {
+    "OK": 1
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "top_n",
+   "variant": "n10",
+   "measured": {
+    "n": 1,
+    "min": 5.856992,
+    "median": 5.856992,
+    "mean": 5.856992,
+    "max": 5.856992,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": null,
+   "median_seconds": 5.856992,
+   "speed_class": "VERY_SLOW",
+   "max_response_characters": 1034,
+   "statuses": {
+    "OK": 1
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "top_n",
+   "variant": "n100",
+   "measured": {
+    "n": 1,
+    "min": 5.220242,
+    "median": 5.220242,
+    "mean": 5.220242,
+    "max": 5.220242,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": null,
+   "median_seconds": 5.220242,
+   "speed_class": "VERY_SLOW",
+   "max_response_characters": 1629,
+   "statuses": {
+    "OK": 1
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "top_n",
+   "variant": "n200",
+   "measured": {
+    "n": 1,
+    "min": 5.742405,
+    "median": 5.742405,
+    "mean": 5.742405,
+    "max": 5.742405,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": null,
+   "median_seconds": 5.742405,
+   "speed_class": "VERY_SLOW",
+   "max_response_characters": 1630,
+   "statuses": {
+    "OK": 1
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "top_n",
+   "variant": "n1000",
+   "measured": {
+    "n": 1,
+    "min": 5.527991,
+    "median": 5.527991,
+    "mean": 5.527991,
+    "max": 5.527991,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": null,
+   "median_seconds": 5.527991,
+   "speed_class": "VERY_SLOW",
+   "max_response_characters": 1635,
+   "statuses": {
+    "OK": 1
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "top_n",
+   "variant": "n10000000",
+   "measured": {
+    "n": 1,
+    "min": 16.214372,
+    "median": 16.214372,
+    "mean": 16.214372,
+    "max": 16.214372,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": null,
+   "median_seconds": 16.214372,
+   "speed_class": "SEVERE",
+   "max_response_characters": 1652,
+   "statuses": {
+    "OK": 1
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "concentration",
+   "variant": "hi",
+   "measured": {
+    "n": 1,
+    "min": 2.978563,
+    "median": 2.978563,
+    "mean": 2.978563,
+    "max": 2.978563,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": null,
+   "median_seconds": 2.978563,
+   "speed_class": "SLOW",
+   "max_response_characters": 393,
+   "statuses": {
+    "REFUSED": 1
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "pareto",
+   "variant": "hi",
+   "measured": {
+    "n": 1,
+    "min": 2.774076,
+    "median": 2.774076,
+    "mean": 2.774076,
+    "max": 2.774076,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": null,
+   "median_seconds": 2.774076,
+   "speed_class": "SLOW",
+   "max_response_characters": 386,
+   "statuses": {
+    "REFUSED": 1
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "compute_analysis",
+   "analysis": "group_compare",
+   "variant": "hi",
+   "measured": {
+    "n": 1,
+    "min": 0.799913,
+    "median": 0.799913,
+    "mean": 0.799913,
+    "max": 0.799913,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": null,
+   "median_seconds": 0.799913,
+   "speed_class": "MODERATE",
+   "max_response_characters": 471,
+   "statuses": {
+    "REFUSED": 1
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
+   "rows": 10000000,
+   "tool": "build_report",
+   "analysis": "",
+   "variant": "",
+   "measured": {
+    "n": 1,
+    "min": 0.042829,
+    "median": 0.042829,
+    "mean": 0.042829,
+    "max": 0.042829,
+    "p95": null,
+    "stdev": 0.0
+   },
+   "cold_seconds": 0.044624,
+   "median_seconds": 0.042829,
+   "speed_class": "FAST",
+   "max_response_characters": 1969,
+   "statuses": {
+    "OK": 2
+   },
+   "runs_note": "cold = first call on the dataset; warm = the measured runs; no application cache, so all are CACHE_MISS"
+  },
+  {
+   "domain": "sales",
    "rows": 2000000,
    "tool": "check_file",
    "analysis": "",
