@@ -197,7 +197,8 @@ def _judge_profile_corr(sub, b, a):
     x = a["extra"]
     same = norm(a["response"]) == norm(b["response"])
     fields = x.get("field_differences")
-    return (same and a["status"] == b["status"] and not fields), \
+    want = "REFUSED" if sub.endswith(".nope") else "OK"
+    return (same and a["status"] == b["status"] == want and not fields), \
         "same reply as the whole-table path, 0 field differences", True
 
 

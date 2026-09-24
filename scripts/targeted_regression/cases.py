@@ -585,16 +585,25 @@ def case_profile_correctness() -> list[dict]:
                      for i in range(5000)])
     ingest(ws, specials, "specials")
     out = []
+    # Every tool call first: a read-only connection held open meanwhile makes each call fail
+    # to connect (first run of this case: ConnectionException on both revisions).
+    replies = {}
+    cols_of = {}
+    for name in ("fin", "specials"):
+        with duckdb.connect(str(workspace.duckdb_path(ws)), read_only=True) as c0:
+            cols_of[name] = [r[0] for r in c0.execute(
+                "SELECT column_name FROM information_schema.columns WHERE table_name = ? "
+                "ORDER BY ordinal_position", [name]).fetchall()]
+        for col in cols_of[name] + (["nope"] if name == "specials" else []):
+            replies[(name, col)] = call(server.profile_column, dataset_name=name, column=col,
+                                        workspace_id=ws)
     con = duckdb.connect(str(workspace.duckdb_path(ws)), read_only=True)
     has_only = "only" in table_profile.profile_table.__code__.co_varnames
     for name in ("fin", "specials"):
-        cols = [r[0] for r in con.execute(
-            "SELECT column_name FROM information_schema.columns WHERE table_name = ? "
-            "ORDER BY ordinal_position", [name]).fetchall()]
         full = {cp.evidence.name if hasattr(cp.evidence, "name") else cp.evidence.column: cp
                 for cp in table_profile.profile_table(con, name).columns}
-        for col in cols + (["nope"] if name == "specials" else []):
-            r = call(server.profile_column, dataset_name=name, column=col, workspace_id=ws)
+        for col in cols_of[name] + (["nope"] if name == "specials" else []):
+            r = replies[(name, col)]
             diffs = None
             if has_only and col in full:
                 one = table_profile.profile_table(con, name, only=col).columns
