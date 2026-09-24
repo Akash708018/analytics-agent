@@ -905,6 +905,8 @@ def main() -> int:
     ap.add_argument("--only", nargs="*", default=None)
     ap.add_argument("--report", action="store_true")
     ap.add_argument("--domains", nargs="*", default=list(DOMAINS))
+    # stress units to run, as name:rows (default: every STRESS_DOMAINS x STRESS_SIZES)
+    ap.add_argument("--stress", nargs="*", default=None)
     args = ap.parse_args()
     C.OUT.mkdir(parents=True, exist_ok=True)
     C.CHECKPOINT.mkdir(parents=True, exist_ok=True)
@@ -952,8 +954,10 @@ def main() -> int:
     if "H" in want:
         unit("H", phase_h)
     if "I" in want:
-        for name in C.STRESS_DOMAINS:
-            for n in C.STRESS_SIZES:
+        pairs = ([(s.split(":")[0], int(s.split(":")[1])) for s in args.stress]
+                 if args.stress is not None else
+                 [(name, n) for name in C.STRESS_DOMAINS for n in C.STRESS_SIZES])
+        for name, n in pairs:
                 u = f"I_{name}_{n}"
                 if u in state()["done"]:
                     continue

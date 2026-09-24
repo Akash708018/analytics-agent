@@ -103,3 +103,69 @@ Run 1 of phases A, B and C, preserved outside the repository under _superseded/r
   preserved.
 
 The full run (run 2) starts from an empty checkpoint.
+
+### 3. Run 2, and the harness faults it found (2.7 to 2.19, each fixed in the harness)
+
+Run 2 measured the original code throughout. src/ was not touched in this tree while it ran:
+fixes were made in a separate worktree (section 4).
+
+- 2.7 distribution: the engine gives integer measures integer-aligned bins, so the last bin
+  is narrower. The oracle assumed equal widths. It now checks each count against the edges
+  the result states, and records the unequal last bin as a finding (LOW, section 4).
+- 2.8 sample_adequacy: two root-finders on one power curve agree to 1e-3 relative, not to the
+  printed digit (ecommerce: 0.4206 printed, 0.420650 here).
+- 2.9 The top_n and frequency oracles were quadratic, and a 1M unit stalled in the oracle, not
+  the tool. I stopped the run at the D/E boundary, made both linear, and resumed from the
+  checkpoint.
+- 2.10 wait4's ru_maxrss carries the parent's high-water mark across fork+exec on Linux, so
+  every worker "peaked" at the parent's size. The worker peak now comes from the per-call
+  VmHWM records.
+- 2.11 The stress gate scaled from the 1M tier. It asked 16.2 GB for sales 10M against 14.6
+  free, and skipped it. The gate now scales from the largest completed tier, and sales 10M
+  is re-gated.
+- 2.12 G's adversarial dataset kept its exact duplicate rows. Its contract on record_id was
+  rightly refused, so 17 wrong calls met the contract gate instead of their own fault. C001
+  now runs before the contract, and dup_ids expects a refusal naming the contract.
+- 2.13 The classifier credited only a few phrasings. "No test: ...", "undefined rather than"
+  and the like are safe diagnoses. Dirty variants are now judged on every step, not only the
+  first.
+- 2.14 Welch's df printed as "2e+06" failed my regex. The regex now accepts it; the notation
+  itself is a finding (section 4).
+- 2.15 scipy's noncentral t returns NaN at 1M-row df. `_power` falls back to the normal
+  approximation there.
+- 2.16 "p < 1e-300." ends a sentence, and my parser read the period as part of the number.
+- 2.17 Dirty plans were judged against 0 duplicates. Per-row noise makes most of the clean
+  file's duplicates distinct, so the expectation is now each variant file's own exact
+  repeats.
+- 2.18 read_result_file serves at most 50 rows a page and says so, with the call for the next
+  page. I asked for 200 and counted the stated cap as a failure.
+- 2.19 H (repeat, traced, concurrency, isolation) and J (reproducibility) contracted on
+  record_id without dropping duplicates first. Every contract was refused, so they measured
+  gate refusals. C001 now runs first everywhere. Isolation now cleans all ten datasets in one
+  workspace, and each ledger must hold exactly its own action with its own count. F, G, H,
+  J and sales 10M are superseded in state.json with their reason, their evidence is moved
+  to _superseded/run2_*, and they are re-run.
+
+### 4. Defects in the product, and their fixes (worktree branch step14-fixes-wip)
+
+Every fix has a test in tests/test_domain_benchmark_defects.py (D1-D11) or
+tests/test_date_prescreen_facts.py. Run against src/ as of f5dd3d4 (the code the benchmark
+measured): `11 failed, 1 passed` -- every D test fails there, and the one control (a key
+repeated by distinct rows keeps the contract call) passes. The facts file cannot import there
+(DATE_PREFIX is new), which is expected.
+
+| id | found by | defect | fix |
+|---|---|---|---|
+| D1 | E, G | mix_shift over a count_distinct text measure raised BinderException | `_produce` turns Binder/Conversion/OutOfRange errors into ANALYSIS_NOT_POSSIBLE naming the column types |
+| D2 | B_stat, G | hypothesis_test / effect_size on zero-variance groups raised ZeroDivisionError | a stated "No test" / "No effect size" |
+| D3 | G | a VARCHAR column accepted as a sum measure, then every analysis raised | contract refuses a numeric aggregation of a text column, pointing to propose_cleaning_plan |
+| D4 | H_concurrency | threads first using one workspace raced on CREATE TABLE (TransactionException) | `create_if_missing` retries at the schema and six lazy tables |
+| D5 | I 5M | Mann-Whitney / Kruskal tie term overflowed INT64 | HUGEINT tie term |
+| D6 | H, J, G | a key repeated only by exact duplicate rows got a `primary_key=[...]` template | names propose_cleaning_plan and the count |
+| D7 | G | correlation with one declared measure suggested `against="..."`, or the measure itself | keeps the given arguments; asks for a contract when none is left |
+| D8 | F | a corrupt .xlsx was sent back through propose_ingest_spec on the same file | says to re-save or export |
+| D9 | G | `<one of: x>` when x was the only result file | the runnable path |
+| D10 | C-E charts | cohort heatmap replies over 8,000 characters (49 series described) | first 12 described, the rest counted |
+| D11 | E, I | Welch df "2e+06"; "equal-width" bins with a narrower last bin | df as a number; the narrow last bin stated |
+| P1 | E, I | profile_column profiled the whole table (51 s a call at 10M) | profiles its own column; identical output on 24 of 24 columns |
+| P2 | E | propose_cleaning_plan 13.6 s median at 1M: 16 date formats tried on id and label columns | an exact pre-screen (fuzzed: 0 of 140,232 parsed values screened out); 24.3 s to 11.8 s on financial 1M under load |

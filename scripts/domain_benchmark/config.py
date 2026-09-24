@@ -6,7 +6,8 @@ import os
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT / "docs" / "benchmark" / "domain_benchmark"
+# A post-fix re-run writes beside the original rather than over it (DOMAIN_BENCH_OUT).
+OUT = Path(os.environ.get("DOMAIN_BENCH_OUT", ROOT / "docs" / "benchmark" / "domain_benchmark"))
 # Generated datasets are large and reproducible from their seed: they live outside the repository.
 DATA = Path(os.environ.get("DOMAIN_BENCH_DATA", "/tmp/domain_benchmark_data"))
 # Raw evidence (every worker's JSONL, copies of the result files, the job files) is kept out of

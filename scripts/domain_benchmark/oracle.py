@@ -718,7 +718,7 @@ def o_hypothesis(c, sk, p, rows, text, d, measures, dims):
     line = next((ln for ln in text.splitlines() if "Test:" in ln), "")
     # df is printed with 4 significant figures, in scientific notation past 9,999 ("df 1.569e+04",
     # Step 13 run 2): the regex reads both.
-    m = re.search(r"Statistic (-?[\d.,]+), df ([\d.eE+]+|n/a)(?:, ([\d.eE+]+))?, "
+    m = re.search(r"Statistic (-?[\d.,]+), df ([\d.,eE+]+?|n/a)(?:, ([\d.,eE+]+?))?, "
                   r"p (<\s?[\d.eE+-]+|[\d.eE+-]*\d)", line)
     if not m:
         c.equal("the reply states a statistic and a p value", line[:120], "Test: ... p ...")
