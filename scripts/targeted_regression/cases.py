@@ -412,7 +412,8 @@ def case_d5() -> list[dict]:
     from analytics_agent.analysis import inferential
     from types import SimpleNamespace
     out = []
-    for n in (100_000, 1_000_000, 2_300_000):
+    # 6M: sales 10M's rank test met 5,851,188 tied values and overflowed on the original code
+    for n in (100_000, 1_000_000, 2_300_000, 6_000_000):
         tied = n * 22 // 23
         con = duckdb.connect()
         con.execute(f"CREATE TABLE t AS SELECT CASE WHEN i % 2 = 0 THEN 'a' ELSE 'b' END AS g, "
