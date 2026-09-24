@@ -172,3 +172,4 @@
 2026-09-24T21:33:16 E_healthcare: reverified, checks 37172/37172
 2026-09-24T21:35:03 E_manufacturing: reverified, checks 81832/81832
 2026-09-24T21:37:17 E_education: reverified, checks 83077/83077
+2026-09-24T21:45:11 I_sales_10000000: resource gate {'ok': True, 'estimated_memory_mb': 7536, 'available_memory_mb': 15122, 'estimated_disk_mb': 4208, 'available_disk_mb': 26063, 'basis': 'I_sales_5000000 x rows/5,000,000 x margin 1.5', 'reference_peak_mb': 2512}
