@@ -6425,3 +6425,54 @@ unchanged; browser walk 11 screens, 0 exceptions. Digests:
   abbb5642d57d0ddab349c0ff1777537678fc05ac6adfb9b9acb8e31fc433bba4  scripts/scenario_matrix.py
   35819faef675d7315cdf32581ee0afec107c92a5424b2246f2fc6e35abbe7fda  tests/test_scenarios.py
   30225b13adc3b49a7b12ada511cbf40920daa7a3b4a0d3adc5eb991fb31c610d  docs/stress/scenario_matrix.json
+
+## Phase 14 Step 11 (24/09/2026): a benchmark of every tool, and the negatives written down
+
+P14-D74. scripts/benchmark.py IS THE BENCHMARK: one generated sales table with answers known by
+construction (an empty month, 1% outside the window, 0.5% null measures, planted group effects)
+at 1,000 / 100,000 / 1,000,000 rows. It calls all 29 MCP tools and runs all 27 analyses twice,
+compares every result-file figure with plain Python / scipy to the rounding printed, and makes 36
+wrong calls, a dirty-table cleaning and a pass of the web Explore. A measurement: it exits zero.
+Measured: 1,932/1,932 figures right, 0 nondeterministic, 0 overwritten, the slowest analysis at
+1M rows 0.41 s, the 1M load 1.6 s, no call faster than linear (worst 8.5x for 10x the rows,
+median 1.7x over 93), no reply over the agent's 8,000 characters (largest 7,700).
+P14-D75. THE NEGATIVES ARE REGISTERED, NOT FIXED -- the request was to write them down. Each is in
+docs/benchmark/BENCHMARK.md with its measurement:
+P14-O13 IS OPEN. (N1) load_excel raises InvalidFileException on a non-workbook (excel.py:284).
+P14-O14 IS OPEN. (N2) Explore's defaults for period_compare, growth_decomposition, mix_shift take
+the data's last months, not the window's, and are refused when data runs past the window.
+P14-O15 IS OPEN. (N3) profile_dataset 2.1 s / 5.9 s, profile_column the same, propose_cleaning_plan
+3.4 s / 8.5 s at 100k / 1M: type reading casts every value of every text column, each call.
+P14-O16 IS OPEN. (N4) four compute_analysis refusals end in a summary_stats NEXT STEP their WHY
+does not support.
+P14-O17 IS OPEN. (N5) propose_dataset_contract as the NEXT STEP where no contract helps
+(concentration over too many groups; a measure that is not a column).
+P14-O18 IS OPEN. (N6) profile_dataset on a missing dataset points at describe_dataset, which fails
+the same way.
+P14-O19 IS OPEN. (N7) get_cleaning_ledger calls a missing dataset uncleaned; its NEXT STEP holds
+a literal "...".
+P14-O20 IS OPEN. (N8) render_chart draws a heatmap of a trend, two units on one scale.
+P14-O21 IS OPEN. (N9) the 9 chart analyses are refused in their own chart kind until y is given.
+P14-O22 IS OPEN. (N10) result CSVs hold display text (thousands separators, % strings, signs,
+display rounding).
+P14-O23 IS OPEN. (N11) the report's Key findings are each run's scope line, repeated per run; the
+reply grows past 8,000 characters at about 80 runs.
+P14-O24 IS OPEN. (N12) the run_analysis menu is 6,551 characters for a 10-column contract.
+P14-O25 IS OPEN. (N13) the Postgres tools need to download DuckDB's extension on first use.
+P14-O26 IS OPEN. (N14) reset_workspace leaves a workspace's contract exports in
+docs/contracts/<workspace>/.
+
+C104. FIGURES WRITTEN BEFORE THEY WERE READ, AGAIN (C102's failure). BENCHMARK.md's first draft
+gave validate's outside-window counts as 1,100 and 10,636 and the growth as "at most 3x"; the
+JSON said 1,004, 9,879 and 8.5x. Caught by reading every scorecard figure back out of
+benchmark.json before committing. A figure goes into a document from a command's output or not
+at all.
+
+MEASURED VALIDATION, 24/09/2026. Nothing in src/ changed. Engine 1910 passed; UI 50 passed;
+acceptance phase6 36/0/0, phase8 55/0/3, phase9 0/0/1, phase10 0/0/1, phase11 26/0/0, phase12
+36/0/0; eval 76/76; benchmark 1932/1932. Digests:
+  55eea130e474aa23d6e1c89c970534f706d07cf6a92fb4e65ead68d422e5add9  scripts/benchmark.py
+  cd361a48392151b668bc5312d6f2eca46a5e5d39a6f79a42d7b063b396acb94d  docs/benchmark/BENCHMARK.md
+  82b72cd1b17952027c858dcd50041e1d8a75f52ad76cda4079e82584c2efaa0b  docs/benchmark/results.md
+  3beafe659029152c5281af9e6154c76b58b9614b4ebb3c455b7fd83c56e8ae0a  docs/benchmark/benchmark.json
+  8bc71dd0b880eae0c5d4a157fdea8a9307a42ee7941058e5e34a5ca2d37d11fb  docs/steps/phase14_step11_benchmark.md

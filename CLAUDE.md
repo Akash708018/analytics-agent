@@ -2,17 +2,19 @@
 
 MCP server exposing data loading, profiling, cleaning and contract-gated analysis
 to Claude Desktop. Phases 1-13 done, then Cleanup Steps 4-7; Phase 14
-(Track B) in progress, Steps 1-10 done (UI in ui/, on the fake backend or the engine with
+(Track B) in progress, Steps 1-11 done (UI in ui/, on the fake backend or the engine with
 ANALYTICS_UI_BACKEND=real;
 `uv run --group ui streamlit run ui/app.py`; its 50 tests: `uv run --group ui pytest ui/tests`;
 the behaviour matrix: `uv run python scripts/scenario_matrix.py` (30 checks);
+the benchmark: `uv run python scripts/benchmark.py` (1,932 ground-truth checks at 1k/100k/1M rows;
+its 14 negatives, P14-O13 to O26, are OPEN and listed in docs/benchmark/BENCHMARK.md);
 the browser walk: `uv run --group ui --with playwright python scripts/browser_check.py`;
 the demo: docs/DEMO.md). P14-O1 and P14-O2 closed at Step 5
 (idle web workspaces expire; cleaning has a screen). The stress matrix's 14 bugs
 (P14-O3 to O12) closed at Step 7; Step 8 fixed what remained and ran three more rounds of
 anomalies to a round with no new bug. `docs/stress/REPORT.md`; re-run with
 `uv run python scripts/stress_matrix.py --round all` (4 rounds, 95 datasets, 0 crashes; its
-load-time "wrong" lines are text the suggested cleaning converts). Nothing is open. The agent's live check:
+load-time "wrong" lines are text the suggested cleaning converts). Open: P14-O13 to O26 (the benchmark's negatives). The agent's live check:
 `uv run python scripts/agent_live.py` (needs keys in the gitignored .env). Otherwise nothing: P9-O4's feature half was closed by the user's
 decision on 21/09/2026 (copy-first; in-place analysis is a later scaling item).
 
