@@ -68,3 +68,4 @@ TypeError: obs() got multiple values for argument 'tool'
 2026-09-24T22:48:20 PROFILE_CORRECTNESS after: 32 observation(s) in 7s
 2026-09-24T22:52:04 CLEANING before: 2 observation(s) in 224s
 2026-09-24T22:53:48 CLEANING after: 2 observation(s) in 104s
+2026-09-24T23:07:59 PROFILE_PERF before: 16 observation(s) in 851s

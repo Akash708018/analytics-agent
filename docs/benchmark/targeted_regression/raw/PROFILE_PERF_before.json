@@ -1,0 +1,420 @@
+{
+ "case": "PROFILE_PERF",
+ "src": "/home/user/aa-orig/src",
+ "commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+ "src_dirty": [],
+ "python": "3.12.3",
+ "duckdb": "1.5.5",
+ "seconds": 847.94,
+ "harness_error": null,
+ "observations": [
+  {
+   "sub": "100000_record_id",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "sales",
+   "rows": 100000,
+   "parameters": {
+    "column": "record_id"
+   },
+   "status": "OK",
+   "wall_time_seconds": 0.891374,
+   "response": "sales.record_id\n\n  record_id (VARCHAR): 100,000 distinct value(s) across 100,288 rows, no nulls, range SAL000000000 to SAL000099999.\n\nMost frequent value(s), 10 of 100,000 distinct:\n\n  SAL000001210          2    0.0%\n  SAL000001510          2    0.0%\n  SAL000002353          2    0.0%\n  SAL000003237 ",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "cold_seconds": 0.893695,
+    "measured_seconds": [
+     0.910502,
+     0.872246
+    ],
+    "min_seconds": 0.872246,
+    "max_seconds": 0.910502,
+    "load_seconds": 0.73,
+    "role": "performance"
+   }
+  },
+  {
+   "sub": "100000_region",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "sales",
+   "rows": 100000,
+   "parameters": {
+    "column": "region"
+   },
+   "status": "OK",
+   "wall_time_seconds": 0.8847895,
+   "response": "sales.region\n\n  region (VARCHAR): 5 distinct value(s) across 100,288 rows, 331 null (0.3%), range central to west.\n\nMost frequent value(s), 6 of 5 distinct:\n\n  north       29,862   29.8%\n  south       25,055   25.0%\n  east        19,895   19.8%\n  west        15,206   15.2%\n  central      9,939    9.",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "cold_seconds": 0.915971,
+    "measured_seconds": [
+     0.893359,
+     0.87622
+    ],
+    "min_seconds": 0.87622,
+    "max_seconds": 0.893359,
+    "load_seconds": 0.73,
+    "role": "performance"
+   }
+  },
+  {
+   "sub": "100000_net_sales",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "sales",
+   "rows": 100000,
+   "parameters": {
+    "column": "net_sales"
+   },
+   "status": "OK",
+   "wall_time_seconds": 0.917556,
+   "response": "sales.net_sales\n\n  net_sales (DOUBLE): 31,551 distinct value(s) across 100,288 rows, 212 null (0.2%), range 1.34 to 1000000000.0. It has 9,099 value(s) outside [-159.5, 347.6] (0 below, 9,099 above; Tukey IQR fences, k=1.5).\n\nMost frequent value(s), 10 of 31,551 distinct:\n\n  (null)        212    0.2",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "cold_seconds": 0.874832,
+    "measured_seconds": [
+     0.865637,
+     0.969475
+    ],
+    "min_seconds": 0.865637,
+    "max_seconds": 0.969475,
+    "load_seconds": 0.73,
+    "role": "performance"
+   }
+  },
+  {
+   "sub": "100000_order_date",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "sales",
+   "rows": 100000,
+   "parameters": {
+    "column": "order_date"
+   },
+   "status": "OK",
+   "wall_time_seconds": 0.8975255,
+   "response": "sales.order_date\n\n  order_date (DATE): 759 distinct value(s) across 100,288 rows, 485 null (0.5%), range 2023-01-01 to 2025-01-28.\n\nMost frequent value(s), 10 of 759 distinct:\n\n  (null)            485    0.5%\n  2024-12-31        211    0.2%\n  2024-02-29        210    0.2%\n  2023-01-01        184    ",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "cold_seconds": 0.879945,
+    "measured_seconds": [
+     0.866783,
+     0.928268
+    ],
+    "min_seconds": 0.866783,
+    "max_seconds": 0.928268,
+    "load_seconds": 0.73,
+    "role": "performance"
+   }
+  },
+  {
+   "sub": "1000000_record_id",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "sales",
+   "rows": 1000000,
+   "parameters": {
+    "column": "record_id"
+   },
+   "status": "OK",
+   "wall_time_seconds": 4.8302975,
+   "response": "sales.record_id\n\n  record_id (VARCHAR): 1,000,000 distinct value(s) across 1,002,942 rows, no nulls, range SAL000000000 to SAL000999999.\n\nMost frequent value(s), 10 of 1,000,000 distinct:\n\n  SAL000000060          2    0.0%\n  SAL000000879          2    0.0%\n  SAL000000991          2    0.0%\n  SAL0000",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "cold_seconds": 4.793734,
+    "measured_seconds": [
+     4.880087,
+     4.780508
+    ],
+    "min_seconds": 4.780508,
+    "max_seconds": 4.880087,
+    "load_seconds": 3.68,
+    "role": "performance"
+   }
+  },
+  {
+   "sub": "1000000_region",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "sales",
+   "rows": 1000000,
+   "parameters": {
+    "column": "region"
+   },
+   "status": "OK",
+   "wall_time_seconds": 4.775187,
+   "response": "sales.region\n\n  region (VARCHAR): 5 distinct value(s) across 1,002,942 rows, 3,057 null (0.3%), range central to west.\n\nMost frequent value(s), 6 of 5 distinct:\n\n  north      300,151   29.9%\n  south      250,083   24.9%\n  east       199,519   19.9%\n  west       149,922   14.9%\n  central    100,210  ",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "cold_seconds": 4.912488,
+    "measured_seconds": [
+     4.761641,
+     4.788733
+    ],
+    "min_seconds": 4.761641,
+    "max_seconds": 4.788733,
+    "load_seconds": 3.68,
+    "role": "performance"
+   }
+  },
+  {
+   "sub": "1000000_net_sales",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "sales",
+   "rows": 1000000,
+   "parameters": {
+    "column": "net_sales"
+   },
+   "status": "OK",
+   "wall_time_seconds": 4.7219295,
+   "response": "sales.net_sales\n\n  net_sales (DOUBLE): 78,410 distinct value(s) across 1,002,942 rows, 2,057 null (0.2%), range 0.55 to 1000000000.0. It has 89,641 value(s) outside [-160.9, 349.5] (0 below, 89,641 above; Tukey IQR fences, k=1.5).\n\nMost frequent value(s), 10 of 78,410 distinct:\n\n  (null)      2,057 ",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "cold_seconds": 4.873446,
+    "measured_seconds": [
+     4.767759,
+     4.6761
+    ],
+    "min_seconds": 4.6761,
+    "max_seconds": 4.767759,
+    "load_seconds": 3.68,
+    "role": "performance"
+   }
+  },
+  {
+   "sub": "1000000_order_date",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "sales",
+   "rows": 1000000,
+   "parameters": {
+    "column": "order_date"
+   },
+   "status": "OK",
+   "wall_time_seconds": 4.6178574999999995,
+   "response": "sales.order_date\n\n  order_date (DATE): 759 distinct value(s) across 1,002,942 rows, 4,960 null (0.5%), range 2023-01-01 to 2025-01-28.\n\nMost frequent value(s), 10 of 759 distinct:\n\n  (null)          4,960    0.5%\n  2024-02-29      2,396    0.2%\n  2024-12-31      1,856    0.2%\n  2023-01-01      1,788",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "cold_seconds": 4.726646,
+    "measured_seconds": [
+     4.688332,
+     4.547383
+    ],
+    "min_seconds": 4.547383,
+    "max_seconds": 4.688332,
+    "load_seconds": 3.68,
+    "role": "performance"
+   }
+  },
+  {
+   "sub": "5000000_record_id",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "sales",
+   "rows": 5000000,
+   "parameters": {
+    "column": "record_id"
+   },
+   "status": "OK",
+   "wall_time_seconds": 23.279265,
+   "response": "sales.record_id\n\n  record_id (VARCHAR): 5,000,000 distinct value(s) across 5,015,094 rows, no nulls, range SAL000000000 to SAL004999999.\n\nMost frequent value(s), 10 of 5,000,000 distinct:\n\n  SAL000000718          2    0.0%\n  SAL000000787          2    0.0%\n  SAL000001816          2    0.0%\n  SAL0000",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "cold_seconds": 23.458878,
+    "measured_seconds": [
+     23.279265
+    ],
+    "min_seconds": 23.279265,
+    "max_seconds": 23.279265,
+    "load_seconds": 11.09,
+    "role": "performance"
+   }
+  },
+  {
+   "sub": "5000000_region",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "sales",
+   "rows": 5000000,
+   "parameters": {
+    "column": "region"
+   },
+   "status": "OK",
+   "wall_time_seconds": 23.429154,
+   "response": "sales.region\n\n  region (VARCHAR): 5 distinct value(s) across 5,015,094 rows, 14,811 null (0.3%), range central to west.\n\nMost frequent value(s), 6 of 5 distinct:\n\n  north    1,499,521   29.9%\n  south    1,249,844   24.9%\n  east     1,000,220   19.9%\n  west       750,934   15.0%\n  central    499,764 ",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "cold_seconds": 23.467535,
+    "measured_seconds": [
+     23.429154
+    ],
+    "min_seconds": 23.429154,
+    "max_seconds": 23.429154,
+    "load_seconds": 11.09,
+    "role": "performance"
+   }
+  },
+  {
+   "sub": "5000000_net_sales",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "sales",
+   "rows": 5000000,
+   "parameters": {
+    "column": "net_sales"
+   },
+   "status": "OK",
+   "wall_time_seconds": 23.938796,
+   "response": "sales.net_sales\n\n  net_sales (DOUBLE): 131,326 distinct value(s) across 5,015,094 rows, 10,087 null (0.2%), range 0.37 to 1000000000.0. It has 448,695 value(s) outside [-160.6, 348.9] (0 below, 448,695 above; Tukey IQR fences, k=1.5).\n\nMost frequent value(s), 10 of 131,326 distinct:\n\n  (null)     10",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "cold_seconds": 23.268519,
+    "measured_seconds": [
+     23.938796
+    ],
+    "min_seconds": 23.938796,
+    "max_seconds": 23.938796,
+    "load_seconds": 11.09,
+    "role": "performance"
+   }
+  },
+  {
+   "sub": "5000000_order_date",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "sales",
+   "rows": 5000000,
+   "parameters": {
+    "column": "order_date"
+   },
+   "status": "OK",
+   "wall_time_seconds": 23.478222,
+   "response": "sales.order_date\n\n  order_date (DATE): 759 distinct value(s) across 5,015,094 rows, 25,107 null (0.5%), range 2023-01-01 to 2025-01-28.\n\nMost frequent value(s), 10 of 759 distinct:\n\n  (null)         25,107    0.5%\n  2024-02-29     11,590    0.2%\n  2024-12-31      9,349    0.2%\n  2023-01-01      9,20",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "cold_seconds": 22.739613,
+    "measured_seconds": [
+     23.478222
+    ],
+    "min_seconds": 23.478222,
+    "max_seconds": 23.478222,
+    "load_seconds": 11.09,
+    "role": "performance"
+   }
+  },
+  {
+   "sub": "10000000_record_id",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "sales",
+   "rows": 10000000,
+   "parameters": {
+    "column": "record_id"
+   },
+   "status": "OK",
+   "wall_time_seconds": 45.954045,
+   "response": "sales.record_id\n\n  record_id (VARCHAR): 10,000,000 distinct value(s) across 10,029,884 rows, no nulls, range SAL000000000 to SAL009999999.\n\nMost frequent value(s), 10 of 10,000,000 distinct:\n\n  SAL000000467          2    0.0%\n  SAL000000798          2    0.0%\n  SAL000000939          2    0.0%\n  SAL0",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "cold_seconds": 46.418895,
+    "measured_seconds": [
+     45.954045
+    ],
+    "min_seconds": 45.954045,
+    "max_seconds": 45.954045,
+    "load_seconds": 21.15,
+    "role": "performance"
+   }
+  },
+  {
+   "sub": "10000000_region",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "sales",
+   "rows": 10000000,
+   "parameters": {
+    "column": "region"
+   },
+   "status": "OK",
+   "wall_time_seconds": 45.381239,
+   "response": "sales.region\n\n  region (VARCHAR): 5 distinct value(s) across 10,029,884 rows, 30,158 null (0.3%), range central to west.\n\nMost frequent value(s), 6 of 5 distinct:\n\n  north    3,000,265   29.9%\n  south    2,500,366   24.9%\n  east     1,999,046   19.9%\n  west     1,499,650   15.0%\n  central  1,000,399",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "cold_seconds": 44.591191,
+    "measured_seconds": [
+     45.381239
+    ],
+    "min_seconds": 45.381239,
+    "max_seconds": 45.381239,
+    "load_seconds": 21.15,
+    "role": "performance"
+   }
+  },
+  {
+   "sub": "10000000_net_sales",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "sales",
+   "rows": 10000000,
+   "parameters": {
+    "column": "net_sales"
+   },
+   "status": "OK",
+   "wall_time_seconds": 44.881629,
+   "response": "sales.net_sales\n\n  net_sales (DOUBLE): 160,326 distinct value(s) across 10,029,884 rows, 20,325 null (0.2%), range 0.37 to 1000000000.0. It has 896,107 value(s) outside [-160.7, 349.1] (0 below, 896,107 above; Tukey IQR fences, k=1.5).\n\nMost frequent value(s), 10 of 160,326 distinct:\n\n  (null)     2",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "cold_seconds": 45.392076,
+    "measured_seconds": [
+     44.881629
+    ],
+    "min_seconds": 44.881629,
+    "max_seconds": 44.881629,
+    "load_seconds": 21.15,
+    "role": "performance"
+   }
+  },
+  {
+   "sub": "10000000_order_date",
+   "tool": "profile_column",
+   "analysis": null,
+   "dataset": "sales",
+   "rows": 10000000,
+   "parameters": {
+    "column": "order_date"
+   },
+   "status": "OK",
+   "wall_time_seconds": 45.153578,
+   "response": "sales.order_date\n\n  order_date (DATE): 759 distinct value(s) across 10,029,884 rows, 50,148 null (0.5%), range 2023-01-01 to 2025-01-28.\n\nMost frequent value(s), 10 of 759 distinct:\n\n  (null)         50,148    0.5%\n  2024-02-29     23,338    0.2%\n  2024-12-31     18,551    0.2%\n  2023-01-01     18,5",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "cold_seconds": 45.395974,
+    "measured_seconds": [
+     45.153578
+    ],
+    "min_seconds": 45.153578,
+    "max_seconds": 45.153578,
+    "load_seconds": 21.15,
+    "role": "performance"
+   }
+  }
+ ]
+}
