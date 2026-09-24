@@ -10,6 +10,7 @@ D5 the Mann-Whitney tie term overflowed INT64 at 5M rows.
 
 from __future__ import annotations
 
+import json
 import sys
 import threading
 from pathlib import Path
@@ -219,3 +220,29 @@ def test_d11_welch_df_is_a_number_and_a_narrow_last_bin_is_said(tmp_path, ws):
                                 bins=5, workspace_id=ws)
     # v spans 0..12, 13 values: 3-wide bins make 5, the last 1 value wide
     assert "The last bin is narrower: 1 value(s) wide against 3" in d, d[:1500]
+
+
+def test_d12_threads_parsing_predicates_get_their_own_trees():
+    """Ten threads scoping one workspace at once raised IndexError from the shared parser
+    connection in sql_guard (Step 13 benchmark, H_concurrency after D4 was out of the way)."""
+    from analytics_agent.util import sql_guard
+
+    errors, wrong = [], []
+
+    def work(k):
+        for i in range(200):
+            want = f"col_{k}_{i}"
+            try:
+                tree = sql_guard._ast(f"SELECT 1 WHERE {want} > {i}")
+            except Exception as exc:  # noqa: BLE001 - the defect is any exception here
+                errors.append(repr(exc))
+                return
+            if want not in json.dumps(tree):
+                wrong.append(want)
+
+    threads = [threading.Thread(target=work, args=(k,)) for k in range(16)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    assert not errors and not wrong, (errors[:3], wrong[:3])

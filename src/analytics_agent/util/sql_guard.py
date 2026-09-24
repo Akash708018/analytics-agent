@@ -19,6 +19,7 @@ rather than running the text against the data.
 from __future__ import annotations
 
 import json
+import threading
 
 import duckdb
 
@@ -83,7 +84,10 @@ def _wrapped(rule: str) -> str:
     return f"SELECT 1 WHERE ({rule})"
 
 
-_PARSER = None
+# One parser connection per thread: a DuckDB connection is not safe to execute on from two
+# threads at once, and ten threads sharing one took each other's results (IndexError on an
+# empty fetch; Step 13 benchmark, H_concurrency).
+_PARSER = threading.local()
 
 
 def _ast(sql: str) -> dict:
@@ -94,10 +98,10 @@ def _ast(sql: str) -> dict:
     point: this reads the shape of the text, and nothing it returns depends on
     what is loaded.
     """
-    global _PARSER
-    if _PARSER is None:
-        _PARSER = duckdb.connect()
-    raw = _PARSER.execute("SELECT json_serialize_sql(?)", [sql]).fetchall()[0][0]
+    con = getattr(_PARSER, "con", None)
+    if con is None:
+        con = _PARSER.con = duckdb.connect()
+    raw = con.execute("SELECT json_serialize_sql(?)", [sql]).fetchall()[0][0]
     tree = json.loads(raw)
     if tree.get("error"):
         raise UnsafeSQL(
