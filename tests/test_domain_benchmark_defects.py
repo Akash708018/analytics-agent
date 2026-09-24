@@ -246,3 +246,17 @@ def test_d12_threads_parsing_predicates_get_their_own_trees():
     for t in threads:
         t.join()
     assert not errors and not wrong, (errors[:3], wrong[:3])
+
+
+def test_d13_a_page_cap_is_stated(tmp_path, ws):
+    from analytics_agent.util import results
+    d = results.results_dir(ws)
+    d.mkdir(parents=True, exist_ok=True)
+    f = d / "many.csv"
+    f.write_text("k,v\n" + "".join(f"k{i},{i}\n" for i in range(984)))
+    out = server.read_result_file(path=str(f), start=901, limit=200, workspace_id=ws)
+    assert "rows 901 to 950 of 984" in out
+    assert "limit=200 was asked; a page holds at most 50 rows" in out
+    assert "34 rows after this page" in out and "start=951, limit=50" in out
+    plain = server.read_result_file(path=str(f), start=1, limit=10, workspace_id=ws)
+    assert "was asked" not in plain                     # control: a limit within the cap

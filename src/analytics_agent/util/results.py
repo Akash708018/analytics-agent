@@ -321,6 +321,7 @@ def read_result_file(
             next_call=f'read_result_file(path="{target}", start=1)',
         ).to_text()
 
+    asked = limit
     limit = max(1, min(limit, PAGE_ROWS))
 
     with target.open(newline="", encoding="utf-8") as fh:
@@ -363,6 +364,14 @@ def read_result_file(
     out = [
         f"{target.name}: rows {start:,} to {last:,} of {total:,}, "
         f"columns {start_col:,} to {last_col:,} of {len(headers):,}.",
+    ]
+    if asked > PAGE_ROWS:
+        # The cap was applied without a word: limit=200 returned 50 rows and the reader could not
+        # tell a cap from a short file (Step 13 benchmark, D13).
+        out.append(f"limit={asked:,} was asked; a page holds at most {PAGE_ROWS} rows, so "
+                   f"{len(page):,} are shown"
+                   + ("; the next page is the call below." if last < total else "."))
+    out += [
         "",
         format_table([r[first_col:last_col] for r in page], shown_headers),
     ]
