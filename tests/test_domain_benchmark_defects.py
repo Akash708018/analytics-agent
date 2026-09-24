@@ -269,3 +269,29 @@ def test_d13_a_page_cap_is_stated(tmp_path, ws):
     assert "34 rows after this page" in out and "start=951, limit=50" in out
     plain = server.read_result_file(path=str(f), start=1, limit=10, workspace_id=ws)
     assert "was asked" not in plain                     # control: a limit within the cap
+
+
+def test_d14_deduplication_keeps_file_order_so_sums_repeat(tmp_path, ws):
+    """Two identical runs printed one total two ways: DISTINCT reordered the rows and a DOUBLE
+    sum depends on order. The rebuild now keeps first occurrences in file order."""
+    import random
+    rng = random.Random(5)
+    rows = [f"r{i},2024-{1 + i % 12:02d}-05,{'ab'[i % 2]},"
+            f"{rng.uniform(0, 1e6) * (1e3 if i % 997 == 0 else 1):.4f}" for i in range(150_000)]
+    rows += rows[:500]                                      # exact duplicates to drop
+    totals, orders = set(), set()
+    for k in range(3):
+        name = f"s{k}"
+        _load(tmp_path, ws, name, "id,d,g,v", rows)
+        server.propose_cleaning_plan(dataset_name=name, workspace_id=ws)
+        out = server.apply_cleaning_plan(dataset_name=name, approved_action_ids=["C001"],
+                                         workspace_id=ws)
+        assert "500 row(s) removed" in out, out[:300]
+        con = duckdb.connect(str(workspace.duckdb_path(ws)), read_only=True)
+        totals.add(con.execute(f'SELECT sum(v)::VARCHAR FROM "{name}"').fetchone()[0])
+        orders.add(tuple(r[0] for r in con.execute(f'SELECT id FROM "{name}" LIMIT 1000')
+                         .fetchall()))
+        first = con.execute(f'SELECT id FROM "{name}" LIMIT 3').fetchall()
+        con.close()
+        assert first == [("r0",), ("r1",), ("r2",)]          # file order kept
+    assert len(totals) == 1 and len(orders) == 1, (totals, len(orders))
