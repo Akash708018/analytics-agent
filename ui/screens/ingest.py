@@ -9,6 +9,7 @@ readable. Confirm stays disabled while the draft is PROVISIONAL.
 from __future__ import annotations
 
 import html
+from pathlib import Path
 
 import streamlit as st
 
@@ -39,6 +40,20 @@ _GRID_CSS = """
 .aa-legend b.s { text-decoration: line-through; }
 </style>
 """
+
+
+SAMPLE = Path(__file__).resolve().parents[1] / "samples" / "sales_2024.xlsx"
+
+
+class _Sample:
+    """The sample file, shaped like the uploader's object: name, size, getvalue()."""
+
+    def __init__(self, path: Path) -> None:
+        self._data = path.read_bytes()
+        self.name, self.size = path.name, len(self._data)
+
+    def getvalue(self) -> bytes:
+        return self._data
 
 
 def stylesheet() -> str:
@@ -81,6 +96,12 @@ def render() -> None:
     limits = be.limits()
 
     upload = st.file_uploader("CSV or Excel workbook", type=["csv", "xlsx"])
+    if upload is None and "ingest" not in st.session_state:
+        # A real file to try with, through exactly the path an upload takes: two stacked header
+        # rows over merged labels, and dates stored as text for Clean to fix.
+        if st.button("No file to hand? Try the sample workbook", type="secondary",
+                     icon=":material/science:"):
+            upload = _Sample(SAMPLE)
     if upload is not None:
         token = (upload.name, upload.size)
         if st.session_state.get("ingest", {}).get("token") != token:

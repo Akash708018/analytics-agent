@@ -50,9 +50,9 @@ from analytics_agent.util.results import RESULTS_DIRNAME
 from analytics_agent.analysis import runs as analysis_runs
 
 from .contract import (
-    ActionResult, Artifact, ChatTurn, CleaningProposal, CleaningStep, ColumnDraft,
-    ContractColumn, ContractDraft,
-    DatasetSummary, GridPreview, IngestDraft, Limits, Refusal, UploadResult,
+    ActionResult, AnalysisMenu, AnalysisParam, AnalysisRun, AnalysisSpec, Artifact, ChatTurn,
+    CleaningProposal, CleaningStep, ColumnDraft, ContractColumn, ContractDraft, DatasetSummary,
+    GridPreview, IngestDraft, Limits, Refusal, UploadResult,
 )
 
 UPLOADS_DIRNAME = "uploads"
@@ -64,6 +64,46 @@ DEFAULT_TTL_HOURS = 72  # a web workspace unused this long is removed (P14-O1)
 SWEEP_EVERY = 3600  # seconds between sweeps triggered by new visitors
 
 
+def redact(text: str) -> str:
+    """A web visitor never sees where the server keeps files: an engine message that names a
+    path under the workspace root shows it relative to the workspace (P14-O9)."""
+    for root in {str(WORKSPACE_ROOT.resolve()), str(WORKSPACE_ROOT)}:
+        text = re.sub(re.escape(root) + r"/ws_[0-9a-f]{12}/(?:uploads/)?", "", text)
+        text = text.replace(root, "workspace")
+    return text
+
+
+# How each analysis argument appears as a form field (Explore screen, P14-D65): which widget,
+# and the one line under it. Arguments not named here are free text.
+_DIMENSION_ARGS = ("dimension", "rows", "columns", "column", "second_dimension", "entity")
+_MEASURE_ARGS = ("measure", "against")
+_PARAM_HELP = {
+    "measure": "the declared measure it is about", "against": "the second declared measure",
+    "dimension": "the declared dimension to group by", "rows": "down the side",
+    "columns": "across the top", "column": "the column whose values are counted",
+    "second_dimension": "a second dimension, instead of a measure",
+    "entity": "who comes back -- a customer id, say", "grain": "the calendar period",
+    "period": "the period to compare (YYYY-MM by month, YYYY-Qn by quarter, YYYY by year)",
+    "baseline": "the period it is compared with, written the same way",
+    "before_start": "YYYY-MM-DD", "before_end": "YYYY-MM-DD", "after_start": "YYYY-MM-DD",
+    "after_end": "YYYY-MM-DD", "n": "how many groups", "limit": "how many values",
+    "bins": "how many bins", "threshold": "the share to reach, 0-1",
+    "confidence": "0-1, e.g. 0.95", "alpha": "significance level, e.g. 0.05",
+    "power": "0-1, e.g. 0.8", "method": "auto chooses the test from the data",
+}
+_NUMBER_ARGS = ("n", "limit", "bins", "threshold", "confidence", "alpha", "power")
+_CHOICES = {"grain": ["day", "week", "month", "quarter", "year"],
+            "method": ["auto", "parametric", "rank"]}
+# The chart kind each analysis is drawn as (render_chart's own docstring pairs them).
+CHART_FOR = {
+    "calendar_coverage": "line", "trend": "line", "seasonality": "line", "period_compare": "bar",
+    "frequency": "bar", "top_n": "bar", "group_compare": "bar", "ranking_shift": "bar",
+    "pareto": "bar", "cross_tab": "heatmap", "correlation": "scatter", "bivariate": "scatter",
+    "distribution": "histogram", "summary_stats": "box", "outlier_detection": "box",
+    "cohort_retention": "heatmap", "mix_shift": "waterfall", "growth_decomposition": "waterfall",
+}
+
+
 def refusal_from_text(text: str) -> Refusal:
     """Any engine refusal as the contract's Refusal.
 
@@ -71,11 +111,7 @@ def refusal_from_text(text: str) -> Refusal:
     X / reason: CODE) and the older LoadRefused messages (BLOCKED / WHY? / NEXT STEP: prose). The
     fields are read from their line prefixes; a missing one is left empty rather than invented.
     """
-    # A web visitor never sees where the server keeps files: an engine message that names a path
-    # under the workspace root shows it relative to the workspace (P14-O9).
-    for root in {str(WORKSPACE_ROOT.resolve()), str(WORKSPACE_ROOT)}:
-        text = re.sub(re.escape(root) + r"/ws_[0-9a-f]{12}/(?:uploads/)?", "", text)
-        text = text.replace(root, "workspace")
+    text = redact(text)
     what = why = step = ""
     for line in text.splitlines():
         if line.startswith("BLOCKED:"):
@@ -491,6 +527,142 @@ class RealBackend:
             r = refusal_from_text(text)
             return ActionResult(ok=False, message=r.what, refusal=r)
         return ActionResult(ok=True, message=text)
+
+    # --- Explore: analyses with no model in between (P14-D65) ------------------------------
+
+    def analysis_menu(self, workspace_id: str, dataset_name: str) -> AnalysisMenu:
+        import inspect
+
+        from analytics_agent.analysis import registry
+        from analytics_agent.contract import store as contract_store
+
+        with self._workspace(workspace_id):
+            stored = None
+            if self._exists(workspace_id):
+                con = db.connect(workspace_id)
+                try:
+                    stored = contract_store.current(con, dataset_name)
+                    if stored is not None:
+                        defaults = self._form_defaults(con, dataset_name, stored.contract)
+                finally:
+                    con.close()
+        if stored is None:
+            r = refusal_from_text(
+                f"BLOCKED: {dataset_name} has no confirmed Dataset Contract.\n"
+                f"WHY: no number is computed until what a row is and what each measure means "
+                f"has been agreed.\n"
+                f'NEXT STEP: call confirm_dataset_contract(dataset_name="{dataset_name}") '
+                f"on the Contract screen.\n\nreason: NO_CONTRACT")
+            return AnalysisMenu(dataset_name, [], refusal=r)
+        c = stored.contract
+        measures = [m.name for m in c.measures]
+        # A measure declared agg='none' has no total per period: offered last as `against`.
+        additive = [m.name for m in c.measures if (m.agg or "none") != "none"]
+        dims = defaults["dims"]
+        specs = []
+        for name, a in registry.REGISTRY.items():
+            fields = []
+            for p in list(inspect.signature(a.run).parameters.values())[3:]:
+                if p.kind is p.VAR_KEYWORD:
+                    continue
+                required = p.default is inspect.Parameter.empty
+                kind, opts, default = "text", [], defaults.get(p.name)
+                if p.name == "measure":
+                    kind, opts = "measure", measures
+                elif p.name == "against":
+                    kind = "measure"
+                    opts = [m for m in additive[1:] + additive[:1]] + \
+                        [m for m in measures if m not in additive]
+                elif p.name == "entity":
+                    kind, opts = "dimension", list(reversed(dims))  # most distinct first
+                elif p.name == "column":
+                    kind, opts = "dimension", dims + measures
+                elif p.name in ("columns", "second_dimension"):
+                    kind, opts = "dimension", dims[1:] + dims[:1]
+                elif p.name in _DIMENSION_ARGS:
+                    kind, opts = "dimension", dims
+                elif p.name == "period" and name == "cohort_retention":
+                    # Here `period` is the cohort's grain, not a date (its signature says so).
+                    kind, opts, default = "choice", ["week", "month", "quarter"], "month"
+                elif p.name in _CHOICES:
+                    kind, opts = "choice", _CHOICES[p.name]
+                    default = "month" if p.name == "grain" else None
+                elif p.name in _NUMBER_ARGS:
+                    kind = "number"
+                if kind in ("measure", "dimension") and opts:
+                    default = opts[0]
+                # An optional argument stays the engine's to default -- except grain, and measure,
+                # which the tests of tier 6 take as one of "measure or second_dimension".
+                if not required and p.name not in ("grain", "measure"):
+                    default = None
+                fields.append(AnalysisParam(p.name, kind, required, list(opts), default,
+                                            _PARAM_HELP.get(p.name, "")))
+            specs.append(AnalysisSpec(name, a.tier, a.summary, fields, CHART_FOR.get(name)))
+        return AnalysisMenu(dataset_name, specs)
+
+    @staticmethod
+    def _form_defaults(con, dataset_name: str, contract) -> dict:
+        """Values that make each analysis runnable as it first appears: the dimension with the
+        fewest groups first (the group caps refuse a 60-customer one), the last two months as
+        period and baseline, the analysis window's two halves as before and after."""
+        q = lambda n: '"' + n.replace('"', '""') + '"'  # noqa: E731
+        dims = list(contract.dimensions)
+        if dims:
+            counts = con.execute("SELECT " + ", ".join(f"count(DISTINCT {q(d)})" for d in dims)
+                                 + f" FROM {q(dataset_name)}").fetchone()
+            dims = [d for _, d in sorted(zip(counts, dims))]
+        out: dict = {"dims": dims}
+        date = contract.date_column
+        if date:
+            months = [r[0] for r in con.execute(
+                f"SELECT DISTINCT strftime({q(date)}, '%Y-%m') AS m FROM {q(dataset_name)} "
+                f"WHERE {q(date)} IS NOT NULL ORDER BY m").fetchall()]
+            if len(months) >= 2:
+                out["period"], out["baseline"] = months[-1], months[-2]
+        window = getattr(contract, "analysis_window", None)
+        if window:
+            mid = window.start + (window.end - window.start) / 2
+            out.update(before_start=window.start.isoformat(), before_end=mid.isoformat(),
+                       after_start=(mid + _dt.timedelta(days=1)).isoformat(),
+                       after_end=window.end.isoformat())
+        return out
+
+    def run_analysis(self, workspace_id: str, dataset_name: str, analysis_type: str,
+                     params: dict, chart: str | None = None) -> AnalysisRun:
+        from analytics_agent.analysis import tools as analysis_tools
+
+        args = {k: v for k, v in params.items() if v not in (None, "")}
+        before = {a.path for a in self.list_artifacts(workspace_id)}
+        with self._workspace(workspace_id):
+            text = server.compute_analysis(dataset_name=dataset_name,
+                                           analysis_type=analysis_type,
+                                           workspace_id=workspace_id, **args)
+            if _refused(text):
+                return AnalysisRun("", refusal=refusal_from_text(text))
+            note = ""
+            if chart:
+                con = db.connect(workspace_id)
+                try:
+                    drawn = analysis_tools.render_chart(
+                        con, workspace_id, dataset_name, analysis_type, chart,
+                        pick_y=True, **args)
+                finally:
+                    con.close()
+                if _refused(drawn):
+                    note = ("\n\n*No chart: " + refusal_from_text(drawn).why
+                            + " The table above is the answer.*")
+        new = [a for a in self.list_artifacts(workspace_id) if a.path not in before]
+        return AnalysisRun(redact(text) + note, new)
+
+    def build_report(self, workspace_id: str, dataset_name: str, question: str) -> AnalysisRun:
+        before = {a.path for a in self.list_artifacts(workspace_id)}
+        with self._workspace(workspace_id):
+            text = server.build_report(dataset_name=dataset_name, question=question,
+                                       workspace_id=workspace_id)
+        if _refused(text):
+            return AnalysisRun("", refusal=refusal_from_text(text))
+        new = [a for a in self.list_artifacts(workspace_id) if a.path not in before]
+        return AnalysisRun(redact(text), new)
 
     # --- chat, files, reset --------------------------------------------------------------
 

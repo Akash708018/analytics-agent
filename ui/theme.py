@@ -95,6 +95,10 @@ p, li, label {{ color: var(--text); }}
 .stButton > button[kind="secondary"]:hover {{ background: #fcecd4; border-color: #aa7c55;
   color: #725039; }}
 .stButton > button:disabled {{ opacity: .45; box-shadow: none; transform: none; }}
+/* The label is a paragraph Streamlit colours itself: on a terracotta button it came out dark on
+   copper, unreadable (seen in the browser check, Step 9). It takes the button's colour. */
+.stButton > button p, .stDownloadButton > button p, .stFormSubmitButton > button p {{
+  color: inherit; }}
 
 /* Cards: warm panel, fine copper-sand border, soft lift. */
 [data-testid="stExpander"], [data-testid="stForm"], .aa-card {{

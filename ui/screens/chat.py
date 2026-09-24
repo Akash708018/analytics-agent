@@ -26,6 +26,10 @@ def _artifact(art: Artifact) -> None:
 def _turn(turn: ChatTurn) -> None:
     if turn.error:
         st.error(turn.error)
+        # A failed turn is not a dead end: every analysis the assistant would run is on Explore,
+        # which needs a contract and no model (P14-D65).
+        st.caption("Every analysis the assistant runs is also on **Explore**, which needs no "
+                   "model key -- the same engine, the same contract.")
     if turn.reply:
         st.markdown(turn.reply)
     for art in turn.artifacts:
@@ -41,7 +45,7 @@ def _turn(turn: ChatTurn) -> None:
 
 
 def render() -> None:
-    theme.eyebrow("04 / Analyse")
+    theme.eyebrow("05 / Ask")
     st.title("Ask in your *own words.*")
     st.caption("Ask in your own words. Every number comes from an analysis run under the "
                "dataset's contract.")

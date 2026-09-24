@@ -16,7 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import streamlit as st  # noqa: E402
 
 from ui import components, journey, theme  # noqa: E402
-from ui.screens import chat, clean, contract, files, ingest  # noqa: E402
+from ui.screens import chat, clean, contract, explore, files, ingest  # noqa: E402
 
 st.set_page_config(page_title="Analytics Agent", page_icon=":material/insights:", layout="wide")
 # One stylesheet per render, every page's rules included: see theme.apply.
@@ -29,6 +29,7 @@ pages = [
     st.Page(ingest.render, title="Upload & read", icon=":material/upload_file:", url_path="upload"),
     st.Page(clean.render, title="Clean", icon=":material/cleaning_services:", url_path="clean"),
     st.Page(contract.render, title="Contract", icon=":material/verified:", url_path="contract"),
+    st.Page(explore.render, title="Explore", icon=":material/query_stats:", url_path="explore"),
     st.Page(chat.render, title="Ask", icon=":material/forum:", url_path="ask"),
     st.Page(files.render, title="Files", icon=":material/folder_open:", url_path="files"),
 ]

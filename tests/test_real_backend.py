@@ -360,3 +360,45 @@ def test_cleaning_a_workspace_never_written_creates_nothing(be):
     wid = be.new_workspace_id()
     assert be.propose_cleaning(wid, "x").refusal.reason == "DATASET_NOT_LOADED"
     assert not (WORKSPACE_ROOT / wid).exists()
+
+
+# --- Explore: analyses with no model (Phase 14 Step 9, P14-D65) ----------------------------------
+
+def test_the_analysis_menu_is_the_contract_gate(be, ws):
+    _loaded(be, ws)
+    menu = be.analysis_menu(ws, "clean_sales")
+    assert menu.refusal is not None and menu.refusal.reason == "NO_CONTRACT" and not menu.analyses
+
+
+def test_every_analysis_runs_from_its_form_defaults_and_charts_where_it_should(be, ws):
+    """The form is what a demo clicks through: every one of the 27 must run as it first appears,
+    draw where it has a chart, and show no server path."""
+    from analytics_agent.analysis import registry
+    from analytics_agent.config import WORKSPACE_ROOT
+    _loaded(be, ws)
+    assert be.confirm_contract(ws, be.draft_contract(ws, "clean_sales", **ANSWERS)).ok
+    menu = be.analysis_menu(ws, "clean_sales")
+    assert [s.name for s in menu.analyses] == list(registry.REGISTRY)
+    for spec in menu.analyses:
+        run = be.run_analysis(ws, "clean_sales", spec.name,
+                              {p.name: p.default for p in spec.params}, spec.chart)
+        assert run.refusal is None, (spec.name, run.refusal and run.refusal.text)
+        assert str(WORKSPACE_ROOT) not in run.text, spec.name
+        if spec.chart:
+            assert any(a.kind == "chart" for a in run.artifacts), spec.name
+
+
+def test_a_refused_analysis_comes_back_as_the_engines_refusal(be, ws):
+    _loaded(be, ws)
+    be.confirm_contract(ws, be.draft_contract(ws, "clean_sales", **ANSWERS))
+    run = be.run_analysis(ws, "clean_sales", "top_n", {"dimension": "order_id",
+                                                       "measure": "revenue"})
+    assert run.refusal is not None and run.text == ""
+
+
+def test_the_report_is_built_and_listed(be, ws):
+    _loaded(be, ws)
+    be.confirm_contract(ws, be.draft_contract(ws, "clean_sales", **ANSWERS))
+    rep = be.build_report(ws, "clean_sales", "What drives revenue?")
+    assert rep.refusal is None and [a.kind for a in rep.artifacts] == ["report"]
+    assert b"What drives revenue?" in be.read_artifact(ws, rep.artifacts[0].path)

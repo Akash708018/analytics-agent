@@ -218,6 +218,57 @@ class CleaningProposal:
 
 
 @dataclass(frozen=True)
+class AnalysisParam:
+    """One argument an analysis takes, as a form field.
+
+    `kind` says which widget: "measure" / "dimension" (pick from `options`, the contract's own
+    declared columns), "choice" (pick from `options`), "number", or "text". `default` is the
+    engine's suggestion for this dataset -- the last two months for a period, the window's
+    halves for a before/after split -- and may be None.
+    """
+
+    name: str
+    kind: str
+    required: bool
+    options: list[str] = field(default_factory=list)
+    default: str | float | None = None
+    help: str = ""
+
+
+@dataclass(frozen=True)
+class AnalysisSpec:
+    """One analysis the engine can run on a dataset under its contract. `chart` is the chart
+    kind that draws it, or None when a table is the answer."""
+
+    name: str
+    tier: int
+    summary: str
+    params: list[AnalysisParam]
+    chart: str | None = None
+
+
+@dataclass(frozen=True)
+class AnalysisMenu:
+    """Every analysis for one dataset, with its form. Refused while the dataset has no
+    confirmed contract -- the gate is the engine's, not the screen's."""
+
+    dataset_name: str
+    analyses: list[AnalysisSpec]
+    refusal: Refusal | None = None
+
+
+@dataclass(frozen=True)
+class AnalysisRun:
+    """One analysis (or report) as the engine wrote it. `text` is Markdown: the contract it ran
+    under, what it was computed over, the table. `artifacts` are the files it wrote -- the
+    chart, the result table, the report."""
+
+    text: str
+    artifacts: list[Artifact] = field(default_factory=list)
+    refusal: Refusal | None = None
+
+
+@dataclass(frozen=True)
 class DatasetSummary:
     """One dataset in the workspace and where it has got to.
 
@@ -335,6 +386,18 @@ class Backend(Protocol):
         """Run exactly the approved steps of the latest proposal, in the order given, or none.
         Refused if the table changed since the proposal, an id is unknown, or none is given."""
 
+    def analysis_menu(self, workspace_id: str, dataset_name: str) -> AnalysisMenu:
+        """Every analysis runnable on this dataset, each with its form. Refused without a
+        confirmed contract."""
+
+    def run_analysis(self, workspace_id: str, dataset_name: str, analysis_type: str,
+                     params: dict, chart: str | None = None) -> AnalysisRun:
+        """Run one analysis under the contract, and draw it when `chart` is given. The same
+        gate and the same engine calls the assistant makes -- with no model in between."""
+
+    def build_report(self, workspace_id: str, dataset_name: str, question: str) -> AnalysisRun:
+        """The full report for a dataset: every section, every number traced to its call."""
+
     def chat(self, workspace_id: str, history: list[dict], message: str) -> ChatTurn:
         """Answer one message. history is [{"role": "user"|"assistant", "content": str}, ...],
         oldest first, not including `message`."""
@@ -352,7 +415,8 @@ class Backend(Protocol):
 
 __all__ = [
     "AGGREGATIONS", "DTYPES", "HEADER_JOINS", "ROLES",
-    "ActionResult", "Artifact", "Backend", "ChatTurn", "CleaningProposal", "CleaningStep",
+    "ActionResult", "AnalysisMenu", "AnalysisParam", "AnalysisRun", "AnalysisSpec", "Artifact",
+    "Backend", "ChatTurn", "CleaningProposal", "CleaningStep",
     "ColumnDraft", "ContractColumn",
     "ContractDraft", "DatasetSummary", "GridPreview", "IngestDraft", "Limits", "Refusal",
     "ToolCall", "UploadResult",

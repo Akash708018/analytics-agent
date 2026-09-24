@@ -2,7 +2,7 @@
 
 Every date is the day a phase's first commit landed (`git log`), and every figure is one a command
 printed -- the repository's rule that nothing is recorded without its output applies to what the
-product says about itself too. Figures are as of 22/09/2026; update STATS when they change.
+product says about itself too. Figures are as of 24/09/2026; update STATS when they change.
 """
 
 from __future__ import annotations
@@ -84,12 +84,17 @@ CHAPTERS: tuple[Chapter, ...] = (
     Chapter("Phase 14", "22/09/2026", "A door for everyone",
             "The same engine, opened to the browser -- measured first: locks, threads and "
             "sessions, before a single screen. You are reading its first page.",
-            "in progress", "bot"),
+            "7 screens", "bot"),
+    Chapter("Stress", "24/09/2026", "Ninety-five kinds of bad data",
+            "Every tool driven over files built to break it: Windows exports, pasted headers, "
+            "totals rows, two-digit years, merged cells, twenty-digit ids. Each round's bugs "
+            "fixed and the round run again, until a round found nothing.",
+            "95 datasets · 0 crashes", "shield-check"),
 )
 
 STATS: tuple[tuple[str, str], ...] = (
-    ("29", "tools"), ("27", "analyses"), ("1,787", "tests passing"), ("76/76", "eval score"),
-    ("96", "self-corrections logged"), ("140", "commits"),
+    ("29", "tools"), ("27", "analyses"), ("1,949", "tests passing"), ("76/76", "eval score"),
+    ("101", "self-corrections logged"), ("95", "stress datasets"),
 )
 
 # The portfolio's own vocabulary for this project (its formula-map.js, chapter "#agent"), plus
@@ -292,9 +297,9 @@ def page_html(nonce: int = 0) -> str:
         '<div class="aa-j-hero"><div class="aa-j-art"></div>',
         '<div class="aa-j-kicker">ANALYTICS AGENT · THE JOURNEY</div>',
         '<div class="aa-j-h1">How this engine <em>was made.</em></div>',
-        '<p class="aa-j-note">Fifteen chapters, from a server that could only say "ping" to a '
+        '<p class="aa-j-note">Sixteen chapters, from a server that could only say "ping" to a '
         "door anyone can open. Watch each one write itself in.</p>",
-        '<div class="aa-j-meta"><span>27/08/2026 → 22/09/2026</span><span>MCP + DUCKDB</span>'
+        '<div class="aa-j-meta"><span>27/08/2026 → 24/09/2026</span><span>MCP + DUCKDB</span>'
         "<span>HUMAN IN THE LOOP</span></div></div>",
         '<div class="aa-j-rail">',
     ]

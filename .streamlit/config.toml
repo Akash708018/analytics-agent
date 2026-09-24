@@ -10,6 +10,10 @@ enableStaticServing = true
 [browser]
 gatherUsageStats = false
 
+[client]
+# No "Deploy" button or developer menu for a visitor (seen in the browser check, Step 9).
+toolbarMode = "viewer"
+
 # The portfolio's "warm data studio" tokens (akash-portfolio dist/styles.css).
 [theme]
 base = "light"

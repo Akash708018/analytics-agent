@@ -6349,3 +6349,41 @@ load-time check that the suggested cleaning corrects, except the two by design. 
   413c50c1e39c4210414dd2f93f4737c31a62ff6ef8353eae6af1ed27a4260c19  src/analytics_agent/webapp/real_backend.py
   d1c99f56145d1b22eeb2606f6378f360fec6481266a542a18fe27c9ffde785b2  tests/test_stress_fixes.py
   14fa6d72d444286064971d69cf51c2fbb53bf70417c13b8396a6daa5b67e3098  scripts/stress_matrix.py
+
+## Phase 14, Step 9 - the app in a real browser, and ready to demo, 24/09/2026
+
+Step document: docs/steps/phase14_step9_browser_and_demo.md. Walkthrough: docs/DEMO.md.
+
+P14-D65. EXPLORE: EVERY ANALYSIS WITHOUT A MODEL, BEHIND THE SAME GATE. The browser run found no
+analysis reachable in the web app without a model key. The Backend contract gains analysis_menu,
+run_analysis and build_report, and an Explore screen between Contract and Ask runs them: a form
+per analysis built from the registry's signatures and the contract's declared columns, defaults
+that run as they first appear (27 of 27, measured), and a chart through render_chart's new
+pick_y -- the refusal's own suggested y, used only by a caller with no one to ask; the MCP tool
+never passes it. No contract, no menu: the NO_CONTRACT refusal is the engine's.
+P14-D66. THE BROWSER WALK IS A SCRIPT. scripts/browser_check.py drives headless Chromium through
+all seven screens on the real engine, with the real widgets, screenshots each, and fails on any
+exception box. Streamlit's deep-link probes and refused web fonts are listed apart as known.
+P14-D67. DEMO SURFACES. A sample workbook through the upload path; Next in words; no Deploy button;
+readable button labels; the Journey measured to 24/09; docs/DEMO.md.
+
+C102. I WROTE FIGURES INTO THE DEMO SCRIPT BEFORE MEASURING THEM. "1,947 tests" and "36 bugs" went
+into docs/DEMO.md as I drafted it; the suite printed 1,900 + 49 = 1,949, and the rounds' records
+add to 34. Both corrected before commit -- the claim-before-output failure C61-C76 name, in a
+document meant to be read aloud.
+
+MEASURED VALIDATION, 24/09/2026. Engine 1896 -> 1900; UI 43 -> 49; acceptance in this container
+55/0/3, 0/0/1, 0/0/1, 26/0/0, 36/0/0, phase 6 36/0/0; eval 76/76; browser walk 11 screens, 0
+exceptions. Digests:
+  7f94f1c8118ba91c84199d788b13cbedef75a9d33e289739cf8e77c27f80da0a  src/analytics_agent/webapp/real_backend.py
+  162ce8f82fb0fcbc678fcbca69ecb4fded54a6cda1f4c2b098b6a9ea8a982722  src/analytics_agent/webapp/contract.py
+  5358805d0f15d4281b9496abbaf2c98cb6a117a41dcc7c14c8ac87a6743f57a0  src/analytics_agent/analysis/tools.py
+  d29cbae6acab93840be002b0f5b05130a1d05571dbc2bf2955052776fb045fe1  ui/screens/explore.py
+  5972aacde62c9759e20113f0b84af3f8b9a66a5d6b24e975f1197e813af712b4  ui/screens/ingest.py
+  55430d4d5284d9c6940176f0da0667797dbf52d02ecdbd22333d84fc8b744113  ui/components.py
+  15304dd45551c443f74e27492cbceb70c1722756fc8976641e3e0a674104655d  ui/theme.py
+  c4dfcbb3f0417f76e5058cc437ab04b0e4d10a5d33a7a776cbb70a6e9b2029fa  ui/journey.py
+  160f502731b697216c828a3904e0c751e8461741db29daf2c8529481f19b6ce3  ui/fake_backend.py
+  d640da09ead514155918e315efa58ae0a523b7d80bda1983686eb36004499a19  scripts/browser_check.py
+  b09783b3f25702e8145a2fa896a894190387d6959270c7fc0dbfae1d439a3ee4  ui/samples/sales_2024.xlsx
+  93954ef35b42eda1348e800d36dca8caf9a35efd7e12bc309e56b74e41e21d8e  docs/DEMO.md

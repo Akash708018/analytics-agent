@@ -282,9 +282,14 @@ def render_chart(
     x: str | None = None,
     y: str | None = None,
     title: str | None = None,
+    pick_y: bool = False,
     **params,
 ) -> str:
     """Run one analysis and draw it, under the same contract and the same gate.
+
+    `pick_y` is for a caller that has no one to ask -- the web app's Explore screen: when the
+    result offers several measures, draw the one the refusal would have named (_suggested_y)
+    instead of refusing. The MCP tool never passes it; an agent is still made to choose.
 
     A chart is a claim about data, so it goes through the gate a table goes
     through -- `_produce` is the same ladder `compute_analysis` climbs, and a
@@ -306,16 +311,23 @@ def render_chart(
         return exc.text
 
     try:
-        drawn = render(
-            workspace_id,
-            kind=chart,
-            output=output,
-            label=output.label,
-            dataset_name=dataset_name,
-            x=x,
-            y=[y] if y else None,
-            title=title,
-        )
+        try:
+            drawn = render(
+                workspace_id,
+                kind=chart,
+                output=output,
+                label=output.label,
+                dataset_name=dataset_name,
+                x=x,
+                y=[y] if y else None,
+                title=title,
+            )
+        except ChartRefused as exc:
+            if not (pick_y and exc.choices and y is None):
+                raise
+            y = _suggested_y(exc.choices, used.get("measure"))
+            drawn = render(workspace_id, kind=chart, output=output, label=output.label,
+                           dataset_name=dataset_name, x=x, y=[y], title=title)
     except ChartRefused as exc:
         detail = (
             "The numbers are not in question -- the analysis ran. This is "

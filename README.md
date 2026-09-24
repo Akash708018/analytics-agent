@@ -28,3 +28,16 @@ flowchart TD
     DuckDB --> PG[(<b>PostgreSQL</b><br>ATTACH READ_ONLY)]
     DuckDB --> Files[<b>Excel / CSV</b><br>Streamed]
 ```
+
+## Run it
+
+```bash
+uv sync --all-groups
+ANALYTICS_UI_BACKEND=real uv run --group ui streamlit run ui/app.py   # the web app, on the engine
+uv run pytest -q                                                      # the engine's suite
+uv run python scripts/stress_matrix.py --round all                    # 95 files built to break it
+```
+
+The web app runs Upload & read → Clean → Contract → Explore / Ask → Files. Nothing loads, changes
+or gets computed without a person's approval at each gate. The walkthrough, with what to say at
+each screen, is in [`docs/DEMO.md`](docs/DEMO.md); screenshots are in `docs/demo/screens/`.

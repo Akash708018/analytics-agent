@@ -19,7 +19,7 @@ from ui.fake_backend import FakeBackend  # noqa: E402
 
 APP = str(ROOT / "ui" / "app.py")
 SCREENS = {"upload": "ui.screens.ingest", "clean": "ui.screens.clean",
-           "contract": "ui.screens.contract",
+           "contract": "ui.screens.contract", "explore": "ui.screens.explore",
            "ask": "ui.screens.chat", "files": "ui.screens.files"}
 
 
@@ -63,7 +63,7 @@ def test_the_journey_is_written_and_the_stylesheet_is_one_block():
     htmls = [h.proto.body for h in at.get("html")]
     page = next(h for h in htmls if "aa-j-rail" in h)
     assert "How this engine <em>was made.</em>" in page
-    assert page.count('class="aa-j-ch"') == 15  # every chapter
+    assert page.count('class="aa-j-ch"') == 16  # every chapter, the stress rounds' included (Step 9)
     # The portfolio's field notes for this project, in its own words.
     assert "{ contract: confirmed }" in page and "propose → approve → apply" in page
     styles = [h for h in htmls if h.lstrip().startswith("<style>")]
@@ -228,6 +228,7 @@ def test_a_failed_turn_is_shown_and_the_conversation_survives():
     at = screen("ask").run()
     at.chat_input[0].set_value("fail").run()
     assert "did not answer in time" in _text(at)
+    assert "also on **Explore**" in _text(at)  # a failed turn points at the no-model path
     at.chat_input[0].set_value("hello").run()
     assert "Try *show me a chart*" in _text(at)
 
@@ -372,3 +373,51 @@ def test_the_clean_screen_converts_the_text_date_on_the_real_engine(monkeypatch)
         backend.get_backend.clear()
         workspace.reset(ws)
         workspace.workspace_dir(ws).rmdir()
+
+
+# --- the Explore screen (Phase 14 Step 9, P14-D65) -------------------------------------------------
+
+def test_explore_runs_an_analysis_with_no_model_and_draws_it():
+    at = screen("explore").run()
+    assert not at.exception, at.exception
+    at.selectbox(key="explore_kind_geolocation").set_value("top_n").run()
+    [b for b in at.button if b.label == "Run top_n"][0].click().run()
+    assert not at.exception, at.exception
+    assert len(at.get("imgs")) >= 1 or at.get("image")  # the chart
+    assert any("1,000 of 1,000 row(s) analysed" in m.value for m in at.markdown)
+
+
+def test_explore_builds_the_report():
+    at = screen("explore").run()
+    [b for b in at.button if b.label == "Build the report"][0].click().run()
+    assert not at.exception, at.exception
+    assert any("Report written" in m.value for m in at.markdown)
+
+
+def test_explore_without_a_contract_is_the_engines_refusal():
+    at = screen("explore")
+    at.run()
+    from ui.backend import get_backend
+    be = get_backend()
+    ws = at.session_state["workspace_id"]
+    path = be.save_upload(ws, "sales.csv", b"x").path
+    be.confirm_ingest(ws, be.draft_ingest(ws, path, header_rows=[1, 2]).spec)
+    at.run()
+    at.selectbox(key="explore_dataset").set_value("sales").run()
+    assert not at.exception, at.exception
+    assert any("no confirmed Dataset Contract" in e.value for e in at.error)
+
+
+def test_the_sample_workbook_loads_through_the_upload_path():
+    at = screen("upload").run()
+    [b for b in at.button if b.label.startswith("No file to hand?")][0].click().run()
+    assert not at.exception, at.exception
+    assert at.session_state["ingest"]["path"].endswith("sales_2024.xlsx")
+    assert [b for b in at.button if b.label == "Confirm and load"]
+
+
+def test_the_sidebar_says_where_the_next_step_is_taken():
+    from ui.components import next_step_words
+    assert "**Contract**" in next_step_words('propose_dataset_contract(dataset_name="x")')
+    assert "**Explore**" in next_step_words('compute_analysis(dataset_name="x", ...)')
+    assert next_step_words("mystery()") == "`mystery()`"

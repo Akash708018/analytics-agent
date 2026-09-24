@@ -38,6 +38,26 @@ def workspace_id() -> str:
     return wid
 
 
+# The engine names its next step as a call; the sidebar says where a person takes it (display
+# only -- the step itself is still the engine's). An unknown call is shown as the call.
+_SCREEN_FOR = (
+    (("propose_cleaning_plan", "apply_cleaning_plan"), "review the proposed fixes on **Clean**"),
+    (("propose_dataset_contract", "confirm_dataset_contract"),
+     "agree what the columns mean on **Contract**"),
+    (("run_analysis", "compute_analysis", "render_chart"),
+     "run an analysis on **Explore**, or ask on **Ask**"),
+    (("propose_ingest_spec", "confirm_ingest_spec", "load_csv", "load_excel"),
+     "load it on **Upload & read**"),
+)
+
+
+def next_step_words(call: str) -> str:
+    for names, words in _SCREEN_FOR:
+        if call.split("(", 1)[0].strip() in names:
+            return words
+    return f"`{call}`"
+
+
 def show_refusal(refusal: Refusal) -> None:
     """A refusal as the engine meant it: what, why, and the one call that fixes it."""
     st.error(f"**{refusal.what}**\n\n{refusal.why}")
@@ -63,7 +83,7 @@ def sidebar() -> None:
                 f'{theme.pill(html.escape(d.stage), theme.stage_kind(d.stage))}</div>')
             for note in d.notes:  # every note, never truncated
                 st.html(f'<div class="aa-subset">{html.escape(note)}</div>')
-            st.caption(f"Next: `{d.next_step}`")
+            st.caption(f"Next: {next_step_words(d.next_step)}")
         st.divider()
         # The portfolio's "Pause motion": stops every animation, keeps two faint marks.
         st.toggle("Motion", value=theme.motion_on(), key="motion",
@@ -75,9 +95,11 @@ def sidebar() -> None:
             st.session_state.pop("reset_confirm", None)
             for key in [k for k in st.session_state
                         if k in ("ingest", "contract_draft", "contract_result", "chat",
-                                 "clean_proposal", "clean_result", "clean_dataset")
-                        or k.startswith(("clean_", "c_grain_", "c_from_", "c_to_", "c_rows_",
-                                         "c_caveats_", "c_agg_", "c_def_", "contract_cols_"))]:
+                                 "clean_proposal", "clean_result", "clean_dataset",
+                                 "explore_runs", "explore_dataset")
+                        or k.startswith(("clean_", "x_", "explore_", "c_grain_", "c_from_",
+                                         "c_to_", "c_rows_", "c_caveats_", "c_agg_", "c_def_",
+                                         "contract_cols_"))]:
                 st.session_state.pop(key, None)
             st.toast(result.message)
             st.rerun()

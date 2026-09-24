@@ -17,7 +17,8 @@ import zlib
 from dataclasses import dataclass, field, replace
 
 from analytics_agent.webapp.contract import (
-    ActionResult, Artifact, ChatTurn, CleaningProposal, CleaningStep, ColumnDraft, ContractColumn, ContractDraft,
+    ActionResult, AnalysisMenu, AnalysisParam, AnalysisRun, AnalysisSpec, Artifact, ChatTurn,
+    CleaningProposal, CleaningStep, ColumnDraft, ContractColumn, ContractDraft,
     DatasetSummary, GridPreview, IngestDraft, Limits, Refusal, ToolCall, UploadResult,
 )
 
@@ -363,6 +364,56 @@ class FakeBackend:
             done.extend(approved_action_ids)
         return ActionResult(ok=True, message=(
             f"Applied {', '.join(approved_action_ids)} to {dataset_name}; row count unchanged."))
+
+    # Three analyses, one per shape the Explore screen draws: no arguments, a grouping, a calendar.
+    def analysis_menu(self, workspace_id: str, dataset_name: str) -> AnalysisMenu:
+        with self._lock:
+            ds = self._ws(workspace_id).datasets.get(dataset_name)
+        if ds is None or not ds.stage.startswith("contract v"):  # "loaded, no contract" has none
+            r = _refusal("NO_CONTRACT", f"{dataset_name} has no confirmed Dataset Contract.",
+                         "no number is computed until a contract is agreed.",
+                         f'confirm_dataset_contract(dataset_name="{dataset_name}")')
+            return AnalysisMenu(dataset_name, [], refusal=r)
+        dims = ["geolocation_state", "geolocation_city"]
+        return AnalysisMenu(dataset_name, [
+            AnalysisSpec("summary_stats", 1, "Every declared measure summarised.", [], "box"),
+            AnalysisSpec("top_n", 1, "The largest groups of a dimension by a measure.", [
+                AnalysisParam("dimension", "dimension", True, dims, dims[0], "group by"),
+                AnalysisParam("measure", "measure", True, ["geolocation_lat"], "geolocation_lat"),
+                AnalysisParam("n", "number", False, [], None, "how many groups")], "bar"),
+            AnalysisSpec("trend", 3, "One measure per period.", [
+                AnalysisParam("measure", "measure", True, ["geolocation_lat"], "geolocation_lat"),
+                AnalysisParam("grain", "choice", False, ["month", "quarter"], "month")], "line"),
+        ])
+
+    def run_analysis(self, workspace_id: str, dataset_name: str, analysis_type: str,
+                     params: dict, chart: str | None = None) -> AnalysisRun:
+        if params.get("measure") == "nope":
+            r = _refusal("ANALYSIS_NOT_POSSIBLE", f"{analysis_type} cannot use 'nope'.",
+                         "it is not a declared measure.", "list_datasets()")
+            return AnalysisRun("", refusal=r)
+        values = [3.0, 5.0, 4.0, 6.5, 7.0]
+        text = (f"Under contract v1 for {dataset_name}: one row = one location sample.\n\n"
+                f"What this shows:\n  - 1,000 of 1,000 row(s) analysed.\n\n"
+                f"| group | value |\n|---|---|\n| SP | 7.0 |\n| RJ | 6.5 |")
+        arts = []
+        with self._lock:
+            space = self._ws(workspace_id)
+            if chart:
+                arts.append(self._artifact(space, "chart", f"{analysis_type}.png",
+                                           f"{analysis_type} {chart}", _png(values),
+                                           f"{chart} of {analysis_type}: lowest 3.0, highest 7.0"))
+            arts.append(self._artifact(space, "result", f"{analysis_type}.csv", analysis_type,
+                                       b"group,value\nSP,7.0\nRJ,6.5\n", "the full table"))
+        return AnalysisRun(text, arts)
+
+    def build_report(self, workspace_id: str, dataset_name: str, question: str) -> AnalysisRun:
+        body = (f"# {dataset_name}\n\n**Question.** {question}\n\n"
+                "Nine sections, every number traced to its call.").encode()
+        with self._lock:
+            art = self._artifact(self._ws(workspace_id), "report", f"{dataset_name}.md",
+                                 f"{dataset_name} report", body, "9 sections")
+        return AnalysisRun(f"Report written: {art.path}", [art])
 
     def chat(self, workspace_id: str, history: list[dict], message: str) -> ChatTurn:
         text = message.lower()
