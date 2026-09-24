@@ -1,0 +1,769 @@
+{
+ "gemini": [
+  {
+   "id": "R01",
+   "status": "DONE",
+   "model": "gemini-3.5-flash-lite",
+   "served_model": "gemini-3.5-flash-lite",
+   "latency_s": 1.278,
+   "raw": "{\n  \"internal_fact_ids\": [\n    \"I1\",\n    \"I2\"\n  ],\n  \"external_fact_ids\": [\n    \"E1\",\n    \"E2\",\n    \"E3\"\n  ],\n  \"inference\": \"Product A's revenue fell 27% driven primarily by a 25% drop in units sold, with a minor 3% price increase. While a price increase occurred in April, industry demand remained flat, and a direct substitute competitor launched right at the start of the revenue decline in May.\",\n  \"causality_status\": \"SUPPORTED_ASSOCIATION\",\n  \"plausible_contributors\": [\n    \"competitor\",\n    \"price\"\n  ],\n  \"ruled_out\": [\n    \"demand\"\n  ],\n  \"conclusion\": \"The drop in Product A revenue is strongly associated with the introduction of a competing substitute product and a price increase, while broader industry demand declines are ruled out.\"\n}",
+   "answer": {
+    "internal_fact_ids": [
+     "I1",
+     "I2"
+    ],
+    "external_fact_ids": [
+     "E1",
+     "E2",
+     "E3"
+    ],
+    "inference": "Product A's revenue fell 27% driven primarily by a 25% drop in units sold, with a minor 3% price increase. While a price increase occurred in April, industry demand remained flat, and a direct substitute competitor launched right at the start of the revenue decline in May.",
+    "causality_status": "SUPPORTED_ASSOCIATION",
+    "plausible_contributors": [
+     "competitor",
+     "price"
+    ],
+    "ruled_out": [
+     "demand"
+    ],
+    "conclusion": "The drop in Product A revenue is strongly associated with the introduction of a competing substitute product and a price increase, while broader industry demand declines are ruled out."
+   },
+   "score": {
+    "total": 85.0,
+    "components": {
+     "separation": 30,
+     "causality": 15,
+     "contributors": 20.0,
+     "ruled_out": 10.0,
+     "no_overreach": 10
+    },
+    "failures": []
+   }
+  },
+  {
+   "id": "R02",
+   "status": "DONE",
+   "model": "gemini-3.5-flash-lite",
+   "served_model": "gemini-3.5-flash-lite",
+   "latency_s": 3.567,
+   "raw": "{\n  \"internal_fact_ids\": [\n    \"I1\",\n    \"I2\"\n  ],\n  \"external_fact_ids\": [\n    \"E1\",\n    \"E2\"\n  ],\n  \"inference\": \"The decline in ROAS from 4.1 to 2.9 is explained by a combination of rising ad costs (CPM inflation) and measurement challenges due to platform privacy changes, alongside diminishing returns from a 60% increase in paid social spend that only yielded an 8% revenue increase.\",\n  \"causality_status\": \"SUPPORTED_ASSOCIATION\",\n  \"plausible_contributors\": [\n    \"cpm\",\n    \"tracking\",\n    \"spend\"\n  ],\n  \"ruled_out\": [],\n  \"conclusion\": \"Paid social ROAS fell due to a mix of higher advertising costs, tracking limitations reducing attributed conversions, and inefficient scaling of ad spend.\"\n}",
+   "answer": {
+    "internal_fact_ids": [
+     "I1",
+     "I2"
+    ],
+    "external_fact_ids": [
+     "E1",
+     "E2"
+    ],
+    "inference": "The decline in ROAS from 4.1 to 2.9 is explained by a combination of rising ad costs (CPM inflation) and measurement challenges due to platform privacy changes, alongside diminishing returns from a 60% increase in paid social spend that only yielded an 8% revenue increase.",
+    "causality_status": "SUPPORTED_ASSOCIATION",
+    "plausible_contributors": [
+     "cpm",
+     "tracking",
+     "spend"
+    ],
+    "ruled_out": [],
+    "conclusion": "Paid social ROAS fell due to a mix of higher advertising costs, tracking limitations reducing attributed conversions, and inefficient scaling of ad spend."
+   },
+   "score": {
+    "total": 68.33,
+    "components": {
+     "separation": 30,
+     "causality": 15,
+     "contributors": 13.33,
+     "ruled_out": 10.0,
+     "no_overreach": 0
+    },
+    "failures": [
+     "CAUSAL_OVERREACH"
+    ]
+   }
+  },
+  {
+   "id": "R03",
+   "status": "DONE",
+   "model": "gemini-3.5-flash-lite",
+   "served_model": "gemini-3.5-flash-lite",
+   "latency_s": 1.42,
+   "raw": "{\n  \"internal_fact_ids\": [\n    \"I1\",\n    \"I2\"\n  ],\n  \"external_fact_ids\": [\n    \"E1\",\n    \"E2\"\n  ],\n  \"inference\": \"Support tickets surged following a February service outage, leading to an increase in churn starting in March. The competitor's June price cut occurred after churn had already risen.\",\n  \"causality_status\": \"SUPPORTED_ASSOCIATION\",\n  \"plausible_contributors\": [\n    \"outage\"\n  ],\n  \"ruled_out\": [\n    \"competitor\"\n  ],\n  \"conclusion\": \"The February service outage likely drove the increase in support tickets and subsequent rise in customer churn, whereas the June competitor price cut was not the cause since churn rose months prior.\"\n}",
+   "answer": {
+    "internal_fact_ids": [
+     "I1",
+     "I2"
+    ],
+    "external_fact_ids": [
+     "E1",
+     "E2"
+    ],
+    "inference": "Support tickets surged following a February service outage, leading to an increase in churn starting in March. The competitor's June price cut occurred after churn had already risen.",
+    "causality_status": "SUPPORTED_ASSOCIATION",
+    "plausible_contributors": [
+     "outage"
+    ],
+    "ruled_out": [
+     "competitor"
+    ],
+    "conclusion": "The February service outage likely drove the increase in support tickets and subsequent rise in customer churn, whereas the June competitor price cut was not the cause since churn rose months prior."
+   },
+   "score": {
+    "total": 85.0,
+    "components": {
+     "separation": 30,
+     "causality": 15,
+     "contributors": 20.0,
+     "ruled_out": 10.0,
+     "no_overreach": 10
+    },
+    "failures": []
+   }
+  },
+  {
+   "id": "R04",
+   "status": "DONE",
+   "model": "gemini-3.5-flash-lite",
+   "served_model": "gemini-3.5-flash-lite",
+   "latency_s": 0.963,
+   "raw": "{\n  \"internal_fact_ids\": [\n    \"I1\",\n    \"I2\"\n  ],\n  \"external_fact_ids\": [\n    \"E1\",\n    \"E2\"\n  ],\n  \"inference\": \"The internal data shows a significant increase in shipment volume coinciding with longer delivery times. External data confirms national peak shopping season congestion while ruling out fuel price changes as a factor.\",\n  \"causality_status\": \"SUPPORTED_ASSOCIATION\",\n  \"plausible_contributors\": [\n    \"peak\"\n  ],\n  \"ruled_out\": [\n    \"fuel\"\n  ],\n  \"conclusion\": \"Delivery times worsened primarily due to seasonal peak congestion combined with a surge in internal shipment volume, while fluctuating fuel prices were not a factor.\"\n}",
+   "answer": {
+    "internal_fact_ids": [
+     "I1",
+     "I2"
+    ],
+    "external_fact_ids": [
+     "E1",
+     "E2"
+    ],
+    "inference": "The internal data shows a significant increase in shipment volume coinciding with longer delivery times. External data confirms national peak shopping season congestion while ruling out fuel price changes as a factor.",
+    "causality_status": "SUPPORTED_ASSOCIATION",
+    "plausible_contributors": [
+     "peak"
+    ],
+    "ruled_out": [
+     "fuel"
+    ],
+    "conclusion": "Delivery times worsened primarily due to seasonal peak congestion combined with a surge in internal shipment volume, while fluctuating fuel prices were not a factor."
+   },
+   "score": {
+    "total": 75.0,
+    "components": {
+     "separation": 30,
+     "causality": 15,
+     "contributors": 20.0,
+     "ruled_out": 10.0,
+     "no_overreach": 0
+    },
+    "failures": [
+     "CAUSAL_OVERREACH"
+    ]
+   }
+  },
+  {
+   "id": "R05",
+   "status": "DONE",
+   "model": "gemini-3.5-flash-lite",
+   "served_model": "gemini-3.5-flash-lite",
+   "latency_s": 0.969,
+   "raw": "{\"internal_fact_ids\": [\"I1\", \"I2\"], \"external_fact_ids\": [\"E1\", \"E2\"], \"inference\": \"The conversion rate dropped significantly immediately following the June 9 release, with mobile sessions experiencing the largest decline, while external factors like holidays or promotions are ruled out.\", \"causality_status\": \"SUPPORTED_ASSOCIATION\", \"plausible_contributors\": [\"release\"], \"ruled_out\": [\"holiday\"], \"conclusion\": \"The new mobile checkout release is the primary supported cause of the mobile-driven conversion drop.\"}",
+   "answer": {
+    "internal_fact_ids": [
+     "I1",
+     "I2"
+    ],
+    "external_fact_ids": [
+     "E1",
+     "E2"
+    ],
+    "inference": "The conversion rate dropped significantly immediately following the June 9 release, with mobile sessions experiencing the largest decline, while external factors like holidays or promotions are ruled out.",
+    "causality_status": "SUPPORTED_ASSOCIATION",
+    "plausible_contributors": [
+     "release"
+    ],
+    "ruled_out": [
+     "holiday"
+    ],
+    "conclusion": "The new mobile checkout release is the primary supported cause of the mobile-driven conversion drop."
+   },
+   "score": {
+    "total": 85.0,
+    "components": {
+     "separation": 30,
+     "causality": 15,
+     "contributors": 20.0,
+     "ruled_out": 10.0,
+     "no_overreach": 10
+    },
+    "failures": []
+   }
+  },
+  {
+   "id": "R06",
+   "status": "DONE",
+   "model": "gemini-3.5-flash-lite",
+   "served_model": "gemini-3.5-flash-lite",
+   "latency_s": 1.342,
+   "raw": "{\n  \"internal_fact_ids\": [\n    \"I1\",\n    \"I2\"\n  ],\n  \"external_fact_ids\": [\n    \"E1\",\n    \"E2\"\n  ],\n  \"inference\": \"The introduction of a national early-discharge incentive in 2024 (E1) combined with an unchanged patient case mix (E2) coincides with a drop in the average length of stay (I1) and a concurrent rise in 30-day readmissions (I2). While the temporal association is strong and alternative explanations like case mix changes are ruled out, true experimental isolation is lacking.\",\n  \"causality_status\": \"SUPPORTED_ASSOCIATION\",\n  \"plausible_contributors\": [\n    \"policy\"\n  ],\n  \"ruled_out\": [\n    \"case_mix\"\n  ],\n  \"conclusion\": \"The early-discharge policy is strongly associated with the shortened stays and increased readmissions, though causal isolation (ESTABLISHED) is not met.\"\n}",
+   "answer": {
+    "internal_fact_ids": [
+     "I1",
+     "I2"
+    ],
+    "external_fact_ids": [
+     "E1",
+     "E2"
+    ],
+    "inference": "The introduction of a national early-discharge incentive in 2024 (E1) combined with an unchanged patient case mix (E2) coincides with a drop in the average length of stay (I1) and a concurrent rise in 30-day readmissions (I2). While the temporal association is strong and alternative explanations like case mix changes are ruled out, true experimental isolation is lacking.",
+    "causality_status": "SUPPORTED_ASSOCIATION",
+    "plausible_contributors": [
+     "policy"
+    ],
+    "ruled_out": [
+     "case_mix"
+    ],
+    "conclusion": "The early-discharge policy is strongly associated with the shortened stays and increased readmissions, though causal isolation (ESTABLISHED) is not met."
+   },
+   "score": {
+    "total": 85.0,
+    "components": {
+     "separation": 30,
+     "causality": 15,
+     "contributors": 20.0,
+     "ruled_out": 10.0,
+     "no_overreach": 10
+    },
+    "failures": []
+   }
+  },
+  {
+   "id": "R07",
+   "status": "DONE",
+   "model": "gemini-3.5-flash-lite",
+   "served_model": "gemini-3.5-flash-lite",
+   "latency_s": 0.927,
+   "raw": "{\n  \"internal_fact_ids\": [\n    \"I1\",\n    \"I2\"\n  ],\n  \"external_fact_ids\": [\n    \"E1\",\n    \"E2\"\n  ],\n  \"inference\": \"The defect rate increase was isolated to line 3 starting in week 14, immediately following a switch in resin supplier for that line in week 13. Meanwhile, plant humidity remained unchanged, ruling out environmental factors.\",\n  \"causality_status\": \"SUPPORTED_ASSOCIATION\",\n  \"plausible_contributors\": [\n    \"supplier\"\n  ],\n  \"ruled_out\": [\n    \"humidity\"\n  ],\n  \"conclusion\": \"The switch in resin supplier on line 3 is the most plausible cause for the rise in defect rates.\"\n}",
+   "answer": {
+    "internal_fact_ids": [
+     "I1",
+     "I2"
+    ],
+    "external_fact_ids": [
+     "E1",
+     "E2"
+    ],
+    "inference": "The defect rate increase was isolated to line 3 starting in week 14, immediately following a switch in resin supplier for that line in week 13. Meanwhile, plant humidity remained unchanged, ruling out environmental factors.",
+    "causality_status": "SUPPORTED_ASSOCIATION",
+    "plausible_contributors": [
+     "supplier"
+    ],
+    "ruled_out": [
+     "humidity"
+    ],
+    "conclusion": "The switch in resin supplier on line 3 is the most plausible cause for the rise in defect rates."
+   },
+   "score": {
+    "total": 85.0,
+    "components": {
+     "separation": 30,
+     "causality": 15,
+     "contributors": 20.0,
+     "ruled_out": 10.0,
+     "no_overreach": 10
+    },
+    "failures": []
+   }
+  },
+  {
+   "id": "R08",
+   "status": "DONE",
+   "model": "gemini-3.5-flash-lite",
+   "served_model": "gemini-3.5-flash-lite",
+   "latency_s": 1.183,
+   "raw": "{\"internal_fact_ids\": [\"I1\", \"I2\"], \"external_fact_ids\": [\"E1\", \"E2\"], \"inference\": \"The increase in engineering attrition coincides with both a regional increase in engineering salaries and the termination of the company's remote work policy, suggesting multiple potential external drivers for the internal trend.\", \"causality_status\": \"SUPPORTED_ASSOCIATION\", \"plausible_contributors\": [\"market\", \"remote\"], \"ruled_out\": [], \"conclusion\": \"Engineering attrition increased significantly in 2024, likely driven by a combination of competitive market salary pressures and dissatisfaction with the end of remote work.\"}",
+   "answer": {
+    "internal_fact_ids": [
+     "I1",
+     "I2"
+    ],
+    "external_fact_ids": [
+     "E1",
+     "E2"
+    ],
+    "inference": "The increase in engineering attrition coincides with both a regional increase in engineering salaries and the termination of the company's remote work policy, suggesting multiple potential external drivers for the internal trend.",
+    "causality_status": "SUPPORTED_ASSOCIATION",
+    "plausible_contributors": [
+     "market",
+     "remote"
+    ],
+    "ruled_out": [],
+    "conclusion": "Engineering attrition increased significantly in 2024, likely driven by a combination of competitive market salary pressures and dissatisfaction with the end of remote work."
+   },
+   "score": {
+    "total": 85.0,
+    "components": {
+     "separation": 30,
+     "causality": 15,
+     "contributors": 20.0,
+     "ruled_out": 10.0,
+     "no_overreach": 10
+    },
+    "failures": []
+   }
+  },
+  {
+   "id": "R09",
+   "status": "DONE",
+   "model": "gemini-3.5-flash-lite",
+   "served_model": "gemini-3.5-flash-lite",
+   "latency_s": 9.188,
+   "raw": "{\n  \"internal_fact_ids\": [\n    \"I1\",\n    \"I2\"\n  ],\n  \"external_fact_ids\": [\n    \"E1\",\n    \"E2\"\n  ],\n  \"inference\": \"The fall in scores occurred across all campuses simultaneously with the introduction of a new national curriculum and a change in the national grading scale by the exam board.\",\n  \"causality_status\": \"SUPPORTED_ASSOCIATION\",\n  \"plausible_contributors\": [\n    \"curriculum\",\n    \"exam\"\n  ],\n  \"ruled_out\": [],\n  \"conclusion\": \"While the score drop is associated with the timing of the new curriculum, the simultaneous change in the national grading scale makes it impossible to isolate the curriculum as the sole cause without controlled experimentation.\"\n}",
+   "answer": {
+    "internal_fact_ids": [
+     "I1",
+     "I2"
+    ],
+    "external_fact_ids": [
+     "E1",
+     "E2"
+    ],
+    "inference": "The fall in scores occurred across all campuses simultaneously with the introduction of a new national curriculum and a change in the national grading scale by the exam board.",
+    "causality_status": "SUPPORTED_ASSOCIATION",
+    "plausible_contributors": [
+     "curriculum",
+     "exam"
+    ],
+    "ruled_out": [],
+    "conclusion": "While the score drop is associated with the timing of the new curriculum, the simultaneous change in the national grading scale makes it impossible to isolate the curriculum as the sole cause without controlled experimentation."
+   },
+   "score": {
+    "total": 85.0,
+    "components": {
+     "separation": 30,
+     "causality": 15,
+     "contributors": 20.0,
+     "ruled_out": 10.0,
+     "no_overreach": 10
+    },
+    "failures": []
+   }
+  },
+  {
+   "id": "R10",
+   "status": "DONE",
+   "model": "gemini-3.5-flash-lite",
+   "served_model": "gemini-3.5-flash-lite",
+   "latency_s": 3.629,
+   "raw": "{\n  \"internal_fact_ids\": [\n    \"I1\",\n    \"I2\"\n  ],\n  \"external_fact_ids\": [\n    \"E1\",\n    \"E2\"\n  ],\n  \"inference\": \"Card fraud losses rose 30% in Q3, with 80% of the new fraud concentrated in a single payment method. Although a card processor data breach occurred in July and transaction volume on that method rose slightly, there is no experimental proof directly linking the breach or volume increase as the sole isolated cause of the fraud spike.\",\n  \"causality_status\": \"SUPPORTED_ASSOCIATION\",\n  \"plausible_contributors\": [\n    \"breach\",\n    \"volume\"\n  ],\n  \"ruled_out\": [],\n  \"conclusion\": \"Card fraud losses increased significantly, heavily concentrated in one payment method associated with a recent data breach and a rise in transaction volume, though direct causality is not definitively isolated.\"\n}",
+   "answer": {
+    "internal_fact_ids": [
+     "I1",
+     "I2"
+    ],
+    "external_fact_ids": [
+     "E1",
+     "E2"
+    ],
+    "inference": "Card fraud losses rose 30% in Q3, with 80% of the new fraud concentrated in a single payment method. Although a card processor data breach occurred in July and transaction volume on that method rose slightly, there is no experimental proof directly linking the breach or volume increase as the sole isolated cause of the fraud spike.",
+    "causality_status": "SUPPORTED_ASSOCIATION",
+    "plausible_contributors": [
+     "breach",
+     "volume"
+    ],
+    "ruled_out": [],
+    "conclusion": "Card fraud losses increased significantly, heavily concentrated in one payment method associated with a recent data breach and a rise in transaction volume, though direct causality is not definitively isolated."
+   },
+   "score": {
+    "total": 65.0,
+    "components": {
+     "separation": 30,
+     "causality": 15,
+     "contributors": 10.0,
+     "ruled_out": 0.0,
+     "no_overreach": 10
+    },
+    "failures": []
+   }
+  },
+  {
+   "id": "R11",
+   "status": "DONE",
+   "model": "gemini-3.5-flash-lite",
+   "served_model": "gemini-3.5-flash-lite",
+   "latency_s": 1.386,
+   "raw": "{\n  \"internal_fact_ids\": [\n    \"I1\",\n    \"I2\"\n  ],\n  \"external_fact_ids\": [\n    \"E1\",\n    \"E2\"\n  ],\n  \"inference\": \"Search leads fell by 22% in April despite unchanged search spend. Historical seasonality is ruled out because April leads in prior years remained stable compared to March, while the timing of a search engine ranking update on April 2 coincides with the drop.\",\n  \"causality_status\": \"SUPPORTED_ASSOCIATION\",\n  \"plausible_contributors\": [\n    \"algo\"\n  ],\n  \"ruled_out\": [\n    \"season\"\n  ],\n  \"conclusion\": \"The drop in search leads was likely caused by the search engine ranking update, as seasonal trends are ruled out and spend remained constant.\"\n}",
+   "answer": {
+    "internal_fact_ids": [
+     "I1",
+     "I2"
+    ],
+    "external_fact_ids": [
+     "E1",
+     "E2"
+    ],
+    "inference": "Search leads fell by 22% in April despite unchanged search spend. Historical seasonality is ruled out because April leads in prior years remained stable compared to March, while the timing of a search engine ranking update on April 2 coincides with the drop.",
+    "causality_status": "SUPPORTED_ASSOCIATION",
+    "plausible_contributors": [
+     "algo"
+    ],
+    "ruled_out": [
+     "season"
+    ],
+    "conclusion": "The drop in search leads was likely caused by the search engine ranking update, as seasonal trends are ruled out and spend remained constant."
+   },
+   "score": {
+    "total": 85.0,
+    "components": {
+     "separation": 30,
+     "causality": 15,
+     "contributors": 20.0,
+     "ruled_out": 10.0,
+     "no_overreach": 10
+    },
+    "failures": []
+   }
+  },
+  {
+   "id": "R12",
+   "status": "DONE",
+   "model": "gemini-3.5-flash-lite",
+   "served_model": "gemini-3.5-flash-lite",
+   "latency_s": 1.135,
+   "raw": "{\n  \"internal_fact_ids\": [\n    \"I1\",\n    \"I2\"\n  ],\n  \"external_fact_ids\": [\n    \"E1\",\n    \"E2\"\n  ],\n  \"inference\": \"The opening of a new flagship store in the North region temporally coincides with a 15% rise in net sales, while other regions remained flat and weather conditions were typical everywhere, suggesting the new store launch contributed to the growth.\",\n  \"causality_status\": \"SUPPORTED_ASSOCIATION\",\n  \"plausible_contributors\": [\n    \"store\"\n  ],\n  \"ruled_out\": [\n    \"weather\"\n  ],\n  \"conclusion\": \"The 15% sales growth in the North region was likely driven by the opening of the new flagship store, as weather was controlled for and other regions saw no similar growth.\"\n}",
+   "answer": {
+    "internal_fact_ids": [
+     "I1",
+     "I2"
+    ],
+    "external_fact_ids": [
+     "E1",
+     "E2"
+    ],
+    "inference": "The opening of a new flagship store in the North region temporally coincides with a 15% rise in net sales, while other regions remained flat and weather conditions were typical everywhere, suggesting the new store launch contributed to the growth.",
+    "causality_status": "SUPPORTED_ASSOCIATION",
+    "plausible_contributors": [
+     "store"
+    ],
+    "ruled_out": [
+     "weather"
+    ],
+    "conclusion": "The 15% sales growth in the North region was likely driven by the opening of the new flagship store, as weather was controlled for and other regions saw no similar growth."
+   },
+   "score": {
+    "total": 100.0,
+    "components": {
+     "separation": 30,
+     "causality": 30,
+     "contributors": 20.0,
+     "ruled_out": 10.0,
+     "no_overreach": 10
+    },
+    "failures": []
+   }
+  },
+  {
+   "id": "R13",
+   "status": "DONE",
+   "model": "gemini-3.5-flash-lite",
+   "served_model": "gemini-3.5-flash-lite",
+   "latency_s": 1.001,
+   "raw": "{\"internal_fact_ids\": [\"I1\", \"I2\"], \"external_fact_ids\": [\"E1\", \"E2\"], \"inference\": \"Satisfaction scores dropped alongside a doubling of delivery complaints in May, coinciding directly with the switch to a new delivery carrier on May 1st, while survey methodology remained constant.\", \"causality_status\": \"SUPPORTED_ASSOCIATION\", \"plausible_contributors\": [\"carrier\"], \"ruled_out\": [\"survey\"], \"conclusion\": \"The drop in customer satisfaction was likely driven by delivery issues caused by the new carrier.\"}",
+   "answer": {
+    "internal_fact_ids": [
+     "I1",
+     "I2"
+    ],
+    "external_fact_ids": [
+     "E1",
+     "E2"
+    ],
+    "inference": "Satisfaction scores dropped alongside a doubling of delivery complaints in May, coinciding directly with the switch to a new delivery carrier on May 1st, while survey methodology remained constant.",
+    "causality_status": "SUPPORTED_ASSOCIATION",
+    "plausible_contributors": [
+     "carrier"
+    ],
+    "ruled_out": [
+     "survey"
+    ],
+    "conclusion": "The drop in customer satisfaction was likely driven by delivery issues caused by the new carrier."
+   },
+   "score": {
+    "total": 85.0,
+    "components": {
+     "separation": 30,
+     "causality": 15,
+     "contributors": 20.0,
+     "ruled_out": 10.0,
+     "no_overreach": 10
+    },
+    "failures": []
+   }
+  },
+  {
+   "id": "R14",
+   "status": "DONE",
+   "model": "gemini-3.5-flash-lite",
+   "served_model": "gemini-3.5-flash-lite",
+   "latency_s": 0.899,
+   "raw": "{\"internal_fact_ids\": [\"I1\", \"I2\"], \"external_fact_ids\": [\"E1\", \"E2\"], \"inference\": \"The 12% rise in average order value while units per order remained unchanged and no new upsell feature was launched, combined with an industry-wide category price increase of 11%, indicates that higher prices rather than selling more items drove the increase.\", \"causality_status\": \"SUPPORTED_ASSOCIATION\", \"plausible_contributors\": [\"inflation\"], \"ruled_out\": [\"upsell\"], \"conclusion\": \"Average order value increased primarily due to higher pricing across the category rather than increased volume per order or new upsell features.\"}",
+   "answer": {
+    "internal_fact_ids": [
+     "I1",
+     "I2"
+    ],
+    "external_fact_ids": [
+     "E1",
+     "E2"
+    ],
+    "inference": "The 12% rise in average order value while units per order remained unchanged and no new upsell feature was launched, combined with an industry-wide category price increase of 11%, indicates that higher prices rather than selling more items drove the increase.",
+    "causality_status": "SUPPORTED_ASSOCIATION",
+    "plausible_contributors": [
+     "inflation"
+    ],
+    "ruled_out": [
+     "upsell"
+    ],
+    "conclusion": "Average order value increased primarily due to higher pricing across the category rather than increased volume per order or new upsell features."
+   },
+   "score": {
+    "total": 90.0,
+    "components": {
+     "separation": 30,
+     "causality": 30,
+     "contributors": 20.0,
+     "ruled_out": 10.0,
+     "no_overreach": 0
+    },
+    "failures": [
+     "CAUSAL_OVERREACH"
+    ]
+   }
+  },
+  {
+   "id": "R15",
+   "status": "DONE",
+   "model": "gemini-3.5-flash-lite",
+   "served_model": "gemini-3.5-flash-lite",
+   "latency_s": 1.087,
+   "raw": "{\n  \"internal_fact_ids\": [\n    \"I1\",\n    \"I2\"\n  ],\n  \"external_fact_ids\": [\n    \"E1\",\n    \"E2\"\n  ],\n  \"inference\": \"The increase in failed delivery attempts is concentrated in the exact two hubs where 40% of the riders were replaced in February, while address data quality remained unchanged.\",\n  \"causality_status\": \"SUPPORTED_ASSOCIATION\",\n  \"plausible_contributors\": [\n    \"staffing\"\n  ],\n  \"ruled_out\": [\n    \"address\"\n  ],\n  \"conclusion\": \"The rise in failed delivery attempts was likely caused by high rider turnover in the affected hubs.\"\n}",
+   "answer": {
+    "internal_fact_ids": [
+     "I1",
+     "I2"
+    ],
+    "external_fact_ids": [
+     "E1",
+     "E2"
+    ],
+    "inference": "The increase in failed delivery attempts is concentrated in the exact two hubs where 40% of the riders were replaced in February, while address data quality remained unchanged.",
+    "causality_status": "SUPPORTED_ASSOCIATION",
+    "plausible_contributors": [
+     "staffing"
+    ],
+    "ruled_out": [
+     "address"
+    ],
+    "conclusion": "The rise in failed delivery attempts was likely caused by high rider turnover in the affected hubs."
+   },
+   "score": {
+    "total": 85.0,
+    "components": {
+     "separation": 30,
+     "causality": 15,
+     "contributors": 20.0,
+     "ruled_out": 10.0,
+     "no_overreach": 10
+    },
+    "failures": []
+   }
+  },
+  {
+   "id": "R16",
+   "status": "DONE",
+   "model": "gemini-3.5-flash-lite",
+   "served_model": "gemini-3.5-flash-lite",
+   "latency_s": 1.162,
+   "raw": "{\n  \"internal_fact_ids\": [\n    \"I1\",\n    \"I2\"\n  ],\n  \"external_fact_ids\": [\n    \"E1\",\n    \"E2\"\n  ],\n  \"inference\": \"The 30% drop in email revenue is real, but the apparent drop in open rates is likely an artifact of mail client pre-loading rather than a true decline in engagement, while list size stability rules out audience contraction as a cause.\",\n  \"causality_status\": \"SUPPORTED_ASSOCIATION\",\n  \"plausible_contributors\": [\n    \"privacy\"\n  ],\n  \"ruled_out\": [\n    \"list\"\n  ],\n  \"conclusion\": \"Email revenue genuinely fell by 30%, but open rate metrics are unreliable due to client-side image pre-loading.\"\n}",
+   "answer": {
+    "internal_fact_ids": [
+     "I1",
+     "I2"
+    ],
+    "external_fact_ids": [
+     "E1",
+     "E2"
+    ],
+    "inference": "The 30% drop in email revenue is real, but the apparent drop in open rates is likely an artifact of mail client pre-loading rather than a true decline in engagement, while list size stability rules out audience contraction as a cause.",
+    "causality_status": "SUPPORTED_ASSOCIATION",
+    "plausible_contributors": [
+     "privacy"
+    ],
+    "ruled_out": [
+     "list"
+    ],
+    "conclusion": "Email revenue genuinely fell by 30%, but open rate metrics are unreliable due to client-side image pre-loading."
+   },
+   "score": {
+    "total": 75.0,
+    "components": {
+     "separation": 30,
+     "causality": 15,
+     "contributors": 20.0,
+     "ruled_out": 10.0,
+     "no_overreach": 0
+    },
+    "failures": [
+     "CAUSAL_OVERREACH"
+    ]
+   }
+  },
+  {
+   "id": "R17",
+   "status": "DONE",
+   "model": "gemini-3.5-flash-lite",
+   "served_model": "gemini-3.5-flash-lite",
+   "latency_s": 0.977,
+   "raw": "{\n  \"internal_fact_ids\": [\n    \"I1\"\n  ],\n  \"external_fact_ids\": [\n    \"E1\",\n    \"E2\"\n  ],\n  \"inference\": \"Treatment cost per patient increased by 9% while patient admissions remained unchanged. External data shows that the price of a common biologic drug increased by 25% in the same period, contributing to higher treatment costs.\",\n  \"causality_status\": \"SUPPORTED_ASSOCIATION\",\n  \"plausible_contributors\": [\n    \"drug\"\n  ],\n  \"ruled_out\": [\n    \"volume\"\n  ],\n  \"conclusion\": \"The rise in treatment cost per patient is associated with the increased price of biologic drugs, while changes in patient volume are ruled out as a contributing factor since admissions were unchanged.\"\n}",
+   "answer": {
+    "internal_fact_ids": [
+     "I1"
+    ],
+    "external_fact_ids": [
+     "E1",
+     "E2"
+    ],
+    "inference": "Treatment cost per patient increased by 9% while patient admissions remained unchanged. External data shows that the price of a common biologic drug increased by 25% in the same period, contributing to higher treatment costs.",
+    "causality_status": "SUPPORTED_ASSOCIATION",
+    "plausible_contributors": [
+     "drug"
+    ],
+    "ruled_out": [
+     "volume"
+    ],
+    "conclusion": "The rise in treatment cost per patient is associated with the increased price of biologic drugs, while changes in patient volume are ruled out as a contributing factor since admissions were unchanged."
+   },
+   "score": {
+    "total": 85.0,
+    "components": {
+     "separation": 30,
+     "causality": 15,
+     "contributors": 20.0,
+     "ruled_out": 10.0,
+     "no_overreach": 10
+    },
+    "failures": []
+   }
+  },
+  {
+   "id": "R18",
+   "status": "DONE",
+   "model": "gemini-3.5-flash-lite",
+   "served_model": "gemini-3.5-flash-lite",
+   "latency_s": 0.955,
+   "raw": "{\"internal_fact_ids\": [\"I1\"], \"external_fact_ids\": [\"E1\", \"E2\"], \"inference\": \"Energy use per unit increased during the winter months while energy tariffs remained constant, and the winter was notably colder than average.\", \"causality_status\": \"SUPPORTED_ASSOCIATION\", \"plausible_contributors\": [\"weather\"], \"ruled_out\": [\"tariff\"], \"conclusion\": \"The 14% rise in energy use per unit during winter is associated with colder weather rather than changes in energy tariffs.\"}",
+   "answer": {
+    "internal_fact_ids": [
+     "I1"
+    ],
+    "external_fact_ids": [
+     "E1",
+     "E2"
+    ],
+    "inference": "Energy use per unit increased during the winter months while energy tariffs remained constant, and the winter was notably colder than average.",
+    "causality_status": "SUPPORTED_ASSOCIATION",
+    "plausible_contributors": [
+     "weather"
+    ],
+    "ruled_out": [
+     "tariff"
+    ],
+    "conclusion": "The 14% rise in energy use per unit during winter is associated with colder weather rather than changes in energy tariffs."
+   },
+   "score": {
+    "total": 100.0,
+    "components": {
+     "separation": 30,
+     "causality": 30,
+     "contributors": 20.0,
+     "ruled_out": 10.0,
+     "no_overreach": 10
+    },
+    "failures": []
+   }
+  },
+  {
+   "id": "R19",
+   "status": "DONE",
+   "model": "gemini-3.5-flash-lite",
+   "served_model": "gemini-3.5-flash-lite",
+   "latency_s": 1.271,
+   "raw": "{\n  \"internal_fact_ids\": [\n    \"I1\"\n  ],\n  \"external_fact_ids\": [\n    \"E1\",\n    \"E2\"\n  ],\n  \"inference\": \"The company's online channel share grew significantly from 30% to 42% in 2024, outpacing the broader industry trend where online share only rose from 28% to 31%. This substantial increase is partially attributed to the closure of 12 physical stores in January 2024, which shifted customer purchases from offline to online channels.\",\n  \"causality_status\": \"SUPPORTED_ASSOCIATION\",\n  \"plausible_contributors\": [\n    \"closures\",\n    \"trend\"\n  ],\n  \"ruled_out\": [],\n  \"conclusion\": \"The rise in the company's online share is supported by both a broader industry shift towards online shopping and internal store closures that drove customers to the digital channel.\"\n}",
+   "answer": {
+    "internal_fact_ids": [
+     "I1"
+    ],
+    "external_fact_ids": [
+     "E1",
+     "E2"
+    ],
+    "inference": "The company's online channel share grew significantly from 30% to 42% in 2024, outpacing the broader industry trend where online share only rose from 28% to 31%. This substantial increase is partially attributed to the closure of 12 physical stores in January 2024, which shifted customer purchases from offline to online channels.",
+    "causality_status": "SUPPORTED_ASSOCIATION",
+    "plausible_contributors": [
+     "closures",
+     "trend"
+    ],
+    "ruled_out": [],
+    "conclusion": "The rise in the company's online share is supported by both a broader industry shift towards online shopping and internal store closures that drove customers to the digital channel."
+   },
+   "score": {
+    "total": 75.0,
+    "components": {
+     "separation": 30,
+     "causality": 15,
+     "contributors": 20.0,
+     "ruled_out": 10.0,
+     "no_overreach": 0
+    },
+    "failures": [
+     "CAUSAL_OVERREACH"
+    ]
+   }
+  },
+  {
+   "id": "R20",
+   "status": "DONE",
+   "model": "gemini-3.5-flash-lite",
+   "served_model": "gemini-3.5-flash-lite",
+   "latency_s": 1.081,
+   "raw": "{\n  \"internal_fact_ids\": [\n    \"I1\"\n  ],\n  \"external_fact_ids\": [\n    \"E1\",\n    \"E2\"\n  ],\n  \"inference\": \"Referred customers exhibit 40% lower churn, and industry studies indicate they have higher intent. However, since there is no referral-specific retention programme, the lower churn is associated with customer selection rather than the retention mechanics of the programme itself.\",\n  \"causality_status\": \"SUPPORTED_ASSOCIATION\",\n  \"plausible_contributors\": [\n    \"selection\"\n  ],\n  \"ruled_out\": [\n    \"programme\"\n  ],\n  \"conclusion\": \"The referral programme is associated with lower customer churn, primarily due to the higher-intent nature of referred customers rather than specific retention efforts.\"\n}",
+   "answer": {
+    "internal_fact_ids": [
+     "I1"
+    ],
+    "external_fact_ids": [
+     "E1",
+     "E2"
+    ],
+    "inference": "Referred customers exhibit 40% lower churn, and industry studies indicate they have higher intent. However, since there is no referral-specific retention programme, the lower churn is associated with customer selection rather than the retention mechanics of the programme itself.",
+    "causality_status": "SUPPORTED_ASSOCIATION",
+    "plausible_contributors": [
+     "selection"
+    ],
+    "ruled_out": [
+     "programme"
+    ],
+    "conclusion": "The referral programme is associated with lower customer churn, primarily due to the higher-intent nature of referred customers rather than specific retention efforts."
+   },
+   "score": {
+    "total": 85.0,
+    "components": {
+     "separation": 30,
+     "causality": 15,
+     "contributors": 20.0,
+     "ruled_out": 10.0,
+     "no_overreach": 10
+    },
+    "failures": []
+   }
+  }
+ ],
+ "groq": []
+}

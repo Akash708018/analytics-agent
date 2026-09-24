@@ -1,11 +1,11 @@
 {
  "case": "D12",
- "src": "/home/user/aa-fixes/src",
- "commit": "fc6ffd8847e9ef311a1219b2bc29c4a2fac79a52",
+ "src": "/home/user/analytics-agent/src",
+ "commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
  "src_dirty": [],
  "python": "3.12.3",
  "duckdb": "1.5.5",
- "seconds": 1.44,
+ "seconds": 1.33,
  "harness_error": null,
  "observations": [
   {
@@ -16,7 +16,7 @@
    "rows": null,
    "parameters": {},
    "status": "OK",
-   "wall_time_seconds": 1.435695,
+   "wall_time_seconds": 1.32607,
    "response": "",
    "exception_type": null,
    "exception_message": null,

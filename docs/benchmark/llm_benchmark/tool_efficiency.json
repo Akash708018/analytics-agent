@@ -1,0 +1,16 @@
+{
+ "gemini": {
+  "tool_efficiency": null,
+  "invalid_call_rate": null,
+  "redundant_call_rate": null,
+  "premature_stop_rate": null,
+  "overanalysis_rate": null
+ },
+ "groq": {
+  "tool_efficiency": null,
+  "invalid_call_rate": null,
+  "redundant_call_rate": null,
+  "premature_stop_rate": null,
+  "overanalysis_rate": null
+ }
+}

@@ -1,0 +1,292 @@
+[
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "FIN04",
+  "failures": [
+   "INTENT_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "FIN12",
+  "failures": [
+   "METRIC_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "HR01",
+  "failures": [
+   "METRIC_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "HR02",
+  "failures": [
+   "INTENT_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "HR03",
+  "failures": [
+   "METRIC_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "HR04",
+  "failures": [
+   "INTENT_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "HR08",
+  "failures": [
+   "METRIC_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "HR10",
+  "failures": [
+   "INTENT_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "SAL03",
+  "failures": [
+   "INTENT_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "SAL06",
+  "failures": [
+   "METRIC_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "SAL09",
+  "failures": [
+   "TIME_RANGE_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "SAL10",
+  "failures": [
+   "DIMENSION_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "SAL12",
+  "failures": [
+   "DIMENSION_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "MAR04",
+  "failures": [
+   "INTENT_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "MAR05",
+  "failures": [
+   "INTENT_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "MAR08",
+  "failures": [
+   "INVALID_TOOL"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "MAR09",
+  "failures": [
+   "INTENT_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "CRM06",
+  "failures": [
+   "INTENT_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "CRM07",
+  "failures": [
+   "INTENT_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "CRM08",
+  "failures": [
+   "DIMENSION_ERROR",
+   "METRIC_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "CRM12",
+  "failures": [
+   "METRIC_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "ECO05",
+  "failures": [
+   "INTENT_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "ECO08",
+  "failures": [
+   "INTENT_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "LOG04",
+  "failures": [
+   "INTENT_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "LOG06",
+  "failures": [
+   "INTENT_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "HEA08",
+  "failures": [
+   "INTENT_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "MAN09",
+  "failures": [
+   "INTENT_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "MAN12",
+  "failures": [
+   "CAUSAL_OVERREACH"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "EDU08",
+  "failures": [
+   "INTENT_ERROR",
+   "METRIC_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "EDU10",
+  "failures": [
+   "DIMENSION_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "planner",
+  "id": "EDU12",
+  "failures": [
+   "CAUSAL_OVERREACH"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "research",
+  "id": "R02",
+  "failures": [
+   "CAUSAL_OVERREACH"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "research",
+  "id": "R04",
+  "failures": [
+   "CAUSAL_OVERREACH"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "research",
+  "id": "R14",
+  "failures": [
+   "CAUSAL_OVERREACH"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "research",
+  "id": "R16",
+  "failures": [
+   "CAUSAL_OVERREACH"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "research",
+  "id": "R19",
+  "failures": [
+   "CAUSAL_OVERREACH"
+  ]
+ }
+]

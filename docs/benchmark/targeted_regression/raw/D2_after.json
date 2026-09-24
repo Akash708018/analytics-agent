@@ -1,11 +1,11 @@
 {
  "case": "D2",
- "src": "/home/user/aa-fixes/src",
- "commit": "6f67a570e8a5f602459c49bd6af586d84cdbd47b",
+ "src": "/home/user/analytics-agent/src",
+ "commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
  "src_dirty": [],
  "python": "3.12.3",
  "duckdb": "1.5.5",
- "seconds": 2.85,
+ "seconds": 2.61,
  "harness_error": null,
  "observations": [
   {
@@ -19,8 +19,8 @@
     "measure": "v"
    },
    "status": "OK",
-   "wall_time_seconds": 0.101547,
-   "response": "Under contract v1 for both_zero_variance: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/hypothesis_test_20260924-222522.csv\nfrom dataset   both_zero_variance\ncreated        2026-09-24 22:25:22\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - No test: both groups have zero variance. The group means are in the table above; a difference between values that do not vary is not a question sampling can answer.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 5 | 0 | nan |\n| b | 10 | 3 | 0 | nan |",
+   "wall_time_seconds": 0.054347,
+   "response": "Under contract v1 for both_zero_variance: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-224545.csv\nfrom dataset   both_zero_variance\ncreated        2026-09-24 22:45:45\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - No test: both groups have zero variance. The group means are in the table above; a difference between values that do not vary is not a question sampling can answer.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 5 | 0 | nan |\n| b | 10 | 3 | 0 | nan |",
    "exception_type": null,
    "exception_message": null,
    "extra": {
@@ -46,8 +46,8 @@
     "method": "rank"
    },
    "status": "OK",
-   "wall_time_seconds": 0.115703,
-   "response": "Under contract v1 for both_zero_variance: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/hypothesis_test_20260924-222522_2.csv\nfrom dataset   both_zero_variance\ncreated        2026-09-24 22:25:22\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 100, df n/a, p 1.59379e-05.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew nan.\n  - At the conventional 5% threshold, v differs between the groups of g by more than sampling alone would produce. That is a statement about these rows, not a cause.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 5 | 0 | nan |\n| b | 10 | 3 | 0 | nan |",
+   "wall_time_seconds": 0.068597,
+   "response": "Under contract v1 for both_zero_variance: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-224546.csv\nfrom dataset   both_zero_variance\ncreated        2026-09-24 22:45:46\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 100, df n/a, p 1.59379e-05.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew nan.\n  - At the conventional 5% threshold, v differs between the groups of g by more than sampling alone would produce. That is a statement about these rows, not a cause.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 5 | 0 | nan |\n| b | 10 | 3 | 0 | nan |",
    "exception_type": null,
    "exception_message": null,
    "extra": {
@@ -72,8 +72,8 @@
     "measure": "v"
    },
    "status": "OK",
-   "wall_time_seconds": 0.09153,
-   "response": "Under contract v1 for both_zero_variance: row.\n\n2 rows x 4 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/effect_size_20260924-222522.csv\nfrom dataset   both_zero_variance\ncreated        2026-09-24 22:25:22\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - No effect size: both groups are constant, so the difference has no scale. The group means are in the table above.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 10 | 5 | 0 |\n| b | 10 | 3 | 0 |",
+   "wall_time_seconds": 0.063536,
+   "response": "Under contract v1 for both_zero_variance: row.\n\n2 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/effect_size_20260924-224546.csv\nfrom dataset   both_zero_variance\ncreated        2026-09-24 22:45:46\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - No effect size: both groups are constant, so the difference has no scale. The group means are in the table above.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 10 | 5 | 0 |\n| b | 10 | 3 | 0 |",
    "exception_type": null,
    "exception_message": null,
    "extra": {
@@ -98,8 +98,8 @@
     "measure": "v"
    },
    "status": "OK",
-   "wall_time_seconds": 0.097136,
-   "response": "Under contract v1 for a_zero_variance_only: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/hypothesis_test_20260924-222523.csv\nfrom dataset   a_zero_variance_only\ncreated        2026-09-24 22:25:23\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic 0.5222, df 9, p 0.614117.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g 0.2237. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew nan.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 5 | 0 | nan |\n| b | 10 | 4.5 | 3.0277 | 0 |",
+   "wall_time_seconds": 0.079749,
+   "response": "Under contract v1 for a_zero_variance_only: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-224546_2.csv\nfrom dataset   a_zero_variance_only\ncreated        2026-09-24 22:45:46\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic 0.5222, df 9, p 0.614117.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g 0.2237. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew nan.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 5 | 0 | nan |\n| b | 10 | 4.5 | 3.0277 | 0 |",
    "exception_type": null,
    "exception_message": null,
    "extra": {
@@ -125,8 +125,8 @@
     "method": "rank"
    },
    "status": "OK",
-   "wall_time_seconds": 0.088147,
-   "response": "Under contract v1 for a_zero_variance_only: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/hypothesis_test_20260924-222523_2.csv\nfrom dataset   a_zero_variance_only\ncreated        2026-09-24 22:25:23\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 55, df n/a, p 0.709628.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew nan.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 5 | 0 | nan |\n| b | 10 | 4.5 | 3.0277 | 0 |",
+   "wall_time_seconds": 0.067151,
+   "response": "Under contract v1 for a_zero_variance_only: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-224546_3.csv\nfrom dataset   a_zero_variance_only\ncreated        2026-09-24 22:45:46\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 55, df n/a, p 0.709628.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew nan.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 5 | 0 | nan |\n| b | 10 | 4.5 | 3.0277 | 0 |",
    "exception_type": null,
    "exception_message": null,
    "extra": {
@@ -151,8 +151,8 @@
     "measure": "v"
    },
    "status": "OK",
-   "wall_time_seconds": 0.062177,
-   "response": "Under contract v1 for a_zero_variance_only: row.\n\n2 rows x 4 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/effect_size_20260924-222523.csv\nfrom dataset   a_zero_variance_only\ncreated        2026-09-24 22:25:23\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Hedges' g 0.2237 \u2014 small by Cohen's convention. a exceeds b by 0.5, which is 0.2237 standard deviation(s).\n  - g rather than d: P10-D17 measured the small-sample correction at 0.9578 for ten rows per group and 0.9962 for a hundred, so it matters where group breakdowns actually land.\n  - Cohen's bands are a vocabulary, not a verdict: they were proposed for psychology and what counts as large is a question about the subject, not about the arithmetic.\n  - An effect size does not fall as rows are added, which is the whole point of reading it beside a p-value rather than instead of one.\n  - Excluded and shown: 0 with no g, 0 with no v. The counts add back to the 20 row(s) in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 10 | 5 | 0 |\n| b | 10 | 4.5 | 3.0277 |",
+   "wall_time_seconds": 0.071361,
+   "response": "Under contract v1 for a_zero_variance_only: row.\n\n2 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/effect_size_20260924-224546_2.csv\nfrom dataset   a_zero_variance_only\ncreated        2026-09-24 22:45:46\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Hedges' g 0.2237 \u2014 small by Cohen's convention. a exceeds b by 0.5, which is 0.2237 standard deviation(s).\n  - g rather than d: P10-D17 measured the small-sample correction at 0.9578 for ten rows per group and 0.9962 for a hundred, so it matters where group breakdowns actually land.\n  - Cohen's bands are a vocabulary, not a verdict: they were proposed for psychology and what counts as large is a question about the subject, not about the arithmetic.\n  - An effect size does not fall as rows are added, which is the whole point of reading it beside a p-value rather than instead of one.\n  - Excluded and shown: 0 with no g, 0 with no v. The counts add back to the 20 row(s) in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 10 | 5 | 0 |\n| b | 10 | 4.5 | 3.0277 |",
    "exception_type": null,
    "exception_message": null,
    "extra": {
@@ -177,8 +177,8 @@
     "measure": "v"
    },
    "status": "OK",
-   "wall_time_seconds": 0.061273,
-   "response": "Under contract v1 for b_zero_variance_only: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/hypothesis_test_20260924-222523_3.csv\nfrom dataset   b_zero_variance_only\ncreated        2026-09-24 22:25:23\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic 1.5667, df 9, p 0.151627.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g 0.671. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 4.5 | 3.0277 | 0 |\n| b | 10 | 3 | 0 | nan |",
+   "wall_time_seconds": 0.061755,
+   "response": "Under contract v1 for b_zero_variance_only: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-224546_4.csv\nfrom dataset   b_zero_variance_only\ncreated        2026-09-24 22:45:46\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic 1.5667, df 9, p 0.151627.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g 0.671. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 4.5 | 3.0277 | 0 |\n| b | 10 | 3 | 0 | nan |",
    "exception_type": null,
    "exception_message": null,
    "extra": {
@@ -204,8 +204,8 @@
     "method": "rank"
    },
    "status": "OK",
-   "wall_time_seconds": 0.06552,
-   "response": "Under contract v1 for b_zero_variance_only: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/hypothesis_test_20260924-222523_4.csv\nfrom dataset   b_zero_variance_only\ncreated        2026-09-24 22:25:23\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 65, df n/a, p 0.230212.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 4.5 | 3.0277 | 0 |\n| b | 10 | 3 | 0 | nan |",
+   "wall_time_seconds": 0.071837,
+   "response": "Under contract v1 for b_zero_variance_only: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-224546_5.csv\nfrom dataset   b_zero_variance_only\ncreated        2026-09-24 22:45:46\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 65, df n/a, p 0.230212.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 4.5 | 3.0277 | 0 |\n| b | 10 | 3 | 0 | nan |",
    "exception_type": null,
    "exception_message": null,
    "extra": {
@@ -230,8 +230,8 @@
     "measure": "v"
    },
    "status": "OK",
-   "wall_time_seconds": 0.058842,
-   "response": "Under contract v1 for b_zero_variance_only: row.\n\n2 rows x 4 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/effect_size_20260924-222523_2.csv\nfrom dataset   b_zero_variance_only\ncreated        2026-09-24 22:25:23\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Hedges' g 0.671 \u2014 medium by Cohen's convention. a exceeds b by 1.5, which is 0.671 standard deviation(s).\n  - g rather than d: P10-D17 measured the small-sample correction at 0.9578 for ten rows per group and 0.9962 for a hundred, so it matters where group breakdowns actually land.\n  - Cohen's bands are a vocabulary, not a verdict: they were proposed for psychology and what counts as large is a question about the subject, not about the arithmetic.\n  - An effect size does not fall as rows are added, which is the whole point of reading it beside a p-value rather than instead of one.\n  - Excluded and shown: 0 with no g, 0 with no v. The counts add back to the 20 row(s) in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 10 | 4.5 | 3.0277 |\n| b | 10 | 3 | 0 |",
+   "wall_time_seconds": 0.065028,
+   "response": "Under contract v1 for b_zero_variance_only: row.\n\n2 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/effect_size_20260924-224546_3.csv\nfrom dataset   b_zero_variance_only\ncreated        2026-09-24 22:45:46\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Hedges' g 0.671 \u2014 medium by Cohen's convention. a exceeds b by 1.5, which is 0.671 standard deviation(s).\n  - g rather than d: P10-D17 measured the small-sample correction at 0.9578 for ten rows per group and 0.9962 for a hundred, so it matters where group breakdowns actually land.\n  - Cohen's bands are a vocabulary, not a verdict: they were proposed for psychology and what counts as large is a question about the subject, not about the arithmetic.\n  - An effect size does not fall as rows are added, which is the whole point of reading it beside a p-value rather than instead of one.\n  - Excluded and shown: 0 with no g, 0 with no v. The counts add back to the 20 row(s) in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 10 | 4.5 | 3.0277 |\n| b | 10 | 3 | 0 |",
    "exception_type": null,
    "exception_message": null,
    "extra": {
@@ -256,8 +256,8 @@
     "measure": "v"
    },
    "status": "OK",
-   "wall_time_seconds": 0.06635,
-   "response": "Under contract v1 for identical_groups: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/hypothesis_test_20260924-222523_5.csv\nfrom dataset   identical_groups\ncreated        2026-09-24 22:25:23\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic 0, df 18, p 1.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g 0. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 3 | 1.4907 | 0 |\n| b | 10 | 3 | 1.4907 | 0 |",
+   "wall_time_seconds": 0.065457,
+   "response": "Under contract v1 for identical_groups: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-224547.csv\nfrom dataset   identical_groups\ncreated        2026-09-24 22:45:47\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic 0, df 18, p 1.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g 0. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 3 | 1.4907 | 0 |\n| b | 10 | 3 | 1.4907 | 0 |",
    "exception_type": null,
    "exception_message": null,
    "extra": {
@@ -283,8 +283,8 @@
     "method": "rank"
    },
    "status": "OK",
-   "wall_time_seconds": 0.095164,
-   "response": "Under contract v1 for identical_groups: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/hypothesis_test_20260924-222524.csv\nfrom dataset   identical_groups\ncreated        2026-09-24 22:25:24\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 50, df n/a, p 1.03073.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 3 | 1.4907 | 0 |\n| b | 10 | 3 | 1.4907 | 0 |",
+   "wall_time_seconds": 0.066982,
+   "response": "Under contract v1 for identical_groups: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-224547_2.csv\nfrom dataset   identical_groups\ncreated        2026-09-24 22:45:47\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 50, df n/a, p 1.03073.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 3 | 1.4907 | 0 |\n| b | 10 | 3 | 1.4907 | 0 |",
    "exception_type": null,
    "exception_message": null,
    "extra": {
@@ -309,8 +309,8 @@
     "measure": "v"
    },
    "status": "OK",
-   "wall_time_seconds": 0.06078,
-   "response": "Under contract v1 for identical_groups: row.\n\n2 rows x 4 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/effect_size_20260924-222524.csv\nfrom dataset   identical_groups\ncreated        2026-09-24 22:25:24\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Hedges' g 0 \u2014 negligible by Cohen's convention. b exceeds a by 0, which is 0 standard deviation(s).\n  - g rather than d: P10-D17 measured the small-sample correction at 0.9578 for ten rows per group and 0.9962 for a hundred, so it matters where group breakdowns actually land.\n  - Cohen's bands are a vocabulary, not a verdict: they were proposed for psychology and what counts as large is a question about the subject, not about the arithmetic.\n  - An effect size does not fall as rows are added, which is the whole point of reading it beside a p-value rather than instead of one.\n  - Excluded and shown: 0 with no g, 0 with no v. The counts add back to the 20 row(s) in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 10 | 3 | 1.4907 |\n| b | 10 | 3 | 1.4907 |",
+   "wall_time_seconds": 0.074753,
+   "response": "Under contract v1 for identical_groups: row.\n\n2 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/effect_size_20260924-224547.csv\nfrom dataset   identical_groups\ncreated        2026-09-24 22:45:47\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Hedges' g 0 \u2014 negligible by Cohen's convention. b exceeds a by 0, which is 0 standard deviation(s).\n  - g rather than d: P10-D17 measured the small-sample correction at 0.9578 for ten rows per group and 0.9962 for a hundred, so it matters where group breakdowns actually land.\n  - Cohen's bands are a vocabulary, not a verdict: they were proposed for psychology and what counts as large is a question about the subject, not about the arithmetic.\n  - An effect size does not fall as rows are added, which is the whole point of reading it beside a p-value rather than instead of one.\n  - Excluded and shown: 0 with no g, 0 with no v. The counts add back to the 20 row(s) in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 10 | 3 | 1.4907 |\n| b | 10 | 3 | 1.4907 |",
    "exception_type": null,
    "exception_message": null,
    "extra": {
@@ -335,8 +335,8 @@
     "measure": "v"
    },
    "status": "OK",
-   "wall_time_seconds": 0.062768,
-   "response": "Under contract v1 for constant_same_value: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/hypothesis_test_20260924-222524_2.csv\nfrom dataset   constant_same_value\ncreated        2026-09-24 22:25:24\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - No test: both groups have zero variance. The group means are in the table above; a difference between values that do not vary is not a question sampling can answer.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 4 | 0 | nan |\n| b | 10 | 4 | 0 | nan |",
+   "wall_time_seconds": 0.066544,
+   "response": "Under contract v1 for constant_same_value: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-224547_3.csv\nfrom dataset   constant_same_value\ncreated        2026-09-24 22:45:47\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - No test: both groups have zero variance. The group means are in the table above; a difference between values that do not vary is not a question sampling can answer.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 4 | 0 | nan |\n| b | 10 | 4 | 0 | nan |",
    "exception_type": null,
    "exception_message": null,
    "extra": {
@@ -362,8 +362,8 @@
     "method": "rank"
    },
    "status": "OK",
-   "wall_time_seconds": 0.070775,
-   "response": "Under contract v1 for constant_same_value: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/hypothesis_test_20260924-222524_3.csv\nfrom dataset   constant_same_value\ncreated        2026-09-24 22:25:24\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - No test: every value is tied, so the ranks carry no information. The group means are in the table above; a difference between values that do not vary is not a question sampling can answer.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 4 | 0 | nan |\n| b | 10 | 4 | 0 | nan |",
+   "wall_time_seconds": 0.078915,
+   "response": "Under contract v1 for constant_same_value: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-224547_4.csv\nfrom dataset   constant_same_value\ncreated        2026-09-24 22:45:47\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - No test: every value is tied, so the ranks carry no information. The group means are in the table above; a difference between values that do not vary is not a question sampling can answer.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 4 | 0 | nan |\n| b | 10 | 4 | 0 | nan |",
    "exception_type": null,
    "exception_message": null,
    "extra": {
@@ -388,8 +388,8 @@
     "measure": "v"
    },
    "status": "OK",
-   "wall_time_seconds": 0.084096,
-   "response": "Under contract v1 for constant_same_value: row.\n\n2 rows x 4 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/effect_size_20260924-222524_2.csv\nfrom dataset   constant_same_value\ncreated        2026-09-24 22:25:24\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - No effect size: both groups are constant, so the difference has no scale. The group means are in the table above.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 10 | 4 | 0 |\n| b | 10 | 4 | 0 |",
+   "wall_time_seconds": 0.062416,
+   "response": "Under contract v1 for constant_same_value: row.\n\n2 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/effect_size_20260924-224547_2.csv\nfrom dataset   constant_same_value\ncreated        2026-09-24 22:45:47\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - No effect size: both groups are constant, so the difference has no scale. The group means are in the table above.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 10 | 4 | 0 |\n| b | 10 | 4 | 0 |",
    "exception_type": null,
    "exception_message": null,
    "extra": {
@@ -414,8 +414,8 @@
     "measure": "v"
    },
    "status": "OK",
-   "wall_time_seconds": 0.058555,
-   "response": "Under contract v1 for tiny_two_each: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/hypothesis_test_20260924-222524_4.csv\nfrom dataset   tiny_two_each\ncreated        2026-09-24 22:25:24\n\nWhat this shows:\n  - 4 of 4 row(s) analysed.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic -2.2361, df 1.471, p 0.198727.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g -1.2778. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 2 row(s).\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 4 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 2 | 1.5 | 0.7071 |  |\n| b | 2 | 4 | 1.4142 |  |",
+   "wall_time_seconds": 0.061594,
+   "response": "Under contract v1 for tiny_two_each: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-224547_5.csv\nfrom dataset   tiny_two_each\ncreated        2026-09-24 22:45:47\n\nWhat this shows:\n  - 4 of 4 row(s) analysed.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic -2.2361, df 1.471, p 0.198727.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g -1.2778. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 2 row(s).\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 4 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 2 | 1.5 | 0.7071 |  |\n| b | 2 | 4 | 1.4142 |  |",
    "exception_type": null,
    "exception_message": null,
    "extra": {
@@ -441,8 +441,8 @@
     "method": "rank"
    },
    "status": "OK",
-   "wall_time_seconds": 0.06207,
-   "response": "Under contract v1 for tiny_two_each: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/hypothesis_test_20260924-222524_5.csv\nfrom dataset   tiny_two_each\ncreated        2026-09-24 22:25:24\n\nWhat this shows:\n  - 4 of 4 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 0, df n/a, p 0.245278.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 2 row(s).\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 4 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 2 | 1.5 | 0.7071 |  |\n| b | 2 | 4 | 1.4142 |  |",
+   "wall_time_seconds": 0.068113,
+   "response": "Under contract v1 for tiny_two_each: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-224547_6.csv\nfrom dataset   tiny_two_each\ncreated        2026-09-24 22:45:47\n\nWhat this shows:\n  - 4 of 4 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 0, df n/a, p 0.245278.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 2 row(s).\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 4 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 2 | 1.5 | 0.7071 |  |\n| b | 2 | 4 | 1.4142 |  |",
    "exception_type": null,
    "exception_message": null,
    "extra": {
@@ -467,8 +467,8 @@
     "measure": "v"
    },
    "status": "OK",
-   "wall_time_seconds": 0.058134,
-   "response": "Under contract v1 for tiny_two_each: row.\n\n2 rows x 4 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/effect_size_20260924-222524_3.csv\nfrom dataset   tiny_two_each\ncreated        2026-09-24 22:25:24\n\nWhat this shows:\n  - 4 of 4 row(s) analysed.\n  - Hedges' g -1.2778 \u2014 large by Cohen's convention. b exceeds a by 2.5, which is 1.2778 standard deviation(s).\n  - g rather than d: P10-D17 measured the small-sample correction at 0.9578 for ten rows per group and 0.9962 for a hundred, so it matters where group breakdowns actually land.\n  - Cohen's bands are a vocabulary, not a verdict: they were proposed for psychology and what counts as large is a question about the subject, not about the arithmetic.\n  - An effect size does not fall as rows are added, which is the whole point of reading it beside a p-value rather than instead of one.\n  - Excluded and shown: 0 with no g, 0 with no v. The counts add back to the 4 row(s) in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 2 | 1.5 | 0.7071 |\n| b | 2 | 4 | 1.4142 |",
+   "wall_time_seconds": 0.061992,
+   "response": "Under contract v1 for tiny_two_each: row.\n\n2 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/effect_size_20260924-224547_3.csv\nfrom dataset   tiny_two_each\ncreated        2026-09-24 22:45:47\n\nWhat this shows:\n  - 4 of 4 row(s) analysed.\n  - Hedges' g -1.2778 \u2014 large by Cohen's convention. b exceeds a by 2.5, which is 1.2778 standard deviation(s).\n  - g rather than d: P10-D17 measured the small-sample correction at 0.9578 for ten rows per group and 0.9962 for a hundred, so it matters where group breakdowns actually land.\n  - Cohen's bands are a vocabulary, not a verdict: they were proposed for psychology and what counts as large is a question about the subject, not about the arithmetic.\n  - An effect size does not fall as rows are added, which is the whole point of reading it beside a p-value rather than instead of one.\n  - Excluded and shown: 0 with no g, 0 with no v. The counts add back to the 4 row(s) in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 2 | 1.5 | 0.7071 |\n| b | 2 | 4 | 1.4142 |",
    "exception_type": null,
    "exception_message": null,
    "extra": {
@@ -493,8 +493,8 @@
     "measure": "v"
    },
    "status": "OK",
-   "wall_time_seconds": 0.06659,
-   "response": "Under contract v1 for normal_valid: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/hypothesis_test_20260924-222525.csv\nfrom dataset   normal_valid\ncreated        2026-09-24 22:25:25\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic -11.4827, df 16.26, p 3.25262e-09.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g -4.9182. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.1278.\n  - At the conventional 5% threshold, v differs between the groups of g by more than sampling alone would produce. That is a statement about these rows, not a cause.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 11.5 | 1.5811 | 0 |\n| b | 10 | 21.4 | 2.2211 | 0.1278 |",
+   "wall_time_seconds": 0.088101,
+   "response": "Under contract v1 for normal_valid: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-224548.csv\nfrom dataset   normal_valid\ncreated        2026-09-24 22:45:48\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic -11.4827, df 16.26, p 3.25262e-09.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g -4.9182. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.1278.\n  - At the conventional 5% threshold, v differs between the groups of g by more than sampling alone would produce. That is a statement about these rows, not a cause.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 11.5 | 1.5811 | 0 |\n| b | 10 | 21.4 | 2.2211 | 0.1278 |",
    "exception_type": null,
    "exception_message": null,
    "extra": {
@@ -520,8 +520,8 @@
     "method": "rank"
    },
    "status": "OK",
-   "wall_time_seconds": 0.07042,
-   "response": "Under contract v1 for normal_valid: row.\n\n2 rows x 5 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/hypothesis_test_20260924-222525_2.csv\nfrom dataset   normal_valid\ncreated        2026-09-24 22:25:25\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 0, df n/a, p 0.000176611.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.1278.\n  - At the conventional 5% threshold, v differs between the groups of g by more than sampling alone would produce. That is a statement about these rows, not a cause.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 11.5 | 1.5811 | 0 |\n| b | 10 | 21.4 | 2.2211 | 0.1278 |",
+   "wall_time_seconds": 0.099238,
+   "response": "Under contract v1 for normal_valid: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-224548_2.csv\nfrom dataset   normal_valid\ncreated        2026-09-24 22:45:48\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 0, df n/a, p 0.000176611.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.1278.\n  - At the conventional 5% threshold, v differs between the groups of g by more than sampling alone would produce. That is a statement about these rows, not a cause.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 11.5 | 1.5811 | 0 |\n| b | 10 | 21.4 | 2.2211 | 0.1278 |",
    "exception_type": null,
    "exception_message": null,
    "extra": {
@@ -546,8 +546,8 @@
     "measure": "v"
    },
    "status": "OK",
-   "wall_time_seconds": 0.063074,
-   "response": "Under contract v1 for normal_valid: row.\n\n2 rows x 4 columns, written to\n  /home/user/aa-fixes/workspace/tr_d2/results/effect_size_20260924-222525.csv\nfrom dataset   normal_valid\ncreated        2026-09-24 22:25:25\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Hedges' g -4.9182 \u2014 large by Cohen's convention. b exceeds a by 9.9, which is 4.9182 standard deviation(s).\n  - g rather than d: P10-D17 measured the small-sample correction at 0.9578 for ten rows per group and 0.9962 for a hundred, so it matters where group breakdowns actually land.\n  - Cohen's bands are a vocabulary, not a verdict: they were proposed for psychology and what counts as large is a question about the subject, not about the arithmetic.\n  - An effect size does not fall as rows are added, which is the whole point of reading it beside a p-value rather than instead of one.\n  - Excluded and shown: 0 with no g, 0 with no v. The counts add back to the 20 row(s) in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 10 | 11.5 | 1.5811 |\n| b | 10 | 21.4 | 2.2211 |",
+   "wall_time_seconds": 0.06738,
+   "response": "Under contract v1 for normal_valid: row.\n\n2 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/effect_size_20260924-224548.csv\nfrom dataset   normal_valid\ncreated        2026-09-24 22:45:48\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Hedges' g -4.9182 \u2014 large by Cohen's convention. b exceeds a by 9.9, which is 4.9182 standard deviation(s).\n  - g rather than d: P10-D17 measured the small-sample correction at 0.9578 for ten rows per group and 0.9962 for a hundred, so it matters where group breakdowns actually land.\n  - Cohen's bands are a vocabulary, not a verdict: they were proposed for psychology and what counts as large is a question about the subject, not about the arithmetic.\n  - An effect size does not fall as rows are added, which is the whole point of reading it beside a p-value rather than instead of one.\n  - Excluded and shown: 0 with no g, 0 with no v. The counts add back to the 20 row(s) in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 10 | 11.5 | 1.5811 |\n| b | 10 | 21.4 | 2.2211 |",
    "exception_type": null,
    "exception_message": null,
    "extra": {
