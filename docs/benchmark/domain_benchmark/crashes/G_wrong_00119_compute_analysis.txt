@@ -1,10 +1,10 @@
 job G_wrong
 tool compute_analysis
 analysis trend
-parameters {"dataset_name": "inf_nan", "analysis_type": "trend", "measure": "v", "grain": "month"}
+parameters {"dataset_name": "all_null_col", "analysis_type": "trend", "measure": "v", "grain": "month"}
 domain None rows 0
 time 2026-09-24T21:43:14
-rss_before_kb 303548
+rss_before_kb 304832
 
 Traceback (most recent call last):
   File "/home/user/analytics-agent/scripts/domain_benchmark/worker.py", line 161, in call
@@ -34,5 +34,5 @@ _duckdb.BinderException: Binder Error: No function matches the given name and ar
 	sum(BIGNUM) -> BIGNUM
 
 
-LINE 1: ... 1 MONTH) x(g)), d AS (SELECT date_trunc('month', "d") AS m, sum("v") AS v, count(*) AS n FROM "inf_nan" WHERE (true...
+LINE 1: ... 1 MONTH) x(g)), d AS (SELECT date_trunc('month', "d") AS m, sum("v") AS v, count(*) AS n FROM "all_null_col" WHERE ...
                                                                         ^

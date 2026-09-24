@@ -1,0 +1,41 @@
+job G_wrong
+tool compute_analysis
+analysis driver_analysis
+parameters {"dataset_name": "adv_cd", "analysis_type": "driver_analysis", "measure": "customer_id"}
+domain None rows 0
+time 2026-09-24T21:43:12
+rss_before_kb 299404
+
+Traceback (most recent call last):
+  File "/home/user/analytics-agent/scripts/domain_benchmark/worker.py", line 161, in call
+    text = fn(**kwargs)
+           ^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/server.py", line 917, in compute_analysis
+    return analysis_tools.compute_analysis(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/analysis/tools.py", line 294, in compute_analysis
+    gate, output, used = _produce(con, dataset_name, analysis_type, params)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/analysis/tools.py", line 239, in _produce
+    output = analysis.run(con, gate, scope, **params)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/analysis/driver_analysis.py", line 88, in driver_analysis
+    total = con.execute(
+            ^^^^^^^^^^^^
+_duckdb.BinderException: Binder Error: No function matches the given name and argument types 'avg(VARCHAR)'. You might need to add explicit type casts.
+	Candidate functions:
+	avg(DECIMAL) -> DECIMAL
+	avg(SMALLINT) -> DOUBLE
+	avg(INTEGER) -> DOUBLE
+	avg(BIGINT) -> DOUBLE
+	avg(HUGEINT) -> DOUBLE
+	avg(INTERVAL) -> INTERVAL
+	avg(DOUBLE) -> DOUBLE
+	avg(TIMESTAMP) -> TIMESTAMP
+	avg(TIMESTAMP WITH TIME ZONE) -> TIMESTAMP WITH TIME ZONE
+	avg(TIME) -> TIME
+	avg(TIME WITH TIME ZONE) -> TIME WITH TIME ZONE
+
+
+LINE 1: ...+ INTERVAL 1 DAY) AND "customer_id" IS NOT NULL), t AS (SELECT avg(y) AS gm FROM p) SELECT (SELECT count(*) FROM p), (SELECT...
+                                                                          ^

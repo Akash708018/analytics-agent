@@ -1,0 +1,33 @@
+job H_concurrency
+tool compute_analysis
+analysis top_n
+parameters {"dataset_name": "financial", "analysis_type": "top_n", "dimension": "payment_method", "measure": "revenue"}
+domain None rows 0
+time 2026-09-24T21:44:44
+rss_before_kb 298704
+
+Traceback (most recent call last):
+  File "/home/user/analytics-agent/scripts/domain_benchmark/worker.py", line 161, in call
+    text = fn(**kwargs)
+           ^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/server.py", line 917, in compute_analysis
+    return analysis_tools.compute_analysis(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/analysis/tools.py", line 294, in compute_analysis
+    gate, output, used = _produce(con, dataset_name, analysis_type, params)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/analysis/tools.py", line 238, in _produce
+    scope = scope_for(con, gate)
+            ^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/analysis/base.py", line 291, in scope_for
+    rule = bind_predicate(con, name, exclusion.rule)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/util/sql_guard.py", line 194, in bind_predicate
+    check_predicate(rule)
+  File "/home/user/analytics-agent/src/analytics_agent/util/sql_guard.py", line 169, in check_predicate
+    if "SUBQUERY" in set(_classes(_ast(wrapped))):
+                                  ^^^^^^^^^^^^^
+  File "/home/user/analytics-agent/src/analytics_agent/util/sql_guard.py", line 100, in _ast
+    raw = _PARSER.execute("SELECT json_serialize_sql(?)", [sql]).fetchall()[0][0]
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range

@@ -1,10 +1,10 @@
 job G_wrong
 tool compute_analysis
-analysis trend
-parameters {"dataset_name": "inf_nan", "analysis_type": "trend", "measure": "v", "grain": "month"}
+analysis correlation
+parameters {"dataset_name": "adv_cd", "analysis_type": "correlation", "measure": "customer_id", "against": "revenue"}
 domain None rows 0
-time 2026-09-24T21:43:14
-rss_before_kb 303548
+time 2026-09-24T21:43:12
+rss_before_kb 299620
 
 Traceback (most recent call last):
   File "/home/user/analytics-agent/scripts/domain_benchmark/worker.py", line 161, in call
@@ -19,20 +19,13 @@ Traceback (most recent call last):
   File "/home/user/analytics-agent/src/analytics_agent/analysis/tools.py", line 239, in _produce
     output = analysis.run(con, gate, scope, **params)
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/user/analytics-agent/src/analytics_agent/analysis/trend.py", line 103, in trend
-    fetched = con.execute(per_period_sql(
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_duckdb.BinderException: Binder Error: No function matches the given name and argument types 'sum(VARCHAR)'. You might need to add explicit type casts.
+  File "/home/user/analytics-agent/src/analytics_agent/analysis/correlation.py", line 110, in correlation
+    row = con.execute(
+          ^^^^^^^^^^^^
+_duckdb.BinderException: Binder Error: No function matches the given name and argument types 'corr(DOUBLE, VARCHAR)'. You might need to add explicit type casts.
 	Candidate functions:
-	sum(DECIMAL) -> DECIMAL
-	sum(BOOLEAN) -> HUGEINT
-	sum(SMALLINT) -> HUGEINT
-	sum(INTEGER) -> HUGEINT
-	sum(BIGINT) -> HUGEINT
-	sum(HUGEINT) -> HUGEINT
-	sum(DOUBLE) -> DOUBLE
-	sum(BIGNUM) -> BIGNUM
+	corr(DOUBLE, DOUBLE) -> DOUBLE
 
 
-LINE 1: ... 1 MONTH) x(g)), d AS (SELECT date_trunc('month', "d") AS m, sum("v") AS v, count(*) AS n FROM "inf_nan" WHERE (true...
-                                                                        ^
+LINE 1: ... BY y) AS ay FROM n) SELECT (SELECT count(*) FROM p), (SELECT corr(y, x) FROM p), (SELECT corr(ay, ax) FROM r), (SELECT...
+                                                                         ^
