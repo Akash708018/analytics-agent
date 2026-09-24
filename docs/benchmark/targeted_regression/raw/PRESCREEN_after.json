@@ -1,0 +1,50 @@
+{
+ "case": "PRESCREEN",
+ "src": "/home/user/analytics-agent/src",
+ "commit": "7ff28b46bc55076da741751b6a17c437fd19ef31",
+ "src_dirty": [],
+ "python": "3.12.3",
+ "duckdb": "1.5.5",
+ "seconds": 13.0,
+ "harness_error": null,
+ "observations": [
+  {
+   "sub": "prescreen",
+   "tool": "detect.DATE_PREFIX",
+   "analysis": null,
+   "dataset": null,
+   "rows": null,
+   "parameters": {},
+   "status": "OK",
+   "wall_time_seconds": 11.063,
+   "response": "",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "corpora": {
+     "fuzz": {
+      "values": 600000,
+      "parseable": 140232,
+      "false_negatives": 0,
+      "screened_out": 102029
+     },
+     "extra": {
+      "values": 36,
+      "parseable": 14,
+      "false_negatives": 0,
+      "screened_out": 14
+     }
+    },
+    "ids_screened_out": {
+     "123e4567-e89b-12d3-a456-426614174000": false,
+     "CUST-000123": true,
+     "c000123": true,
+     "SKU_4411": true,
+     "Electronics": true,
+     "TXN000123": true
+    },
+    "role": "ground_fact"
+   }
+  }
+ ]
+}
