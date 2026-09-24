@@ -56,3 +56,4 @@ TypeError: obs() got multiple values for argument 'tool'
 2026-09-24T22:46:12 CHART_ISOLATION after: 2 observation(s) in 4s
 2026-09-24T22:46:23 WELCH before: 2 observation(s) in 11s
 2026-09-24T22:46:31 WELCH after: 2 observation(s) in 8s
+2026-09-24T22:46:43 COHORT before: 2 observation(s) in 13s
