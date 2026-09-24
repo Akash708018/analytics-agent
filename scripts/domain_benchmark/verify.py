@@ -49,7 +49,12 @@ def correctness(records: list[dict], data: "oracle.Data", domain, *, context: di
             # A written result with no data rows: the oracle decides whether empty is right.
             rows = [] if n.get("result_path") and Path(n["result_path"]).exists() else None
         try:
-            if rows == []:
+            if rows is None and n.get("analysis") not in ("correlated_shift",):
+                # the call wrote no result (it raised or was refused): nothing to verify, and
+                # the call's own record carries why (H_concurrency: an ORACLE_ERROR of KeyError)
+                checks, skipped = [], ["the call produced no result file"]
+                status = "NOT_VERIFIED_NO_RESULT"
+            elif rows == []:
                 checks, skipped = [], ["result file has no data rows"]
                 status = "PASS_EMPTY"
             else:

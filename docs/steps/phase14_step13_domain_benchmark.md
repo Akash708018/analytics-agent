@@ -145,12 +145,14 @@ fixes were made in a separate worktree (section 4).
   workspace, and each ledger must hold exactly its own action with its own count. F, G, H,
   J and sales 10M are superseded in state.json with their reason, their evidence is moved
   to _superseded/run2_*, and they are re-run.
+- 2.20 A call that raised wrote no result, and the oracle was handed None (an ORACLE_ERROR of
+  KeyError). Such a call is now NOT_VERIFIED_NO_RESULT; its own record carries the exception.
 
 ### 4. Defects in the product, and their fixes (worktree branch step14-fixes-wip)
 
 Every fix has a test in tests/test_domain_benchmark_defects.py (D1-D11) or
 tests/test_date_prescreen_facts.py. Run against src/ as of f5dd3d4 (the code the benchmark
-measured): `11 failed, 1 passed` -- every D test fails there, and the one control (a key
+measured): `11 failed, 1 passed` (D12, added later: fails there, passes here) -- every D test fails there, and the one control (a key
 repeated by distinct rows keeps the contract call) passes. The facts file cannot import there
 (DATE_PREFIX is new), which is expected.
 
@@ -167,5 +169,6 @@ repeated by distinct rows keeps the contract call) passes. The facts file cannot
 | D9 | G | `<one of: x>` when x was the only result file | the runnable path |
 | D10 | C-E charts | cohort heatmap replies over 8,000 characters (49 series described) | first 12 described, the rest counted |
 | D11 | E, I | Welch df "2e+06"; "equal-width" bins with a narrower last bin | df as a number; the narrow last bin stated |
+| D12 | H_concurrency (rerun) | ten threads scoping one workspace: 2 raised IndexError from sql_guard's one shared parser connection. Run 2 met D4 first and never got here | one parser connection per thread |
 | P1 | E, I | profile_column profiled the whole table (51 s a call at 10M) | profiles its own column; identical output on 24 of 24 columns |
 | P2 | E | propose_cleaning_plan 13.6 s median at 1M: 16 date formats tried on id and label columns | an exact pre-screen (fuzzed: 0 of 140,232 parsed values screened out); 24.3 s to 11.8 s on financial 1M under load |
