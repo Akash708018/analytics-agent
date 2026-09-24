@@ -163,6 +163,8 @@ _DAY_FIRST = ("%d/%m/%y", "%d.%m.%y", "%d-%m-%y", "%d/%m/%Y", "%d.%m.%Y", "%d-%m
 _MONTH_FIRST = ("%m/%d/%y", "%m.%d.%y", "%m-%d-%y", "%m/%d/%Y", "%m.%d.%Y", "%m-%d-%Y")
 _NUMERIC_DATE = r"(\d{1,2})[/.-](\d{1,2})[/.-](?:\d{4}|\d{2})"
 _TWO_DIGIT_YEAR = r"\d{1,2}[/.-]\d{1,2}[/.-]\d{2}"
+# What a value any date format above parses must open with (tests/test_date_prescreen_facts.py).
+DATE_PREFIX = r"^[\s\x0b\-+0-9]|^(?i)(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)"
 
 
 def _share_where(con, table: str, column: str, condition: str) -> float:
@@ -303,7 +305,12 @@ def _date_conversion(con, table: str, column: str) -> tuple[str, str, str] | Non
     formats += _DATE_FORMATS
     parsed = "COALESCE(" + ", ".join(
         f"TRY_STRPTIME({trimmed}, {sql.literal(f)})" for f in formats) + ")"
-    if not _reaches(con, table, column, f"{parsed} IS NOT NULL"):
+    # Every format opens with a number or a month name, and strptime skips leading whitespace
+    # (trim() keeps a tab): a value opening otherwise parses by none of them. The CASE keeps
+    # the formats off such values -- id and label columns, 1.2 s each at 1M rows (Step 13).
+    screened = (f"CASE WHEN regexp_matches({trimmed}, {sql.literal(DATE_PREFIX)}) "
+                f"THEN {parsed} IS NOT NULL ELSE false END")
+    if not _reaches(con, table, column, screened):
         return None
     with_time = _scalar(con, f"SELECT count(*) FROM {t} WHERE {parsed} IS NOT NULL "
                              f"AND {parsed} <> date_trunc('day', {parsed})")
