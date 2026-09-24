@@ -46,7 +46,7 @@ MAX_CALLS = 10
 RESULT_CHARS = 6000
 # Seconds between two requests to one provider: free tiers count requests per minute. The wait
 # is outside every measured latency.
-PACE = {"gemini": float(os.environ.get("LLM_PACE_GEMINI", "7")),
+PACE = {"gemini": float(os.environ.get("LLM_PACE_GEMINI", "13")),
         "groq": float(os.environ.get("LLM_PACE_GROQ", "3"))}
 _last: dict[str, float] = {}
 # Smoke runs name a few ids here (and a scratch LLM_BENCH_DATA); a real run leaves it unset.
@@ -164,6 +164,16 @@ class Provider:
             return False, f"{exc}"[:300]
 
     def ask(self, system: str, turns: list[tuple[str, str]]) -> dict:
+        """ask_once, with one patient retry on a 'daily quota' 429: on 24/09/2026 the first
+        such answer was followed by a 200 a few minutes later, so one sighting is not proof
+        the day is spent; two a minute apart are taken as that."""
+        r = self.ask_once(system, turns)
+        if not r["ok"] and r.get("daily_quota"):
+            time.sleep(65)
+            r = self.ask_once(system, turns)
+        return r
+
+    def ask_once(self, system: str, turns: list[tuple[str, str]]) -> dict:
         """One request. turns: [(role 'user'|'model', text)]. Returns text, latency, served
         model, or a classified error; the pacing wait is not in the latency."""
         gap = PACE[self.name] - (time.time() - _last.get(self.name, 0))
@@ -195,7 +205,7 @@ class Provider:
         except llm.ProviderError as exc:
             kind = "RATE_LIMIT" if "429" in str(exc) or exc.kind == "daily_quota" \
                 else "PROVIDER_ERROR"
-            return {"ok": False, "error": kind, "detail": str(exc)[:300],
+            return {"ok": False, "error": kind, "detail": str(exc)[:900],
                     "daily_quota": exc.kind == "daily_quota",
                     "latency_s": round(time.perf_counter() - t0, 3)}
         finally:
