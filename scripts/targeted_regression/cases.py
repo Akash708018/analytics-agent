@@ -914,10 +914,69 @@ def case_chart_isolation() -> list[dict]:
     return out
 
 
+def case_d16() -> list[dict]:
+    """24 threads of one workspace writing a result in the same second (H_concurrency found a
+    result file holding another dataset's rows)."""
+    from datetime import datetime
+
+    from analytics_agent.util import results
+    ws = fresh("tr_d16")
+    now = datetime(2026, 9, 24, 23, 10, 51)
+    barrier = threading.Barrier(24)
+    got, errs = [None] * 24, []
+
+    def work(k):
+        barrier.wait()
+        try:
+            got[k] = results.write_result(ws, label="top_n", headers=["who"],
+                                          rows=[[f"t{k}"]] * 3, now=now)
+        except Exception as exc:  # noqa: BLE001
+            errs.append(repr(exc))
+
+    threads = [threading.Thread(target=work, args=(k,)) for k in range(24)]
+    t0 = time.perf_counter()
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    paths = [g.path for g in got if g]
+    wrong = [k for k, g in enumerate(got) if g and g.path.read_text().splitlines()[1:]
+             != [f"t{k}"] * 3]
+    r = {"status": "EXCEPTION" if errs else "WRONG" if wrong or len(set(paths)) < 24 else "OK",
+         "wall_time_seconds": round(time.perf_counter() - t0, 4), "response": "",
+         "exception_type": errs[0].split("(")[0] if errs else None,
+         "exception_message": errs[0] if errs else None}
+    workspace.reset(ws)
+    return [obs("write_result_24_threads", "write_result", r, threads=24,
+                distinct_paths=len(set(paths)), files_with_another_writers_rows=len(wrong),
+                role="defect")]
+
+
+def case_d15() -> list[dict]:
+    """One plan proposed twice on a table scanned in parallel: the same examples each time."""
+    ws = fresh("tr_d15")
+    rows = [[f"r{i}", f"2024-{1 + i % 12:02d}-05", ["Card", "card", "CARD", "Wire", "wire"][i % 5],
+             i % 97] for i in range(300_000)]
+    path = tiny("d15_plan", ["id", "d", "pay", "v"], rows + rows[:4000])
+    texts, times = [], []
+    for k in range(2):
+        ingest(ws, path, f"p{k}")
+        r = call(server.propose_cleaning_plan, dataset_name=f"p{k}", workspace_id=ws)
+        texts.append(r["response"].replace(f"p{k}", "P").split("NEXT STEP", 1)[0])
+        times.append(r["wall_time_seconds"])
+    same = texts[0] == texts[1]
+    out = {"status": "OK" if same else "WRONG", "wall_time_seconds": max(times),
+           "response": texts[0][:1500], "exception_type": None, "exception_message": None}
+    workspace.reset(ws)
+    return [obs("plan_twice_300k", "propose_cleaning_plan", out, rows=304_000,
+                identical_text=same, role="defect")]
+
+
 CASES = {
     "D1": case_d1, "D2": case_d2, "D3": case_d3, "D4": case_d4, "D5": case_d5, "D12": case_d12,
     "RECS": case_recs, "PROFILE_CORRECTNESS": case_profile_correctness,
     "PROFILE_PERF": case_profile_perf, "CLEANING": case_cleaning,
     "PRESCREEN": case_date_prescreen, "COHORT": case_cohort, "WELCH": case_welch,
-    "PAGING": case_paging, "CHART_ISOLATION": case_chart_isolation,
+    "PAGING": case_paging, "CHART_ISOLATION": case_chart_isolation, "D16": case_d16,
+    "D15": case_d15,
 }

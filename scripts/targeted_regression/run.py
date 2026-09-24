@@ -29,7 +29,7 @@ ORIGINAL_SRC = Path(os.environ.get("TR_ORIGINAL_SRC", "/home/user/aa-orig/src"))
 FIXED_SRC = Path(os.environ.get("TR_FIXED_SRC", str(ROOT / "src")))
 BENCH_DATA = Path("/tmp/domain_benchmark_data")
 HJ_DATA = Path("/tmp/tr_hj")
-ORDER = ["D1", "D2", "D3", "D4", "D5", "D12", "RECS", "PROFILE_CORRECTNESS", "PROFILE_PERF",
+ORDER = ["D1", "D2", "D3", "D4", "D5", "D12", "D15", "D16", "RECS", "PROFILE_CORRECTNESS", "PROFILE_PERF",
          "CLEANING", "PRESCREEN", "COHORT", "WELCH", "PAGING", "CHART_ISOLATION"]
 
 ESTIMATE = """ESTIMATED DURATION (this machine: 4 vCPU, 16 GB)
@@ -250,17 +250,27 @@ def _judge_iso(sub, b, a):
     return clean and x["names_own_dataset"], "no value of the other dataset anywhere", True
 
 
-JUDGES = {"D1": _judge_d1, "D2": _judge_d2, "D3": _judge_d3, "D4": _judge_d4, "D5": _judge_d5,
+def _judge_d16(sub, b, a):
+    return a["status"] == "OK", "24 distinct files, each holding its own writer's rows", \
+        b["status"] in ("WRONG", "EXCEPTION")
+
+
+def _judge_d15(sub, b, a):
+    return a["status"] == "OK", "the same plan text, examples included, twice", \
+        b["status"] == "WRONG"
+
+
+JUDGES = {"D15": _judge_d15, "D16": _judge_d16, "D1": _judge_d1, "D2": _judge_d2, "D3": _judge_d3, "D4": _judge_d4, "D5": _judge_d5,
           "D12": _judge_d12, "RECS": _judge_recs, "PROFILE_CORRECTNESS": _judge_profile_corr,
           "PROFILE_PERF": _judge_perf, "CLEANING": _judge_cleaning,
           "PRESCREEN": _judge_prescreen, "COHORT": _judge_cohort, "WELCH": _judge_welch,
           "PAGING": _judge_paging, "CHART_ISOLATION": _judge_iso}
-DEFECT_OF = {"D1": "D1", "D2": "D2", "D3": "D3", "D4": "D4", "D5": "D5", "D12": "D12",
+DEFECT_OF = {"D15": "D15", "D16": "D16", "D1": "D1", "D2": "D2", "D3": "D3", "D4": "D4", "D5": "D5", "D12": "D12",
              "RECS": "D6-D9", "COHORT": "D10", "WELCH": "D11", "PAGING": "D13",
              "PROFILE_CORRECTNESS": "P1", "PROFILE_PERF": "P1", "CLEANING": "P2",
              "PRESCREEN": "P2", "CHART_ISOLATION": "H chart (harness)"}
 SEVERITY = {"D1": "HIGH", "D2": "HIGH", "D3": "HIGH", "D4": "HIGH", "D5": "HIGH",
-            "D12": "HIGH", "D6-D9": "MEDIUM", "D10": "MEDIUM", "D11": "LOW", "D13": "LOW",
+            "D12": "HIGH", "D15": "LOW", "D16": "CRITICAL", "D6-D9": "MEDIUM", "D10": "MEDIUM", "D11": "LOW", "D13": "LOW",
             "P1": "MEDIUM", "P2": "MEDIUM", "H chart (harness)": "CRITICAL-if-real"}
 
 
