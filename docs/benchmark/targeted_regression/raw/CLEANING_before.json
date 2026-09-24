@@ -1,0 +1,114 @@
+{
+ "case": "CLEANING",
+ "src": "/home/user/aa-orig/src",
+ "commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+ "src_dirty": [],
+ "python": "3.12.3",
+ "duckdb": "1.5.5",
+ "seconds": 221.03,
+ "harness_error": null,
+ "observations": [
+  {
+   "sub": "plan_dirty_1000000",
+   "tool": "propose_cleaning_plan",
+   "analysis": null,
+   "dataset": "financial_dirty",
+   "rows": 1000000,
+   "parameters": {},
+   "status": "OK",
+   "wall_time_seconds": 23.0109,
+   "response": "7 change(s) proposed for fin (1,003,045 row(s)). Nothing has been changed.\n\n  C001  DROP_DUPLICATE_ROWS: keep one of each of the 500 exactly duplicated row(s) (500 row(s)). 500 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"FIN000591844\",\"transaction_id\":\"T00591844\",\"account_id\":\"A0048229\",\"customer_id\":\"C0066346\",\"transaction_date\":\"2024-12-28\",\"posted_at\":\"2024-12-28 13:05:43\",\"transaction_type\":\"fee\",\"category\":\"groceries\",\"debit\":101.1,\"credit\":0.0,\"amount_usd\":101.1,\"balance\":\"3,214.40\",\"currency\":\"USD\",\"branch\":\"BR28\",\"payment_method\":\"CASH\",\"risk_score_pct\":\"10.20%\",\"fraud_flag\":false,\"revenue\":\"$101.10\",\"expense\":\"73.84\",\"profit\":27.26,\"budget\":243.4,\"actual\":183.2,\"fiscal_period\":\"FY2024-Q4\",\"source_system\":\"CORE\",\"notes\":null,\"duplicate_count\":2}', '{\"record_id\":\"FIN000608243\",\"transaction_id\":\"T00608243\",\"account_id\":\"A0028248\",\"customer_id\":\"C0065749\",\"transaction_date\":\"2023-06-20\",\"posted_at\":\"2023-06-20 14:03:03\",\"transaction_type\":\"purchase\",\"category\":null,\"debit\":45.13,\"credit\":0.0,\"amount_usd\":45.13,\"balance\":\"4,450.39\",\"currency\":\"USD\",\"branch\":\"BR08\",\"payment_method\":\"CASH\",\"risk_score_pct\":\"6.81%\",\"fraud_flag\":false,\"revenue\":\"$45.13\",\"expense\":\"43.66\",\"profit\":1.47,\"budget\":64.82,\"actual\":78.61,\"fiscal_period\":\"FY2023-Q2\",\"source_system\":\"CORE\",\"notes\":null,\"duplicate_count\":2}', '{\"record_id\":\"FIN000916327\",\"transaction_id\":\"T00916327\",\"account_id\":\"A0069038\",\"customer_id\":\"C0030749\",\"transaction_date\":\"2023-11-29\",\"posted_at\":\"2023-11-29 18:29:04\",\"transaction_type\":\"purchase\",\"category\":\"groceries\",\"debit\":407.83,\"credit\":0.0,\"amount_usd\":407.83,\"balance\":\"-2,410.22\",\"currency\":\"USD\",\"branch\":\"BR01\",\"payment_method\":\"card\",\"risk_score_pct\":\"25.59%\",\"fraud_flag\":false,\"revenue\":\"$407.83\",\"expense\":\"296.31\",\"profit\":111.52,\"budget\":330.15,\"actual\":341.88,\"fiscal_period\":\"FY2023-Q4\",\"source_system\":\"CORE\",\"notes\":null,\"duplicate_count\":2}'. That is information, not absence -- approve this only if you mean to lose it.\n\n  C002  TRIM_WHITESPACE on category: strip padding from 298,141 value(s) in category (298,141 row(s))\n\n  C003  CONVERT_TYPE on balance: read balance as DECIMAL(18,2), with its currency signs and thousands separators removed ('$1,234.56' is 1234.56) (1,003,045 row(s))\n\n  C004  NORMALISE_CASE on payment_method: fold payment_method to one case, merging 10 distinct value(s) into others (665,054 row(s)). 10 distinct value(s) will be discarded and are not declared missing anywhere: 'Card', 'WIRE', 'Wire'. That is information, not absence -- approve this only if you mean to lose it.\n\n  C005  CONVERT_TYPE on risk_score_pct: read risk_score_pct as DECIMAL(18,2), the number before its % sign, so '12.5%' becomes 12.5 (983,022 row(s))\n\n  C006  CONVERT_TYPE on revenue: read revenue as DECIMAL(18,2), with its currency signs and thousands separators removed ('$1,234.56' is 1234.56) (997,952 row(s))\n\n  C007  CONVERT_TYPE on expense: read expense as DECIMAL(18,2) (961,319 row(s)). 8,390 value(s) will be discarded and are not declared missing anywhere: 'unknown'. That is information, not absence -- approve this only if you mean to lose it.\n\n3 of these discard something that is not declared missing anywhere (C001, C004, C007). Read those lines before approving them.\n\nApprove by id, in the order you want them run. Anything you do not name is not run.\n\nNEXT STEP: call apply_cleaning_plan(dataset_name=\"fin\", approved_action_ids=[\"C002\", \"C003\", \"C005\", \"C006\"]) \u2014 these discard nothing and can run together. Any of the others are yours to add by id.",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "cold_seconds": 23.390981,
+    "measured_seconds": [
+     22.985651,
+     23.036149
+    ],
+    "actions": [
+     {
+      "id": "C001",
+      "kind": "DROP_DUPLICATE_ROWS",
+      "column": "",
+      "text": "keep one of each of the 500 exactly duplicated row(s) (500 row(s)). 500 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"FIN000591844\",\"transaction_id\":\"T00591844\",\"account_id\":\"A0048229\",\"customer_id\":\"C0066346\",\"transaction_date\":\"2024-12-28\",\"posted_at\":\"2024-12-28 13:05:43\",\"transaction_type\":\"fee\",\"category\":\"groceries\",\"debit\":101.1,\"credit\":0.0,\"amount_usd\":101.1,\"balance\":\"3,214.40\",\"currency\":\"USD\",\"branch\":\"BR28\",\"payment_method\":\"CASH\",\"risk_score_pct\":\"10.20%\",\"fraud_flag\":false,\"revenue\":\"$101.10\",\"expense\":\"73.84\",\"profit\":27.26,\"budget\":243.4,\"actual\":183.2,\"fiscal_period\":\"FY2024-Q4\",\"source_system\":\"CORE\",\"notes\":null,\"duplicate_count\":2}', '{\"record_id\":\"FIN000608243\",\"transaction_id\":\"T00608243\",\"account_id\":\"A0028248\",\"customer_id\":\"C0065749\",\"transaction_date\":\"2023-06-20\",\"posted_at\":\"2023-06-20 14:03:03\",\"transaction_type\":\"purchase\",\"category\":null,\"debit\":45.13,\"credit\":0.0,\"amount_usd\":45.13,\"balance\":\"4,450.39\",\"currency\":\"USD\",\"branch\":\"BR08\",\"payment_method\":\"CASH\",\"risk_score_pct\":\"6.81%\",\"fraud_flag\":false,\"revenue\":\"$45.13\",\"expense\":\"43.66\",\"profit\":1.47,\"budget\":64.82,\"actual\":78.61,\"fiscal_period\":\"FY2023-Q2\",\"source_system\":\"CORE\",\"notes\":null,\"duplicate_count\":2}', '{\"record_id\":\"FIN000916327\",\"transaction_id\":\"T00916327\",\"account_id\":\"A0069038\",\"customer_id\":\"C0030749\",\"transaction_date\":\"2023-11-29\",\"posted_at\":\"2023-11-29 18:29:04\",\"transaction_type\":\"purchase\",\"category\":\"groceries\",\"debit\":407.83,\"credit\":0.0,\"amount_usd\":407.83,\"balance\":\"-2,410.22\",\"currency\":\"USD\",\"branch\":\"BR01\",\"payment_method\":\"card\",\"risk_score_pct\":\"25.59%\",\"fraud_flag\":false,\"revenue\":\"$407.83\",\"expense\":\"296.31\",\"profit\":111.52,\"budget\":330.15,\"actual\":341.88,\"fiscal_period\":\"FY2023-Q4\",\"source_system\":\"CORE\",\"notes\":null,\"duplicate_count\":2}'. That is information, not absence -- approve this only if you mean to lose it."
+     },
+     {
+      "id": "C002",
+      "kind": "TRIM_WHITESPACE",
+      "column": "category",
+      "text": "strip padding from 298,141 value(s) in category (298,141 row(s))"
+     },
+     {
+      "id": "C003",
+      "kind": "CONVERT_TYPE",
+      "column": "balance",
+      "text": "read balance as DECIMAL(18,2), with its currency signs and thousands separators removed ('$1,234.56' is 1234.56) (1,003,045 row(s))"
+     },
+     {
+      "id": "C004",
+      "kind": "NORMALISE_CASE",
+      "column": "payment_method",
+      "text": "fold payment_method to one case, merging 10 distinct value(s) into others (665,054 row(s)). 10 distinct value(s) will be discarded and are not declared missing anywhere: 'Card', 'WIRE', 'Wire'. That is information, not absence -- approve this only if you mean to lose it."
+     },
+     {
+      "id": "C005",
+      "kind": "CONVERT_TYPE",
+      "column": "risk_score_pct",
+      "text": "read risk_score_pct as DECIMAL(18,2), the number before its % sign, so '12.5%' becomes 12.5 (983,022 row(s))"
+     },
+     {
+      "id": "C006",
+      "kind": "CONVERT_TYPE",
+      "column": "revenue",
+      "text": "read revenue as DECIMAL(18,2), with its currency signs and thousands separators removed ('$1,234.56' is 1234.56) (997,952 row(s))"
+     },
+     {
+      "id": "C007",
+      "kind": "CONVERT_TYPE",
+      "column": "expense",
+      "text": "read expense as DECIMAL(18,2) (961,319 row(s)). 8,390 value(s) will be discarded and are not declared missing anywhere: 'unknown'. That is information, not absence -- approve this only if you mean to lose it."
+     }
+    ],
+    "detector_queries": 357,
+    "date_queries": 11,
+    "date_query_seconds": 8.855,
+    "detector_seconds": 23.797,
+    "role": "performance"
+   }
+  },
+  {
+   "sub": "plan_clean_1000000",
+   "tool": "propose_cleaning_plan",
+   "analysis": null,
+   "dataset": "financial_clean",
+   "rows": 1000000,
+   "parameters": {},
+   "status": "OK",
+   "wall_time_seconds": 16.2218295,
+   "response": "1 change(s) proposed for fin (1,003,045 row(s)). Nothing has been changed.\n\n  C001  DROP_DUPLICATE_ROWS: keep one of each of the 3,045 exactly duplicated row(s) (3,045 row(s)). 3,045 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"FIN000134999\",\"transaction_id\":\"T00134999\",\"account_id\":\"A0079786\",\"customer_id\":\"C0017175\",\"transaction_date\":\"2023-02-15\",\"posted_at\":\"2023-02-15 00:49:45\",\"transaction_type\":\"fee\",\"category\":\"rent\",\"debit\":280.06,\"credit\":0.0,\"amount\":280.06,\"balance\":2115.76,\"currency\":\"USD\",\"branch\":\"BR06\",\"payment_method\":\"cheque\",\"risk_score\":0.2135,\"fraud_flag\":false,\"revenue\":280.06,\"expense\":144.84,\"profit\":135.22,\"budget\":197.02,\"actual\":227.4,\"fiscal_period\":\"FY2023-Q1\",\"source_system\":\"CORE\",\"duplicate_count\":2}', '{\"record_id\":\"FIN000147869\",\"transaction_id\":\"T00147869\",\"account_id\":\"A0048171\",\"customer_id\":\"C0029104\",\"transaction_date\":\"2023-06-28\",\"posted_at\":\"2023-06-28 10:51:29\",\"transaction_type\":\"refund\",\"category\":\"entertainment\",\"debit\":0.0,\"credit\":12.84,\"amount\":-12.84,\"balance\":3170.78,\"currency\":\"USD\",\"branch\":\"BR16\",\"payment_method\":\"ach\",\"risk_score\":0.1817,\"fraud_flag\":false,\"revenue\":12.84,\"expense\":-0.91,\"profit\":13.75,\"budget\":281.83,\"actual\":201.63,\"fiscal_period\":\"FY2023-Q2\",\"source_system\":\"CORE\",\"duplicate_count\":2}', '{\"record_id\":\"FIN000166142\",\"transaction_id\":\"T00166142\",\"account_id\":\"A0018216\",\"customer_id\":\"C0105231\",\"transaction_date\":\"2024-05-01\",\"posted_at\":\"2024-05-01 02:48:52\",\"transaction_type\":\"transfer\",\"category\":\"transfer\",\"debit\":15.61,\"credit\":0.0,\"amount\":15.61,\"balance\":4002.43,\"currency\":\"USD\",\"branch\":\"BR38\",\"payment_method\":\"wire\",\"risk_score\":0.2112,\"fraud_flag\":false,\"revenue\":15.61,\"expense\":8.7,\"profit\":6.91,\"budget\":294.27,\"actual\":223.61,\"fiscal_period\":\"FY2024-Q2\",\"source_system\":\"CORE\",\"duplicate_count\":2}'. That is information, not absence -- approve this only if you mean to lose it.\n\n1 of these discard something that is not declared missing anywhere (C001). Read those lines before approving them.\n\nApprove by id, in the order you want them run. Anything you do not name is not run.\n\nNEXT STEP: read the lines above and call apply_cleaning_plan(dataset_name=\"fin\", approved_action_ids=[...]) with the ids you want. Nothing here is free of loss, so there is no set worth suggesting.",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "cold_seconds": 16.309144,
+    "measured_seconds": [
+     16.236204,
+     16.207455
+    ],
+    "actions": [
+     {
+      "id": "C001",
+      "kind": "DROP_DUPLICATE_ROWS",
+      "column": "",
+      "text": "keep one of each of the 3,045 exactly duplicated row(s) (3,045 row(s)). 3,045 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"FIN000134999\",\"transaction_id\":\"T00134999\",\"account_id\":\"A0079786\",\"customer_id\":\"C0017175\",\"transaction_date\":\"2023-02-15\",\"posted_at\":\"2023-02-15 00:49:45\",\"transaction_type\":\"fee\",\"category\":\"rent\",\"debit\":280.06,\"credit\":0.0,\"amount\":280.06,\"balance\":2115.76,\"currency\":\"USD\",\"branch\":\"BR06\",\"payment_method\":\"cheque\",\"risk_score\":0.2135,\"fraud_flag\":false,\"revenue\":280.06,\"expense\":144.84,\"profit\":135.22,\"budget\":197.02,\"actual\":227.4,\"fiscal_period\":\"FY2023-Q1\",\"source_system\":\"CORE\",\"duplicate_count\":2}', '{\"record_id\":\"FIN000147869\",\"transaction_id\":\"T00147869\",\"account_id\":\"A0048171\",\"customer_id\":\"C0029104\",\"transaction_date\":\"2023-06-28\",\"posted_at\":\"2023-06-28 10:51:29\",\"transaction_type\":\"refund\",\"category\":\"entertainment\",\"debit\":0.0,\"credit\":12.84,\"amount\":-12.84,\"balance\":3170.78,\"currency\":\"USD\",\"branch\":\"BR16\",\"payment_method\":\"ach\",\"risk_score\":0.1817,\"fraud_flag\":false,\"revenue\":12.84,\"expense\":-0.91,\"profit\":13.75,\"budget\":281.83,\"actual\":201.63,\"fiscal_period\":\"FY2023-Q2\",\"source_system\":\"CORE\",\"duplicate_count\":2}', '{\"record_id\":\"FIN000166142\",\"transaction_id\":\"T00166142\",\"account_id\":\"A0018216\",\"customer_id\":\"C0105231\",\"transaction_date\":\"2024-05-01\",\"posted_at\":\"2024-05-01 02:48:52\",\"transaction_type\":\"transfer\",\"category\":\"transfer\",\"debit\":15.61,\"credit\":0.0,\"amount\":15.61,\"balance\":4002.43,\"currency\":\"USD\",\"branch\":\"BR38\",\"payment_method\":\"wire\",\"risk_score\":0.2112,\"fraud_flag\":false,\"revenue\":15.61,\"expense\":8.7,\"profit\":6.91,\"budget\":294.27,\"actual\":223.61,\"fiscal_period\":\"FY2024-Q2\",\"source_system\":\"CORE\",\"duplicate_count\":2}'. That is information, not absence -- approve this only if you mean to lose it."
+     }
+    ],
+    "detector_queries": 260,
+    "date_queries": 11,
+    "date_query_seconds": 8.213,
+    "detector_seconds": 15.817,
+    "role": "performance"
+   }
+  }
+ ]
+}
