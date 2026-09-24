@@ -331,9 +331,18 @@ def test_naming_y_resolves_the_one_measure_a_line_needs(con):
 
 
 def test_a_kind_that_wants_two_measures_gets_them_without_y(con):
-    for kind in ("grouped_bar", "scatter", "heatmap", "box"):
+    for kind in ("grouped_bar", "scatter", "box"):
         text = draw(con, "summary_stats", kind)
         assert reason_of(text) is None, f"{kind}: {text.splitlines()[0]}"
+
+
+def test_a_heatmap_of_different_quantities_is_refused(con):
+    """Superseded at Phase 14 Step 12 (P14-O20): the test above drew summary_stats as a heatmap
+    too, which shades n, nulls, total and mean on one colour scale. A heatmap is drawn for
+    cross_tab and cohort_retention only (tests/test_benchmark_fixes.py draws both)."""
+    text = draw(con, "summary_stats", "heatmap")
+    assert reason_of(text) is Reason.ANALYSIS_NOT_POSSIBLE
+    assert "one colour scale" in text
 
 
 def test_frequency_offers_one_measure_because_share_is_a_percentage(con):

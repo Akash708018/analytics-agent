@@ -434,6 +434,14 @@ def get_cleaning_ledger(workspace_id: str, dataset_name: str | None = None) -> s
     """Every action that has actually run, newest first."""
     con = db.connect(workspace_id)
     try:
+        # A name that is not loaded and never was cleaned is a mistake, not a clean table: it
+        # read "Nothing has been cleaned for nope. Every table is as it was loaded." (P14-O19).
+        if (dataset_name and dataset_name not in db.user_tables(con)
+                and not ledger.count(con, dataset_name)):
+            loaded = ", ".join(db.user_tables(con)) or "(none loaded)"
+            return (f"BLOCKED: no dataset called {dataset_name!r} in this workspace.\n"
+                    f"Loaded: {loaded}\n"
+                    f"NEXT STEP: call list_datasets() and use one of those names.")
         return ledger.describe(con, dataset_name)
     finally:
         con.close()

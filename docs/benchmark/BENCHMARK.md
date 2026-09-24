@@ -1,5 +1,9 @@
 # Benchmark: every tool, measured -- and what behaves badly
 
+> **Status after Phase 14 Step 12 (24/09/2026):** 12 of the 14 are fixed, and 2 are closed by
+> decision. `results.md` and `benchmark.json` now hold the run after the fixes. The findings
+> below are kept as they were measured in Step 11. The table at the end gives each outcome.
+
 Phase 14 Step 11, 24/09/2026. Harness: `uv run python scripts/benchmark.py` (about 10 minutes for
 all three sizes). Raw figures: [results.md](results.md) (generated) and `benchmark.json`.
 The step record, including the harness's own mistakes, is
@@ -187,3 +191,35 @@ These were checked and found sound:
   workspace, and a non-unique key are all correct, all fast, and all name a working next call.
 - **Resources:** peak memory of the whole process, harness included, was 346 / 422 / 968 MiB.
   The workspace held 3.1 / 4.7 / 19.6 MB after 78 files.
+
+## After Step 12
+
+The same harness was run again after the fixes: 1,932 / 1,932 figures right, and 15 flags
+instead of 40. All 15 are FRICTION: charts where the choice of `y` is real, which P11-D13
+leaves to the caller.
+
+| # | outcome | measured |
+|---|---|---|
+| N1 | fixed | load_excel refuses a non-workbook and points at propose_ingest_spec |
+| N2 | fixed | Explore defaults stay inside the window: 3 and 3 refused -> 0 and 0 |
+| N3 | fixed at 100k; improved at 1M | profile_dataset 2.105 -> 0.438 s (1M: 5.878 -> 2.237); profile_column 2.151 -> 0.481 s (1M: 5.941 -> 2.221); propose_cleaning_plan 3.426 -> 1.195 s (1M: 8.452 -> 5.337, the unique id columns) |
+| N4 | fixed | a wrong argument repeats the same analysis with its arguments filled; an unknown one points at run_analysis |
+| N5 | fixed | a group cap points at top_n; a column that does not exist points at describe_dataset |
+| N6 | fixed | a missing dataset points at list_datasets() |
+| N7 | fixed | the ledger refuses a dataset that is not loaded; no "..." |
+| N8 | fixed | a heatmap only for cross_tab and cohort_retention; empty cells stay in place (the old code shifted them) |
+| N9 | fixed where the caller named the measure | trend, top_n, seasonality and period_compare draw without y; real choices still ask |
+| N10 | closed by decision | result files stay the reply's table; see Step 12, section 5 |
+| N11 | fixed | key findings are findings, one per distinct call, capped at 12: 7,700 -> 2,407 characters |
+| N12 | closed by decision | 6,551 characters, under the 8,000-character read; re-measured every run |
+| N13 | fixed as far as a machine can be | a cached extension loads with no network; offline, a downloaded file named in ANALYTICS_DUCKDB_POSTGRES_EXTENSION is installed |
+| N14 | fixed | reset_workspace removes that workspace's contract exports |
+
+Nothing else moved:
+
+- the engine and UI suites pass (1947 and 50);
+- the acceptance scripts are unchanged;
+- the eval is 76/76;
+- the scenario matrix is 30/30;
+- the stress rounds' 4,336 records are identical call by call.
+

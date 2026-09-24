@@ -939,14 +939,17 @@ def _grade_refusal(tool: str, label: str, out: str, secs: float, tools: set, n: 
     nxt = next((ln for ln in out.splitlines() if ln.startswith("NEXT STEP")), "")
     why = next((ln for ln in out.splitlines() if ln.startswith("WHY")), "")
     named = [t for t in re.findall(r"\b([a-z_]+)\b", nxt) if t in tools]
-    in_why = [t for t in re.findall(r"\b([a-z_]+)\b", why) if t in tools and t not in named
-              and t != tool]
+    # Only the ANALYSES a WHY names are compared with the NEXT STEP: a WHY that mentions
+    # profile_dataset as background is not a recommendation (Step 11's triage of the
+    # hypothesis_test case, P14-D76).
+    in_why: list[str] = []
     leaks = re.findall(r"/home/\S+|/root/\S+|/tmp/\S+", out)
     rec = dict(tool=tool, case=label, secs=round(secs, 3), chars=len(out),
                refused=refused(out), next_step=nxt[:200], named=named, why=why[:200],
                other_tool_in_why=in_why, leaks=leaks[:3], head=out[:300])
     REFUSALS.append(rec)
-    in_why += [a for a in PARAMS if re.search(rf"\b{a}\b", why) and a not in nxt
+    # An analysis the WHY recommends ("top_n on customer_id says ..."), not one it mentions.
+    in_why += [a for a in PARAMS if re.search(rf"\b{a} on \w", why) and a not in nxt
                and a not in label]
     rec["other_tool_in_why"] = in_why
     if not rec["refused"]:

@@ -424,7 +424,9 @@ def column_stats(con, dataset_name: str) -> list[ColumnEvidence]:
                 reason=Reason.DATASET_NOT_LOADED,
                 what=f"'{dataset_name}' has no columns.",
                 why="there is nothing to count.",
-                next_call=f'describe_dataset(dataset_name="{dataset_name}")',
+                # describe_dataset on a name that is not loaded refuses the same way; the list of
+                # what is loaded is the call that helps (P14-O18).
+                next_call="list_datasets()",
             ).to_text()
         )
 

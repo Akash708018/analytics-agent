@@ -85,7 +85,10 @@ CHARTS = (
     ("grouped_bar", "summary_stats", {}),
     ("scatter", "summary_stats", {}),
     ("box", "summary_stats", {}),
-    ("heatmap", "summary_stats", {}),
+    # Was summary_stats until Phase 14 Step 12: a heatmap shades every column on one colour
+    # scale, and summary_stats' n, nulls, total and mean are not one quantity (P14-O20). A
+    # cross_tab's cells are.
+    ("heatmap", "cross_tab", {"rows": "channel", "columns": "region", "measure": "units"}),
 )
 
 PASSED = 0

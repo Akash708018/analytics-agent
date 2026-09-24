@@ -578,6 +578,24 @@ def _cast_exprs(name: str, listed: str) -> list[str]:
     return out
 
 
+def _cast_counts(con, dataset_name: str, name: str, listed: str) -> list[int]:
+    """`_cast_exprs` counted over the column's distinct values, each weighted by its rows.
+
+    A cast is a function of the value, so the counts are the row counts exactly
+    (tests/test_benchmark_fix_facts.py) -- and a column of four regions is cast four times,
+    not once per row. Inside the table's one SELECT these casts cost 0.3-0.4 s per text column
+    at 100,000 rows, which made profile_dataset 2.1 s there and 5.9 s at a million (P14-O15).
+    """
+    col = _q(name)
+    weighted = [f"coalesce({e.replace('count(*)', 'sum(n)', 1)}, 0)"
+                for e in _cast_exprs(name, listed)]
+    row = con.execute(
+        f"SELECT {', '.join(weighted)} FROM "
+        f"(SELECT {col}, count(*) AS n FROM {_q(dataset_name)} GROUP BY {col})"
+    ).fetchone()
+    return [int(v) for v in row]
+
+
 def _cast_examples(con, dataset_name: str, name: str, listed: str,
                    sql_type: str) -> list[str]:
     col = _q(name)
@@ -733,7 +751,7 @@ def profile_table(
     for c in numeric:
         exprs += _numeric_exprs(c.name, c.dtype)
     for c in text:
-        exprs += _text_exprs(c.name, listed) + _cast_exprs(c.name, listed)
+        exprs += _text_exprs(c.name, listed)
 
     values: tuple = ()
     if exprs:
@@ -751,16 +769,15 @@ def profile_table(
         if bad:
             non_finite[c.name] = bad
 
-    # Per text column: blank, token, considered, then one count per candidate.
-    stride = 2 + 1 + len(CAST_CANDIDATES)
+    # Per text column: blank and token here; the type reading below, once per distinct value.
     offset = NUMERIC_EXPRS * len(numeric)
     blanks: dict[str, int] = {}
     tokens: dict[str, int] = {}
     readings: dict[str, TypeReading] = {}
     for i, c in enumerate(text):
-        base = offset + stride * i
+        base = offset + 2 * i
         blanks[c.name], tokens[c.name] = values[base: base + 2]
-        readings[c.name] = _read_types(list(values[base + 2: base + stride]))
+        readings[c.name] = _read_types(_cast_counts(con, dataset_name, c.name, listed))
 
     notes: list[str] = [
         f"{name}: {n:,} value(s) are not a finite number (NaN or Infinity). Its mean, spread "

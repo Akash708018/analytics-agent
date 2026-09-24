@@ -170,8 +170,11 @@ def describe(con, dataset_name: str | None = None) -> str:
         return (
             f"Nothing has been cleaned{scope}. Every table is as it was "
             f"loaded.\n\n"
-            f"NEXT STEP: call propose_cleaning_plan(dataset_name=\"...\") to "
-            f"see what could be changed."
+            + (f'NEXT STEP: call propose_cleaning_plan(dataset_name="{dataset_name}") to '
+               f"see what could be changed."
+               if dataset_name else
+               "NEXT STEP: call list_datasets() to see what is loaded, then "
+               "propose_cleaning_plan on one of them.")
         )
 
     shown = entries(con, dataset_name, limit=INLINE_ENTRIES)

@@ -321,18 +321,20 @@ def _draw(ax, kind: str, extract: Extract) -> int:
         return sum(len(d) for d in data)
 
     if kind == "heatmap":
-        grid = [[v for v in s.values if v is not None] for s in series]
-        width = min((len(row) for row in grid), default=0)
-        if not width:
+        # Every cell stays at its own column: an empty one is left blank (NaN is not drawn).
+        # Dropping the empties shifted the later values of a row under the wrong labels and cut
+        # every row to the shortest -- a cohort grid to its youngest cohort (P14-O20).
+        width = len(extract.x)
+        if not width or not any(s.present for s in series):
             raise ChartRefused("every value is empty, so there is nothing to shade.")
-        grid = [row[:width] for row in grid]
+        grid = [[float("nan") if v is None else v for v in s.values] for s in series]
         image = ax.imshow(grid, aspect="auto")
         ax.set_yticks(_positions(len(series)))
         ax.set_yticklabels([s.name for s in series])
         ax.set_xticks(_positions(width))
         ax.set_xticklabels(extract.x[:width], rotation=45, ha="right")
         ax.figure.colorbar(image, ax=ax)
-        return sum(len(row) for row in grid)
+        return sum(len(s.present) for s in series)
 
     if kind == "scatter":
         if len(series) < 2:

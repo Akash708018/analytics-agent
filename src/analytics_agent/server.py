@@ -64,6 +64,7 @@ gets back.
 from __future__ import annotations
 
 import os
+import shutil
 from pathlib import Path
 
 from fastmcp import FastMCP
@@ -157,11 +158,21 @@ def reset_workspace(confirm: bool = False, workspace_id: str | None = None) -> s
             "reset_workspace(confirm=True)."
         )
     info = workspace.reset(wid)
+    # A workspace other than the default exports its contracts to docs/contracts/<id>/, and
+    # those outlived the data they describe (P14-O26). The default workspace's exports are the
+    # version-controlled docs/contracts/<dataset>.yaml and stay.
+    exports = 0
+    if wid != DEFAULT_WORKSPACE_ID:
+        root = contract_tools.workspace_export_root(wid)
+        if root.is_dir():
+            exports = sum(1 for p in root.rglob("*") if p.is_file())
+            shutil.rmtree(root)
+    note = f" Removed its {exports} exported contract file(s) too." if exports else ""
     if not info["existed"]:
-        return f"Workspace '{wid}' did not exist. Nothing to remove."
+        return f"Workspace '{wid}' did not exist. Nothing to remove.{note}"
     return (
         f"Workspace '{wid}' reset. Removed {info['removed_files']} file(s), "
-        f"{info['bytes'] / 1024 / 1024:.1f} MB."
+        f"{info['bytes'] / 1024 / 1024:.1f} MB.{note}"
     )
 
 

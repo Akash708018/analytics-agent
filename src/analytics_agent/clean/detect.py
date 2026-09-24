@@ -27,6 +27,8 @@ person, and `clean/sql.py` renders it when asked.
 
 from __future__ import annotations
 
+import math
+
 from .plan import ActionKind, CleaningAction, next_action_id
 from . import sql
 
@@ -85,15 +87,10 @@ def proposed_type(con, table: str, column: str) -> str | None:
     if total == 0:
         return None
 
-    def share(to_type: str) -> float:
-        n = _scalar(
-            con,
-            f"SELECT count(*) FROM {t} WHERE {c} IS NOT NULL "
-            f"AND TRY_CAST({c} AS {to_type}) IS NOT NULL",
-        )
-        return n / total
+    def reaches(to_type: str) -> bool:
+        return _reaches(con, table, column, f"TRY_CAST({c} AS {to_type}) IS NOT NULL")
 
-    if share("BOOLEAN") >= CONVERT_MIN_SHARE:
+    if reaches("BOOLEAN"):
         words = ", ".join(sql.literal(w) for w in BOOLEAN_WORDS)
         odd = _scalar(
             con,
@@ -103,21 +100,22 @@ def proposed_type(con, table: str, column: str) -> str | None:
         if odd == 0:
             return "BOOLEAN"
 
-    if share("DOUBLE") >= CONVERT_MIN_SHARE:
+    if reaches("DOUBLE"):
         rounded = _scalar(
             con,
             f"SELECT count(*) FROM {t} WHERE TRY_CAST({c} AS DOUBLE) IS NOT NULL "
             f"AND TRY_CAST({c} AS DOUBLE) <> TRY_CAST({c} AS BIGINT)",
         )
-        if rounded == 0 and share("BIGINT") >= CONVERT_MIN_SHARE:
+        if rounded == 0 and reaches("BIGINT"):
             return "BIGINT"
         return "DECIMAL(18,2)" if _fits_two_places(con, table, column) else "DOUBLE"
 
     # A two-digit year casts, year FIRST: '01/01/24' becomes 0001-01-24 (measured, P14-D60).
     # Such a column goes to _date_conversion, which reads the year last.
-    two_digit = _scalar(con, f"SELECT count(*) FROM {t} WHERE "
-                             f"regexp_full_match(trim({c}), {sql.literal(_TWO_DIGIT_YEAR)})")
-    if share("TIMESTAMP") >= CONVERT_MIN_SHARE and not two_digit:
+    # Asked only of a column that reads as timestamps: the answer is the same, the scan is not.
+    if reaches("TIMESTAMP") and not _scalar(
+            con, f"SELECT count(*) FROM {t} WHERE "
+                 f"regexp_full_match(trim({c}), {sql.literal(_TWO_DIGIT_YEAR)})"):
         with_time = _scalar(
             con,
             f"SELECT count(*) FROM {t} WHERE TRY_CAST({c} AS TIMESTAMP) IS NOT NULL "
@@ -176,6 +174,35 @@ def _share_where(con, table: str, column: str, condition: str) -> float:
     return n / total
 
 
+def _reaches(con, table: str, column: str, condition: str) -> bool:
+    """Whether `condition` holds for CONVERT_MIN_SHARE of the non-null values -- the only use
+    any share here is put to.
+
+    A sample is read first. Failures in a sample are failures of the column, so when the sample
+    alone holds more than the column may have and still reach the share, the answer is exactly
+    no, without the full scan. The full count decides everything else, as it always did. This is
+    what keeps the mixed-date test (up to 16 TRY_STRPTIME formats per value) off every value
+    of an id column: 0.9 s per column at 100,000 rows (P14-O15).
+    """
+    total = _non_null(con, table, column)
+    if not total:
+        return False
+    need = math.ceil(CONVERT_MIN_SHARE * total)
+    while need > 0 and (need - 1) / total >= CONVERT_MIN_SHARE:
+        need -= 1
+    while need / total < CONVERT_MIN_SHARE:
+        need += 1
+    max_fails = total - need
+    k = (max_fails + 1) * 3 // 2 + 1
+    if k < total:
+        t, c = sql.ident(table), sql.ident(column)
+        fails = _scalar(con, f"SELECT count(*) FROM (SELECT {c} FROM {t} WHERE {c} IS NOT NULL "
+                             f"LIMIT {k}) WHERE NOT coalesce(({condition}), false)")
+        if fails > max_fails:
+            return False
+    return _share_where(con, table, column, condition) >= CONVERT_MIN_SHARE
+
+
 def _numeric_type_of(con, table: str, text: str) -> str:
     """BIGINT, DECIMAL(18,2) or DOUBLE for a cleaned text expression, by the same rules as
     proposed_type: never round a fraction away, keep cents exact."""
@@ -213,15 +240,15 @@ def alternative_conversion(con, table: str, column: str) -> list[tuple[str, str,
     def full(pattern: str) -> str:
         return f"regexp_full_match({trimmed}, {sql.literal(pattern)})"
 
-    if _share_where(con, table, column, full(_PERCENT)) >= CONVERT_MIN_SHARE:
+    if _reaches(con, table, column, full(_PERCENT)):
         text = f"replace(rtrim({trimmed}, '%'), ',', '.')"
         to_type = _numeric_type_of(con, table, text)
         return [(to_type, f"TRY_CAST({text} AS {to_type})",
                  "the number before its % sign, so '12.5%' becomes 12.5")]
 
-    us = _share_where(con, table, column, full(_US_NUMBER))
-    eu = _share_where(con, table, column, full(_EU_NUMBER))
-    if max(us, eu) >= CONVERT_MIN_SHARE:
+    us = _reaches(con, table, column, full(_US_NUMBER))
+    eu = _reaches(con, table, column, full(_EU_NUMBER))
+    if us or eu:
         only_us = _share_where(con, table, column,
                                f"{full(_US_NUMBER)} AND NOT {full(_EU_NUMBER)}")
         only_eu = _share_where(con, table, column,
@@ -232,11 +259,11 @@ def alternative_conversion(con, table: str, column: str) -> list[tuple[str, str,
                       "('$1,234.56' is 1234.56)")
         eu_reading = (f"replace(replace({bare}, '.', ''), ',', '.')",
                       "with a decimal comma ('1.234,56' is 1234.56)")
-        if us >= CONVERT_MIN_SHARE and only_us and not only_eu:
+        if us and only_us and not only_eu:
             readings = [us_reading]
-        elif eu >= CONVERT_MIN_SHARE and only_eu and not only_us:
+        elif eu and only_eu and not only_us:
             readings = [eu_reading]
-        elif us >= CONVERT_MIN_SHARE and eu >= CONVERT_MIN_SHARE and not (only_us or only_eu):
+        elif us and eu and not (only_us or only_eu):
             # Every value reads both ways: which one is meant is the person's to say.
             readings = [(t, how + " -- IF that is this file's convention; the other reading is "
                             "offered beside it, and only one can be approved")
@@ -257,8 +284,7 @@ def _date_conversion(con, table: str, column: str) -> tuple[str, str, str] | Non
     t, c = sql.ident(table), sql.ident(column)
     trimmed = f"trim({c})"
     # A column of plain digits is ids or amounts, however many of them look like 20240131.
-    if _share_where(con, table, column,
-                    f"regexp_full_match({trimmed}, '\\d+')") >= CONVERT_MIN_SHARE:
+    if _reaches(con, table, column, f"regexp_full_match({trimmed}, '\\d+')"):
         return None
     first = f"TRY_CAST(regexp_extract({trimmed}, {sql.literal(_NUMERIC_DATE)}, 1) AS INTEGER)"
     second = f"TRY_CAST(regexp_extract({trimmed}, {sql.literal(_NUMERIC_DATE)}, 2) AS INTEGER)"
@@ -277,7 +303,7 @@ def _date_conversion(con, table: str, column: str) -> tuple[str, str, str] | Non
     formats += _DATE_FORMATS
     parsed = "COALESCE(" + ", ".join(
         f"TRY_STRPTIME({trimmed}, {sql.literal(f)})" for f in formats) + ")"
-    if _share_where(con, table, column, f"{parsed} IS NOT NULL") < CONVERT_MIN_SHARE:
+    if not _reaches(con, table, column, f"{parsed} IS NOT NULL"):
         return None
     with_time = _scalar(con, f"SELECT count(*) FROM {t} WHERE {parsed} IS NOT NULL "
                              f"AND {parsed} <> date_trunc('day', {parsed})")

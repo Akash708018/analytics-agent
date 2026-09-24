@@ -656,6 +656,12 @@ class RealBackend:
             months = [r[0] for r in con.execute(
                 f"SELECT DISTINCT strftime({q(date)}, '%Y-%m') AS m FROM {q(dataset_name)} "
                 f"WHERE {q(date)} IS NOT NULL ORDER BY m").fetchall()]
+            window = getattr(contract, "analysis_window", None)
+            if window:
+                # The calendar an analysis accepts is the window's; data past it made the
+                # defaults '2025-01' and the form's own Run a refusal (P14-O14).
+                lo, hi = window.start.strftime("%Y-%m"), window.end.strftime("%Y-%m")
+                months = [m for m in months if lo <= m <= hi]
             if len(months) >= 2:
                 out["period"], out["baseline"] = months[-1], months[-2]
         window = getattr(contract, "analysis_window", None)

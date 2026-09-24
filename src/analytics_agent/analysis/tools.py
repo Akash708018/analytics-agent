@@ -28,6 +28,7 @@ rows it did not describe, so it is refused as UNSOUND rather than written.
 
 from __future__ import annotations
 
+import inspect
 import re
 
 from analytics_agent.contract import ContractRefused
@@ -66,7 +67,8 @@ _UNEXPECTED_ARG = re.compile(r"unexpected keyword argument '(\w+)'")
 # What each argument names, so the example can be filled from the contract.
 _MEASURE_ARGS = ("measure", "against")
 _DIMENSION_ARGS = ("dimension", "rows", "columns", "column", "second_dimension", "entity")
-_PLACEHOLDER = {"period": "YYYY-MM", "baseline": "YYYY-MM", "before_start": "YYYY-MM-DD",
+_PLACEHOLDER = {"grain": "month",
+                "period": "YYYY-MM", "baseline": "YYYY-MM", "before_start": "YYYY-MM-DD",
                 "before_end": "YYYY-MM-DD", "after_start": "YYYY-MM-DD", "after_end": "YYYY-MM-DD"}
 
 
@@ -94,30 +96,72 @@ def _params_refusal(analysis_type: str, dataset_name: str, exc: Exception, gate)
                 what=f"{analysis_type} was called without {', '.join(names)}.",
                 why=why, state=declared,
                 next_call=f'propose_dataset_contract(dataset_name="{dataset_name}")')
-        pool = {"measure": iter(measures), "dimension": iter(dims)}
-        args = []
-        for n in names:
-            kind = "measure" if n in _MEASURE_ARGS else "dimension" if n in _DIMENSION_ARGS else None
-            value = next(pool[kind], None) if kind else _PLACEHOLDER.get(n)
-            args.append(f'{n}="{value or "..."}"')
         return Refusal(
             reason=Reason.ANALYSIS_PARAMS_INVALID,
             what=f"{analysis_type} was called without {', '.join(names)}.",
             why=why, state=declared,
-            next_call=(f'compute_analysis(dataset_name="{dataset_name}", '
-                       f'analysis_type="{analysis_type}", {", ".join(args)})'))
+            next_call=_filled_call(dataset_name, analysis_type, names, measures, dims))
     if unexpected:
         why = (f"{analysis_type} does not take {unexpected.group(1)}. "
                f"{get(analysis_type).summary}")
     else:
         why = text
+    # The same analysis again, with what it needs filled from the contract. summary_stats here
+    # answered a different question from the one asked (P14-O16); the WHY says what to change.
+    required = [p.name for p in list(inspect.signature(get(analysis_type).run).parameters.values())[3:]
+                if p.default is inspect.Parameter.empty
+                and p.kind in (p.POSITIONAL_OR_KEYWORD, p.KEYWORD_ONLY)]
     return Refusal(
         reason=Reason.ANALYSIS_PARAMS_INVALID,
         what=f"{analysis_type} was called with arguments it cannot take.",
         why=why,
         state=f"{analysis_type}: {get(analysis_type).summary}",
-        next_call=_example_call(dataset_name),
+        next_call=_filled_call(dataset_name, analysis_type, required, measures, dims),
     )
+
+
+def _filled_call(dataset_name: str, analysis_type: str, names: list[str], measures: list[str],
+                 dims: list[str]) -> str:
+    """compute_analysis for this analysis with `names` filled: declared columns for columns, a
+    format for a date, the name of what is wanted otherwise."""
+    pool = {"measure": iter(measures), "dimension": iter(dims)}
+    args = []
+    for n in names:
+        kind = "measure" if n in _MEASURE_ARGS else "dimension" if n in _DIMENSION_ARGS else None
+        value = next(pool[kind], None) if kind else _PLACEHOLDER.get(n)
+        args.append(f'{n}="{value or "..."}"')
+    return (f'compute_analysis(dataset_name="{dataset_name}", '
+            f'analysis_type="{analysis_type}"' + "".join(f", {a}" for a in args) + ")")
+
+
+_UNDECLARED = re.compile(r"^'(.+?)' is not a declared (?:dimension|measure) of ")
+
+
+def _not_possible_call(con, dataset_name: str, why: str, params: dict, gate) -> str:
+    """The call that answers what the WHY says, not always a new contract (P14-O17).
+
+    A group cap's WHY names top_n on the dimension: that is the call. A column that is not
+    declared and is not in the table either cannot be declared by any contract: describe_dataset
+    lists what is there. A column that exists and is undeclared, and everything else the
+    contract rules out, keep propose_dataset_contract, which is right for them.
+    """
+    dimension = params.get("dimension")
+    if dimension and f"top_n on {dimension}" in why:
+        measure = params.get("measure") or next(
+            (m.name for m in gate.contract.measures if m.agg != "none"), None)
+        if measure:
+            return (f'compute_analysis(dataset_name="{dataset_name}", analysis_type="top_n", '
+                    f'dimension="{dimension}", measure="{measure}")')
+        return (f'compute_analysis(dataset_name="{dataset_name}", analysis_type="frequency", '
+                f'column="{dimension}")')
+    named = _UNDECLARED.match(why)
+    if named:
+        columns = {r[0] for r in con.execute(
+            "SELECT column_name FROM information_schema.columns WHERE table_name = ?",
+            [dataset_name]).fetchall()}
+        if named.group(1) not in columns:
+            return f'describe_dataset(dataset_name="{dataset_name}")'
+    return f'propose_dataset_contract(dataset_name="{dataset_name}")'
 
 
 class _Refused(Exception):
@@ -186,7 +230,8 @@ def _produce(con, dataset_name: str, analysis_type: str, params: dict):
                 "would answer a question that was not asked."
             ),
             state=f"available: {_catalogue_text()}",
-            next_call=_example_call(dataset_name),
+            # run_analysis lists what this dataset's contract can compute (P14-O16).
+            next_call=f'run_analysis(dataset_name="{dataset_name}")',
         ).to_text()) from None
 
     try:
@@ -218,7 +263,7 @@ def _produce(con, dataset_name: str, analysis_type: str, params: dict):
             what=f"{analysis_type} cannot answer that under this contract.",
             why=str(exc),
             state=f"contract v{gate.version} for {dataset_name}",
-            next_call=f'propose_dataset_contract(dataset_name="{dataset_name}")',
+            next_call=_not_possible_call(con, dataset_name, str(exc), params, gate),
         ).to_text()) from None
 
     note = scope.method_note()
@@ -310,6 +355,32 @@ def render_chart(
     except _Refused as exc:
         return exc.text
 
+    if chart == "heatmap" and analysis_type not in _ONE_SCALE:
+        # One colour scale across every column: right for a cross_tab's cells and a cohort grid,
+        # wrong for revenue beside a row count (P14-O20). The recovery is the chart that fits,
+        # with y named where the result offers several.
+        from ..charts.render import series_from_output
+
+        kind = "line" if output.headers and output.headers[0] == "period" else "bar"
+        try:
+            names = [s_.name for s_ in series_from_output(output).series]
+        except ChartRefused:
+            names = []
+        fits = dict(used, chart=kind)
+        if len(names) > 1:
+            fits["y"] = (_named_y(names, used.get("measure"))
+                         or _suggested_y(tuple(names), used.get("measure")))
+        return Refusal(
+            reason=Reason.ANALYSIS_NOT_POSSIBLE,
+            what=f"{analysis_type} was computed and cannot be drawn as a 'heatmap' chart.",
+            why=(f"a heatmap shades every column on one colour scale, and the columns of "
+                 f"{analysis_type} are different quantities. A heatmap is drawn for "
+                 f"{' and '.join(sorted(_ONE_SCALE))}; a {kind} chart draws this one."),
+            detail="The numbers are not in question -- the analysis ran. Nothing was written.",
+            state=f"contract v{gate.version} for {dataset_name}",
+            next_call=_as_call("render_chart", dataset_name, analysis_type, fits),
+        ).to_text()
+
     try:
         try:
             drawn = render(
@@ -323,9 +394,12 @@ def render_chart(
                 title=title,
             )
         except ChartRefused as exc:
-            if not (pick_y and exc.choices and y is None):
+            named = _named_y(exc.choices, used.get("measure")) if y is None else None
+            if not (named or (pick_y and exc.choices and y is None)):
                 raise
-            y = _suggested_y(exc.choices, used.get("measure"))
+            # One offered column carrying the measure the caller named IS the caller's choice
+            # (P14-O21): P11-D13 still holds wherever the choice is real.
+            y = named or _suggested_y(exc.choices, used.get("measure"))
             drawn = render(workspace_id, kind=chart, output=output, label=output.label,
                            dataset_name=dataset_name, x=x, y=[y], title=title)
     except ChartRefused as exc:
@@ -380,6 +454,19 @@ def render_chart(
         summary=output.summary,
     )
     return f"{gate.header()}\n\n{drawn.to_text()}"
+
+
+_ONE_SCALE = {"cross_tab", "cohort_retention"}
+
+
+def _named_y(choices, measure: str | None) -> str | None:
+    """The one offered column that carries `measure` as a word, or None when there are none or
+    several -- trend's 'revenue (sum)' beside 'rows', not ranking_shift's before and after."""
+    if not (choices and measure):
+        return None
+    word = re.compile(rf"(?<!\w){re.escape(measure)}(?!\w)")
+    hits = [c for c in choices if word.search(c)]
+    return hits[0] if len(hits) == 1 else None
 
 
 def _suggested_y(choices: tuple[str, ...], measure: str | None) -> str:

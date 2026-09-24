@@ -6476,3 +6476,75 @@ acceptance phase6 36/0/0, phase8 55/0/3, phase9 0/0/1, phase10 0/0/1, phase11 26
   82b72cd1b17952027c858dcd50041e1d8a75f52ad76cda4079e82584c2efaa0b  docs/benchmark/results.md
   3beafe659029152c5281af9e6154c76b58b9614b4ebb3c455b7fd83c56e8ae0a  docs/benchmark/benchmark.json
   8bc71dd0b880eae0c5d4a157fdea8a9307a42ee7941058e5e34a5ca2d37d11fb  docs/steps/phase14_step11_benchmark.md
+
+## Phase 14 Step 12 (24/09/2026): the benchmark's negatives fixed, nothing else moved
+
+P14-D76. TYPE READING IS COUNTED PER DISTINCT VALUE, AND A THRESHOLD IS DECIDED ON A SAMPLE
+FIRST. A cast is a function of the value, so the profile's six readings per text column are
+counted over (value, count(*)) and are the row counts exactly (tests/test_benchmark_fix_facts.py).
+The cleaning plan asks only whether a share reaches CONVERT_MIN_SHARE; failures in a sample are
+failures of the column, so a sample holding more than the column may have answers "no" exactly,
+and the full count decides the rest (clean/detect._reaches). Measured, at 100k / 1M rows:
+profile_dataset 2.105 -> 0.438 / 5.878 -> 2.237 s, profile_column 2.151 -> 0.481 / 5.941 ->
+2.221 s, propose_cleaning_plan 3.426 -> 1.195 / 8.452 -> 5.337 s. Proposals identical: 0
+differences in 4,336 stress records.
+P14-D77. A NEXT STEP DOES WHAT ITS WHY SAYS. A wrong argument set repeats the same analysis with
+its required arguments filled from the contract (was summary_stats); an unknown analysis points at
+run_analysis; a group cap points at the top_n its WHY names; an undeclared column that is not in
+the table points at describe_dataset (a column that is in it still points at the contract); a
+missing dataset points at list_datasets(); the ledger refuses a dataset that is not loaded.
+P14-D78. A HEATMAP SHADES ONE QUANTITY. Drawn for cross_tab and cohort_retention only; anything
+else is refused with the chart that fits, y included. Every cell stays at its own column, an empty
+one blank: the old code dropped empties and cut each row to the shortest, shifting values under
+the wrong labels and cutting a cohort grid to its youngest cohort. P11-D13 is refined, not
+reversed: when exactly one offered column carries the measure the caller named, that is the
+caller's choice and it is drawn; a real choice still asks.
+P14-D79. N10 AND N12 ARE CLOSED BY DECISION, NOT FIXED. Result files keep the reply's display
+cells: a numeric file means rewriting 27 row builders and every reply table, against the
+instruction not to move anything else. The run_analysis menu (6,551 characters) stays under the
+8,000-character read and is re-measured by every benchmark run.
+P14-D80. SMALLER FIXES: load_excel refuses a non-workbook (was openpyxl's exception); Explore's
+period defaults stay in the contract window; the report's key findings are each distinct call's
+first substantive line, the latest run of it, capped at 12 with the rest counted (7,700 -> 2,407
+characters); the postgres extension is LOADed before any INSTALL, and offline a downloaded file
+named in ANALYTICS_DUCKDB_POSTGRES_EXTENSION is installed; reset_workspace removes a non-default
+workspace's contract exports.
+P14-O13, O14, O16, O17, O18, O19, O20, O21, O23, O25, O26 ARE CLOSED (fixed, tests in
+tests/test_benchmark_fixes.py). P14-O15 IS CLOSED at 100k rows; its residual, propose_cleaning_plan
+at 5.3 s on a million rows with unique id columns, is recorded here rather than left open.
+P14-O22 AND P14-O24 ARE CLOSED BY DECISION (P14-D79).
+
+C105. I CHANGED A BEHAVIOUR WITHOUT SEARCHING FOR WHAT PINNED IT. Refusing a summary_stats heatmap
+broke tests/test_analysis_tools.py and Phase 11's acceptance clause 2, both of which drew one;
+the checks found it (phase11 25/1), I had not looked. Both kept their point -- every kind can be
+drawn -- with the heatmap taken from cross_tab, and the reason written beside each.
+C106. A COMPARISON KEYED ON FIELDS THE RECORDS DO NOT HAVE. My first stress diff keyed on 'step'
+and 'tool'; the records carry 'stage' and 'call', so it compared each dataset's outcomes in list
+order. Redone on (dataset, stage, call) with the refusal reason: 0 differences in 4,336. A
+comparison is checked for what it compares before its zero is believed.
+
+MEASURED VALIDATION, 24/09/2026. Engine 1910 -> 1947; UI 50; acceptance phase6 36/0/0, phase8
+55/0/3, phase9 0/0/1, phase10 0/0/1, phase11 26/0/0, phase12 36/0/0; eval 76/76; stress rounds
+CRASH 0, WRONG 10/3/8/0, 4,336 records identical; scenario matrix 30/30; benchmark 1932/1932,
+15 flags (FRICTION). Digests:
+  c6b7daf3f80fb630c929c16c597e17487f29a5c7776568d7f30e1547ba67c18e  scripts/benchmark.py
+  2cf8be4f1359de11548893bc8c52dfbefb8f78b28ba4ff4c4f4482f75c9d62b5  src/analytics_agent/analysis/tools.py
+  16c3e1e4bf86bb3f8ea1a4587068550ca3df6f9fe15ba992168d94d1f45acbdd  src/analytics_agent/charts/render.py
+  8764bd080788b524217e211b4a030faa95c5558b9a01f37109e0ee8fc739b35b  src/analytics_agent/clean/detect.py
+  2d3d9842158c23a1a9cc2a34fd799a0a5d8b931258be6ba12d7413e935717a7b  src/analytics_agent/clean/ledger.py
+  8118d50ab64124fe03319dffe70f95cd4148cb72463a8bda9d25b52027c4d4ad  src/analytics_agent/clean/tools.py
+  b54ae06e172d1f7cfb37d75f2f938167ef733278142980415db804af0b289b85  src/analytics_agent/contract/evidence.py
+  12b293c42c3cac9fe4e53aedb97a52b6ede78436bdc57e5ce1faa010a02cfc07  src/analytics_agent/ingest/excel.py
+  f22a163c317192c6206b6e4836e8728c2e5c3cac1ae67b673cb3fa93f1d113b8  src/analytics_agent/ingest/postgres.py
+  303b3f082e060beb3d7c6f38338e9abeec0d28d1abf81efa225c64ed24a7be90  src/analytics_agent/profile/table_profile.py
+  79810661dd5662a39acafa8a325c38b477370253e581d33f1dd4ebb2803b59b6  src/analytics_agent/report/assemble.py
+  380801a415a20cd313151f69d9b4ef8bed68c0ce68a74674bcb986a5a24efe5b  src/analytics_agent/server.py
+  32104df37aaceb5dea808c1a3c7554efcda78c0eda2920afd3f5c3da9e3aeb7c  src/analytics_agent/webapp/real_backend.py
+  5603a38ac27d6e6a0d8e435dd40a6f2a8e67277e6bb1d474133d91d070d0ed40  tests/test_analysis_tools.py
+  a4bcac8103c1f19c783b5d668165b06ec89e9aaf37b6915b02f15504c94936c5  tests/test_phase11.py
+  e1cac74c1f0b170859ecfe61fc608be0d4fc6489599abb1436d9d57b1e4da334  tests/test_benchmark_fixes.py
+  018605d92a2f2bc6df613d1a3afbd7a9a55fe84621fe260b8f76d1d9b39be7d2  tests/test_benchmark_fix_facts.py
+  feeb1064831124b00204553670bfc9bf31738fc4e67916d6a66f66418335563e  docs/steps/phase14_step12_benchmark_fixes.md
+  86a8dcbdec0257bb41fa6d7f9660a28b74090a0427e5083d0d017b55e88f981b  docs/benchmark/BENCHMARK.md
+  e534e3db45dc77ab13d0042aab228979e35fff2748439af2555a1ec690f02395  docs/benchmark/results.md
+  2451a4a147dbe2f13320d5b47681d1d46dd753a9dabeea13322598bdbf1f80d1  docs/benchmark/benchmark.json

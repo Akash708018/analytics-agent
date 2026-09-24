@@ -169,20 +169,31 @@ def _validation(run) -> tuple[list[str], bool]:
     return (lines, False)
 
 
+#: Key findings in the reply. The report itself holds every run in section 6.
+KEY_FINDINGS = 12
+
+
 def _findings(runs_) -> tuple[list[str], bool, list[str]]:
     if not runs_:
         return (["No analysis has been run against this dataset, so there is nothing to "
                  "report. The sections above describe data nobody has asked a question of."],
                 True, [])
     lines: list[str] = []
-    key: list[str] = []
+    # One key finding per distinct call, the latest run of it, in its first substantive line:
+    # the method note is every run's first line and said only "N of M row(s) analysed", once
+    # per run, repeats included -- 7,700 characters at 75 runs (P14-O23). The method notes have
+    # their own section.
+    latest: dict[str, str] = {}
     for i, r in enumerate(runs_, start=1):
         head = f"### {i}. `{r.analysis_type}`"
         lines.append(head)
         note = r.method_note()
-        summary = (f"{r.analysis_type}: {note}" if note
+        said = next((s for s in r.summary if s != note), None)
+        summary = (f"{r.analysis_type}: {said}" if said
+                   else f"{r.analysis_type}: {note}" if note
                    else f"{r.analysis_type}: {r.row_count:,} row(s)")
-        key.append(summary)
+        latest.pop(r.call(), None)
+        latest[r.call()] = summary
         lines.append("")
         for s in r.summary:
             lines.append(f"- {s}")
@@ -196,6 +207,11 @@ def _findings(runs_) -> tuple[list[str], bool, list[str]]:
             lines.append(f"![{r.analysis_type} {r.chart_kind}]"
                          f"(../{'charts'}/{Path(r.chart_path).name})")
         lines.append("")
+    key = list(latest.values())
+    if len(key) > KEY_FINDINGS:
+        rest = len(key) - KEY_FINDINGS
+        key = key[-KEY_FINDINGS:] + [f"... and {rest:,} earlier finding(s): section 6 of the "
+                                     f"report holds every run."]
     return (lines, False, key)
 
 

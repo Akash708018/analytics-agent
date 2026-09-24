@@ -28,6 +28,7 @@ Verified against a live PostgreSQL server:
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 
 import duckdb
@@ -82,6 +83,41 @@ def _resolve_dsn(alias: str) -> str:
         raise LoadRefused(str(exc.args[0])) from exc
 
 
+#: A downloaded postgres_scanner.duckdb_extension file, for a machine that cannot reach
+#: extensions.duckdb.org (P14-O25). Installed from the file, then cached like any other.
+EXTENSION_FILE_ENV = "ANALYTICS_DUCKDB_POSTGRES_EXTENSION"
+
+
+def _load_extension(con) -> None:
+    """LOAD first: a cached extension needs no network. INSTALL only when that fails -- from
+    the file EXTENSION_FILE_ENV names if set, from DuckDB's repository otherwise."""
+    try:
+        con.execute("LOAD postgres")
+        return
+    except duckdb.Error:
+        pass
+    local = os.environ.get(EXTENSION_FILE_ENV)
+    try:
+        if local:
+            con.execute("INSTALL '" + local.replace("'", "''") + "'")
+        else:
+            con.execute("INSTALL postgres")
+        con.execute("LOAD postgres")
+    except duckdb.Error as exc:
+        platform = con.execute("PRAGMA platform").fetchone()[0]
+        version = "v" + duckdb.__version__
+        raise LoadRefused(
+            f"BLOCKED: could not load DuckDB's postgres extension.\n"
+            f"DuckDB said: {exc}\n"
+            f"WHY: the extension is downloaded on first use and cached in "
+            f"~/.duckdb/extensions/{version}/{platform}/; this machine has neither the "
+            f"cached copy nor a route to the download.\n"
+            f"NEXT STEP: allow access to extensions.duckdb.org once, or download "
+            f"http://extensions.duckdb.org/{version}/{platform}/postgres_scanner.duckdb_extension.gz"
+            f" on another machine, unzip it, and set {EXTENSION_FILE_ENV} to the file's path."
+        ) from exc
+
+
 def attach(
     con: duckdb.DuckDBPyConnection,
     alias: str,
@@ -112,16 +148,7 @@ def attach(
     if db_alias in attached:
         return db_alias
 
-    try:
-        con.execute("INSTALL postgres")
-        con.execute("LOAD postgres")
-    except duckdb.Error as exc:
-        raise LoadRefused(
-            f"BLOCKED: could not load DuckDB's postgres extension.\n"
-            f"DuckDB said: {exc}\n"
-            f"NEXT STEP: check network access -- the extension downloads on "
-            f"first use and is then cached in ~/.duckdb/extensions."
-        ) from exc
+    _load_extension(con)
 
     try:
         con.execute(

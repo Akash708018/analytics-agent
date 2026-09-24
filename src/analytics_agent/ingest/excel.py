@@ -281,7 +281,18 @@ def load_excel(
 
     # data_only: a formula cell loads the value Excel saved for it. Without it openpyxl returns
     # '=G2*H2', and every formula column loaded as text (P14-O5, B3).
-    wb = load_workbook(path, read_only=True, data_only=True)
+    try:
+        wb = load_workbook(path, read_only=True, data_only=True)
+    except Exception as exc:  # noqa: BLE001 - BadZipFile, InvalidFileException, KeyError
+        # The draft path refuses these (P14-D70); load_excel called directly raised openpyxl's
+        # InvalidFileException out of the MCP tool, the benchmark's one crash (P14-O13).
+        raise LoadRefused(
+            f"BLOCKED: {path.name} is not a readable .xlsx workbook.\n"
+            f"WHY: {type(exc).__name__}: {exc}. It may be another kind of file renamed, cut "
+            f"short, or protected with a password.\n"
+            f'NEXT STEP: call propose_ingest_spec(path="{path}") -- it reads CSV and Excel '
+            f"alike -- or open the file in Excel and save it as .xlsx."
+        ) from exc
     try:
         if sheet is not None and sheet not in wb.sheetnames:
             raise LoadRefused(
