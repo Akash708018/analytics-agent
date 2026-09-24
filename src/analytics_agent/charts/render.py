@@ -221,6 +221,9 @@ def series_from_output(output, x: str | None = None, y: Sequence[str] | None = N
     return Extract(x=labels, series=series, dropped=dropped)
 
 
+SERIES_SHOWN = 12
+
+
 @dataclass(frozen=True)
 class Chart:
     """A chart on disk, and everything needed to say what it holds without seeing it.
@@ -246,19 +249,32 @@ class Chart:
     def to_text(self) -> str:
         of = f" for {self.dataset_name}" if self.dataset_name else ""
         plural = "s" if len(self.series_names) != 1 else ""
+        # A cohort heatmap has a series per offset: 49 of them wrote a line each and the reply
+        # passed the 8,000 characters an agent reads (Step 13 benchmark). The first
+        # SERIES_SHOWN are described and the rest counted; the analysis's table holds them all.
+        more = len(self.series_names) - SERIES_SHOWN
+        names = ", ".join(self.series_names[:SERIES_SHOWN]) + (
+            f" and {more:,} more" if more > 0 else "")
         lines = [
             f"Chart written: {self.path}",
             "",
             f"A {self.kind} chart of {self.label}{of}. "
             f"{self.drawn_count:,} of {self.point_count:,} point(s) drawn, "
             f"{self.x_name} across the x axis, "
-            f"measure{plural} {', '.join(self.series_names)}.",
+            f"measure{plural} {names}.",
             "",
             "You cannot see this image. What it shows:",
         ]
-        lines += [f"  {v}" for v in self.key_values]
+        lines += [f"  {v}" for v in self.key_values[:SERIES_SHOWN]]
+        if len(self.key_values) > SERIES_SHOWN:
+            lines.append(f"  ... {len(self.key_values) - SERIES_SHOWN:,} more series, not "
+                         f"described here; compute_analysis with the same arguments returns "
+                         f"the table that holds them")
         if self.notes:
-            lines += [""] + [f"  {n}" for n in self.notes]
+            notes = self.notes[:SERIES_SHOWN] + (
+                [f"... {len(self.notes) - SERIES_SHOWN:,} more note(s) of the same kind"]
+                if len(self.notes) > SERIES_SHOWN else [])
+            lines += [""] + [f"  {n}" for n in notes]
         if self.summary:
             lines += ["", "From the analysis it was drawn from:"] + [
                 f"  {s}" for s in self.summary

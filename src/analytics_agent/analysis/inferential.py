@@ -127,7 +127,8 @@ def welch(a: GroupStats, b: GroupStats) -> TestResult:
     p = 2.0 * float(t_dist.sf(abs(t), df))
     return TestResult(
         name="Welch's unequal-variance t-test (two-sided)",
-        statistic=t, p=p, df=f"{df:.4g}",
+        # "2e+06" read as notation, not as a count of degrees of freedom (Step 13 benchmark)
+        statistic=t, p=p, df=f"{df:,.1f}",
         note="Welch rather than Student: the groups are not assumed to share a variance.",
     )
 

@@ -189,3 +189,33 @@ def test_d9_the_only_result_file_is_named_as_a_runnable_path(tmp_path, ws):
     (d / "only.csv").write_text("a\n1\n")
     out = server.read_result_file(path="/etc/passwd", workspace_id=ws)
     assert f'read_result_file(path="{d / "only.csv"}")' in out, out
+
+
+def test_d10_a_many_series_chart_reply_stays_readable():
+    from datetime import datetime
+
+    from analytics_agent.charts.render import SERIES_SHOWN, Chart
+    names = [f"+{k}" for k in range(49)]
+    c = Chart(path=Path("x.png"), kind="heatmap", label="cohort_retention",
+              created_at=datetime(2026, 9, 24), x_name="cohort", series_names=names,
+              point_count=1617, drawn_count=533,
+              key_values=[f"{n}: lowest 1 at 2021-01-01, highest 18 at 2021-02-01, first 1, "
+                          f"last 1, 33 point(s)" for n in names])
+    text = c.to_text()
+    assert len(text) < 3000, len(text)
+    assert f"and {49 - SERIES_SHOWN} more" in text and "37 more series" in text
+
+
+def test_d11_welch_df_is_a_number_and_a_narrow_last_bin_is_said(tmp_path, ws):
+    rows = [f"r{i},2024-01-05,{'ab'[i % 2]},{i % 10 + (i % 2) * 3}" for i in range(40)]
+    _load(tmp_path, ws, "w", "id,d,g,v", rows)
+    _contract(ws, "w", grain="row", primary_key=["id"], date_column="d", measures=["v"],
+              dimensions=["g"], aggregations={"v": "sum"}, measure_definitions={"v": "v"},
+              analysis_window_start="2024-01-01", analysis_window_end="2024-12-31")
+    t = server.compute_analysis(dataset_name="w", analysis_type="hypothesis_test", dimension="g",
+                                measure="v", workspace_id=ws)
+    assert "df " in t and "e+" not in t.split("df ", 1)[1][:12], t[:600]
+    d = server.compute_analysis(dataset_name="w", analysis_type="distribution", measure="v",
+                                bins=5, workspace_id=ws)
+    # v spans 0..12, 13 values: 3-wide bins make 5, the last 1 value wide
+    assert "The last bin is narrower: 1 value(s) wide against 3" in d, d[:1500]
