@@ -2,13 +2,14 @@
 
 MCP server exposing data loading, profiling, cleaning and contract-gated analysis
 to Claude Desktop. Phases 1-13 done, then Cleanup Steps 4-7; Phase 14
-(Track B) in progress, Steps 1-7 done (UI in ui/, on the fake backend or the engine with
+(Track B) in progress, Steps 1-8 done (UI in ui/, on the fake backend or the engine with
 ANALYTICS_UI_BACKEND=real;
 `uv run --group ui streamlit run ui/app.py`; its 43 tests: `uv run --group ui pytest ui/tests`). P14-O1 and P14-O2 closed at Step 5
 (idle web workspaces expire; cleaning has a screen). The stress matrix's 14 bugs
-(P14-O3 to O12) closed at Step 7; `docs/stress/REPORT.md`, re-run with
-`uv run python scripts/stress_matrix.py` (0 crashes; its load-time "wrong" lines are text that
-the suggested cleaning converts). Nothing is open. The agent's live check:
+(P14-O3 to O12) closed at Step 7; Step 8 fixed what remained and ran three more rounds of
+anomalies to a round with no new bug. `docs/stress/REPORT.md`; re-run with
+`uv run python scripts/stress_matrix.py --round all` (4 rounds, 95 datasets, 0 crashes; its
+load-time "wrong" lines are text the suggested cleaning converts). Nothing is open. The agent's live check:
 `uv run python scripts/agent_live.py` (needs keys in the gitignored .env). Otherwise nothing: P9-O4's feature half was closed by the user's
 decision on 21/09/2026 (copy-first; in-place analysis is a later scaling item).
 
@@ -22,11 +23,11 @@ Layout: `src/analytics_agent/{ingest,profile,clean,contract,validate,analysis,ch
 
 ## Verify before committing
 All six, every time. Run the suite BEFORE committing, not after (C76: two commits
-recorded a broken tree). Engine suite last measured 24/09/2026, at Phase 14 Step 7; phases 8-10
+recorded a broken tree). Engine suite last measured 24/09/2026, at Phase 14 Step 8; phases 8-10
 at Step 4 (21/09) -- they need the Postgres `olist` source, and without it their Olist clauses
 skip (55/0/3, 0/0/1, 0/0/1 in a container lacking it):
 
-    uv run pytest -q                      # 1874 passed
+    uv run pytest -q                      # 1896 passed
     uv run python tests/test_phase8.py    # 99 passed, 0 failed, 2 skipped
     uv run python tests/test_phase9.py    # 19 passed, 0 failed, 0 skipped
     uv run python tests/test_phase10.py   # 35 passed, 0 failed, 1 skipped
@@ -40,7 +41,7 @@ because a suite that must be 100% cannot carry a score (P13-D1):
     uv run python eval/run_eval.py        # SCORE: 76/76 (100%), 40 questions
 
 The acceptance scripts are scripts, not pytest files -- `pytest` collects nothing
-from them, so 1874 excludes them. The three skips are each deliberate and
+from them, so 1896 excludes them. The three skips are each deliberate and
 recorded: ANALYSIS_RESULT_UNSOUND and the rendered MCP schema in phase8, the
 non-finite screen in phase10. A skip is an outstanding clause, not a passing one
 -- count them against this line, which is how C80 was found.

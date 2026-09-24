@@ -1,3 +1,52 @@
+# Step 8 -- the residuals, then rounds 2 to 4 of new anomalies
+
+`uv run python scripts/stress_matrix.py --round all`. Each round added anomalies no earlier round
+had. Each round was run, every non-OK line triaged, each bug fixed with a test
+(`tests/test_stress_fixes.py`, 46 tests), and every round re-run. The loop stopped at round 4,
+the first round to find no new bug. Final code:
+
+| round | datasets | calls | OK | refused | wrong | crash | suspect |
+|---|--:|--:|--:|--:|--:|--:|--:|
+| 1 | 40 | 1,778 | 1,649 | 118 | 10 | 0 | 1 |
+| 2 | 25 | 1,137 | 1,037 | 97 | 3 | 0 | 0 |
+| 3 | 18 | 875 | 827 | 40 | 8 | 0 | 0 |
+| 4 | 12 | 546 | 523 | 23 | 0 | 0 | 0 |
+
+Every "wrong" line is a load-time check on text the suggested cleaning then converts to the
+file's exact figures. There are two exceptions, both by design: a formula file holding no values,
+and `nil` in a number column, which is undeclared and so waits for a person's approval.
+
+| # | Found in | Bug | Fix |
+|---|---|---|---|
+| R1 | residual | Windows-1252 file with `€` did not load at all | Encoding sniffed (UTF-16, UTF-8, cp1252, Latin-1); a streamed UTF-8 copy |
+| R2 | residual | A complete last row labelled "Total" would be dropped | The label counts only if the row lacks what data rows fill |
+| R3 | residual | Excel errors named the wrong row after blank rows | Sheet row numbers kept |
+| R4 | residual | `1,234`-only columns got no conversion | Both readings offered, neither suggested, both together refused |
+| R5 | residual | Tail probe could start inside a quoted field | Starts at a quote-balanced boundary; records counted, not lines |
+| R6 | residual | Profile printed "range -inf to nan" | Float ranges over finite values |
+| 2a | round 2 | Time-zone timestamps crashed `describe_dataset` (pytz) | Stored in UTC by every loader |
+| 2b | round 2 | Ragged rows refused with a false column count | Short rows padded, noted |
+| 2c | round 2 | Trailing delimiter added an empty `column_10` | Dropped when unnamed and empty, noted |
+| 2d | round 2 | Accounting `(1,234.56)` not converted | Read as negative |
+| 2e | round 2 | Excel `#DIV/0!` / `#N/A` cells made the column text | Loaded empty, counted |
+| 2f | round 2 | Vertically merged cells left rows empty | Merge value filled, as displayed |
+| 2g | round 2 | Mixed CRLF/LF (and so `#` comment files) failed to load | Normalised copy; `#` lines are comments |
+| 2h | round 2 | A header of years read as "headerless" | Year headers recognised |
+| 2i | round 2 | 20-digit integers summed off by 34,650 (DOUBLE) | Reloaded as HUGEINT |
+| 3a | round 3 | **Two-digit years loaded silently wrong** (31/12/24 -> 2031-12-24) | Kept as text; cleaning reads day/month first, two-digit formats first |
+| 3b | round 3 | Header cell with a line break -> false refusal | One header read as a record |
+| 3c | round 3 | `Ventes 2024 (été).csv` refused at upload | Name made safe |
+| 3d | round 3 | SAP `1234.56-` not converted | Read as negative |
+| 3e | round 3 | `0000-00-00` made the date conversion lossy | Treated as absent |
+
+Correct as found, not bugs: `region` beside `Region` (loads as `region_2`); a duplicate `order_id`
+(the engine proposes a unique composite key and refuses `order_id` alone); a column named `rowid`;
+1,000,000 rows (7 s); zero variance, all-negative measures (a share of a negative total is refused
+on principle), two rows, three stacked Excel headers, 1800-2999 dates (correlated_shift 11.4 s over
+14,400 months).
+
+---
+
 # Stress matrix report -- 24/09/2026, fixed at Phase 14 Step 7
 
 `uv run python scripts/stress_matrix.py` runs 40 generated datasets through every tool on the web

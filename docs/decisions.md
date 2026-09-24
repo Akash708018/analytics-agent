@@ -6287,3 +6287,65 @@ left. Digests:
   242f73c0c176b300323be4b57c25c8e1302be7129eb62648d1d62d6180e82afd  tests/test_stress_fixes.py
   91e97ffd23ff8b457fdd9cc1d673ebc21b99dc03a2cb5c7588623d64f8dcb6f5  scripts/stress_matrix.py
   5736890985df5895175353c382606b345eb953096714ad7f03b0c3b6e9fed853  docs/stress/REPORT.md
+
+## Phase 14, Step 8 - what remained, then four rounds of new anomalies, 24/09/2026
+
+Step document: docs/steps/phase14_step8_anomaly_loop.md. Report: docs/stress/REPORT.md.
+
+P14-D47. A NON-UTF-8 CSV IS READ FROM A UTF-8 COPY. DuckDB reads only UTF-8, UTF-16 and Latin-1,
+and refused a cp1252 file holding a euro sign outright (measured). The encoding is sniffed (UTF-16
+by byte-order mark, UTF-8, cp1252, else Latin-1) and the file transcoded, streamed, into a
+temporary copy that is deleted after the load; a load note names the encoding.
+P14-D48. A TOTALS LABEL MAKES A FOOTER ONLY WHEN THE ROW LACKS WHAT DATA ROWS HAVE. A complete last
+row labelled "Total" is data.
+P14-D49. AN EXCEL LOAD ERROR NAMES THE SHEET ROW, blank rows above it included.
+P14-D50. A NUMBER COLUMN THAT READS BOTH WAYS IS OFFERED BOTH READINGS, neither suggested, and
+approving both is refused (ACTIONS_CONFLICT).
+P14-D51. THE CSV TAIL IS READ FROM A RECORD BOUNDARY: the first line after which the probe holds an
+even number of quotes; records, not lines, are counted.
+P14-D52. A FLOAT COLUMN'S RANGE IS OVER ITS FINITE VALUES (no more "range -inf to nan").
+P14-D53. A ROW OF LABELS WHOSE NUMBERS ARE DISTINCT YEARS IS A HEADER ("region, 2021, 2022").
+P14-D54. MIXED LINE ENDINGS ARE NORMALISED, and '#' lines above the header are comments. One cause
+behind both round-2 load failures: DuckDB's strict parser refuses mixed CRLF/LF.
+P14-D55. TIME ZONE TIMESTAMPS ARE STORED IN UTC, by every loader. A TIMESTAMPTZ value reaches
+Python only through pytz, so describe_dataset raised ModuleNotFoundError.
+P14-D56. SHORT ROWS ARE PADDED, AND A TRAILING DELIMITER'S EMPTY UNNAMED COLUMN IS DROPPED, each
+with a note. A named empty column is kept.
+P14-D57. WHOLE NUMBERS BEYOND 2^53 ARE RELOADED AS HUGEINT. DuckDB offers no HUGEINT sniff
+candidate; a sum of 20-digit ids was off by 34,650.
+P14-D58. EXCEL IS LOADED AS IT DISPLAYS: a vertical merge's value in every row of it, error cells
+(#DIV/0!, #N/A, ...) as empty, both counted in the notes.
+P14-D59. ACCOUNTING NEGATIVES (1,234.56) CONVERT AS NEGATIVE.
+P14-D60. A TWO-DIGIT YEAR IS NEVER READ YEAR-FIRST. DuckDB loaded 31/12/24 as 2031-12-24, a valid
+DATE, in silence. Such a column is kept as text with a note; cleaning reads it day- or
+month-first as the values settle, two-digit formats before four-digit ones (strptime '%Y' reads
+'24' as 0024, measured), with the POSIX century rule stated.
+P14-D61. SAP NEGATIVES (1234.56-) CONVERT AS NEGATIVE.
+P14-D62. '0000-00-00' IS ABSENT, NOT LOST, in a date conversion.
+P14-D63. ONE HEADER ROW IS READ AS A RECORD (header=true), so a header cell holding a line break
+loads; skip=1 skipped one line.
+P14-D64. AN UPLOAD'S NAME IS MADE SAFE, NOT REFUSED: 'Ventes 2024 (été).csv' -> 'Ventes 2024 _ete.csv'.
+
+C101. MY HARNESS HID A WRONG SUM, AND MY TWO-DIGIT-YEAR FIX WAS WRONG TWICE BEFORE IT WAS RIGHT.
+The 20-digit sum compared in floats, where 1e21 equals 1000000000000000034650; exact Decimal
+comparison found it. The first two-digit-year fix kept the text at load but let cleaning convert
+it year-first, first through the plain TRY_CAST, then through '%Y/%m/%d' early in the format
+list; each was found only by re-running the round, not by the unit test written with the fix.
+
+No open item. By design, not bugs: 'nil' in a number column is information (lossy conversion,
+the person approves); a formula saved with no value loads empty (the draft says so).
+
+MEASURED VALIDATION, 24/09/2026. Engine 1874 -> 1896 (tests/test_stress_fixes.py 24 -> 46); UI 43;
+acceptance in this container 55/0/3, 0/0/1, 0/0/1, 26/0/0, 36/0/0, phase 6 36/0/0; eval 76/76.
+Stress rounds on the final code: 95 datasets, 4,336 calls, 0 crashes; every WRONG line a
+load-time check that the suggested cleaning corrects, except the two by design. Digests:
+  58c0af3c3329d4294847198b13e6f7b7c2a70d59357f790c3c24541cbb8c66b7  src/analytics_agent/ingest/csv_loader.py
+  fafa7718346e332b78ef2617153eca142956e723c15b3e89aa99f22e206ae0c4  src/analytics_agent/ingest/excel.py
+  34656d2b7cac03d43464b903825f0b52fc75a8f2ee7166ce20e9e634a72f0db5  src/analytics_agent/ingest/draft.py
+  ca854eda7d69fb02f75de79e623ddaf54f5469c9e62ce99770856e688e02a9cc  src/analytics_agent/ingest/preview.py
+  d8f1b2598bef056d906cbe7dd09c87677991918adf33ac8c7a23a88326d80349  src/analytics_agent/clean/detect.py
+  a13f607052f62274cd1762d31056be8602d6fae91cd9d5174bf3cb39f1289238  src/analytics_agent/clean/sql.py
+  2a6e29a6b457e7705eea52a38ae014c814d32496d5341416508a152e1a4bb081  src/analytics_agent/util/db.py
+  413c50c1e39c4210414dd2f93f4737c31a62ff6ef8353eae6af1ed27a4260c19  src/analytics_agent/webapp/real_backend.py
+  d1c99f56145d1b22eeb2606f6378f360fec6481266a542a18fe27c9ffde785b2  tests/test_stress_fixes.py
+  14fa6d72d444286064971d69cf51c2fbb53bf70417c13b8396a6daa5b67e3098  scripts/stress_matrix.py

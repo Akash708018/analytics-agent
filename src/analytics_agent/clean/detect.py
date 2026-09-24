@@ -113,7 +113,11 @@ def proposed_type(con, table: str, column: str) -> str | None:
             return "BIGINT"
         return "DECIMAL(18,2)" if _fits_two_places(con, table, column) else "DOUBLE"
 
-    if share("TIMESTAMP") >= CONVERT_MIN_SHARE:
+    # A two-digit year casts, year FIRST: '01/01/24' becomes 0001-01-24 (measured, P14-D60).
+    # Such a column goes to _date_conversion, which reads the year last.
+    two_digit = _scalar(con, f"SELECT count(*) FROM {t} WHERE "
+                             f"regexp_full_match(trim({c}), {sql.literal(_TWO_DIGIT_YEAR)})")
+    if share("TIMESTAMP") >= CONVERT_MIN_SHARE and not two_digit:
         with_time = _scalar(
             con,
             f"SELECT count(*) FROM {t} WHERE TRY_CAST({c} AS TIMESTAMP) IS NOT NULL "
@@ -155,9 +159,12 @@ _CURRENCY_AND_SPACE = "[$€£¥\\s]"
 # day/month orders are added only when a value settles which comes first (a part above 12).
 _DATE_FORMATS = ("%Y-%m-%d", "%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S", "%Y/%m/%d",
                  "%b %d, %Y", "%B %d, %Y", "%d %b %Y", "%d %B %Y", "%d-%b-%Y", "%Y%m%d")
-_DAY_FIRST = ("%d/%m/%Y", "%d.%m.%Y", "%d-%m-%Y")
-_MONTH_FIRST = ("%m/%d/%Y", "%m.%d.%Y", "%m-%d-%Y")
-_NUMERIC_DATE = r"(\d{1,2})[/.-](\d{1,2})[/.-]\d{4}"
+# Two-digit years first: %Y reads '31/12/24' as the year 0024, and %y refuses a four-digit year
+# (both measured, P14-D60), so this order reads each value by the one format that fits it.
+_DAY_FIRST = ("%d/%m/%y", "%d.%m.%y", "%d-%m-%y", "%d/%m/%Y", "%d.%m.%Y", "%d-%m-%Y")
+_MONTH_FIRST = ("%m/%d/%y", "%m.%d.%y", "%m-%d-%y", "%m/%d/%Y", "%m.%d.%Y", "%m-%d-%Y")
+_NUMERIC_DATE = r"(\d{1,2})[/.-](\d{1,2})[/.-](?:\d{4}|\d{2})"
+_TWO_DIGIT_YEAR = r"\d{1,2}[/.-]\d{1,2}[/.-]\d{2}"
 
 
 def _share_where(con, table: str, column: str, condition: str) -> float:
@@ -183,15 +190,25 @@ def _numeric_type_of(con, table: str, text: str) -> str:
     return "DOUBLE" if off_cents else "DECIMAL(18,2)"
 
 
-def alternative_conversion(con, table: str, column: str) -> tuple[str, str, str] | None:
-    """(to_type, expression, how) for text a plain cast cannot read, or None.
+def alternative_conversion(con, table: str, column: str) -> list[tuple[str, str, str]]:
+    """[(to_type, expression, how)] for text a plain cast cannot read -- empty, one, or two.
+
+    Two when every value reads both ways ('1,234' is a thousand and twenty-four with a
+    thousands comma, one point two three four with a decimal comma): both are offered, neither is
+    suggested, and approving both is refused (P14-D50).
 
     Tried only after proposed_type found nothing. Each candidate must read CONVERT_MIN_SHARE of
     the column, like any conversion, and what it cannot read is counted as lost from the same
     expression when the action is built.
     """
     c = sql.ident(column)
-    trimmed = f"trim({c})"
+    # Accounting writes a negative as (1,234.56): read it as -1,234.56 before any pattern, so
+    # every reading below handles it (P14-D59).
+    # SAP writes it 1234.56- (P14-D61).
+    trimmed = (f"(CASE WHEN regexp_full_match(trim({c}), '\\(.*\\)') "
+               f"THEN '-' || trim(trim({c}), '()') "
+               f"WHEN regexp_full_match(trim({c}), '[^-].*[0-9.,]-') "
+               f"THEN '-' || rtrim(trim({c}), '-') ELSE trim({c}) END)")
 
     def full(pattern: str) -> str:
         return f"regexp_full_match({trimmed}, {sql.literal(pattern)})"
@@ -199,8 +216,8 @@ def alternative_conversion(con, table: str, column: str) -> tuple[str, str, str]
     if _share_where(con, table, column, full(_PERCENT)) >= CONVERT_MIN_SHARE:
         text = f"replace(rtrim({trimmed}, '%'), ',', '.')"
         to_type = _numeric_type_of(con, table, text)
-        return (to_type, f"TRY_CAST({text} AS {to_type})",
-                "the number before its % sign, so '12.5%' becomes 12.5")
+        return [(to_type, f"TRY_CAST({text} AS {to_type})",
+                 "the number before its % sign, so '12.5%' becomes 12.5")]
 
     us = _share_where(con, table, column, full(_US_NUMBER))
     eu = _share_where(con, table, column, full(_EU_NUMBER))
@@ -210,18 +227,30 @@ def alternative_conversion(con, table: str, column: str) -> tuple[str, str, str]
         only_eu = _share_where(con, table, column,
                                f"{full(_EU_NUMBER)} AND NOT {full(_US_NUMBER)}")
         bare = f"regexp_replace({trimmed}, {sql.literal(_CURRENCY_AND_SPACE)}, '', 'g')"
+        us_reading = (f"replace({bare}, ',', '')",
+                      "with its currency signs and thousands separators removed "
+                      "('$1,234.56' is 1234.56)")
+        eu_reading = (f"replace(replace({bare}, '.', ''), ',', '.')",
+                      "with a decimal comma ('1.234,56' is 1234.56)")
         if us >= CONVERT_MIN_SHARE and only_us and not only_eu:
-            text = f"replace({bare}, ',', '')"
-            how = "with its currency signs and thousands separators removed ('$1,234.56' is 1234.56)"
+            readings = [us_reading]
         elif eu >= CONVERT_MIN_SHARE and only_eu and not only_us:
-            text = f"replace(replace({bare}, '.', ''), ',', '.')"
-            how = "with a decimal comma ('1.234,56' is 1234.56)"
+            readings = [eu_reading]
+        elif us >= CONVERT_MIN_SHARE and eu >= CONVERT_MIN_SHARE and not (only_us or only_eu):
+            # Every value reads both ways: which one is meant is the person's to say.
+            readings = [(t, how + " -- IF that is this file's convention; the other reading is "
+                            "offered beside it, and only one can be approved")
+                        for t, how in (us_reading, eu_reading)]
         else:
-            return None  # every value reads both ways: which one is the person's to say
-        to_type = _numeric_type_of(con, table, text)
-        return to_type, f"TRY_CAST({text} AS {to_type})", how
+            return []
+        out = []
+        for text, how in readings:
+            to_type = _numeric_type_of(con, table, text)
+            out.append((to_type, f"TRY_CAST({text} AS {to_type})", how))
+        return out
 
-    return _date_conversion(con, table, column)
+    date = _date_conversion(con, table, column)
+    return [date] if date else []
 
 
 def _date_conversion(con, table: str, column: str) -> tuple[str, str, str] | None:
@@ -235,7 +264,9 @@ def _date_conversion(con, table: str, column: str) -> tuple[str, str, str] | Non
     second = f"TRY_CAST(regexp_extract({trimmed}, {sql.literal(_NUMERIC_DATE)}, 2) AS INTEGER)"
     day_first = _scalar(con, f"SELECT count(*) FROM {t} WHERE {first} > 12")
     month_first = _scalar(con, f"SELECT count(*) FROM {t} WHERE {second} > 12")
-    formats = list(_DATE_FORMATS)
+    # The settled numeric order goes FIRST: '%Y/%m/%d' in the general list reads '01/01/24' as
+    # 0001-01-24, and '%d/%m/%y' cannot mistake a four-digit year (P14-D60).
+    formats: list[str] = []
     order = ""
     if day_first and not month_first:
         formats += _DAY_FIRST
@@ -243,6 +274,7 @@ def _date_conversion(con, table: str, column: str) -> tuple[str, str, str] | Non
     elif month_first and not day_first:
         formats += _MONTH_FIRST
         order = "; numeric dates read month first, as values such as 01/31 show"
+    formats += _DATE_FORMATS
     parsed = "COALESCE(" + ", ".join(
         f"TRY_STRPTIME({trimmed}, {sql.literal(f)})" for f in formats) + ")"
     if _share_where(con, table, column, f"{parsed} IS NOT NULL") < CONVERT_MIN_SHARE:
@@ -251,6 +283,11 @@ def _date_conversion(con, table: str, column: str) -> tuple[str, str, str] | Non
                              f"AND {parsed} <> date_trunc('day', {parsed})")
     to_type = "TIMESTAMP" if with_time else "DATE"
     expression = parsed if with_time else f"CAST({parsed} AS DATE)"
+    two_digit = _scalar(con, f"SELECT count(*) FROM {t} WHERE "
+                             f"regexp_full_match({trimmed}, {sql.literal(_TWO_DIGIT_YEAR)})")
+    if two_digit:
+        order += ("; a two-digit year 69-99 is read as 19xx and 00-68 as 20xx, the POSIX rule "
+                  "-- say so if this file means otherwise")
     return to_type, expression, f"from the date formats it is written in{order}"
 
 
@@ -353,9 +390,7 @@ def detect(
                 column,
             )
         else:
-            alt = alternative_conversion(con, source, column)
-            if alt:
-                alt_type, expression, how = alt
+            for alt_type, expression, how in alternative_conversion(con, source, column):
                 add(
                     ActionKind.CONVERT_TYPE,
                     sql.convert_type(source=source, target=target, column=column,

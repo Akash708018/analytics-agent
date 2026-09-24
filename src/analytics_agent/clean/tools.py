@@ -153,6 +153,12 @@ def _safe_suggestion(actions, limit: int | None = None):
         a.column for a in actions
         if a.kind is ActionKind.NORMALISE_MISSING and a.column
     }
+    # A column offered two readings is a question, not a suggestion (P14-D50).
+    readings: dict[str, int] = {}
+    for a in actions:
+        if a.kind is ActionKind.CONVERT_TYPE and a.column:
+            readings[a.column] = readings.get(a.column, 0) + 1
+    deferred |= {c for c, n in readings.items() if n > 1}
     picked = []
     for a in actions:
         if a.is_lossy:

@@ -243,6 +243,27 @@ def user_tables(con: duckdb.DuckDBPyConnection) -> list[str]:
     return [r[0] for r in rows]
 
 
+def utc_timestamps(con: duckdb.DuckDBPyConnection, table: str) -> list[str]:
+    """Convert every TIMESTAMP WITH TIME ZONE column of `table` to TIMESTAMP, in UTC.
+
+    DuckDB hands a TIMESTAMPTZ value to Python only through pytz, which this project does not
+    depend on, so the first tool to fetch one -- describe_dataset -- raised ModuleNotFoundError
+    (P14-D55). UTC keeps every instant exact; the returned names go into the load's notes.
+    """
+    cols = [r[0] for r in con.execute(
+        "SELECT column_name FROM information_schema.columns WHERE table_schema = 'main' "
+        "AND table_name = ? AND data_type = 'TIMESTAMP WITH TIME ZONE'", [table]).fetchall()]
+    for c in cols:
+        q = '"' + c.replace('"', '""') + '"'
+        con.execute(f'ALTER TABLE "{table}" ALTER {q} TYPE TIMESTAMP USING timezone(\'UTC\', {q})')
+    return cols
+
+
+def utc_note(cols: list[str]) -> list[str]:
+    return ([f"{', '.join(cols)} carried a time zone offset; stored in UTC, so an instant written "
+             f"12:00+05:30 reads 06:30."] if cols else [])
+
+
 def table_shape(con: duckdb.DuckDBPyConnection, table: str) -> tuple[int, int]:
     """(row_count, column_count) for a table. Raises if it does not exist."""
     rows = con.execute(f'SELECT count(*) FROM "{table}"').fetchone()[0]

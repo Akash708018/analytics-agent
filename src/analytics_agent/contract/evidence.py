@@ -429,12 +429,18 @@ def column_stats(con, dataset_name: str) -> list[ColumnEvidence]:
         )
 
     exprs = ["count(*)"]
-    for name, _dtype, _pos in cols:
+    for name, dtype, _pos in cols:
+        # A float column's range is over its finite values: NaN sorts above everything, so the
+        # raw range of a column holding one read "-inf to nan" (P14-D52). The profile's note says
+        # how many values are not finite. Floating-point columns only; a filter per column is
+        # what made wide profiles slow (C100).
+        keep = (f" FILTER (WHERE isfinite({_q(name)}))"
+                if _base_type(dtype) in ("DOUBLE", "FLOAT", "REAL") else "")
         exprs += [
             f"count({_q(name)})",
             f"count(DISTINCT {_q(name)})",
-            f"min({_q(name)})::VARCHAR",
-            f"max({_q(name)})::VARCHAR",
+            f"(min({_q(name)}){keep})::VARCHAR",
+            f"(max({_q(name)}){keep})::VARCHAR",
         ]
     row = con.execute(
         f"SELECT {', '.join(exprs)} FROM {_q(dataset_name)}"

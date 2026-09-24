@@ -130,6 +130,16 @@ def conflicts(actions: list[CleaningAction]) -> list[str]:
         if a.kind is ActionKind.CONVERT_TYPE and a.column
     }
     out = []
+    # Two readings of one column (a thousands comma and a decimal comma, P14-D50): one of them.
+    seen: dict[str, str] = {}
+    for a in actions:
+        if a.kind is ActionKind.CONVERT_TYPE and a.column:
+            if a.column in seen:
+                out.append(
+                    f"{seen[a.column]} and {a.action_id} are two readings of {a.column}. "
+                    f"Approve the one that matches the file's convention, not both.")
+            else:
+                seen[a.column] = a.action_id
     for a in actions:
         if a.kind is ActionKind.CONVERT_TYPE or not a.column:
             continue

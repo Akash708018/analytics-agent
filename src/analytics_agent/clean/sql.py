@@ -110,6 +110,7 @@ def _replace_one(target: str, source: str, column: str, expression: str) -> str:
 # A value a numeric conversion reads but changes: '00311' casts to 311 and the zeros, which are
 # part of a zip code or an account number, are gone (P14-O4, B2).
 LEADING_ZERO = "regexp_matches(trim({col}), '^[+-]?0[0-9]')"
+ZERO_DATE = r"0000-00-00([ T]00:00:00)?"
 
 
 def convert_type(
@@ -132,6 +133,9 @@ def convert_type(
     fails = f"{expression} IS NULL"
     if numeric:
         fails = f"({fails} OR {LEADING_ZERO.format(col=col)})"
+    if to_type in ("DATE", "TIMESTAMP"):
+        # '0000-00-00' is how MySQL writes "no date": absent, not information (P14-D62).
+        fails = f"({fails} AND NOT regexp_full_match(trim({col}), {literal(ZERO_DATE)}))"
     undeclared = (
         f"{col} IS NOT NULL AND {fails}"
         + (

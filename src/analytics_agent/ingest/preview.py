@@ -108,6 +108,33 @@ def _fill(row) -> int:
     return sum(1 for v in row if not _is_blank(v))
 
 
+def _as_year(v) -> int | None:
+    s = str(v).strip()
+    if isinstance(v, float) and v.is_integer():
+        s = str(int(v))
+    return int(s) if len(s) == 4 and s.isdigit() and 1900 <= int(s) <= 2100 else None
+
+
+def _year_header(rows, i: int) -> bool:
+    """A row of labels whose number cells are all distinct years -- 'region, 2021, 2022, 2023',
+    a pivot's header -- above a row whose same cells are not years. Read as data, it made such a
+    file "headerless" (P14-D53)."""
+    row = rows[i]
+    filled = [(j, v) for j, v in enumerate(row) if not _is_blank(v)]
+    numbers = [(j, v) for j, v in filled if not _is_texty(v)]
+    years = [_as_year(v) for _, v in numbers]
+    if len(numbers) < 2 or None in years or len(set(years)) != len(years):
+        return False
+    if len(numbers) == len(filled) or i + 1 >= len(rows):
+        return False
+    below = rows[i + 1]
+    return not all(j < len(below) and _as_year(below[j]) for j, _ in numbers)
+
+
+def _headerish(rows, i: int) -> bool:
+    return _all_texty(rows[i]) or _year_header(rows, i)
+
+
 def _all_texty(row) -> bool:
     return _fill(row) > 0 and all(_is_texty(v) for v in row)
 
@@ -165,7 +192,7 @@ def guess_header(
 
     first_data_idx = None
     for i, row in enumerate(rows):
-        if not _is_blank_row(row) and not _all_texty(row):
+        if not _is_blank_row(row) and not _headerish(rows, i):
             first_data_idx = i
             break
 
@@ -197,7 +224,7 @@ def guess_header(
         )
 
     start = first_data_idx
-    while start > 0 and _all_texty(rows[start - 1]) and not _is_blank_row(rows[start - 1]):
+    while start > 0 and _headerish(rows, start - 1) and not _is_blank_row(rows[start - 1]):
         start -= 1
 
     block = list(range(start, first_data_idx))
@@ -311,9 +338,18 @@ def count_trailing_junk(tail_rows: list, width: int) -> int:
     if width <= 0:
         return 0
     threshold = width * FOOTER_FILL_RATIO
+    # Columns every ordinary row in the tail fills. A totals row leaves some of them empty (the
+    # id, the date); a data row that happens to carry the label "Total" fills them all, and is
+    # data (P14-D48).
+    ordinary = [r for r in tail_rows if _fill(r) >= threshold and not is_totals_row(r)]
+    always = ({i for i in range(width)
+               if all(i < len(r) and not _is_blank(r[i]) for r in ordinary)}
+              if ordinary else set())
     count = 0
     for row in reversed(tail_rows):
-        if _fill(row) >= threshold and not is_totals_row(row):
+        labelled = is_totals_row(row) and (
+            not always or any(i >= len(row) or _is_blank(row[i]) for i in always))
+        if _fill(row) >= threshold and not labelled:
             break
         count += 1
     return count

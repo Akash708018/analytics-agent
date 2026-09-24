@@ -303,6 +303,7 @@ def load_table(
             f"SQL against this table."
         ) from exc
 
+    utc = db.utc_timestamps(con, dataset_name)
     rows, cols = db.table_shape(con, dataset_name)
     columns = [
         (r[0], r[1])
@@ -339,4 +340,5 @@ def load_table(
         columns=columns,
         gate_verdict="WARN" if gate_message else "OK",
         gate_message=gate_message,
+        notes=db.utc_note(utc),
     )

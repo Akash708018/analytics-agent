@@ -44,7 +44,9 @@ Three more, found while adding footer skipping and coercion counts:
 from __future__ import annotations
 
 import codecs
+import os
 import re
+import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -149,7 +151,7 @@ def _q(name: str) -> str:
 # A seek, so the cost is the same on a 10 KB file and on a 2.5 GB one (P14-O3, P14-O9).
 PROBE_BYTES = 64 * 1024
 
-UTF8, LATIN1 = "utf-8", "latin-1"
+UTF8, UTF16, CP1252, LATIN1 = "utf-8", "utf-16", "cp1252", "latin-1"
 
 
 def _decodes_as_utf8(chunk: bytes, *, from_middle: bool) -> bool:
@@ -166,13 +168,22 @@ def _decodes_as_utf8(chunk: bytes, *, from_middle: bool) -> bool:
         return False
 
 
-def sniff_encoding(path: Path | str) -> str:
-    """UTF-8 if the first and last PROBE_BYTES decode as UTF-8, else Latin-1.
+def _decodes_as(chunk: bytes, encoding: str) -> bool:
+    try:
+        codecs.getincrementaldecoder(encoding)().decode(chunk, final=False)
+        return True
+    except UnicodeDecodeError:
+        return False
 
-    Latin-1 is the fallback because every byte is a Latin-1 character: a file that is not UTF-8
-    always reads, and the Western European text such exports hold reads right. DuckDB takes both
-    (measured: encoding='latin-1' reads b'S\\xfcnd' as 'Sünd'). A UTF-8 error in the middle
-    of a large file is caught by load_csv, which retries as Latin-1.
+
+def sniff_encoding(path: Path | str) -> str:
+    """utf-8, utf-16, cp1252 or latin-1, from a byte-order mark and the first and last PROBE_BYTES.
+
+    UTF-16 is recognised by its byte-order mark (Excel's "Unicode text" export writes one).
+    Otherwise UTF-8 if both probes decode as UTF-8; else Windows-1252, the encoding Windows
+    exports use, if they decode as that (it leaves five bytes undefined); else Latin-1, which
+    every byte decodes as. Latin-1 alone was wrong for the euro sign and curly quotes, and DuckDB
+    refused such a file outright ("File is not latin-1 encoded", measured, P14-D47).
     """
     path = Path(path)
     size = path.stat().st_size
@@ -182,17 +193,65 @@ def sniff_encoding(path: Path | str) -> str:
         if size > PROBE_BYTES:
             f.seek(max(PROBE_BYTES, size - PROBE_BYTES))
             tail = f.read()
-    ok = _decodes_as_utf8(head, from_middle=False) and (
-        not tail or _decodes_as_utf8(tail, from_middle=True))
-    return UTF8 if ok else LATIN1
+    if head.startswith((b"\xff\xfe", b"\xfe\xff")):
+        return UTF16
+    if _decodes_as_utf8(head, from_middle=False) and (
+            not tail or _decodes_as_utf8(tail, from_middle=True)):
+        return UTF8
+    if _decodes_as(head, CP1252) and _decodes_as(tail, CP1252):
+        return CP1252
+    return LATIN1
+
+
+def mixed_line_endings(path: Path | str) -> bool:
+    """Whether the first PROBE_BYTES end lines both as CRLF and as a bare LF.
+
+    DuckDB's strict parser refuses such a file ("state machine reached an invalid state", or a
+    failed sniff -- measured on both, P14-D54); two exports pasted together, or comment lines
+    added by hand, produce one.
+    """
+    with Path(path).open("rb") as f:
+        head = f.read(PROBE_BYTES)
+    crlf = head.count(b"\r\n")
+    return bool(crlf) and head.count(b"\n") > crlf
+
+
+def to_utf8(path: Path, encoding: str) -> tuple[Path, str]:
+    """A temporary UTF-8 copy with every line ending LF, and the encoding it was read as.
+
+    DuckDB's reader takes UTF-8, UTF-16 and Latin-1 only (measured: 'windows-1252' is "not
+    supported"), so every other file is transcoded here, streamed a megabyte at a time. A cp1252
+    guess that meets an undefined byte further in is redone as Latin-1, which cannot fail.
+    The caller deletes the copy.
+    """
+    fd, tmp = tempfile.mkstemp(suffix=".csv", prefix="agent_utf8_")
+    os.close(fd)
+    target = Path(tmp)
+    for enc in ([encoding, LATIN1] if encoding == CP1252 else [encoding]):
+        try:
+            decoder = codecs.getincrementaldecoder(enc)()
+            carry = ""  # a CR at the end of one chunk may be the first half of a CRLF
+            with path.open("rb") as src, target.open("w", encoding=UTF8, newline="") as out:
+                while chunk := src.read(1 << 20):
+                    text = carry + decoder.decode(chunk)
+                    carry = "\r" if text.endswith("\r") else ""
+                    text = text[:-1] if carry else text
+                    out.write(text.replace("\r\n", "\n").replace("\r", "\n"))
+                out.write((carry + decoder.decode(b"", final=True))
+                          .replace("\r\n", "\n").replace("\r", "\n"))
+            return target, enc
+        except UnicodeDecodeError:
+            continue
+    target.unlink(missing_ok=True)
+    raise LoadRefused(f"BLOCKED: {path.name} could not be decoded as {encoding}.\n"
+                      f"NEXT STEP: save the file as UTF-8 and upload it again.")
 
 
 def tail_lines(path: Path | str, n: int) -> list[str]:
-    """The last n non-blank lines, read from the end with a seek -- never the whole file.
-
-    Blank lines are left out because DuckDB skips them (measured), so they are not rows and must
-    not be counted as a footer. The first line of the probe is dropped when the probe starts
-    mid-file, because it is probably cut.
+    """The lines of the file's last PROBE_BYTES, from a record boundary -- read with a seek,
+    never the whole file. The caller parses them and keeps the last `n` non-blank RECORDS: a
+    quoted field may span lines, so lines are not records. Blank records are not rows (DuckDB
+    skips blank lines, measured) and must not be counted as a footer.
     """
     path = Path(path)
     size = path.stat().st_size
@@ -200,11 +259,32 @@ def tail_lines(path: Path | str, n: int) -> list[str]:
         start = max(0, size - PROBE_BYTES)
         f.seek(start)
         raw = f.read()
-    text = raw.decode(sniff_encoding(path), errors="replace")
+    encoding = sniff_encoding(path)
+    if encoding == UTF16:
+        # Mid-file there is no byte-order mark: take the order from the file's first two bytes,
+        # and start on a character boundary, which in UTF-16 is an even offset.
+        with path.open("rb") as f:
+            bom = f.read(2)
+        if start % 2:
+            raw = raw[1:]
+        encoding = "utf-16-le" if bom == b"\xff\xfe" else "utf-16-be"
+        if start == 0:
+            raw = raw[2:]
+    text = raw.decode(encoding, errors="replace")
     lines = text.splitlines()
     if start > 0 and lines:
-        lines = lines[1:]
-    return [ln for ln in lines if ln.strip()][-n:]
+        # The probe may begin inside a quoted field that spans lines. The file's end is outside
+        # every quote, so a line boundary is outside one exactly when an even number of quote
+        # characters follows it: start at the first such boundary (P14-D51).
+        after = text.count('"')
+        for i, line in enumerate(lines):
+            after -= line.count('"')
+            if i >= 0 and after % 2 == 0:
+                lines = lines[i + 1:]
+                break
+        else:
+            lines = []
+    return lines
 
 
 def has_data_rows(path: Path | str, header_rows: int) -> bool:
@@ -236,7 +316,8 @@ def preview_lines(path: Path | str, n: int = CSV_PREVIEW_LINES) -> list[str]:
 
 
 def detect_column_count(
-    con: duckdb.DuckDBPyConnection, path: Path, skip: int = 0, encoding: str = UTF8
+    con: duckdb.DuckDBPyConnection, path: Path, skip: int = 0, encoding: str = UTF8,
+    padding: bool = False, header: bool = False,
 ) -> int:
     """Column count without reading any rows.
 
@@ -244,9 +325,11 @@ def detect_column_count(
     a few kilobytes regardless of file size.
     """
     enc = f", encoding='{encoding}'" if encoding != UTF8 else ""
+    enc += ", null_padding=true" if padding else ""
+    where = "header=true" if header else f"skip={skip}, header=false"
     rel = con.execute(
-        f"SELECT * FROM read_csv({_sql_path(path)}, skip={skip}, "
-        f"header=false, sample_size=1024{enc}) LIMIT 0"
+        f"SELECT * FROM read_csv({_sql_path(path)}, {where}, "
+        f"sample_size=1024{enc}) LIMIT 0"
     )
     return len(rel.description)
 
@@ -343,14 +426,44 @@ def load_csv(
 
     encoding = sniff_encoding(path)
     notes: list[str] = []
+    source, copies = path, []
+    if encoding != UTF8:
+        source, encoding = to_utf8(path, encoding)
+        copies.append(source)
+        notes.append(_encoding_note(path, encoding))
+    elif mixed_line_endings(path):
+        source, _ = to_utf8(path, UTF8)
+        copies.append(source)
+        notes.append(f"{path.name} ends some lines with CRLF and others with LF; it was read "
+                     f"with every line ending made the same.")
+    try:
+        return _load_csv(con, path, source, copies, notes, dataset_name, header_rows, names,
+                         na_values, delimiter, footer_skip_rows, dtypes, on_error, sample_size,
+                         replace, gate)
+    finally:
+        for c in copies:
+            c.unlink(missing_ok=True)
+
+
+def _load_csv(con, path, source, copies, notes, dataset_name, header_rows, names, na_values,
+              delimiter, footer_skip_rows, dtypes, on_error, sample_size, replace, gate):
+    """load_csv's body, reading `source` (the file, or its UTF-8 copy) and naming `path`."""
 
     # Guard the silent-padding trap: fewer names than columns does not error
     # in DuckDB, it just appends 'column7'.
     if names:
         try:
-            actual = detect_column_count(con, path, skip=header_rows, encoding=encoding)
+            one = header_rows == 1
+            actual = detect_column_count(con, source, skip=header_rows, header=one)
+            # Rows with fewer fields than the header make the sniff read one column. Padded,
+            # they match, and the short rows' missing trailing values load empty (P14-D56).
+            if actual != len(names) and detect_column_count(
+                    con, source, skip=header_rows, padding=True, header=one) == len(names):
+                actual, padded = len(names), True
+            else:
+                padded = False
         except duckdb.Error as exc:
-            raise LoadRefused(_duck_refusal(path, exc)) from exc
+            raise LoadRefused(_duck_refusal(path, exc, source)) from exc
         if len(names) != actual:
             raise LoadRefused(
                 f"BLOCKED: {len(names)} column names given but "
@@ -369,14 +482,20 @@ def load_csv(
     # rejects nullstr=[] outright: "requires a non-empty list of possible null
     # strings". Omitting the option is what an empty list has to mean.
     opts = [f"sample_size={sample_size}"]
-    if encoding != UTF8:
-        opts.append(f"encoding='{encoding}'")
-        notes.append(_latin1_note(path))
+    if names and padded:
+        opts.append("null_padding=true")
+        notes.append("Some rows have fewer fields than the header; their missing trailing "
+                     "values load as empty.")
     if nulls:
         opts.append(f"nullstr={nulls!r}")
     if delimiter:
         opts.append(f"delim='{delimiter}'")
-    if names:
+    if names and header_rows == 1:
+        # One header RECORD, read as a record: skip=1 skips one LINE, and a header cell holding
+        # a line break ("Units\nSold") left its second half to be read as data (P14-D63).
+        opts.append("header=true")
+        opts.append(f"names={names!r}")
+    elif names:
         opts.append(f"skip={header_rows}")
         opts.append("header=false")
         opts.append(f"names={names!r}")
@@ -385,7 +504,7 @@ def load_csv(
         if header_rows > 1:
             opts.append(f"skip={header_rows}")
 
-    read_expr = f'read_csv({_sql_path(path)}, {", ".join(opts)})'
+    read_expr = f'read_csv({_sql_path(source)}, {", ".join(opts)})'
 
     coercion: dict[str, int] = {}
     verb = "CREATE OR REPLACE TABLE" if replace else "CREATE TABLE"
@@ -395,15 +514,41 @@ def load_csv(
             coercion = _load(con, read_expr, dataset_name, dtypes, footer_skip_rows, verb,
                              on_error, path)
         except duckdb.Error as exc:
-            # UTF-8 held at the probed ends and broke in the middle: read it all as Latin-1.
-            if encoding != UTF8 or "unicode" not in str(exc).lower():
+            # UTF-8 held at the probed ends and broke in the middle: transcode the whole file.
+            if source != path or "unicode" not in str(exc).lower():
                 raise
-            read_expr = read_expr[:-1] + f", encoding='{LATIN1}')"
-            notes.append(_latin1_note(path))
+            copy, used = to_utf8(path, CP1252)
+            copies.append(copy)
+            notes.append(_encoding_note(path, used))
+            read_expr = read_expr.replace(_sql_path(path), _sql_path(copy), 1)
+            source = copy
             coercion = _load(con, read_expr, dataset_name, dtypes, footer_skip_rows, verb,
                              on_error, path)
+        ambiguous = _two_digit_year_dates(con, dataset_name, read_expr)
+        huge = _huge_integer_columns(con, dataset_name, read_expr)
+        if ambiguous or huge:
+            types = ", ".join([f"'{c}': 'VARCHAR'" for c in ambiguous]
+                              + [f"'{c}': 'HUGEINT'" for c in huge])
+            read_expr = read_expr[:-1] + f", types={{{types}}})"
+            coercion = _load(con, read_expr, dataset_name, dtypes, footer_skip_rows,
+                             "CREATE OR REPLACE TABLE", on_error, path)
+        if ambiguous:
+            notes.append(f"{', '.join(ambiguous)} write{'s' if len(ambiguous) == 1 else ''} "
+                         f"dates with a two-digit year (31/12/24), which the reader took as "
+                         f"YEAR first (2031-12-24). Kept as text; propose_cleaning_plan offers "
+                         f"the day-first or month-first reading the values support.")
+        if huge:
+            notes.append(f"{', '.join(huge)} hold{'s' if len(huge) == 1 else ''} whole numbers "
+                         f"beyond 2^53, which a floating-point column cannot keep exactly; read as "
+                         f"HUGEINT so every digit is kept.")
     except duckdb.Error as exc:
-        raise LoadRefused(_duck_refusal(path, exc)) from exc
+        raise LoadRefused(_duck_refusal(path, exc, source)) from exc
+
+    dropped = _drop_trailing_empty(con, dataset_name)
+    if dropped:
+        notes.append(f"Every line ends with a delimiter, so the file has {len(dropped)} empty "
+                     f"column(s) at the end with no name ({', '.join(dropped)}); dropped.")
+    notes += db.utc_note(db.utc_timestamps(con, dataset_name))
 
     rows, cols = db.table_shape(con, dataset_name)
     columns = [
@@ -441,13 +586,81 @@ def load_csv(
     )
 
 
-def _latin1_note(path: Path) -> str:
-    return (f"{path.name} is not UTF-8, so it was read as Latin-1 (Western European). If "
-            f"accented letters look wrong, the file uses another encoding: save it as UTF-8 and "
-            f"upload it again.")
+_ENCODING_NAMES = {UTF16: "UTF-16", CP1252: "Windows-1252 (Western European)",
+                   LATIN1: "Latin-1 (Western European)"}
 
 
-def _duck_refusal(path: Path, exc: Exception) -> str:
+_AUTO_NAME = re.compile(r"^column_?\d+$")
+_EXACT_DOUBLE = 2 ** 53
+
+
+def _two_digit_year_dates(con, table: str, read_expr: str) -> list[str]:
+    """DATE or TIMESTAMP columns whose text has a two-digit year.
+
+    DuckDB's sniffer reads '31/12/24' as %y/%m/%d, 2031-12-24 -- a valid date, loaded in silence,
+    every one wrong (measured, P14-D60). A two-digit year comes last in the day-first and
+    month-first conventions that write one, so such a column is kept as text for cleaning to read.
+    """
+    dated = [r[0] for r in con.execute(
+        "SELECT column_name FROM information_schema.columns WHERE table_schema = 'main' "
+        "AND table_name = ? AND data_type IN ('DATE', 'TIMESTAMP')", [table]).fetchall()]
+    if not dated:
+        return []
+    text = read_expr[:-1] + ", all_varchar=true)"
+    hits = con.execute("SELECT " + ", ".join(
+        f"count(*) FILTER (WHERE regexp_full_match(trim({_q(c)}), "
+        f"'\\d{{1,2}}[/.-]\\d{{1,2}}[/.-]\\d{{2}}([ T].*)?'))" for c in dated)
+        + f" FROM {text}").fetchone()
+    return [c for c, n in zip(dated, hits) if n]
+
+
+def _huge_integer_columns(con, table: str, read_expr: str) -> list[str]:
+    """DOUBLE columns reaching 2^53 whose text is whole numbers: DuckDB's sniffer offers no
+    HUGEINT ("not accepted as a valid input", measured), so 10**19 + 7 loaded as 1e19 and a sum
+    was off by 34,650 (P14-D57). One aggregate per load; the text is read only on a hit."""
+    doubles = [r[0] for r in con.execute(
+        "SELECT column_name FROM information_schema.columns WHERE table_schema = 'main' "
+        "AND table_name = ? AND data_type = 'DOUBLE'", [table]).fetchall()]
+    if not doubles:
+        return []
+    big = con.execute("SELECT " + ", ".join(
+        f"coalesce(max(abs({_q(c)})) >= {_EXACT_DOUBLE}, false)" for c in doubles)
+        + f" FROM {_q(table)}").fetchone()
+    hits = [c for c, b in zip(doubles, big) if b]
+    if not hits:
+        return []
+    text = read_expr[:-1] + ", all_varchar=true)"
+    whole = con.execute("SELECT " + ", ".join(
+        f"count(*) FILTER (WHERE {_q(c)} IS NOT NULL "
+        f"AND NOT regexp_full_match(trim({_q(c)}), '[-+]?[0-9]+'))" for c in hits)
+        + f" FROM {text}").fetchone()
+    return [c for c, n in zip(hits, whole) if n == 0]
+
+
+def _drop_trailing_empty(con, table: str) -> list[str]:
+    """Drop columns at the END that had no header name and hold no value: what a delimiter at
+    the end of every line makes (P14-D56). A named empty column is kept -- it may be the one
+    that matters and the feed is broken -- as is an unnamed one with any value in it."""
+    cols = [r[0] for r in con.execute(
+        "SELECT column_name FROM information_schema.columns WHERE table_schema = 'main' "
+        "AND table_name = ? ORDER BY ordinal_position", [table]).fetchall()]
+    dropped = []
+    while len(cols) > 1 and _AUTO_NAME.match(cols[-1]):
+        filled = con.execute(f"SELECT count({_q(cols[-1])}) FROM {_q(table)}").fetchone()[0]
+        if filled:
+            break
+        con.execute(f"ALTER TABLE {_q(table)} DROP COLUMN {_q(cols[-1])}")
+        dropped.append(cols.pop())
+    return list(reversed(dropped))
+
+
+def _encoding_note(path: Path, encoding: str) -> str:
+    return (f"{path.name} is not UTF-8, so it was read as {_ENCODING_NAMES[encoding]}. If "
+            f"letters look wrong, the file uses another encoding: save it as UTF-8 and upload "
+            f"it again.")
+
+
+def _duck_refusal(path: Path, exc: Exception, source: Path | None = None) -> str:
     """DuckDB's reason, without the server's paths or the SQL it was running.
 
     Its message names the file's absolute path and echoes the query ('LINE 1: SELECT * FROM
@@ -461,7 +674,9 @@ def _duck_refusal(path: Path, exc: Exception) -> str:
             break
         if stripped:
             kept.append(stripped)
-    reason = " ".join(kept).replace(str(path.resolve()), path.name).replace(str(path), path.name)
+    reason = " ".join(kept)
+    for p in {path, path.resolve(), *((source, Path(source).resolve()) if source else ())}:
+        reason = reason.replace(str(p), path.name)
     return (
         f"BLOCKED: DuckDB could not read {path.name}.\n"
         f"DuckDB said: {reason}\n"

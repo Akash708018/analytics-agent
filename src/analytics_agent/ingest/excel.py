@@ -291,6 +291,10 @@ def load_excel(
             )
         ws = wb[sheet] if sheet else wb.active
         stream = ws.iter_rows(values_only=True)
+        # What the sheet SHOWS: a merged cell's value in every cell of the merge, and an error
+        # cell (#DIV/0!, #N/A) as no value (P14-D58). Both counted into the load's notes.
+        filled, errors = [0], {}
+        stream = _as_displayed(stream, _merge_boxes(path, ws.title), filled, errors)
 
         header: list[str] = []
         for _ in range(header_rows):
@@ -305,7 +309,8 @@ def load_excel(
         # Blank rows inside the data are skipped, not loaded as rows of NULLs (P14-O8, B6). After
         # the footer is trimmed, because footer_skip_rows counts the blank rows in a footer.
         blanks = [0]
-        data = _apply_na_rows(_skip_blank(_trim_footer(stream, footer_skip_rows), blanks),
+        kept: list[int] = []  # the sheet-relative position of every row that is emitted
+        data = _apply_na_rows(_skip_blank(_trim_footer(stream, footer_skip_rows), blanks, kept),
                               na_tokens)
 
         # Buffer enough rows to infer types before creating the table.
@@ -390,13 +395,16 @@ def load_excel(
         fd, tmp_path = _tempfile.mkstemp(suffix=".csv", prefix="agent_xl_")
         _os.close(fd)
         total = 0
-        row_no = header_rows
+        emitted = 0
 
         try:
             with open(tmp_path, "w", newline="", encoding="utf-8") as tmp:
                 writer = _csv.writer(tmp)
                 for row in _chain(sample, data):
-                    row_no += 1
+                    # The sheet's own row number, blank rows above included (P14-D49): counting
+                    # emitted rows named the wrong row once any blank one had been skipped.
+                    row_no = header_rows + kept[emitted] + 1
+                    emitted += 1
                     padded = list(row[:n_cols]) + [None] * (n_cols - len(row))
                     out = []
                     for i, (value, dtype) in enumerate(zip(padded, types)):
@@ -441,6 +449,7 @@ def load_excel(
     finally:
         wb.close()
 
+    utc = db.utc_timestamps(con, dataset_name)
     rows, cols = db.table_shape(con, dataset_name)
     result_columns = [
         (r[0], r[1])
@@ -474,16 +483,65 @@ def load_excel(
         gate_message=gate.message,
         coercion_failures=coercion,
         notes=([f"{blanks[0]:,} blank row(s) inside the data were skipped: a row with no "
-                f"value in any column is a gap in the sheet, not a record."] if blanks[0] else []),
+                f"value in any column is a gap in the sheet, not a record."] if blanks[0] else [])
+        + ([f"{filled[0]:,} cell(s) inside merged ranges took their merge's value, as the "
+            f"sheet displays them."] if filled[0] else [])
+        + ([f"{sum(errors.values()):,} cell(s) held an Excel error ("
+            + ", ".join(f"{k} x{v}" for k, v in sorted(errors.items()))
+            + ") and load as empty: an error is a formula that failed, not a value."]
+           if errors else [])
+        + db.utc_note(utc),
     )
 
 
-def _skip_blank(stream, counter: list[int]):
-    """Every row that holds at least one value; counter[0] counts the ones that held none."""
-    for row in stream:
+EXCEL_ERRORS = frozenset({"#NULL!", "#DIV/0!", "#VALUE!", "#REF!", "#NAME?", "#NUM!", "#N/A",
+                          "#GETTING_DATA", "#SPILL!", "#CALC!"})
+
+
+def _merge_boxes(path, sheet: str) -> list[tuple[int, int, int, int]]:
+    """(min_row, min_col, max_row, max_col), 1-based, of every merge spanning more than one row."""
+    from openpyxl.utils.cell import range_boundaries
+
+    from . import merges
+    boxes = []
+    for ref in merges.merged_ranges(str(path), sheet):
+        c1, r1, c2, r2 = range_boundaries(ref)
+        if r2 > r1:
+            boxes.append((r1, c1, r2, c2))
+    return boxes
+
+
+def _as_displayed(stream, boxes, filled: list[int], errors: dict[str, int]):
+    """Rows as the sheet displays them: a vertical merge's value repeated down it, and error
+    cells as None. `stream` is the sheet from row 1, so the row number is the position + 1."""
+    anchors: dict[tuple[int, int], object] = {}
+    for r, row in enumerate(stream, start=1):
+        row = list(row)
+        for i, v in enumerate(row):
+            if isinstance(v, str) and v.strip() in EXCEL_ERRORS:
+                errors[v.strip()] = errors.get(v.strip(), 0) + 1
+                row[i] = None
+        for r1, c1, r2, c2 in boxes:
+            if r1 <= r <= r2:
+                for c in range(c1, c2 + 1):
+                    if r == r1:
+                        anchors[(r1, c)] = row[c - 1] if c - 1 < len(row) else None
+                    elif c - 1 < len(row) and row[c - 1] is None and \
+                            anchors.get((r1, c)) is not None:
+                        row[c - 1] = anchors[(r1, c)]
+                        filled[0] += 1
+        yield tuple(row)
+
+
+def _skip_blank(stream, counter: list[int], kept: list[int] | None = None):
+    """Every row that holds at least one value; counter[0] counts the ones that held none, and
+    `kept` receives the position of each row yielded, so an error can name its sheet row."""
+    for position, row in enumerate(stream):
         if all(v is None or (isinstance(v, str) and not v.strip()) for v in row):
             counter[0] += 1
             continue
+        if kept is not None:
+            kept.append(position)
         yield row
 
 

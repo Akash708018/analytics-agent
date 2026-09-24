@@ -24,6 +24,7 @@ import re
 import secrets
 import threading
 import time
+import unicodedata
 from collections import defaultdict
 from contextlib import contextmanager
 from pathlib import Path
@@ -199,8 +200,18 @@ class RealBackend:
                       postgres_max_rows=ROW_REFUSE,
                       description=describe_size_gates())
 
-    def save_upload(self, workspace_id: str, filename: str, data: bytes) -> UploadResult:
+    @staticmethod
+    def safe_name(filename: str) -> str:
+        """The upload's base name with accents folded and anything else unsafe replaced:
+        'Ventes 2024 (été).csv' -> 'Ventes 2024 _ete.csv'. It used to be refused (P14-D64)."""
         name = Path(filename).name
+        folded = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode()
+        stem, dot, ext = folded.rpartition(".")
+        stem = re.sub(r"[^A-Za-z0-9._ -]", "_", stem if dot else folded).strip(" ._") or "upload"
+        return f"{stem[:110]}.{ext.lower()}" if dot else stem[:120]
+
+    def save_upload(self, workspace_id: str, filename: str, data: bytes) -> UploadResult:
+        name = self.safe_name(filename)
         if not _SAFE_NAME.match(name) or not name.lower().endswith(_ALLOWED):
             r = refusal_from_text(
                 f"BLOCKED: {name!r} is not a CSV or .xlsx file name this server will store.\n"

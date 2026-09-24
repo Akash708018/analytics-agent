@@ -182,16 +182,31 @@ def draft_for_path(
         return Draft(spec, guess, pivot, "excel", chosen, sheets)
 
     lines = csv_loader.preview_lines(p, n=CSV_PREVIEW_LINES)
-    rows = preview.parse_csv_preview(lines)
+    # Lines starting with '#' above everything else are comments ('# exported by ...'): the
+    # header is the first line after them, not a question to ask (P14-D54).
+    comments = next((i for i, ln in enumerate(lines) if not ln.lstrip().startswith("#")),
+                    len(lines))
+    comment_note = None
+    if comments and header_rows is None and comments < len(lines):
+        header_rows = [comments + 1]
+        comment_note = (f"The first {comments} line(s) begin with '#', so they are comments; "
+                        f"line {comments + 1} is the header.")
+    rows = preview.parse_csv_preview(lines[comments:] if comments else lines)
+    rows = [[] for _ in range(comments)] + rows
     # The tail is parsed with the head's delimiter: twenty lines of totals and notes are too
     # few to sniff one from.
     delimiter = preview.sniff_delimiter(lines)
-    tail = preview.parse_csv_preview(csv_loader.tail_lines(p, TAIL_ROWS), delimiter=delimiter)
+    tail = [r for r in preview.parse_csv_preview(csv_loader.tail_lines(p, TAIL_ROWS),
+                                                 delimiter=delimiter)
+            if any(str(v).strip() for v in r)][-TAIL_ROWS:]
     spec, guess, pivot = preview.draft_spec(
         rows, path=str(p), source_type="csv", dataset_name=name,
         header_rows=header_rows, header_join=header_join,
         authorised_fill=authorised_fill, tail_rows=tail,
     )
+    if spec is not None and comment_note:
+        spec.assumptions = [comment_note] + [
+            a for a in spec.assumptions if not a.startswith("header_rows was given")]
     return Draft(spec, guess, pivot, "csv", None, [])
 
 

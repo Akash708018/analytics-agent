@@ -169,7 +169,8 @@ def test_b7_a_latin1_csv_loads_with_its_text_intact(be, ws):
     _, r = _load(be, ws, "latin1_encoding")
     regions = {v for (v,) in _q(ws, "SELECT DISTINCT region FROM latin1")}
     assert {"Sünd", "Nörd"} <= regions
-    assert "Latin-1" in r.message
+    # Its letters are the same bytes in Windows-1252, which is sniffed first (P14-D47).
+    assert "not UTF-8" in r.message
 
 
 def test_b7_a_load_failure_never_shows_the_servers_path(be, ws):
@@ -255,3 +256,219 @@ def test_b14_one_row_is_not_every_column_constant(be, ws):
     d, _ = _load(be, ws, "one_row")
     roles = {c.name: c.suggested_role for c in be.draft_contract(ws, d.dataset_name).columns}
     assert roles["revenue"] == "measure" and roles["region"] == "dimension", roles
+
+
+# --- Step 8, part A: what remained after Step 7 --------------------------------------------------
+
+def _csv(be, ws, name, text, encoding="utf-8"):
+    return be.save_upload(ws, name, text.encode(encoding)).path
+
+
+def test_r1_a_windows_1252_csv_keeps_its_euro_signs_and_curly_quotes(be, ws):
+    path = _csv(be, ws, "cp.csv", "item,price\n€ voucher,5\n“Quoted” name – dash,7\n", "cp1252")
+    d = be.draft_ingest(ws, path)
+    r = be.confirm_ingest(ws, d.spec)
+    assert r.ok, r.refusal and r.refusal.text
+    items = {v for (v,) in _q(ws, "SELECT item FROM cp")}
+    assert items == {"€ voucher", "“Quoted” name – dash"}
+    assert "Windows-1252" in r.message
+
+
+def test_r1_a_utf16_csv_loads(be, ws):
+    path = _csv(be, ws, "u16.csv", "item\tqty\nSüd\t3\n北部\t4\n", "utf-16")
+    d = be.draft_ingest(ws, path)
+    r = be.confirm_ingest(ws, d.spec)
+    assert r.ok, r.refusal and r.refusal.text
+    assert _q(ws, "SELECT sum(qty) FROM u16")[0][0] == 7
+    assert {v for (v,) in _q(ws, "SELECT item FROM u16")} == {"Süd", "北部"}
+
+
+def test_r2_a_full_last_row_labelled_total_is_data_not_a_footer(be, ws):
+    rows = "".join(f"{r},2024-01-0{i + 1},{i + 1}\n" for i, r in enumerate(["North", "South", "Total"]))
+    path = _csv(be, ws, "cats.csv", "region,day,units\n" + rows)
+    d = be.draft_ingest(ws, path)
+    assert d.footer_skip_rows == 0
+    assert be.confirm_ingest(ws, d.spec).ok
+    assert _q(ws, "SELECT count(*) FROM cats")[0][0] == 3
+
+
+def test_r3_an_excel_error_names_the_sheet_row_after_blank_rows(tmp_path):
+    import duckdb
+    from analytics_agent.ingest.csv_loader import LoadRefused
+    from analytics_agent.ingest.excel import load_excel
+    path = tmp_path / "rows.xlsx"
+    path.write_bytes(sm.to_xlsx([("S", [["id", "n"], ["a", 1], ["b", 2], [None, None],
+                                        [None, None], ["c", "oops"]])]))
+    con = duckdb.connect()
+    with pytest.raises(LoadRefused) as exc:
+        load_excel(con, path, "rows", inference_rows=2)
+    assert "row 6 of rows.xlsx" in str(exc.value), str(exc.value)
+
+
+def test_r4_a_column_that_reads_both_ways_is_offered_both_readings_and_neither_suggested(be, ws):
+    vals = ["1,234", "2,500", "3,750", "1,000", "12,345"] * 10
+    path = _csv(be, ws, "amb.csv", "id,amount\n" + "".join(f"{i},\"{v}\"\n" for i, v in enumerate(vals)))
+    d = be.draft_ingest(ws, path)
+    assert be.confirm_ingest(ws, d.spec).ok
+    steps = [s for s in be.propose_cleaning(ws, "amb").steps if s.column == "amount"]
+    assert len(steps) == 2 and not any(s.suggested for s in steps), steps
+    both = be.apply_cleaning(ws, "amb", [s.action_id for s in steps])
+    assert not both.ok and both.refusal.reason == "ACTIONS_CONFLICT"
+    thousands = next(s for s in steps if "thousands" in s.intent)
+    assert be.apply_cleaning(ws, "amb", [thousands.action_id]).ok
+    assert _q(ws, "SELECT sum(amount) FROM amb")[0][0] == sum(
+        int(v.replace(",", "")) for v in vals)
+
+
+def test_r5_the_tail_probe_starting_inside_a_quoted_field_still_finds_the_footer(tmp_path):
+    from analytics_agent.ingest import csv_loader, draft
+    body = "id,note,amount\n" + "".join(
+        f'{i},"line one of {i}\n' + "x" * 300 + f'\nline three",{i}\n' for i in range(400))
+    path = tmp_path / "multi.csv"
+    path.write_text(body + "Total,,79800\n", encoding="utf-8")
+    assert path.stat().st_size > csv_loader.PROBE_BYTES
+    d = draft.draft_for_path(path)
+    assert d.spec.footer_skip_rows == 1, d.spec.assumptions
+
+
+def test_r6_a_float_columns_range_is_over_its_finite_values(infinite):
+    out = server.profile_dataset(dataset_name="sci", workspace_id=infinite)
+    line = next(ln for ln in out.splitlines() if "reading (DOUBLE)" in ln)
+    assert "range -7 to 100000" in line.replace(".0", ""), line
+    assert "nan" not in line and "inf" not in line
+
+
+# --- Step 8, round 2 of the matrix: new anomalies ------------------------------------------------
+
+R2 = {c.name: c for c in sm.cases_round2()}
+
+
+def _load2(be, ws, name, **draft_args):
+    c = R2[name]
+    d = be.draft_ingest(ws, be.save_upload(ws, c.filename, c.data).path, **draft_args)
+    assert d.refusal is None and not d.unresolved, (d.refusal and d.refusal.text, d.unresolved)
+    r = be.confirm_ingest(ws, d.spec)
+    assert r.ok, r.refusal and r.refusal.text
+    return d, r
+
+
+def test_r2_timestamps_with_an_offset_load_as_utc_and_describe_answers(be, ws):
+    d, r = _load2(be, ws, "timestamps_with_offsets")
+    assert _q(ws, "SELECT any_value(typeof(order_date)) FROM tz")[0][0] == "TIMESTAMP"
+    assert "UTC" in r.message
+    out = server.describe_dataset(dataset_name="tz", workspace_id=ws)
+    assert not out.startswith("BLOCKED") and "order_date" in out
+
+
+def test_r2_rows_short_of_fields_are_padded_not_refused(be, ws):
+    _, r = _load2(be, ws, "ragged_rows")
+    t = R2["ragged_rows"].truth
+    assert _q(ws, "SELECT count(*), sum(units) FROM ragged")[0] == (t.rows, t.sums["units"])
+    assert "fewer fields" in r.message
+
+
+def test_r2_a_trailing_delimiter_adds_no_column(be, ws):
+    _, r = _load2(be, ws, "trailing_delimiter")
+    assert len(_q(ws, "DESCRIBE \"trailing\"")) == 9
+    assert "ends with a delimiter" in r.message
+
+
+def test_r2_accounting_negatives_convert_to_negative_numbers(be, ws):
+    _load2(be, ws, "accounting_negatives")
+    step = _steps(be, ws, "accounting").get(("CONVERT_TYPE", "revenue"))
+    assert step is not None and not step.lossy and step.suggested
+    assert be.apply_cleaning(ws, "accounting", [step.action_id]).ok
+    want = R2["accounting_negatives"].truth.sums["revenue"]
+    assert round(float(_q(ws, "SELECT sum(revenue) FROM accounting")[0][0]), 2) == want
+
+
+def test_r2_excel_error_cells_load_empty_and_are_counted(be, ws):
+    _, r = _load2(be, ws, "xlsx_error_cells")
+    want = R2["xlsx_error_cells"].truth.sums["revenue"]
+    typ, total = _q(ws, "SELECT any_value(typeof(revenue)), sum(revenue) FROM errors")[0]
+    assert typ == "DOUBLE" and round(total, 2) == want
+    assert "Excel error" in r.message and "#DIV/0!" in r.message
+
+
+def test_r2_a_vertical_merge_fills_every_row_it_covers(be, ws):
+    _, r = _load2(be, ws, "xlsx_vertically_merged_cells")
+    assert _q(ws, "SELECT count(*) FROM vmerge WHERE region IS NULL")[0][0] == 0
+    assert "merged ranges" in r.message
+
+
+def test_r2_comment_lines_are_comments_and_mixed_line_endings_load(be, ws):
+    d, r = _load2(be, ws, "comment_lines_above_header")
+    assert d.header_rows == [3] and any("comments" in a for a in d.assumptions)
+    assert _q(ws, "SELECT count(*) FROM commented")[0][0] == 140
+
+
+def test_r2_mixed_line_endings_load(be, ws):
+    _, r = _load2(be, ws, "mixed_line_endings")
+    assert _q(ws, "SELECT count(*) FROM mixed_eol")[0][0] == 150
+    assert "CRLF" in r.message
+
+
+def test_r2_a_header_of_years_is_a_header(be, ws):
+    d, _ = _load2(be, ws, "years_as_columns")
+    assert d.header_rows == [1]
+    assert _q(ws, "SELECT count(*) FROM \"pivot\"")[0][0] == 4
+
+
+def test_r2_integers_beyond_bigint_keep_every_digit(be, ws):
+    _, r = _load2(be, ws, "integers_beyond_int64")
+    typ, total = _q(ws, "SELECT any_value(typeof(amount)), sum(amount) FROM huge")[0]
+    assert typ == "HUGEINT" and total == R2["integers_beyond_int64"].truth.sums["amount"]
+    assert "HUGEINT" in r.message
+
+
+# --- Step 8, round 3 ---------------------------------------------------------------------------
+
+R3 = {c.name: c for c in sm.cases_round3()}
+
+
+def _load3(be, ws, name):
+    c = R3[name]
+    d = be.draft_ingest(ws, be.save_upload(ws, c.filename, c.data).path)
+    assert d.refusal is None and not d.unresolved, (d.refusal and d.refusal.text, d.unresolved)
+    r = be.confirm_ingest(ws, d.spec)
+    assert r.ok, r.refusal and r.refusal.text
+    return d, r
+
+
+def test_r3_two_digit_years_are_not_read_year_first(be, ws):
+    """DuckDB read 31/12/24 as 2031-12-24 and the column loaded as a valid DATE, all wrong."""
+    _, r = _load3(be, ws, "two_digit_years")
+    assert _q(ws, "SELECT any_value(typeof(order_date)) FROM yy")[0][0] == "VARCHAR"
+    assert "two-digit year" in r.message
+    step = _steps(be, ws, "yy").get(("CONVERT_TYPE", "order_date"))
+    assert step is not None and step.suggested and "day first" in step.intent
+    assert be.apply_cleaning(ws, "yy", [step.action_id]).ok
+    lo, hi = _q(ws, "SELECT min(order_date)::VARCHAR, max(order_date)::VARCHAR FROM yy")[0]
+    assert (lo, hi) == R3["two_digit_years"].truth.date_range
+
+
+def test_r3_a_header_cell_holding_a_line_break_loads(be, ws):
+    _load3(be, ws, "header_cells_with_newlines")
+    assert _q(ws, "SELECT count(*) FROM nlheader")[0][0] == 120
+
+
+def test_r3_an_accented_file_name_is_made_safe_not_refused(be, ws):
+    up = be.save_upload(ws, "Ventes 2024 (été).csv", b"a,b\n1,2\n")
+    assert up.verdict == "OK" and up.path.endswith("Ventes 2024 _ete.csv")
+
+
+def test_r3_sap_trailing_minus_reads_as_negative(be, ws):
+    _load3(be, ws, "trailing_minus_numbers")
+    step = _steps(be, ws, "sap").get(("CONVERT_TYPE", "revenue"))
+    assert step is not None and not step.lossy and step.suggested
+    assert be.apply_cleaning(ws, "sap", [step.action_id]).ok
+    want = R3["trailing_minus_numbers"].truth.sums["revenue"]
+    assert round(float(_q(ws, "SELECT sum(revenue) FROM sap")[0][0]), 2) == want
+
+
+def test_r3_mysql_zero_dates_are_absent_not_lost(be, ws):
+    _load3(be, ws, "mysql_zero_dates")
+    step = _steps(be, ws, "zerodates").get(("CONVERT_TYPE", "order_date"))
+    assert step is not None and not step.lossy and step.suggested
+    assert be.apply_cleaning(ws, "zerodates", [step.action_id]).ok
+    assert _q(ws, "SELECT count(*) FROM zerodates WHERE order_date IS NULL")[0][0] == 10
