@@ -32,6 +32,12 @@ def _turn(turn: ChatTurn) -> None:
                    "model key -- the same engine, the same contract.")
     if turn.reply:
         st.markdown(turn.reply)
+    if turn.verification:
+        # Every figure looked for in the tool replies (webapp/verify.py); a miss is not hidden.
+        if turn.verified:
+            st.caption(f":material/check_circle: {turn.verification}")
+        else:
+            st.warning(turn.verification, icon=":material/rule:")
     for art in turn.artifacts:
         _artifact(art)
     if turn.tool_calls:

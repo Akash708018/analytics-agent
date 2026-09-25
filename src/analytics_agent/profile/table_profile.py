@@ -748,7 +748,9 @@ def _duplicate_rows(
 def _breakdown(con, dataset_name: str, name: str, listed: str) -> dict[str, int]:
     col = _q(name)
     rows = con.execute(
-        f"SELECT upper(trim({col})) AS token, count(*) "
+        # Named as written, not as the vocabulary spells it: 6,833 'n/a' were reported as
+        # 'N/A x6,833', a value the column does not hold (recheck, 25/09/2026).
+        f"SELECT trim({col}) AS token, count(*) "
         f"FROM {_q(dataset_name)} "
         f"WHERE upper(trim({col})) IN ({listed}) "
         f"GROUP BY 1 ORDER BY 2 DESC, 1"

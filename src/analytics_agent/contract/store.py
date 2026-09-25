@@ -113,6 +113,7 @@ _TRACKED = (
     "known_exclusions",
     "expectations",
     "caveats",
+    "measured_caveats",
     "bound_to",
     "missing_values",
     "excluded_columns",

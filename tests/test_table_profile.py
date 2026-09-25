@@ -705,3 +705,11 @@ def test_a_code_that_parses_as_a_number_says_its_leading_zeros(coded):
 def test_numbers_behind_a_currency_sign_are_named(coded):
     s = profile_table(coded, "coded").column("list_price").sentence()
     assert "read as numbers once the currency sign and thousands separators are removed" in s
+
+
+def test_the_breakdown_names_a_token_as_the_column_writes_it():
+    """Retail rating (recheck, 25/09/2026): 6,833 'n/a' reported as 'N/A x6,833'."""
+    import duckdb as _duckdb
+    c = _duckdb.connect(":memory:")
+    c.execute("CREATE TABLE r AS SELECT * FROM (VALUES ('4'),('n/a'),('n/a'),('N/A')) t(rating)")
+    assert profile_table(c, "r").column("rating").missing_token_breakdown == {"n/a": 2, "N/A": 1}

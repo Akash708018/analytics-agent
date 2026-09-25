@@ -5,8 +5,14 @@ to Claude Desktop. Phases 1-13 done, then Cleanup Steps 4-16; Phase 14
 (Track B) in progress, Steps 1-14 done; Phase 15 (web cleaning + helper columns) planned, not
 started (UI in ui/, on the fake backend or the engine with
 ANALYTICS_UI_BACKEND=real;
-`uv run --group ui streamlit run ui/app.py`; its 50 tests: `uv run --group ui pytest ui/tests`;
+`uv run --group ui streamlit run ui/app.py`; its 53 tests: `uv run --group ui pytest ui/tests`;
 the behaviour matrix: `uv run python scripts/scenario_matrix.py` (30 checks);
+the contract-suggestion bench: `uv run python scripts/suggest_bench.py` (docs/steps/engine_suggested_contract.md;
+`--llm` fills with the live model, `--replay` re-grades a saved run); the model-filled contract (web
+app only, ANALYTICS_AUTOFILL; docs/steps/model_filled_contract.md) and how the model has chosen:
+`uv run python scripts/autofill_report.py`; the marketing bench: `uv run python
+scripts/marketing_bench.py` (docs/steps/marketing_bench.md) and its second round
+`scripts/marketing_bench_v2.py` (docs/steps/marketing_bench_v2.md);
 the benchmark: `uv run python scripts/benchmark.py` (1,932 ground-truth checks at 1k/100k/1M rows;
 its 14 negatives, P14-O13 to O26, closed at Step 12: 12 fixed, 2 by decision;
 the cross-domain benchmark: `uv run python scripts/domain_benchmark/run.py` (hours; checkpointed,
@@ -41,7 +47,7 @@ Steps 8-16 into Phase 14 Step 14; phases 8-10 at Step 4 (21/09) -- they need the
 `olist` source, and without it their Olist clauses skip (55/0/3, 0/0/1, 0/0/1 in a container
 lacking it):
 
-    uv run pytest -q                      # 2105 passed
+    uv run pytest -q                      # 2168 passed, 1 skipped (25/09/2026)
     uv run python tests/test_phase8.py    # 99 passed, 0 failed, 2 skipped
     uv run python tests/test_phase9.py    # 19 passed, 0 failed, 0 skipped
     uv run python tests/test_phase10.py   # 35 passed, 0 failed, 1 skipped

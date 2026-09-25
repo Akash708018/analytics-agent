@@ -20,7 +20,7 @@ from pathlib import Path
 from typing import Any
 
 from analytics_agent.config import DEFAULT_WORKSPACE_ID, validate_workspace_id
-from analytics_agent.contract import ContractRefused, store
+from analytics_agent.contract import ContractRefused, measured_caveats, store
 from analytics_agent.contract.dataset_contract import (
     DatasetContract,
     Exclusion,
@@ -270,6 +270,12 @@ def confirm(
         contract = contract_from_json(contract_json)
     except ValueError as exc:
         return str(exc)
+    # The engine's counts are the engine's: taken again from the table, never from the payload
+    # (a model could edit them in transit, or the table could have changed since the proposal).
+    if con.execute("SELECT count(*) FROM information_schema.tables WHERE table_name = ?",
+                   [contract.dataset_name]).fetchone()[0]:
+        contract.measured_caveats = measured_caveats.for_table(
+            con, contract.dataset_name, contract.date_column)
 
     try:
         previous = store.current(con, contract.dataset_name)

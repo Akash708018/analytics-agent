@@ -296,3 +296,29 @@ def test_a_currency_column_is_offered_with_the_symbols_removed(coded):
     coded.execute(price.sql)   # the statement a person approves, run as they would approve it
     got = [float(r[0]) for r in coded.execute("SELECT list_price FROM coded").fetchall()]
     assert got == [1234.0, 990.0, 10846.5, 58.0]
+
+
+def test_a_date_column_in_two_formats_is_read_by_both():
+    """Retail C004 (recheck, 25/09/2026): delivery_date was 98.1% yyyy-mm-dd and 3,030 dd/mm/yyyy,
+    and the plan offered the plain DATE cast discarding all 3,030 -- while the formats reading,
+    never tried once the cast passed its share, reads every one of them."""
+    c = duckdb.connect(":memory:")
+    iso = ", ".join(f"('2024-01-{d:02d}')" for d in range(1, 31))
+    c.execute(f"CREATE TABLE d AS SELECT * FROM (VALUES {iso}, ('25/12/2024'), ('01/12/2024')) "
+              f"t(delivered)")
+    acts = detect.detect(c, source="d", target="d", missing_tokens=[])
+    conv = [a for a in acts if a.kind is ActionKind.CONVERT_TYPE and a.column == "delivered"]
+    assert len(conv) == 1 and "date formats" in conv[0].intent and "day first" in conv[0].intent
+    assert conv[0].values_lost == 0
+    c.execute(conv[0].sql)
+    got = {str(r[0]) for r in c.execute("SELECT delivered FROM d").fetchall()}
+    assert {"2024-12-25", "2024-12-01", "2024-01-30"} <= got and None not in got
+
+
+def test_a_date_column_the_cast_reads_whole_keeps_the_cast():
+    c = duckdb.connect(":memory:")
+    iso = ", ".join(f"('2024-01-{d:02d}')" for d in range(1, 31))
+    c.execute(f"CREATE TABLE d AS SELECT * FROM (VALUES {iso}) t(delivered)")
+    acts = detect.detect(c, source="d", target="d", missing_tokens=[])
+    conv = [a for a in acts if a.kind is ActionKind.CONVERT_TYPE and a.column == "delivered"]
+    assert len(conv) == 1 and conv[0].intent == "read delivered as DATE"

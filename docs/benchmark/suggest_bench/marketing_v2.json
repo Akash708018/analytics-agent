@@ -1,0 +1,1589 @@
+{
+ "summary": {
+  "measures": 24,
+  "by_strength": {
+   "strong": {
+    "count": 14,
+    "right": 14,
+    "wrong": 0,
+    "abstained": 0
+   },
+   "likely": {
+    "count": 10,
+    "right": 10,
+    "wrong": 0,
+    "abstained": 0
+   },
+   "unsure": {
+    "count": 0,
+    "right": 0,
+    "wrong": 0,
+    "abstained": 0
+   }
+  },
+  "strong_precision": 1.0,
+  "likely_precision": 1.0,
+  "strong_coverage": 0.5833333333333334,
+  "wrong_strong": [],
+  "caveat_recall": 1.0,
+  "caveats_missed": [],
+  "caveats_unexpected": {
+   "crm_funnel": [
+    "mql_at is blank in 1,334 row(s) (33.4%) -- exactly the rows where is_mql = 0.",
+    "sql_at is blank in 2,000 row(s) (50.0%) -- exactly the rows where is_sql = 0.",
+    "won_at and days_to_close are blank in the same 3,201 row(s) (80.0%) -- exactly the rows where is_won = 0."
+   ]
+  },
+  "caveat_lines": 10,
+  "caveat_lines_held": 10,
+  "caveat_lines_refuted": [],
+  "false_alarms_on_clean": 0
+ },
+ "cases": [
+  {
+   "case": "crm_funnel",
+   "rows": 4000,
+   "seconds": 0.37,
+   "suggestions": [
+    {
+     "measure": "deal_amount",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "lead_score",
+     "agg": "none",
+     "per": [],
+     "strength": "strong",
+     "rule": "N2",
+     "right": true,
+     "accept": [
+      "mean",
+      "median",
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "days_to_close",
+     "agg": "mean",
+     "per": [],
+     "strength": "likely",
+     "rule": "D1",
+     "right": true,
+     "accept": [
+      "mean",
+      "median",
+      "none"
+     ],
+     "label_per": []
+    }
+   ],
+   "caveats_expected": 3,
+   "caveats_found": 3,
+   "caveats_missed": [],
+   "caveats_unexpected": [
+    "mql_at is blank in 1,334 row(s) (33.4%) -- exactly the rows where is_mql = 0.",
+    "sql_at is blank in 2,000 row(s) (50.0%) -- exactly the rows where is_sql = 0.",
+    "won_at and days_to_close are blank in the same 3,201 row(s) (80.0%) -- exactly the rows where is_won = 0."
+   ],
+   "note": "",
+   "caveats_recounted": {
+    "held": 6,
+    "refuted": [],
+    "not_parsed": []
+   }
+  },
+  {
+   "case": "saas_monthly",
+   "rows": 4878,
+   "seconds": 0.028,
+   "suggestions": [
+    {
+     "measure": "mrr",
+     "agg": "none",
+     "per": [],
+     "strength": "likely",
+     "rule": "S1",
+     "right": true,
+     "accept": [
+      "mean",
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "seats",
+     "agg": "none",
+     "per": [],
+     "strength": "likely",
+     "rule": "S1",
+     "right": true,
+     "accept": [
+      "mean",
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "new_mrr",
+     "agg": "sum",
+     "per": [],
+     "strength": "likely",
+     "rule": "S2",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "expansion_mrr",
+     "agg": "sum",
+     "per": [],
+     "strength": "likely",
+     "rule": "S2",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "contraction_mrr",
+     "agg": "sum",
+     "per": [],
+     "strength": "likely",
+     "rule": "S2",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "churned_mrr",
+     "agg": "sum",
+     "per": [],
+     "strength": "likely",
+     "rule": "S2",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "cac",
+     "agg": "mean",
+     "per": [
+      "account_id"
+     ],
+     "strength": "likely",
+     "rule": "P1",
+     "right": true,
+     "accept": [
+      "mean",
+      "none"
+     ],
+     "label_per": [
+      "account_id"
+     ]
+    },
+    {
+     "measure": "ltv",
+     "agg": "mean",
+     "per": [
+      "account_id"
+     ],
+     "strength": "likely",
+     "rule": "P1",
+     "right": true,
+     "accept": [
+      "mean",
+      "none"
+     ],
+     "label_per": [
+      "account_id"
+     ]
+    }
+   ],
+   "caveats_expected": 0,
+   "caveats_found": 0,
+   "caveats_missed": [],
+   "caveats_unexpected": [],
+   "note": "mrr is semi-additive: across accounts in a month yes, across months never",
+   "caveats_recounted": {
+    "held": 0,
+    "refuted": [],
+    "not_parsed": []
+   }
+  },
+  {
+   "case": "ab_test",
+   "rows": 20151,
+   "seconds": 0.039,
+   "suggestions": [
+    {
+     "measure": "revenue",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "sessions",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    }
+   ],
+   "caveats_expected": 1,
+   "caveats_found": 1,
+   "caveats_missed": [],
+   "caveats_unexpected": [],
+   "note": "",
+   "caveats_recounted": {
+    "held": 1,
+    "refuted": [],
+    "not_parsed": []
+   }
+  },
+  {
+   "case": "platform_conversions",
+   "rows": 7404,
+   "seconds": 0.019,
+   "suggestions": [
+    {
+     "measure": "conversion_value",
+     "agg": "sum",
+     "per": [
+      "conversion_id"
+     ],
+     "strength": "strong",
+     "rule": "P1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": [
+      "conversion_id"
+     ]
+    }
+   ],
+   "caveats_expected": 1,
+   "caveats_found": 1,
+   "caveats_missed": [],
+   "caveats_unexpected": [],
+   "note": "",
+   "caveats_recounted": {
+    "held": 1,
+    "refuted": [],
+    "not_parsed": []
+   }
+  },
+  {
+   "case": "promo_orders",
+   "rows": 4084,
+   "seconds": 0.028,
+   "suggestions": [
+    {
+     "measure": "order_revenue_local",
+     "agg": "none",
+     "per": [
+      "order_id"
+     ],
+     "strength": "strong",
+     "rule": "C1",
+     "right": true,
+     "accept": [
+      "none"
+     ],
+     "label_per": [
+      "order_id"
+     ]
+    },
+    {
+     "measure": "order_revenue_usd",
+     "agg": "sum",
+     "per": [
+      "order_id"
+     ],
+     "strength": "strong",
+     "rule": "P1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": [
+      "order_id"
+     ]
+    },
+    {
+     "measure": "discount_usd",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "discount_pct",
+     "agg": "none",
+     "per": [],
+     "strength": "strong",
+     "rule": "N2",
+     "right": true,
+     "accept": [
+      "mean",
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "fx_rate_to_usd",
+     "agg": "mean",
+     "per": [
+      "order_id"
+     ],
+     "strength": "strong",
+     "rule": "P1",
+     "right": true,
+     "accept": [
+      "mean",
+      "none"
+     ],
+     "label_per": [
+      "order_id"
+     ]
+    }
+   ],
+   "caveats_expected": 2,
+   "caveats_found": 2,
+   "caveats_missed": [],
+   "caveats_unexpected": [],
+   "note": "",
+   "caveats_recounted": {
+    "held": 2,
+    "refuted": [],
+    "not_parsed": []
+   }
+  },
+  {
+   "case": "seo_rankings",
+   "rows": 9000,
+   "seconds": 0.018,
+   "suggestions": [
+    {
+     "measure": "avg_position",
+     "agg": "none",
+     "per": [],
+     "strength": "likely",
+     "rule": "S1",
+     "right": true,
+     "accept": [
+      "mean",
+      "median",
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "search_volume",
+     "agg": "sum",
+     "per": [
+      "keyword_id"
+     ],
+     "strength": "strong",
+     "rule": "P1",
+     "right": true,
+     "accept": [
+      "mean",
+      "none",
+      "sum"
+     ],
+     "label_per": [
+      "keyword_id"
+     ]
+    },
+    {
+     "measure": "impressions",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "clicks",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "ctr",
+     "agg": "none",
+     "per": [],
+     "strength": "strong",
+     "rule": "R1",
+     "right": true,
+     "accept": [
+      "none"
+     ],
+     "label_per": []
+    }
+   ],
+   "caveats_expected": 0,
+   "caveats_found": 0,
+   "caveats_missed": [],
+   "caveats_unexpected": [],
+   "note": "",
+   "caveats_recounted": {
+    "held": 0,
+    "refuted": [],
+    "not_parsed": []
+   }
+  }
+ ],
+ "filter": {
+  "sum_everything": [
+   {
+    "case": "crm_funnel",
+    "answer": [
+     {
+      "name": "is_mql",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "is_sql",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "is_won",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "deal_amount",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "lead_score",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "days_to_close",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     }
+    ],
+    "raw": {
+     "right": 1,
+     "wrong": 2,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 2,
+     "wrong": 1,
+     "blank": 0
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [
+     "days_to_close"
+    ],
+    "verdicts": {
+     "agree": 4,
+     "overruled": 1,
+     "llm_only": 1
+    }
+   },
+   {
+    "case": "saas_monthly",
+    "answer": [
+     {
+      "name": "seats",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "mrr",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "new_mrr",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "expansion_mrr",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "contraction_mrr",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "churned_mrr",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "is_churned",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "arpu_raw",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "cac",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "ltv",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     }
+    ],
+    "raw": {
+     "right": 4,
+     "wrong": 4,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 6,
+     "wrong": 2,
+     "blank": 0
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [
+     "cac",
+     "ltv"
+    ],
+    "verdicts": {
+     "data": 5,
+     "overruled": 3,
+     "llm_only": 6,
+     "agree": 1
+    }
+   },
+   {
+    "case": "ab_test",
+    "answer": [
+     {
+      "name": "converted",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "revenue",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "sessions",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     }
+    ],
+    "raw": {
+     "right": 2,
+     "wrong": 0,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 2,
+     "wrong": 0,
+     "blank": 0
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [],
+    "verdicts": {
+     "data": 2,
+     "agree": 3
+    }
+   },
+   {
+    "case": "platform_conversions",
+    "answer": [
+     {
+      "name": "conversion_value",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     }
+    ],
+    "raw": {
+     "right": 0,
+     "wrong": 1,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 1,
+     "wrong": 0,
+     "blank": 0
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [],
+    "verdicts": {
+     "data": 3,
+     "agree": 1
+    }
+   },
+   {
+    "case": "promo_orders",
+    "answer": [
+     {
+      "name": "order_revenue_local",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "fx_rate_to_usd",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "order_revenue_usd",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "discount_usd",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "discount_pct",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     }
+    ],
+    "raw": {
+     "right": 1,
+     "wrong": 4,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 5,
+     "wrong": 0,
+     "blank": 0
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [],
+    "verdicts": {
+     "data": 5,
+     "overruled": 3,
+     "agree": 2
+    }
+   },
+   {
+    "case": "seo_rankings",
+    "answer": [
+     {
+      "name": "avg_position",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "search_volume",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "impressions",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "clicks",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "ctr",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     }
+    ],
+    "raw": {
+     "right": 2,
+     "wrong": 3,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 5,
+     "wrong": 0,
+     "blank": 0
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [],
+    "verdicts": {
+     "data": 4,
+     "overruled": 2,
+     "agree": 3
+    }
+   }
+  ],
+  "replayed": [
+   {
+    "case": "crm_funnel",
+    "answer": [
+     {
+      "name": "lead_id",
+      "role": "key",
+      "agg": "none",
+      "per": [],
+      "meaning": "unique lead identifier",
+      "confidence": 1.0
+     },
+     {
+      "name": "lead_created_at",
+      "role": "date",
+      "agg": "none",
+      "per": [],
+      "meaning": "timestamp when lead was created",
+      "confidence": 1.0
+     },
+     {
+      "name": "channel",
+      "role": "dimension",
+      "agg": "none",
+      "per": [],
+      "meaning": "marketing channel source",
+      "confidence": 1.0
+     },
+     {
+      "name": "owner_id",
+      "role": "dimension",
+      "agg": "none",
+      "per": [],
+      "meaning": "owner of the lead",
+      "confidence": 1.0
+     },
+     {
+      "name": "country",
+      "role": "dimension",
+      "agg": "none",
+      "per": [],
+      "meaning": "lead country",
+      "confidence": 1.0
+     },
+     {
+      "name": "mql_at",
+      "role": "date",
+      "agg": "none",
+      "per": [],
+      "meaning": "timestamp when lead became MQL",
+      "confidence": 0.9
+     },
+     {
+      "name": "sql_at",
+      "role": "date",
+      "agg": "none",
+      "per": [],
+      "meaning": "timestamp when lead became SQL",
+      "confidence": 0.9
+     },
+     {
+      "name": "won_at",
+      "role": "date",
+      "agg": "none",
+      "per": [],
+      "meaning": "timestamp when deal was won",
+      "confidence": 0.9
+     },
+     {
+      "name": "is_mql",
+      "role": "dimension",
+      "agg": "none",
+      "per": [],
+      "meaning": "flag if lead is MQL",
+      "confidence": 1.0
+     },
+     {
+      "name": "is_sql",
+      "role": "dimension",
+      "agg": "none",
+      "per": [],
+      "meaning": "flag if lead is SQL",
+      "confidence": 1.0
+     },
+     {
+      "name": "is_won",
+      "role": "dimension",
+      "agg": "none",
+      "per": [],
+      "meaning": "flag if lead is won",
+      "confidence": 1.0
+     },
+     {
+      "name": "deal_amount",
+      "role": "measure",
+      "agg": "sum",
+      "per": [],
+      "meaning": "monetary amount of won deal",
+      "confidence": 0.95
+     },
+     {
+      "name": "lead_score",
+      "role": "measure",
+      "agg": "none",
+      "per": [],
+      "meaning": "lead quality score (0\u2011100)",
+      "confidence": 0.9
+     },
+     {
+      "name": "days_to_close",
+      "role": "measure",
+      "agg": "mean",
+      "per": [],
+      "meaning": "days from lead creation to close",
+      "confidence": 0.9
+     }
+    ],
+    "raw": {
+     "right": 3,
+     "wrong": 0,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 3,
+     "wrong": 0,
+     "blank": 0
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [],
+    "verdicts": {
+     "llm_only": 5,
+     "agree": 2,
+     "data": 4
+    },
+    "model": "groq/openai/gpt-oss-120b"
+   },
+   {
+    "case": "saas_monthly",
+    "answer": [
+     {
+      "name": "account_id",
+      "role": "key",
+      "agg": null,
+      "per": [],
+      "meaning": "unique account identifier",
+      "confidence": 1.0
+     },
+     {
+      "name": "month",
+      "role": "date",
+      "agg": null,
+      "per": [],
+      "meaning": "month of observation",
+      "confidence": 1.0
+     },
+     {
+      "name": "plan",
+      "role": "dimension",
+      "agg": null,
+      "per": [],
+      "meaning": "subscription plan",
+      "confidence": 1.0
+     },
+     {
+      "name": "acquisition_channel",
+      "role": "dimension",
+      "agg": null,
+      "per": [],
+      "meaning": "source of acquisition",
+      "confidence": 1.0
+     },
+     {
+      "name": "seats",
+      "role": "measure",
+      "agg": "sum",
+      "per": [],
+      "meaning": "number of seats",
+      "confidence": 0.95
+     },
+     {
+      "name": "mrr",
+      "role": "measure",
+      "agg": "sum",
+      "per": [],
+      "meaning": "monthly recurring revenue",
+      "confidence": 0.98
+     },
+     {
+      "name": "new_mrr",
+      "role": "measure",
+      "agg": "sum",
+      "per": [],
+      "meaning": "newly added MRR",
+      "confidence": 0.95
+     },
+     {
+      "name": "expansion_mrr",
+      "role": "measure",
+      "agg": "sum",
+      "per": [],
+      "meaning": "expansion MRR",
+      "confidence": 0.9
+     },
+     {
+      "name": "contraction_mrr",
+      "role": "measure",
+      "agg": "sum",
+      "per": [],
+      "meaning": "contraction MRR",
+      "confidence": 0.9
+     },
+     {
+      "name": "churned_mrr",
+      "role": "measure",
+      "agg": "sum",
+      "per": [],
+      "meaning": "churned MRR",
+      "confidence": 0.95
+     },
+     {
+      "name": "is_churned",
+      "role": "dimension",
+      "agg": null,
+      "per": [],
+      "meaning": "whether account churned (0/1)",
+      "confidence": 0.9
+     },
+     {
+      "name": "arpu_raw",
+      "role": "measure",
+      "agg": "none",
+      "per": [
+       "account_id"
+      ],
+      "meaning": "average revenue per user for account",
+      "confidence": 0.95
+     },
+     {
+      "name": "cac",
+      "role": "measure",
+      "agg": "none",
+      "per": [
+       "account_id"
+      ],
+      "meaning": "customer acquisition cost per account",
+      "confidence": 0.95
+     },
+     {
+      "name": "ltv",
+      "role": "measure",
+      "agg": "none",
+      "per": [
+       "account_id"
+      ],
+      "meaning": "lifetime value of account",
+      "confidence": 0.95
+     }
+    ],
+    "raw": {
+     "right": 6,
+     "wrong": 2,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 8,
+     "wrong": 0,
+     "blank": 0
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [],
+    "verdicts": {
+     "agree": 5,
+     "overruled": 2,
+     "llm_only": 15,
+     "data": 2
+    },
+    "model": "groq/openai/gpt-oss-120b"
+   },
+   {
+    "case": "ab_test",
+    "answer": [
+     {
+      "name": "exposure_id",
+      "role": "key",
+      "agg": "none",
+      "per": [],
+      "meaning": "unique exposure identifier",
+      "confidence": 1.0
+     },
+     {
+      "name": "user_id",
+      "role": "dimension",
+      "agg": "none",
+      "per": [],
+      "meaning": "user identifier",
+      "confidence": 1.0
+     },
+     {
+      "name": "variant",
+      "role": "dimension",
+      "agg": "none",
+      "per": [],
+      "meaning": "experiment variant (control or treatment)",
+      "confidence": 1.0
+     },
+     {
+      "name": "exposed_at",
+      "role": "date",
+      "agg": "none",
+      "per": [],
+      "meaning": "timestamp of exposure",
+      "confidence": 1.0
+     },
+     {
+      "name": "device",
+      "role": "dimension",
+      "agg": "none",
+      "per": [],
+      "meaning": "type of device used",
+      "confidence": 1.0
+     },
+     {
+      "name": "converted",
+      "role": "dimension",
+      "agg": "none",
+      "per": [],
+      "meaning": "conversion flag (0 or 1)",
+      "confidence": 1.0
+     },
+     {
+      "name": "revenue",
+      "role": "measure",
+      "agg": "sum",
+      "per": [],
+      "meaning": "revenue generated by exposure",
+      "confidence": 0.9
+     },
+     {
+      "name": "sessions",
+      "role": "measure",
+      "agg": "sum",
+      "per": [],
+      "meaning": "number of sessions for exposure",
+      "confidence": 0.9
+     }
+    ],
+    "raw": {
+     "right": 2,
+     "wrong": 0,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 2,
+     "wrong": 0,
+     "blank": 0
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [],
+    "verdicts": {
+     "agree": 3,
+     "llm_only": 2,
+     "data": 2
+    },
+    "model": "groq/openai/gpt-oss-120b"
+   },
+   {
+    "case": "platform_conversions",
+    "answer": [
+     {
+      "name": "claim_id",
+      "role": "key",
+      "agg": null,
+      "per": [],
+      "meaning": "unique claim identifier",
+      "confidence": 1.0
+     },
+     {
+      "name": "conversion_id",
+      "role": "dimension",
+      "agg": null,
+      "per": [],
+      "meaning": "conversion identifier",
+      "confidence": 1.0
+     },
+     {
+      "name": "platform",
+      "role": "dimension",
+      "agg": null,
+      "per": [],
+      "meaning": "ad platform name",
+      "confidence": 1.0
+     },
+     {
+      "name": "conversion_date",
+      "role": "date",
+      "agg": null,
+      "per": [],
+      "meaning": "date of conversion",
+      "confidence": 1.0
+     },
+     {
+      "name": "conversion_value",
+      "role": "measure",
+      "agg": "sum",
+      "per": [
+       "conversion_id"
+      ],
+      "meaning": "monetary value of conversion",
+      "confidence": 0.95
+     }
+    ],
+    "raw": {
+     "right": 1,
+     "wrong": 0,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 1,
+     "wrong": 0,
+     "blank": 0
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [],
+    "verdicts": {
+     "agree": 3,
+     "llm_only": 1,
+     "data": 1
+    },
+    "model": "groq/openai/gpt-oss-120b"
+   },
+   {
+    "case": "promo_orders",
+    "answer": [
+     {
+      "name": "row_id",
+      "role": "key",
+      "agg": "none",
+      "per": null,
+      "meaning": "unique row identifier",
+      "confidence": 1.0
+     },
+     {
+      "name": "order_id",
+      "role": "dimension",
+      "agg": "none",
+      "per": null,
+      "meaning": "order identifier",
+      "confidence": 1.0
+     },
+     {
+      "name": "channel",
+      "role": "dimension",
+      "agg": "none",
+      "per": null,
+      "meaning": "marketing channel",
+      "confidence": 1.0
+     },
+     {
+      "name": "order_date",
+      "role": "date",
+      "agg": "none",
+      "per": null,
+      "meaning": "date of the order",
+      "confidence": 1.0
+     },
+     {
+      "name": "coupon_code",
+      "role": "dimension",
+      "agg": "none",
+      "per": null,
+      "meaning": "applied coupon code",
+      "confidence": 1.0
+     },
+     {
+      "name": "currency",
+      "role": "dimension",
+      "agg": "none",
+      "per": null,
+      "meaning": "currency of local revenue",
+      "confidence": 1.0
+     },
+     {
+      "name": "order_revenue_local",
+      "role": "measure",
+      "agg": "sum",
+      "per": [
+       "order_id"
+      ],
+      "meaning": "order revenue in local currency",
+      "confidence": 0.95
+     },
+     {
+      "name": "fx_rate_to_usd",
+      "role": "measure",
+      "agg": "none",
+      "per": [
+       "order_id"
+      ],
+      "meaning": "FX rate to USD",
+      "confidence": 0.9
+     },
+     {
+      "name": "order_revenue_usd",
+      "role": "measure",
+      "agg": "sum",
+      "per": [
+       "order_id"
+      ],
+      "meaning": "order revenue in USD",
+      "confidence": 0.95
+     },
+     {
+      "name": "discount_usd",
+      "role": "measure",
+      "agg": "sum",
+      "per": null,
+      "meaning": "discount amount in USD",
+      "confidence": 0.8
+     },
+     {
+      "name": "discount_pct",
+      "role": "dimension",
+      "agg": "none",
+      "per": null,
+      "meaning": "discount percentage",
+      "confidence": 0.85
+     }
+    ],
+    "raw": {
+     "right": 3,
+     "wrong": 1,
+     "blank": 1
+    },
+    "filtered": {
+     "right": 4,
+     "wrong": 0,
+     "blank": 1
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [],
+    "verdicts": {
+     "agree": 7,
+     "overruled": 1,
+     "llm_only": 4,
+     "data": 1
+    },
+    "model": "groq/openai/gpt-oss-120b"
+   },
+   {
+    "case": "seo_rankings",
+    "answer": [
+     {
+      "name": "keyword_id",
+      "role": "key",
+      "agg": "none",
+      "per": [],
+      "meaning": "identifier of the keyword",
+      "confidence": 0.99
+     },
+     {
+      "name": "date",
+      "role": "date",
+      "agg": "none",
+      "per": [],
+      "meaning": "date of the ranking",
+      "confidence": 0.99
+     },
+     {
+      "name": "avg_position",
+      "role": "measure",
+      "agg": "mean",
+      "per": [],
+      "meaning": "average search result position",
+      "confidence": 0.98
+     },
+     {
+      "name": "search_volume",
+      "role": "measure",
+      "agg": "sum",
+      "per": [
+       "keyword_id"
+      ],
+      "meaning": "monthly search volume for the keyword",
+      "confidence": 0.95
+     },
+     {
+      "name": "impressions",
+      "role": "measure",
+      "agg": "sum",
+      "per": [],
+      "meaning": "number of times the keyword was shown",
+      "confidence": 0.99
+     },
+     {
+      "name": "clicks",
+      "role": "measure",
+      "agg": "sum",
+      "per": [],
+      "meaning": "number of clicks on the keyword",
+      "confidence": 0.99
+     },
+     {
+      "name": "ctr",
+      "role": "measure",
+      "agg": "mean",
+      "per": [],
+      "meaning": "click\u2011through rate (clicks/impressions)",
+      "confidence": 0.97
+     }
+    ],
+    "raw": {
+     "right": 4,
+     "wrong": 1,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 5,
+     "wrong": 0,
+     "blank": 0
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [],
+    "verdicts": {
+     "agree": 5,
+     "llm_only": 6,
+     "overruled": 1,
+     "data": 2
+    },
+    "model": "groq/openai/gpt-oss-120b"
+   }
+  ]
+ },
+ "end_to_end": {
+  "figures": [
+   {
+    "check": "revenue_usd per channel, once per order",
+    "group": "direct",
+    "want": 56170.39,
+    "got": 56170.39,
+    "ok": true
+   },
+   {
+    "check": "revenue_usd per channel, once per order",
+    "group": "affiliate",
+    "want": 56363.57,
+    "got": 56363.57,
+    "ok": true
+   },
+   {
+    "check": "revenue_usd per channel, once per order",
+    "group": "email",
+    "want": 56185.65,
+    "got": 56185.65,
+    "ok": true
+   },
+   {
+    "check": "revenue_usd per channel, once per order",
+    "group": "paid_social",
+    "want": 56130.83,
+    "got": 56130.83,
+    "ok": true
+   },
+   {
+    "check": "conversion_value per platform",
+    "group": "google",
+    "want": 566142.0,
+    "got": 566142.0,
+    "ok": true
+   },
+   {
+    "check": "conversion_value per platform",
+    "group": "tiktok",
+    "want": 567240.0,
+    "got": 567240.0,
+    "ok": true
+   },
+   {
+    "check": "conversion_value per platform",
+    "group": "meta",
+    "want": 566040.0,
+    "got": 566040.0,
+    "ok": true
+   },
+   {
+    "check": "conversion_value total, de-duplicated",
+    "group": "(all)",
+    "want": 1377000.0,
+    "got": null,
+    "ok": true
+   },
+   {
+    "check": "conversion rate per variant",
+    "group": "control",
+    "want": 0.11969,
+    "got": 0.1197,
+    "ok": true
+   },
+   {
+    "check": "conversion rate per variant",
+    "group": "treatment",
+    "want": 0.100248,
+    "got": 0.1002,
+    "ok": true
+   },
+   {
+    "check": "win rate per channel",
+    "group": "events",
+    "want": 0.0,
+    "got": 0.0,
+    "ok": true
+   },
+   {
+    "check": "win rate per channel",
+    "group": "organic",
+    "want": 0.0,
+    "got": 0.0,
+    "ok": true
+   },
+   {
+    "check": "win rate per channel",
+    "group": "paid_search",
+    "want": 0.5,
+    "got": 0.5,
+    "ok": true
+   },
+   {
+    "check": "win rate per channel",
+    "group": "paid_social",
+    "want": 0.0,
+    "got": 0.0,
+    "ok": true
+   },
+   {
+    "check": "win rate per channel",
+    "group": "referral",
+    "want": 0.49875,
+    "got": 0.4988,
+    "ok": true
+   },
+   {
+    "check": "new MRR per plan",
+    "group": "growth",
+    "want": 76500.0,
+    "got": 76500.0,
+    "ok": true
+   },
+   {
+    "check": "new MRR per plan",
+    "group": "starter",
+    "want": 36000.0,
+    "got": 36000.0,
+    "ok": true
+   },
+   {
+    "check": "new MRR per plan",
+    "group": "pro",
+    "want": 112500.0,
+    "got": 112500.0,
+    "ok": true
+   },
+   {
+    "check": "new MRR per plan",
+    "group": "enterprise",
+    "want": 147000.0,
+    "got": 147000.0,
+    "ok": true
+   }
+  ],
+  "contracts": {
+   "promo_orders": "Contract stored for promo_orders, version 1.",
+   "platform_conversions": "Contract stored for platform_conversions, version 1.",
+   "ab_test": "Contract stored for ab_test, version 1.",
+   "crm_funnel": "Contract stored for crm_funnel, version 1.",
+   "saas_monthly": "Contract stored for saas_monthly, version 1."
+  },
+  "notes": {
+   "fan_out_inflation": {
+    "direct": 1.111,
+    "affiliate": 1.1,
+    "email": 2.117,
+    "paid_social": 1.105
+   },
+   "currency_caveat_in_reply": true,
+   "per_conversion_by_platform_refused": true,
+   "claims_inflation": 1.234,
+   "split_caveat_in_reply": true,
+   "contamination_caveat_in_reply": true,
+   "mrr_total_refused": true
+  }
+ }
+}

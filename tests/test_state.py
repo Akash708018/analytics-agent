@@ -240,7 +240,8 @@ def test_drift_is_reported_before_the_contracts_own_caveats(con):
     con.execute("ALTER TABLE order_items ADD COLUMN tax INTEGER")
     caveats = require_contract(con, "order_items").caveats
     assert "new column(s) tax" in caveats[0]
-    assert caveats[1] == "a caveat someone wrote"
+    # Marked as the person's statement, never bare beside a measured figure (recheck, 25/09/2026).
+    assert caveats[1] == "Declared in the contract, not measured: a caveat someone wrote"
 
 
 def test_the_gate_uses_the_current_version(con):

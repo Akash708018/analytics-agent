@@ -469,7 +469,7 @@ def test_gemini_climbs_its_ladder_when_a_models_day_is_spent(monkeypatch):
                                                  "gemini-3.7-flash"])
     tried = []
 
-    def request(provider, url, headers, body=None):
+    def request(provider, url, headers, body=None, **_):
         model = url.split("/models/")[1].split(":")[0]
         tried.append(model)
         if model in ("gemini-flash-latest", "gemini-3.8-flash"):

@@ -1,0 +1,1657 @@
+{
+ "summary": {
+  "measures": 35,
+  "by_strength": {
+   "strong": {
+    "count": 28,
+    "right": 28,
+    "wrong": 0,
+    "abstained": 0
+   },
+   "likely": {
+    "count": 6,
+    "right": 6,
+    "wrong": 0,
+    "abstained": 0
+   },
+   "unsure": {
+    "count": 1,
+    "right": 0,
+    "wrong": 0,
+    "abstained": 1
+   }
+  },
+  "strong_precision": 1.0,
+  "likely_precision": 1.0,
+  "strong_coverage": 0.8,
+  "wrong_strong": [],
+  "caveat_recall": 1.0,
+  "caveats_missed": [],
+  "caveats_unexpected": {
+   "ad_daily": [
+    "cpc is below zero in 3 row(s) (as low as -0.7692) -- a return, a correction or an entry error; every total includes them.",
+    "cpm is below zero in 3 row(s) (as low as -12.9904) -- a return, a correction or an entry error; every total includes them."
+   ]
+  },
+  "caveat_lines": 9,
+  "caveat_lines_held": 9,
+  "caveat_lines_refuted": [],
+  "false_alarms_on_clean": 0
+ },
+ "cases": [
+  {
+   "case": "ad_daily",
+   "rows": 3240,
+   "seconds": 0.503,
+   "suggestions": [
+    {
+     "measure": "impressions",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "clicks",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "spend",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "conversions",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "revenue",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "ctr_pct",
+     "agg": "none",
+     "per": [],
+     "strength": "strong",
+     "rule": "R1",
+     "right": true,
+     "accept": [
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "cpc",
+     "agg": "none",
+     "per": [],
+     "strength": "strong",
+     "rule": "R1",
+     "right": true,
+     "accept": [
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "cpm",
+     "agg": "none",
+     "per": [],
+     "strength": "strong",
+     "rule": "R1",
+     "right": true,
+     "accept": [
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "roas",
+     "agg": "none",
+     "per": [],
+     "strength": "strong",
+     "rule": "R1",
+     "right": true,
+     "accept": [
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "conversion_rate",
+     "agg": "none",
+     "per": [],
+     "strength": "strong",
+     "rule": "R1",
+     "right": true,
+     "accept": [
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "reach",
+     "agg": "none",
+     "per": [],
+     "strength": "likely",
+     "rule": "U1",
+     "right": true,
+     "accept": [
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "frequency",
+     "agg": "none",
+     "per": [],
+     "strength": "strong",
+     "rule": "R1",
+     "right": true,
+     "accept": [
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "daily_budget",
+     "agg": "sum",
+     "per": [
+      "campaign_id"
+     ],
+     "strength": "strong",
+     "rule": "P1",
+     "right": true,
+     "accept": [
+      "mean",
+      "none",
+      "sum"
+     ],
+     "label_per": [
+      "campaign_id"
+     ]
+    },
+    {
+     "measure": "avg_position",
+     "agg": "none",
+     "per": [],
+     "strength": "likely",
+     "rule": "S1",
+     "right": true,
+     "accept": [
+      "mean",
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "bid_amount",
+     "agg": "mean",
+     "per": [
+      "ad_group_id"
+     ],
+     "strength": "strong",
+     "rule": "P1",
+     "right": true,
+     "accept": [
+      "mean",
+      "median",
+      "none"
+     ],
+     "label_per": [
+      "ad_group_id"
+     ]
+    },
+    {
+     "measure": "targeting_radius_km",
+     "agg": "mean",
+     "per": [
+      "campaign_id"
+     ],
+     "strength": "likely",
+     "rule": "P1",
+     "right": true,
+     "accept": [
+      "mean",
+      "none"
+     ],
+     "label_per": [
+      "campaign_id"
+     ]
+    },
+    {
+     "measure": "store_lat",
+     "agg": "mean",
+     "per": [
+      "campaign_id"
+     ],
+     "strength": "strong",
+     "rule": "P1",
+     "right": true,
+     "accept": [
+      "mean",
+      "none"
+     ],
+     "label_per": [
+      "campaign_id"
+     ]
+    },
+    {
+     "measure": "store_lng",
+     "agg": "mean",
+     "per": [
+      "campaign_id"
+     ],
+     "strength": "strong",
+     "rule": "P1",
+     "right": true,
+     "accept": [
+      "mean",
+      "none"
+     ],
+     "label_per": [
+      "campaign_id"
+     ]
+    }
+   ],
+   "caveats_expected": 5,
+   "caveats_found": 5,
+   "caveats_missed": [],
+   "caveats_unexpected": [
+    "cpc is below zero in 3 row(s) (as low as -0.7692) -- a return, a correction or an entry error; every total includes them.",
+    "cpm is below zero in 3 row(s) (as low as -12.9904) -- a return, a correction or an entry error; every total includes them."
+   ],
+   "note": "3 rows with clicks above impressions are a cross-column rule: not counted here",
+   "caveats_recounted": {
+    "held": 7,
+    "refuted": [],
+    "not_parsed": []
+   }
+  },
+  {
+   "case": "ga_sessions",
+   "rows": 5000,
+   "seconds": 0.032,
+   "suggestions": [
+    {
+     "measure": "session_duration_sec",
+     "agg": "mean",
+     "per": [],
+     "strength": "likely",
+     "rule": "D1",
+     "right": true,
+     "accept": [
+      "mean",
+      "median",
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "pageviews",
+     "agg": null,
+     "per": [],
+     "strength": "unsure",
+     "rule": "-",
+     "right": null,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "transactions",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "transaction_revenue",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    }
+   ],
+   "caveats_expected": 2,
+   "caveats_found": 2,
+   "caveats_missed": [],
+   "caveats_unexpected": [],
+   "note": "'(direct)' and '(none)' are real GA values: a caveat naming them is a false alarm",
+   "caveats_recounted": {
+    "held": 2,
+    "refuted": [],
+    "not_parsed": []
+   }
+  },
+  {
+   "case": "attribution",
+   "rows": 3000,
+   "seconds": 0.014,
+   "suggestions": [
+    {
+     "measure": "credit",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A2",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "conversion_value",
+     "agg": "sum",
+     "per": [
+      "conversion_id"
+     ],
+     "strength": "strong",
+     "rule": "P1",
+     "right": true,
+     "accept": [
+      "mean",
+      "sum"
+     ],
+     "label_per": [
+      "conversion_id"
+     ]
+    },
+    {
+     "measure": "attributed_value",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    }
+   ],
+   "caveats_expected": 0,
+   "caveats_found": 0,
+   "caveats_missed": [],
+   "caveats_unexpected": [],
+   "note": "credit is a fraction per row that DOES add up: the sum is conversions",
+   "caveats_recounted": {
+    "held": 0,
+    "refuted": [],
+    "not_parsed": []
+   }
+  },
+  {
+   "case": "social_daily",
+   "rows": 600,
+   "seconds": 0.01,
+   "suggestions": [
+    {
+     "measure": "followers",
+     "agg": "none",
+     "per": [],
+     "strength": "likely",
+     "rule": "S1",
+     "right": true,
+     "accept": [
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "posts",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "likes",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "engagement_rate",
+     "agg": "none",
+     "per": [],
+     "strength": "strong",
+     "rule": "N2",
+     "right": true,
+     "accept": [
+      "mean",
+      "none"
+     ],
+     "label_per": []
+    }
+   ],
+   "caveats_expected": 0,
+   "caveats_found": 0,
+   "caveats_missed": [],
+   "caveats_unexpected": [],
+   "note": "followers is a level on a date: summed over days, nothing",
+   "caveats_recounted": {
+    "held": 0,
+    "refuted": [],
+    "not_parsed": []
+   }
+  },
+  {
+   "case": "email_sends",
+   "rows": 120,
+   "seconds": 0.013,
+   "suggestions": [
+    {
+     "measure": "delivered",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "opens",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "clicks",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "unsubscribes",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "open_rate",
+     "agg": "none",
+     "per": [],
+     "strength": "strong",
+     "rule": "R1",
+     "right": true,
+     "accept": [
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "list_size",
+     "agg": "mean",
+     "per": [
+      "list_id"
+     ],
+     "strength": "likely",
+     "rule": "P1",
+     "right": true,
+     "accept": [
+      "mean",
+      "none"
+     ],
+     "label_per": [
+      "list_id"
+     ]
+    }
+   ],
+   "caveats_expected": 0,
+   "caveats_found": 0,
+   "caveats_missed": [],
+   "caveats_unexpected": [],
+   "note": "",
+   "caveats_recounted": {
+    "held": 0,
+    "refuted": [],
+    "not_parsed": []
+   }
+  }
+ ],
+ "filter": {
+  "sum_everything": [
+   {
+    "case": "ad_daily",
+    "answer": [
+     {
+      "name": "impressions",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "clicks",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "spend",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "conversions",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "revenue",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "ctr_pct",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "cpc",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "cpm",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "roas",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "conversion_rate",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "reach",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "frequency",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "daily_budget",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "avg_position",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "bid_amount",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "is_brand",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "targeting_radius_km",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "store_lat",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "store_lng",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     }
+    ],
+    "raw": {
+     "right": 5,
+     "wrong": 13,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 17,
+     "wrong": 1,
+     "blank": 0
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [
+     "targeting_radius_km"
+    ],
+    "verdicts": {
+     "data": 14,
+     "agree": 6,
+     "overruled": 11,
+     "llm_only": 2
+    }
+   },
+   {
+    "case": "ga_sessions",
+    "answer": [
+     {
+      "name": "is_bounce",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "new_user",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "session_duration_sec",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "pageviews",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "transactions",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "transaction_revenue",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     }
+    ],
+    "raw": {
+     "right": 4,
+     "wrong": 0,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 4,
+     "wrong": 0,
+     "blank": 0
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [],
+    "verdicts": {
+     "data": 4,
+     "llm_only": 4,
+     "agree": 2
+    }
+   },
+   {
+    "case": "attribution",
+    "answer": [
+     {
+      "name": "touch_no",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "credit",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "conversion_value",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "attributed_value",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     }
+    ],
+    "raw": {
+     "right": 2,
+     "wrong": 1,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 3,
+     "wrong": 0,
+     "blank": 0
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [],
+    "verdicts": {
+     "overruled": 1,
+     "agree": 3,
+     "data": 1
+    }
+   },
+   {
+    "case": "social_daily",
+    "answer": [
+     {
+      "name": "followers",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "posts",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "likes",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "engagement_rate",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     }
+    ],
+    "raw": {
+     "right": 2,
+     "wrong": 2,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 4,
+     "wrong": 0,
+     "blank": 0
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [],
+    "verdicts": {
+     "data": 2,
+     "overruled": 2,
+     "agree": 2
+    }
+   },
+   {
+    "case": "email_sends",
+    "answer": [
+     {
+      "name": "list_size",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "delivered",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "opens",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "clicks",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "unsubscribes",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "open_rate",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     }
+    ],
+    "raw": {
+     "right": 4,
+     "wrong": 2,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 5,
+     "wrong": 1,
+     "blank": 0
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [
+     "list_size"
+    ],
+    "verdicts": {
+     "data": 4,
+     "llm_only": 1,
+     "agree": 4,
+     "overruled": 1
+    }
+   }
+  ],
+  "live": [
+   {
+    "case": "ad_daily",
+    "answer": [
+     {
+      "name": "date",
+      "role": "date",
+      "agg": null,
+      "per": [],
+      "meaning": "record date of metrics",
+      "confidence": 1.0
+     },
+     {
+      "name": "campaign_id",
+      "role": "key",
+      "agg": "none",
+      "per": [],
+      "meaning": "identifier of campaign",
+      "confidence": 0.99
+     },
+     {
+      "name": "campaign_name",
+      "role": "dimension",
+      "agg": "none",
+      "per": [],
+      "meaning": "campaign descriptive name",
+      "confidence": 0.98
+     },
+     {
+      "name": "ad_group_id",
+      "role": "key",
+      "agg": "none",
+      "per": [],
+      "meaning": "identifier of ad group",
+      "confidence": 0.99
+     },
+     {
+      "name": "channel",
+      "role": "dimension",
+      "agg": "none",
+      "per": [],
+      "meaning": "advertising platform",
+      "confidence": 0.97
+     },
+     {
+      "name": "impressions",
+      "role": "measure",
+      "agg": "sum",
+      "per": [],
+      "meaning": "total ad impressions",
+      "confidence": 0.99
+     },
+     {
+      "name": "clicks",
+      "role": "measure",
+      "agg": "sum",
+      "per": [],
+      "meaning": "total ad clicks",
+      "confidence": 0.99
+     },
+     {
+      "name": "spend",
+      "role": "measure",
+      "agg": "sum",
+      "per": [],
+      "meaning": "total spend amount",
+      "confidence": 0.99
+     },
+     {
+      "name": "conversions",
+      "role": "measure",
+      "agg": "sum",
+      "per": [],
+      "meaning": "total conversions",
+      "confidence": 0.98
+     },
+     {
+      "name": "revenue",
+      "role": "measure",
+      "agg": "sum",
+      "per": [],
+      "meaning": "total revenue generated",
+      "confidence": 0.98
+     },
+     {
+      "name": "ctr_pct",
+      "role": "measure",
+      "agg": "none",
+      "per": [],
+      "meaning": "click\u2011through rate percent",
+      "confidence": 0.95
+     },
+     {
+      "name": "cpc",
+      "role": "measure",
+      "agg": "none",
+      "per": [],
+      "meaning": "cost per click",
+      "confidence": 0.95
+     },
+     {
+      "name": "cpm",
+      "role": "measure",
+      "agg": "none",
+      "per": [],
+      "meaning": "cost per thousand impressions",
+      "confidence": 0.95
+     },
+     {
+      "name": "roas",
+      "role": "measure",
+      "agg": "none",
+      "per": [],
+      "meaning": "return on ad spend",
+      "confidence": 0.94
+     },
+     {
+      "name": "conversion_rate",
+      "role": "measure",
+      "agg": "none",
+      "per": [],
+      "meaning": "conversion rate",
+      "confidence": 0.94
+     },
+     {
+      "name": "reach",
+      "role": "measure",
+      "agg": "none",
+      "per": [],
+      "meaning": "unique users reached",
+      "confidence": 0.9
+     },
+     {
+      "name": "frequency",
+      "role": "measure",
+      "agg": "none",
+      "per": [],
+      "meaning": "average ad frequency",
+      "confidence": 0.9
+     },
+     {
+      "name": "daily_budget",
+      "role": "dimension",
+      "agg": "none",
+      "per": [
+       "campaign_id"
+      ],
+      "meaning": "budget per campaign per day",
+      "confidence": 0.96
+     },
+     {
+      "name": "avg_position",
+      "role": "measure",
+      "agg": "none",
+      "per": [],
+      "meaning": "average ad position",
+      "confidence": 0.93
+     },
+     {
+      "name": "bid_amount",
+      "role": "dimension",
+      "agg": "none",
+      "per": [
+       "ad_group_id"
+      ],
+      "meaning": "bid amount for ad group",
+      "confidence": 0.95
+     },
+     {
+      "name": "is_brand",
+      "role": "dimension",
+      "agg": "none",
+      "per": [
+       "campaign_id"
+      ],
+      "meaning": "brand flag (0/1)",
+      "confidence": 0.98
+     },
+     {
+      "name": "targeting_radius_km",
+      "role": "dimension",
+      "agg": "none",
+      "per": [
+       "campaign_id"
+      ],
+      "meaning": "targeting radius in km",
+      "confidence": 0.96
+     },
+     {
+      "name": "store_lat",
+      "role": "dimension",
+      "agg": "none",
+      "per": [
+       "campaign_id"
+      ],
+      "meaning": "store latitude",
+      "confidence": 0.96
+     },
+     {
+      "name": "store_lng",
+      "role": "dimension",
+      "agg": "none",
+      "per": [
+       "campaign_id"
+      ],
+      "meaning": "store longitude",
+      "confidence": 0.96
+     }
+    ],
+    "raw": {
+     "right": 8,
+     "wrong": 5,
+     "blank": 5
+    },
+    "filtered": {
+     "right": 13,
+     "wrong": 0,
+     "blank": 5
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [],
+    "verdicts": {
+     "agree": 13,
+     "llm_only": 16,
+     "data": 8
+    },
+    "model": "groq/openai/gpt-oss-120b"
+   },
+   {
+    "case": "ga_sessions",
+    "answer": [
+     {
+      "name": "session_id",
+      "role": "key",
+      "agg": "none",
+      "per": [],
+      "meaning": "unique session identifier",
+      "confidence": 1.0
+     },
+     {
+      "name": "user_id",
+      "role": "dimension",
+      "agg": "none",
+      "per": [],
+      "meaning": "user identifier",
+      "confidence": 1.0
+     },
+     {
+      "name": "date",
+      "role": "date",
+      "agg": "null",
+      "per": [],
+      "meaning": "session date",
+      "confidence": 1.0
+     },
+     {
+      "name": "source",
+      "role": "dimension",
+      "agg": "none",
+      "per": [],
+      "meaning": "traffic source",
+      "confidence": 1.0
+     },
+     {
+      "name": "medium",
+      "role": "dimension",
+      "agg": "none",
+      "per": [],
+      "meaning": "traffic medium",
+      "confidence": 1.0
+     },
+     {
+      "name": "keyword",
+      "role": "dimension",
+      "agg": "none",
+      "per": [],
+      "meaning": "search keyword",
+      "confidence": 1.0
+     },
+     {
+      "name": "is_bounce",
+      "role": "dimension",
+      "agg": "none",
+      "per": [
+       "user_id"
+      ],
+      "meaning": "whether session bounced (0/1)",
+      "confidence": 1.0
+     },
+     {
+      "name": "new_user",
+      "role": "dimension",
+      "agg": "none",
+      "per": [
+       "user_id"
+      ],
+      "meaning": "first session for user (0/1)",
+      "confidence": 1.0
+     },
+     {
+      "name": "session_duration_sec",
+      "role": "measure",
+      "agg": "mean",
+      "per": [],
+      "meaning": "session length in seconds",
+      "confidence": 0.9
+     },
+     {
+      "name": "pageviews",
+      "role": "measure",
+      "agg": "sum",
+      "per": [],
+      "meaning": "pages viewed in session",
+      "confidence": 0.9
+     },
+     {
+      "name": "transactions",
+      "role": "measure",
+      "agg": "sum",
+      "per": [],
+      "meaning": "number of transactions in session",
+      "confidence": 0.9
+     },
+     {
+      "name": "transaction_revenue",
+      "role": "measure",
+      "agg": "sum",
+      "per": [],
+      "meaning": "revenue from transactions in session",
+      "confidence": 0.9
+     }
+    ],
+    "raw": {
+     "right": 4,
+     "wrong": 0,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 4,
+     "wrong": 0,
+     "blank": 0
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [],
+    "verdicts": {
+     "agree": 4,
+     "llm_only": 7,
+     "data": 3
+    },
+    "model": "groq/openai/gpt-oss-120b"
+   },
+   {
+    "case": "attribution",
+    "answer": [
+     {
+      "name": "conversion_id",
+      "role": "key",
+      "agg": "none",
+      "per": [],
+      "meaning": "unique conversion identifier",
+      "confidence": 1.0
+     },
+     {
+      "name": "touch_no",
+      "role": "key",
+      "agg": "none",
+      "per": [],
+      "meaning": "sequence number of touch within conversion",
+      "confidence": 1.0
+     },
+     {
+      "name": "touch_channel",
+      "role": "dimension",
+      "agg": "none",
+      "per": [],
+      "meaning": "marketing channel of the touch",
+      "confidence": 1.0
+     },
+     {
+      "name": "credit",
+      "role": "measure",
+      "agg": "sum",
+      "per": [
+       "conversion_id"
+      ],
+      "meaning": "fraction of credit assigned to the touch",
+      "confidence": 0.9
+     },
+     {
+      "name": "conversion_value",
+      "role": "measure",
+      "agg": "none",
+      "per": [
+       "conversion_id"
+      ],
+      "meaning": "total value of the conversion",
+      "confidence": 0.95
+     },
+     {
+      "name": "attributed_value",
+      "role": "measure",
+      "agg": "sum",
+      "per": [
+       "conversion_id"
+      ],
+      "meaning": "value attributed to the touch (credit\u202f\u00d7\u202fconversion value)",
+      "confidence": 0.9
+     }
+    ],
+    "raw": {
+     "right": 0,
+     "wrong": 3,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 3,
+     "wrong": 0,
+     "blank": 0
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [],
+    "verdicts": {
+     "agree": 4,
+     "llm_only": 4,
+     "overruled": 3
+    },
+    "model": "groq/openai/gpt-oss-120b"
+   },
+   {
+    "case": "social_daily",
+    "answer": [
+     {
+      "name": "account_id",
+      "role": "key",
+      "agg": null,
+      "per": null,
+      "meaning": "account identifier",
+      "confidence": 1.0
+     },
+     {
+      "name": "date",
+      "role": "date",
+      "agg": null,
+      "per": null,
+      "meaning": "observation date",
+      "confidence": 1.0
+     },
+     {
+      "name": "followers",
+      "role": "measure",
+      "agg": "mean",
+      "per": null,
+      "meaning": "daily follower count per account",
+      "confidence": 0.9
+     },
+     {
+      "name": "posts",
+      "role": "measure",
+      "agg": "sum",
+      "per": null,
+      "meaning": "number of posts per day per account",
+      "confidence": 0.95
+     },
+     {
+      "name": "likes",
+      "role": "measure",
+      "agg": "sum",
+      "per": null,
+      "meaning": "likes received per day per account",
+      "confidence": 0.95
+     },
+     {
+      "name": "engagement_rate",
+      "role": "measure",
+      "agg": null,
+      "per": null,
+      "meaning": "likes\u2011to\u2011followers ratio per day",
+      "confidence": 0.98
+     }
+    ],
+    "raw": {
+     "right": 2,
+     "wrong": 1,
+     "blank": 1
+    },
+    "filtered": {
+     "right": 3,
+     "wrong": 1,
+     "blank": 0
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [
+     "followers"
+    ],
+    "verdicts": {
+     "agree": 4,
+     "llm_only": 6,
+     "data": 2
+    },
+    "model": "groq/openai/gpt-oss-120b"
+   },
+   {
+    "case": "email_sends",
+    "answer": [
+     {
+      "name": "send_id",
+      "role": "key",
+      "agg": "none",
+      "per": [],
+      "meaning": "unique email send identifier",
+      "confidence": 1.0
+     },
+     {
+      "name": "list_id",
+      "role": "dimension",
+      "agg": "none",
+      "per": [],
+      "meaning": "email list identifier",
+      "confidence": 1.0
+     },
+     {
+      "name": "sent_on",
+      "role": "date",
+      "agg": "none",
+      "per": [],
+      "meaning": "date email was sent",
+      "confidence": 1.0
+     },
+     {
+      "name": "list_size",
+      "role": "measure",
+      "agg": "none",
+      "per": [
+       "list_id"
+      ],
+      "meaning": "size of the email list",
+      "confidence": 1.0
+     },
+     {
+      "name": "delivered",
+      "role": "measure",
+      "agg": "sum",
+      "per": [],
+      "meaning": "delivered email count",
+      "confidence": 1.0
+     },
+     {
+      "name": "opens",
+      "role": "measure",
+      "agg": "sum",
+      "per": [],
+      "meaning": "total opens per send",
+      "confidence": 1.0
+     },
+     {
+      "name": "clicks",
+      "role": "measure",
+      "agg": "sum",
+      "per": [],
+      "meaning": "total clicks per send",
+      "confidence": 1.0
+     },
+     {
+      "name": "unsubscribes",
+      "role": "measure",
+      "agg": "sum",
+      "per": [],
+      "meaning": "total unsubscribes per send",
+      "confidence": 1.0
+     },
+     {
+      "name": "open_rate",
+      "role": "measure",
+      "agg": "none",
+      "per": [],
+      "meaning": "open rate per send",
+      "confidence": 1.0
+     }
+    ],
+    "raw": {
+     "right": 5,
+     "wrong": 1,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 6,
+     "wrong": 0,
+     "blank": 0
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [],
+    "verdicts": {
+     "agree": 8,
+     "llm_only": 8,
+     "data": 2
+    },
+    "model": "groq/openai/gpt-oss-120b"
+   }
+  ]
+ },
+ "end_to_end": {
+  "load": "Loaded ad_daily: 3,240 rows, 24 columns.",
+  "contract": "Contract stored for ad_daily, version 1.",
+  "figures": [
+   {
+    "measure": "ctr_pct_of_sums",
+    "channel": "meta",
+    "want": 2.5426,
+    "ok": true
+   },
+   {
+    "measure": "ctr_pct_of_sums",
+    "channel": "Meta",
+    "want": 3.5968,
+    "ok": true
+   },
+   {
+    "measure": "ctr_pct_of_sums",
+    "channel": "google",
+    "want": 2.4043,
+    "ok": true
+   },
+   {
+    "measure": "ctr_pct_of_sums",
+    "channel": "linkedin",
+    "want": 2.6854,
+    "ok": true
+   },
+   {
+    "measure": "roas_of_sums",
+    "channel": "meta",
+    "want": 4.3341,
+    "ok": true
+   },
+   {
+    "measure": "roas_of_sums",
+    "channel": "Meta",
+    "want": 4.8553,
+    "ok": true
+   },
+   {
+    "measure": "roas_of_sums",
+    "channel": "google",
+    "want": 3.6537,
+    "ok": true
+   },
+   {
+    "measure": "roas_of_sums",
+    "channel": "linkedin",
+    "want": 4.4276,
+    "ok": true
+   },
+   {
+    "measure": "spend",
+    "channel": "meta",
+    "want": 91152.8,
+    "ok": true
+   },
+   {
+    "measure": "spend",
+    "channel": "Meta",
+    "want": 3617.3,
+    "ok": true
+   },
+   {
+    "measure": "spend",
+    "channel": "google",
+    "want": 109132.6,
+    "ok": true
+   },
+   {
+    "measure": "spend",
+    "channel": "linkedin",
+    "want": 113535.1,
+    "ok": true
+   }
+  ],
+  "total_of_a_ratio_refused": true,
+  "trap": {
+   "meta": {
+    "ctr_ratio_of_sums": 2.543,
+    "ctr_mean_of_rows": 2.537,
+    "roas_ratio_of_sums": 4.334,
+    "roas_mean_of_rows": 4.471
+   },
+   "Meta": {
+    "ctr_ratio_of_sums": 3.597,
+    "ctr_mean_of_rows": 3.766,
+    "roas_ratio_of_sums": 4.855,
+    "roas_mean_of_rows": 4.461
+   },
+   "google": {
+    "ctr_ratio_of_sums": 2.404,
+    "ctr_mean_of_rows": 2.399,
+    "roas_ratio_of_sums": 3.654,
+    "roas_mean_of_rows": 4.283
+   },
+   "linkedin": {
+    "ctr_ratio_of_sums": 2.685,
+    "ctr_mean_of_rows": 2.662,
+    "roas_ratio_of_sums": 4.428,
+    "roas_mean_of_rows": 5.331
+   }
+  },
+  "verifier": {
+   "answer": "On google the CTR is 2.40% and ROAS 3.65. Averaged over rows, ROAS is 4.28.",
+   "unsupported": [
+    "4.28"
+   ],
+   "found": 2
+  }
+ }
+}

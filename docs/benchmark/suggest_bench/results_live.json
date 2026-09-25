@@ -1,0 +1,1399 @@
+{
+ "summary": {
+  "measures": 29,
+  "by_strength": {
+   "strong": {
+    "count": 20,
+    "right": 20,
+    "wrong": 0,
+    "abstained": 0
+   },
+   "likely": {
+    "count": 7,
+    "right": 7,
+    "wrong": 0,
+    "abstained": 0
+   },
+   "unsure": {
+    "count": 2,
+    "right": 0,
+    "wrong": 0,
+    "abstained": 2
+   }
+  },
+  "strong_precision": 1.0,
+  "likely_precision": 1.0,
+  "strong_coverage": 0.7142857142857143,
+  "wrong_strong": [],
+  "caveat_recall": 1.0,
+  "caveats_missed": [],
+  "caveats_unexpected": {
+   "shop_lines": [
+    "line_cost is below zero in 6 row(s) (as low as -190.02) -- a return, a correction or an entry error; every total includes them."
+   ]
+  },
+  "caveat_lines": 13,
+  "caveat_lines_held": 13,
+  "caveat_lines_refuted": [],
+  "false_alarms_on_clean": 0
+ },
+ "cases": [
+  {
+   "case": "shop_lines",
+   "rows": 6000,
+   "seconds": 0.711,
+   "suggestions": [
+    {
+     "measure": "unit_price",
+     "agg": "none",
+     "per": [],
+     "strength": "strong",
+     "rule": "R1",
+     "right": true,
+     "accept": [
+      "mean",
+      "median",
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "quantity",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "line_amount",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "line_cost",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "shipping_fee",
+     "agg": "sum",
+     "per": [
+      "order_id"
+     ],
+     "strength": "strong",
+     "rule": "P1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": [
+      "order_id"
+     ]
+    },
+    {
+     "measure": "customer_credit_limit",
+     "agg": "mean",
+     "per": [
+      "customer_id"
+     ],
+     "strength": "likely",
+     "rule": "P1",
+     "right": true,
+     "accept": [
+      "mean",
+      "none"
+     ],
+     "label_per": [
+      "customer_id"
+     ]
+    },
+    {
+     "measure": "session_seconds",
+     "agg": "mean",
+     "per": [],
+     "strength": "likely",
+     "rule": "D1",
+     "right": true,
+     "accept": [
+      "mean",
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "margin_pct",
+     "agg": "none",
+     "per": [],
+     "strength": "strong",
+     "rule": "R1",
+     "right": true,
+     "accept": [
+      "none"
+     ],
+     "label_per": []
+    }
+   ],
+   "caveats_expected": 6,
+   "caveats_found": 6,
+   "caveats_missed": [],
+   "caveats_unexpected": [
+    "line_cost is below zero in 6 row(s) (as low as -190.02) -- a return, a correction or an entry error; every total includes them."
+   ],
+   "note": "session_seconds varies within an order here: no unit is the right answer",
+   "caveats_recounted": {
+    "held": 7,
+    "refuted": [],
+    "not_parsed": []
+   }
+  },
+  {
+   "case": "account_balances",
+   "rows": 6000,
+   "seconds": 0.011,
+   "suggestions": [
+    {
+     "measure": "closing_balance",
+     "agg": "none",
+     "per": [],
+     "strength": "likely",
+     "rule": "S1",
+     "right": true,
+     "accept": [
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "deposits",
+     "agg": null,
+     "per": [],
+     "strength": "unsure",
+     "rule": "-",
+     "right": null,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "interest_rate",
+     "agg": "mean",
+     "per": [
+      "account_id"
+     ],
+     "strength": "strong",
+     "rule": "P1",
+     "right": true,
+     "accept": [
+      "mean",
+      "none"
+     ],
+     "label_per": [
+      "account_id"
+     ]
+    }
+   ],
+   "caveats_expected": 0,
+   "caveats_found": 0,
+   "caveats_missed": [],
+   "caveats_unexpected": [],
+   "note": "interest_rate is one value per account: per account_id is the right unit",
+   "caveats_recounted": {
+    "held": 0,
+    "refuted": [],
+    "not_parsed": []
+   }
+  },
+  {
+   "case": "payroll_clean",
+   "rows": 6000,
+   "seconds": 0.011,
+   "suggestions": [
+    {
+     "measure": "monthly_salary",
+     "agg": "mean",
+     "per": [
+      "employee_id"
+     ],
+     "strength": "strong",
+     "rule": "P1",
+     "right": true,
+     "accept": [
+      "mean",
+      "none"
+     ],
+     "label_per": [
+      "employee_id"
+     ]
+    },
+    {
+     "measure": "bonus_amount",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "hours_worked",
+     "agg": "mean",
+     "per": [],
+     "strength": "likely",
+     "rule": "D1",
+     "right": true,
+     "accept": [
+      "mean",
+      "sum"
+     ],
+     "label_per": []
+    }
+   ],
+   "caveats_expected": 0,
+   "caveats_found": 0,
+   "caveats_missed": [],
+   "caveats_unexpected": [],
+   "note": "clean: any caveat here is a false alarm",
+   "caveats_recounted": {
+    "held": 0,
+    "refuted": [],
+    "not_parsed": []
+   }
+  },
+  {
+   "case": "places",
+   "rows": 6000,
+   "seconds": 0.179,
+   "suggestions": [
+    {
+     "measure": "zip",
+     "agg": "none",
+     "per": [],
+     "strength": "strong",
+     "rule": "N1",
+     "right": true,
+     "accept": [
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "year",
+     "agg": "none",
+     "per": [],
+     "strength": "strong",
+     "rule": "N1",
+     "right": true,
+     "accept": [
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "latitude",
+     "agg": "none",
+     "per": [],
+     "strength": "strong",
+     "rule": "G1",
+     "right": true,
+     "accept": [
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "temperature",
+     "agg": "none",
+     "per": [],
+     "strength": "strong",
+     "rule": "N2",
+     "right": true,
+     "accept": [
+      "mean",
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "share_of_votes",
+     "agg": "none",
+     "per": [],
+     "strength": "strong",
+     "rule": "N2",
+     "right": true,
+     "accept": [
+      "mean",
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "col_x",
+     "agg": null,
+     "per": [],
+     "strength": "unsure",
+     "rule": "-",
+     "right": null,
+     "accept": [
+      "None",
+      "mean",
+      "none",
+      "sum"
+     ],
+     "label_per": []
+    }
+   ],
+   "caveats_expected": 0,
+   "caveats_found": 0,
+   "caveats_missed": [],
+   "caveats_unexpected": [],
+   "note": "Power BI summed temperatures; col_x has no right answer the data can give",
+   "caveats_recounted": {
+    "held": 0,
+    "refuted": [],
+    "not_parsed": []
+   }
+  },
+  {
+   "case": "last_mile",
+   "rows": 6000,
+   "seconds": 0.531,
+   "suggestions": [
+    {
+     "measure": "order_value_inr",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "distance_km",
+     "agg": "sum",
+     "per": [],
+     "strength": "likely",
+     "rule": "G2",
+     "right": true,
+     "accept": [
+      "mean",
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "package_weight_kg",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "recorded_delivery_minutes",
+     "agg": "mean",
+     "per": [],
+     "strength": "likely",
+     "rule": "D2",
+     "right": true,
+     "accept": [
+      "mean",
+      "median",
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "gps_drop_distance_m",
+     "agg": "none",
+     "per": [],
+     "strength": "likely",
+     "rule": "G2",
+     "right": true,
+     "accept": [
+      "mean",
+      "median",
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "delivery_cost_inr",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "customer_rating",
+     "agg": "none",
+     "per": [],
+     "strength": "strong",
+     "rule": "N2",
+     "right": true,
+     "accept": [
+      "mean",
+      "median",
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "drop_lat",
+     "agg": "none",
+     "per": [],
+     "strength": "strong",
+     "rule": "G1",
+     "right": true,
+     "accept": [
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "drop_lng",
+     "agg": "none",
+     "per": [],
+     "strength": "strong",
+     "rule": "G1",
+     "right": true,
+     "accept": [
+      "none"
+     ],
+     "label_per": []
+    }
+   ],
+   "caveats_expected": 6,
+   "caveats_found": 6,
+   "caveats_missed": [],
+   "caveats_unexpected": [],
+   "note": "the vNext plan's strict last-mile shape: geo, distance, a 0/1 flag, spellings",
+   "caveats_recounted": {
+    "held": 6,
+    "refuted": [],
+    "not_parsed": []
+   }
+  }
+ ],
+ "metamorphic": {
+  "shop_lines": {
+   "shuffle": true,
+   "rename_value_rules_kept": "4 of 4",
+   "rename_wrong_strong": [],
+   "duplicates_keep_units": true,
+   "totals_row_caught": true
+  },
+  "account_balances": {
+   "shuffle": true,
+   "rename_value_rules_kept": "1 of 1",
+   "rename_wrong_strong": [],
+   "duplicates_keep_units": true,
+   "totals_row_caught": true
+  },
+  "payroll_clean": {
+   "shuffle": true,
+   "rename_value_rules_kept": "1 of 1",
+   "rename_wrong_strong": [],
+   "duplicates_keep_units": true,
+   "totals_row_caught": true
+  },
+  "places": {
+   "shuffle": true,
+   "rename_value_rules_kept": "0 of 0",
+   "rename_wrong_strong": [],
+   "duplicates_keep_units": true,
+   "totals_row_caught": true
+  },
+  "last_mile": {
+   "shuffle": true,
+   "rename_value_rules_kept": "0 of 0",
+   "rename_wrong_strong": [],
+   "duplicates_keep_units": true,
+   "totals_row_caught": true
+  }
+ },
+ "filter": {
+  "sum_everything": [
+   {
+    "case": "shop_lines",
+    "answer": [
+     {
+      "name": "line_no",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "session_seconds",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "unit_price",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "quantity",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "line_amount",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "line_cost",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "shipping_fee",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "customer_credit_limit",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "margin_pct",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     }
+    ],
+    "raw": {
+     "right": 3,
+     "wrong": 5,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 6,
+     "wrong": 2,
+     "blank": 0
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [
+     "customer_credit_limit",
+     "session_seconds"
+    ],
+    "verdicts": {
+     "data": 7,
+     "overruled": 3,
+     "llm_only": 2,
+     "agree": 4
+    }
+   },
+   {
+    "case": "account_balances",
+    "answer": [
+     {
+      "name": "closing_balance",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "deposits",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "interest_rate",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     }
+    ],
+    "raw": {
+     "right": 1,
+     "wrong": 2,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 3,
+     "wrong": 0,
+     "blank": 0
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [],
+    "verdicts": {
+     "data": 3,
+     "overruled": 2,
+     "llm_only": 1
+    }
+   },
+   {
+    "case": "payroll_clean",
+    "answer": [
+     {
+      "name": "month_no",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "monthly_salary",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "bonus_amount",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "hours_worked",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     }
+    ],
+    "raw": {
+     "right": 2,
+     "wrong": 1,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 3,
+     "wrong": 0,
+     "blank": 0
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [],
+    "verdicts": {
+     "overruled": 2,
+     "data": 1,
+     "agree": 1,
+     "llm_only": 1
+    }
+   },
+   {
+    "case": "places",
+    "answer": [
+     {
+      "name": "zip",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "year",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "latitude",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "temperature",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "share_of_votes",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "col_x",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     }
+    ],
+    "raw": {
+     "right": 1,
+     "wrong": 5,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 6,
+     "wrong": 0,
+     "blank": 0
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [],
+    "verdicts": {
+     "overruled": 5,
+     "llm_only": 1
+    }
+   },
+   {
+    "case": "last_mile",
+    "answer": [
+     {
+      "name": "stop_no",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "order_value_inr",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "distance_km",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "package_weight_kg",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "recorded_delivery_minutes",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "gps_drop_distance_m",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "delivery_cost_inr",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "customer_rating",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "drop_lat",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "drop_lng",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "is_late",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     }
+    ],
+    "raw": {
+     "right": 4,
+     "wrong": 5,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 9,
+     "wrong": 0,
+     "blank": 0
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [],
+    "verdicts": {
+     "data": 2,
+     "overruled": 6,
+     "agree": 4,
+     "llm_only": 1
+    }
+   }
+  ],
+  "live": [
+   {
+    "case": "shop_lines",
+    "answer": [
+     {
+      "name": "line_id",
+      "role": "key",
+      "agg": "none",
+      "per": [],
+      "meaning": "unique line identifier",
+      "confidence": 1.0
+     },
+     {
+      "name": "order_id",
+      "role": "dimension",
+      "agg": "none",
+      "per": [],
+      "meaning": "order identifier",
+      "confidence": 1.0
+     },
+     {
+      "name": "customer_id",
+      "role": "dimension",
+      "agg": "none",
+      "per": [],
+      "meaning": "customer identifier",
+      "confidence": 1.0
+     },
+     {
+      "name": "line_no",
+      "role": "dimension",
+      "agg": "none",
+      "per": [],
+      "meaning": "line sequence number within order",
+      "confidence": 0.9
+     },
+     {
+      "name": "channel",
+      "role": "dimension",
+      "agg": "none",
+      "per": [],
+      "meaning": "sales channel (online or store)",
+      "confidence": 1.0
+     },
+     {
+      "name": "courier",
+      "role": "dimension",
+      "agg": "none",
+      "per": [],
+      "meaning": "courier provider",
+      "confidence": 0.9
+     },
+     {
+      "name": "session_seconds",
+      "role": "measure",
+      "agg": "sum",
+      "per": [],
+      "meaning": "session duration in seconds",
+      "confidence": 0.8
+     },
+     {
+      "name": "customer_age",
+      "role": "dimension",
+      "agg": "none",
+      "per": [],
+      "meaning": "customer age (or unknown)",
+      "confidence": 0.9
+     },
+     {
+      "name": "unit_price",
+      "role": "measure",
+      "agg": "none",
+      "per": [],
+      "meaning": "price per unit",
+      "confidence": 0.9
+     },
+     {
+      "name": "quantity",
+      "role": "measure",
+      "agg": "sum",
+      "per": [],
+      "meaning": "quantity of units ordered",
+      "confidence": 0.9
+     },
+     {
+      "name": "line_amount",
+      "role": "measure",
+      "agg": "sum",
+      "per": [],
+      "meaning": "total amount for the line",
+      "confidence": 0.95
+     },
+     {
+      "name": "line_cost",
+      "role": "measure",
+      "agg": "sum",
+      "per": [],
+      "meaning": "cost for the line",
+      "confidence": 0.9
+     },
+     {
+      "name": "shipping_fee",
+      "role": "measure",
+      "agg": "sum",
+      "per": [
+       "order_id"
+      ],
+      "meaning": "shipping fee (same per order)",
+      "confidence": 0.95
+     },
+     {
+      "name": "customer_credit_limit",
+      "role": "dimension",
+      "agg": "none",
+      "per": [
+       "customer_id"
+      ],
+      "meaning": "credit limit for the customer",
+      "confidence": 0.8
+     },
+     {
+      "name": "delivery_date",
+      "role": "dimension",
+      "agg": "none",
+      "per": [],
+      "meaning": "expected delivery date",
+      "confidence": 0.7
+     },
+     {
+      "name": "order_date",
+      "role": "date",
+      "agg": "none",
+      "per": [],
+      "meaning": "date the order was placed",
+      "confidence": 1.0
+     },
+     {
+      "name": "region",
+      "role": "dimension",
+      "agg": "none",
+      "per": [],
+      "meaning": "geographic region",
+      "confidence": 1.0
+     },
+     {
+      "name": "margin_pct",
+      "role": "measure",
+      "agg": "mean",
+      "per": [],
+      "meaning": "margin percentage for the line",
+      "confidence": 0.85
+     }
+    ],
+    "raw": {
+     "right": 5,
+     "wrong": 2,
+     "blank": 1
+    },
+    "filtered": {
+     "right": 5,
+     "wrong": 2,
+     "blank": 1
+    },
+    "wrong_but_checked": [
+     "margin_pct"
+    ],
+    "wrong_left_for_review": [
+     "session_seconds"
+    ],
+    "verdicts": {
+     "agree": 9,
+     "llm_only": 9,
+     "data": 3
+    },
+    "model": "groq/openai/gpt-oss-120b"
+   },
+   {
+    "case": "account_balances",
+    "answer": [
+     {
+      "name": "account_id",
+      "role": "key",
+      "agg": "none",
+      "per": null,
+      "meaning": "account identifier",
+      "confidence": 1.0
+     },
+     {
+      "name": "as_of",
+      "role": "date",
+      "agg": "none",
+      "per": null,
+      "meaning": "balance date",
+      "confidence": 1.0
+     },
+     {
+      "name": "closing_balance",
+      "role": "measure",
+      "agg": "sum",
+      "per": null,
+      "meaning": "account balance at date",
+      "confidence": 0.9
+     },
+     {
+      "name": "deposits",
+      "role": "measure",
+      "agg": "sum",
+      "per": null,
+      "meaning": "deposits amount for period",
+      "confidence": 0.9
+     },
+     {
+      "name": "interest_rate",
+      "role": "dimension",
+      "agg": "none",
+      "per": [
+       "account_id"
+      ],
+      "meaning": "interest rate for account",
+      "confidence": 0.95
+     }
+    ],
+    "raw": {
+     "right": 1,
+     "wrong": 1,
+     "blank": 1
+    },
+    "filtered": {
+     "right": 2,
+     "wrong": 0,
+     "blank": 1
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [],
+    "verdicts": {
+     "agree": 2,
+     "llm_only": 4,
+     "overruled": 1,
+     "data": 1
+    },
+    "model": "groq/openai/gpt-oss-120b"
+   },
+   {
+    "case": "payroll_clean",
+    "answer": [
+     {
+      "name": "employee_id",
+      "role": "key",
+      "agg": "none",
+      "per": [],
+      "meaning": "employee identifier",
+      "confidence": 1.0
+     },
+     {
+      "name": "month_no",
+      "role": "key",
+      "agg": "none",
+      "per": [],
+      "meaning": "month number (1\u201130)",
+      "confidence": 1.0
+     },
+     {
+      "name": "monthly_salary",
+      "role": "measure",
+      "agg": "sum",
+      "per": [
+       "employee_id"
+      ],
+      "meaning": "monthly salary amount",
+      "confidence": 0.95
+     },
+     {
+      "name": "bonus_amount",
+      "role": "measure",
+      "agg": "sum",
+      "per": [],
+      "meaning": "bonus paid that month",
+      "confidence": 0.95
+     },
+     {
+      "name": "hours_worked",
+      "role": "measure",
+      "agg": "sum",
+      "per": [],
+      "meaning": "hours worked that month",
+      "confidence": 0.95
+     }
+    ],
+    "raw": {
+     "right": 2,
+     "wrong": 1,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 3,
+     "wrong": 0,
+     "blank": 0
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [],
+    "verdicts": {
+     "agree": 3,
+     "llm_only": 5,
+     "overruled": 1
+    },
+    "model": "groq/openai/gpt-oss-120b"
+   },
+   {
+    "case": "places",
+    "answer": [
+     {
+      "name": "place_id",
+      "role": "key",
+      "agg": "none",
+      "per": [],
+      "meaning": "unique identifier for each place",
+      "confidence": 1.0
+     },
+     {
+      "name": "zip",
+      "role": "dimension",
+      "agg": "none",
+      "per": [],
+      "meaning": "postal code of the place",
+      "confidence": 1.0
+     },
+     {
+      "name": "year",
+      "role": "date",
+      "agg": "none",
+      "per": [],
+      "meaning": "year of observation",
+      "confidence": 1.0
+     },
+     {
+      "name": "latitude",
+      "role": "dimension",
+      "agg": "none",
+      "per": [],
+      "meaning": "geographic latitude of the place",
+      "confidence": 0.9
+     },
+     {
+      "name": "temperature",
+      "role": "measure",
+      "agg": "mean",
+      "per": [],
+      "meaning": "average temperature at the place",
+      "confidence": 0.95
+     },
+     {
+      "name": "share_of_votes",
+      "role": "measure",
+      "agg": "mean",
+      "per": [],
+      "meaning": "proportion of votes held",
+      "confidence": 0.9
+     },
+     {
+      "name": "col_x",
+      "role": "measure",
+      "agg": "sum",
+      "per": [],
+      "meaning": "numeric value associated with place",
+      "confidence": 0.8
+     }
+    ],
+    "raw": {
+     "right": 3,
+     "wrong": 0,
+     "blank": 3
+    },
+    "filtered": {
+     "right": 3,
+     "wrong": 0,
+     "blank": 3
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [],
+    "verdicts": {
+     "blocked": 1,
+     "agree": 3,
+     "llm_only": 5
+    },
+    "model": "groq/openai/gpt-oss-120b"
+   },
+   {
+    "case": "last_mile",
+    "answer": [
+     {
+      "name": "order_id",
+      "role": "key",
+      "agg": "none",
+      "per": null,
+      "meaning": "unique identifier of the order",
+      "confidence": 1.0
+     },
+     {
+      "name": "stop_no",
+      "role": "key",
+      "agg": "none",
+      "per": null,
+      "meaning": "sequence number of the stop within the order",
+      "confidence": 1.0
+     },
+     {
+      "name": "order_date",
+      "role": "date",
+      "agg": "none",
+      "per": null,
+      "meaning": "date the order was placed",
+      "confidence": 1.0
+     },
+     {
+      "name": "order_value_inr",
+      "role": "measure",
+      "agg": "sum",
+      "per": [
+       "order_id"
+      ],
+      "meaning": "total value of the order (same for all its stops)",
+      "confidence": 0.85
+     },
+     {
+      "name": "distance_km",
+      "role": "measure",
+      "agg": "sum",
+      "per": null,
+      "meaning": "distance travelled for this stop",
+      "confidence": 0.95
+     },
+     {
+      "name": "package_weight_kg",
+      "role": "measure",
+      "agg": "sum",
+      "per": null,
+      "meaning": "weight of the package delivered at this stop",
+      "confidence": 0.95
+     },
+     {
+      "name": "recorded_delivery_minutes",
+      "role": "measure",
+      "agg": "sum",
+      "per": null,
+      "meaning": "time taken to complete this stop",
+      "confidence": 0.9
+     },
+     {
+      "name": "gps_drop_distance_m",
+      "role": "measure",
+      "agg": "sum",
+      "per": null,
+      "meaning": "GPS\u2011measured drop distance for this stop",
+      "confidence": 0.9
+     },
+     {
+      "name": "delivery_cost_inr",
+      "role": "measure",
+      "agg": "sum",
+      "per": null,
+      "meaning": "cost incurred for this stop",
+      "confidence": 0.95
+     },
+     {
+      "name": "customer_rating",
+      "role": "measure",
+      "agg": "mean",
+      "per": null,
+      "meaning": "customer rating for this stop (1\u20115)",
+      "confidence": 0.9
+     },
+     {
+      "name": "drop_lat",
+      "role": "ignore",
+      "agg": null,
+      "per": null,
+      "meaning": "latitude of drop location",
+      "confidence": 0.8
+     },
+     {
+      "name": "drop_lng",
+      "role": "ignore",
+      "agg": null,
+      "per": null,
+      "meaning": "longitude of drop location",
+      "confidence": 0.8
+     },
+     {
+      "name": "is_late",
+      "role": "dimension",
+      "agg": "sum",
+      "per": null,
+      "meaning": "flag indicating if the stop was late (1)",
+      "confidence": 0.95
+     },
+     {
+      "name": "zone",
+      "role": "dimension",
+      "agg": "none",
+      "per": null,
+      "meaning": "geographic zone of the drop",
+      "confidence": 0.95
+     },
+     {
+      "name": "rider_id",
+      "role": "dimension",
+      "agg": "none",
+      "per": null,
+      "meaning": "identifier of the rider handling the stop",
+      "confidence": 0.95
+     }
+    ],
+    "raw": {
+     "right": 4,
+     "wrong": 3,
+     "blank": 2
+    },
+    "filtered": {
+     "right": 7,
+     "wrong": 0,
+     "blank": 2
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [],
+    "verdicts": {
+     "agree": 6,
+     "llm_only": 9,
+     "overruled": 3,
+     "data": 2
+    },
+    "model": "groq/openai/gpt-oss-120b"
+   }
+  ]
+ }
+}

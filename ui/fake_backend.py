@@ -19,7 +19,8 @@ from dataclasses import dataclass, field, replace
 from analytics_agent.webapp.contract import (
     ActionResult, AnalysisMenu, AnalysisParam, AnalysisRun, AnalysisSpec, Artifact, ChatTurn,
     CleaningProposal, CleaningStep, ColumnDraft, ContractColumn, ContractDraft,
-    DatasetSummary, GridPreview, IngestDraft, Limits, Refusal, ToolCall, UploadResult,
+    DatasetSummary, GridPreview, IngestDraft, Limits, MeasureSuggestion, Refusal, ToolCall,
+    UploadResult,
 )
 
 _MIB = 1024 * 1024
@@ -260,7 +261,8 @@ class FakeBackend:
     def draft_contract(self, workspace_id, dataset_name, *, grain=None, primary_key=None,
                        date_column=None, measures=None, dimensions=None, aggregations=None,
                        measure_definitions=None, analysis_window_start=None,
-                       analysis_window_end=None, caveats=None) -> ContractDraft:
+                       analysis_window_end=None, caveats=None, measure_per=None,
+                       ratios=None, measure_columns=None) -> ContractDraft:
         with self._lock:
             space = self._ws(workspace_id)
             columns = space.columns.get(dataset_name)
@@ -292,10 +294,20 @@ class FakeBackend:
             analysis_window_start=analysis_window_start, analysis_window_end=analysis_window_end,
             caveats=list(caveats or []), columns=columns, provisional=provisional,
             questions=[f"What does one row of {dataset_name} stand for?"] if not grain else [],
+            # The engine's reading of a coordinate (contract/suggest.py, rule N2), for the form's
+            # "use the engine's suggestions".
+            suggestions={m: MeasureSuggestion("none", "strong", f"{m} is named like a per-row "
+                                              f"value (a coordinate): its total means nothing.",
+                                              "N2") for m in measures
+                         if m.endswith(("_lat", "_lng"))},
+            measure_per=dict(measure_per or {}), ratios=dict(ratios or {}),
             evidence=[f"{c.name} holds {c.distinct_count} distinct value(s)" for c in columns
                       if c.distinct_count is not None],
             message="PROVISIONAL -- answer what is missing." if provisional else
                     "Ready to confirm.")
+
+    def refill_contract(self, workspace_id: str, dataset_name: str) -> None:
+        """The fake has no model: nothing to forget."""
 
     def confirm_contract(self, workspace_id: str, draft: ContractDraft) -> ActionResult:
         if draft.provisional:

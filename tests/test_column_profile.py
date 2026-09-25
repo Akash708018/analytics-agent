@@ -350,3 +350,15 @@ def test_the_render_carries_no_path_because_nothing_was_written(sales):
 
 def test_nothing_here_reads_as_a_refusal(sales):
     assert reason_of(render_column(profile_column(sales, "sales", "region"))) is None
+
+
+def test_a_null_in_the_list_is_not_counted_as_a_distinct_value():
+    """Retail rating (recheck, 25/09/2026): 'Most frequent value(s), 7 of 6 distinct'."""
+    import duckdb as _duckdb
+    from analytics_agent.profile.column_profile import profile_column, render_column
+    c = _duckdb.connect(":memory:")
+    c.execute("CREATE TABLE r AS SELECT * FROM (VALUES ('4'),('4'),(NULL),(NULL),(NULL),('3'),"
+              "('n/a')) t(rating)")
+    text = render_column(profile_column(c, "r", "rating", top_n=2))
+    assert "1 of 3 distinct and (null):" in text
+    assert "2 further distinct value(s)" in text

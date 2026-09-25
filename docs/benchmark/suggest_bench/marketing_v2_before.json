@@ -1,0 +1,1017 @@
+{
+ "summary": {
+  "measures": 24,
+  "by_strength": {
+   "strong": {
+    "count": 14,
+    "right": 11,
+    "wrong": 3,
+    "abstained": 0
+   },
+   "likely": {
+    "count": 9,
+    "right": 4,
+    "wrong": 5,
+    "abstained": 0
+   },
+   "unsure": {
+    "count": 1,
+    "right": 0,
+    "wrong": 0,
+    "abstained": 1
+   }
+  },
+  "strong_precision": 0.7857142857142857,
+  "likely_precision": 0.4444444444444444,
+  "strong_coverage": 0.5833333333333334,
+  "wrong_strong": [
+   [
+    "promo_orders",
+    "order_revenue_local",
+    "sum",
+    [
+     "order_id"
+    ],
+    "P1"
+   ],
+   [
+    "promo_orders",
+    "discount_usd",
+    "none",
+    [],
+    "N2"
+   ],
+   [
+    "promo_orders",
+    "discount_pct",
+    "mean",
+    [
+     "coupon_code"
+    ],
+    "P1"
+   ]
+  ],
+  "caveat_recall": 0.14285714285714285,
+  "caveats_missed": [
+   "mql_at is before lead_created_at in 12 row(s)",
+   "deal_amount holds a value in 5 row(s) where is_won = 0",
+   "user_id falls under more than one variant for 151 value(s)",
+   "conversion_id falls under more than one platform for 1,326 value(s)",
+   "order_revenue_local mixes 3 currencies",
+   "order_date is in the future in 7 row(s)"
+  ],
+  "caveats_unexpected": {
+   "crm_funnel": [
+    "won_at and days_to_close are blank in the same 3,201 row(s) (80.0%) -- exactly the rows where is_won = 0.",
+    "deal_amount is blank in 3,196 row(s) (79.9%).",
+    "sql_at is blank in 2,000 row(s) (50.0%) -- exactly the rows where is_sql = 0.",
+    "mql_at is blank in 1,334 row(s) (33.4%) -- exactly the rows where is_mql = 0."
+   ],
+   "promo_orders": [
+    "order_date has no rows in 2024-10, 2024-11, 2024-12, 2025-01, 2025-02, 2025-03 and 69 more -- inside its span 2024-07 to 2031-01. A trend shows the month as empty; nothing in the data says why."
+   ]
+  },
+  "caveat_lines": 6,
+  "caveat_lines_held": 6,
+  "caveat_lines_refuted": [],
+  "false_alarms_on_clean": 0
+ },
+ "cases": [
+  {
+   "case": "crm_funnel",
+   "rows": 4000,
+   "seconds": 0.456,
+   "suggestions": [
+    {
+     "measure": "deal_amount",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "lead_score",
+     "agg": "none",
+     "per": [],
+     "strength": "strong",
+     "rule": "N2",
+     "right": true,
+     "accept": [
+      "mean",
+      "median",
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "days_to_close",
+     "agg": "mean",
+     "per": [],
+     "strength": "likely",
+     "rule": "D1",
+     "right": true,
+     "accept": [
+      "mean",
+      "median",
+      "none"
+     ],
+     "label_per": []
+    }
+   ],
+   "caveats_expected": 3,
+   "caveats_found": 1,
+   "caveats_missed": [
+    "mql_at is before lead_created_at in 12 row(s)",
+    "deal_amount holds a value in 5 row(s) where is_won = 0"
+   ],
+   "caveats_unexpected": [
+    "won_at and days_to_close are blank in the same 3,201 row(s) (80.0%) -- exactly the rows where is_won = 0.",
+    "deal_amount is blank in 3,196 row(s) (79.9%).",
+    "sql_at is blank in 2,000 row(s) (50.0%) -- exactly the rows where is_sql = 0.",
+    "mql_at is blank in 1,334 row(s) (33.4%) -- exactly the rows where is_mql = 0."
+   ],
+   "note": "",
+   "caveats_recounted": {
+    "held": 5,
+    "refuted": [],
+    "not_parsed": []
+   }
+  },
+  {
+   "case": "saas_monthly",
+   "rows": 4878,
+   "seconds": 0.104,
+   "suggestions": [
+    {
+     "measure": "mrr",
+     "agg": "none",
+     "per": [],
+     "strength": "likely",
+     "rule": "S1",
+     "right": true,
+     "accept": [
+      "mean",
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "seats",
+     "agg": null,
+     "per": [],
+     "strength": "unsure",
+     "rule": "-",
+     "right": null,
+     "accept": [
+      "mean",
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "new_mrr",
+     "agg": "none",
+     "per": [],
+     "strength": "likely",
+     "rule": "S1",
+     "right": false,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "expansion_mrr",
+     "agg": "none",
+     "per": [],
+     "strength": "likely",
+     "rule": "S1",
+     "right": false,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "contraction_mrr",
+     "agg": "none",
+     "per": [],
+     "strength": "likely",
+     "rule": "S1",
+     "right": false,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "churned_mrr",
+     "agg": "none",
+     "per": [],
+     "strength": "likely",
+     "rule": "S1",
+     "right": false,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "cac",
+     "agg": "mean",
+     "per": [
+      "account_id"
+     ],
+     "strength": "likely",
+     "rule": "P1",
+     "right": false,
+     "accept": [
+      "mean",
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "ltv",
+     "agg": "mean",
+     "per": [
+      "account_id"
+     ],
+     "strength": "likely",
+     "rule": "P1",
+     "right": true,
+     "accept": [
+      "mean",
+      "none"
+     ],
+     "label_per": [
+      "account_id"
+     ]
+    }
+   ],
+   "caveats_expected": 0,
+   "caveats_found": 0,
+   "caveats_missed": [],
+   "caveats_unexpected": [],
+   "note": "mrr is semi-additive: across accounts in a month yes, across months never",
+   "caveats_recounted": {
+    "held": 0,
+    "refuted": [],
+    "not_parsed": []
+   }
+  },
+  {
+   "case": "ab_test",
+   "rows": 20151,
+   "seconds": 0.034,
+   "suggestions": [
+    {
+     "measure": "revenue",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "sessions",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    }
+   ],
+   "caveats_expected": 1,
+   "caveats_found": 0,
+   "caveats_missed": [
+    "user_id falls under more than one variant for 151 value(s)"
+   ],
+   "caveats_unexpected": [],
+   "note": "",
+   "caveats_recounted": {
+    "held": 0,
+    "refuted": [],
+    "not_parsed": []
+   }
+  },
+  {
+   "case": "platform_conversions",
+   "rows": 7404,
+   "seconds": 0.017,
+   "suggestions": [
+    {
+     "measure": "conversion_value",
+     "agg": "sum",
+     "per": [
+      "conversion_id"
+     ],
+     "strength": "strong",
+     "rule": "P1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": [
+      "conversion_id"
+     ]
+    }
+   ],
+   "caveats_expected": 1,
+   "caveats_found": 0,
+   "caveats_missed": [
+    "conversion_id falls under more than one platform for 1,326 value(s)"
+   ],
+   "caveats_unexpected": [],
+   "note": "",
+   "caveats_recounted": {
+    "held": 0,
+    "refuted": [],
+    "not_parsed": []
+   }
+  },
+  {
+   "case": "promo_orders",
+   "rows": 4084,
+   "seconds": 0.027,
+   "suggestions": [
+    {
+     "measure": "order_revenue_local",
+     "agg": "sum",
+     "per": [
+      "order_id"
+     ],
+     "strength": "strong",
+     "rule": "P1",
+     "right": false,
+     "accept": [
+      "none"
+     ],
+     "label_per": [
+      "order_id"
+     ]
+    },
+    {
+     "measure": "order_revenue_usd",
+     "agg": "sum",
+     "per": [
+      "order_id"
+     ],
+     "strength": "strong",
+     "rule": "P1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": [
+      "order_id"
+     ]
+    },
+    {
+     "measure": "discount_usd",
+     "agg": "none",
+     "per": [],
+     "strength": "strong",
+     "rule": "N2",
+     "right": false,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "discount_pct",
+     "agg": "mean",
+     "per": [
+      "coupon_code"
+     ],
+     "strength": "strong",
+     "rule": "P1",
+     "right": false,
+     "accept": [
+      "mean",
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "fx_rate_to_usd",
+     "agg": "mean",
+     "per": [
+      "order_id"
+     ],
+     "strength": "strong",
+     "rule": "P1",
+     "right": true,
+     "accept": [
+      "mean",
+      "none"
+     ],
+     "label_per": [
+      "order_id"
+     ]
+    }
+   ],
+   "caveats_expected": 2,
+   "caveats_found": 0,
+   "caveats_missed": [
+    "order_revenue_local mixes 3 currencies",
+    "order_date is in the future in 7 row(s)"
+   ],
+   "caveats_unexpected": [
+    "order_date has no rows in 2024-10, 2024-11, 2024-12, 2025-01, 2025-02, 2025-03 and 69 more -- inside its span 2024-07 to 2031-01. A trend shows the month as empty; nothing in the data says why."
+   ],
+   "note": "",
+   "caveats_recounted": {
+    "held": 1,
+    "refuted": [],
+    "not_parsed": []
+   }
+  },
+  {
+   "case": "seo_rankings",
+   "rows": 9000,
+   "seconds": 0.018,
+   "suggestions": [
+    {
+     "measure": "avg_position",
+     "agg": "none",
+     "per": [],
+     "strength": "likely",
+     "rule": "S1",
+     "right": true,
+     "accept": [
+      "mean",
+      "median",
+      "none"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "search_volume",
+     "agg": "sum",
+     "per": [
+      "keyword_id"
+     ],
+     "strength": "strong",
+     "rule": "P1",
+     "right": true,
+     "accept": [
+      "mean",
+      "none",
+      "sum"
+     ],
+     "label_per": [
+      "keyword_id"
+     ]
+    },
+    {
+     "measure": "impressions",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "clicks",
+     "agg": "sum",
+     "per": [],
+     "strength": "strong",
+     "rule": "A1",
+     "right": true,
+     "accept": [
+      "sum"
+     ],
+     "label_per": []
+    },
+    {
+     "measure": "ctr",
+     "agg": "none",
+     "per": [],
+     "strength": "strong",
+     "rule": "R1",
+     "right": true,
+     "accept": [
+      "none"
+     ],
+     "label_per": []
+    }
+   ],
+   "caveats_expected": 0,
+   "caveats_found": 0,
+   "caveats_missed": [],
+   "caveats_unexpected": [],
+   "note": "",
+   "caveats_recounted": {
+    "held": 0,
+    "refuted": [],
+    "not_parsed": []
+   }
+  }
+ ],
+ "filter": {
+  "sum_everything": [
+   {
+    "case": "crm_funnel",
+    "answer": [
+     {
+      "name": "is_mql",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "is_sql",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "is_won",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "deal_amount",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "lead_score",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "days_to_close",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     }
+    ],
+    "raw": {
+     "right": 1,
+     "wrong": 2,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 2,
+     "wrong": 1,
+     "blank": 0
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [
+     "days_to_close"
+    ],
+    "verdicts": {
+     "agree": 4,
+     "overruled": 1,
+     "llm_only": 1
+    }
+   },
+   {
+    "case": "saas_monthly",
+    "answer": [
+     {
+      "name": "seats",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "mrr",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "new_mrr",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "expansion_mrr",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "contraction_mrr",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "churned_mrr",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "is_churned",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "arpu_raw",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "cac",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "ltv",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     }
+    ],
+    "raw": {
+     "right": 4,
+     "wrong": 4,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 1,
+     "wrong": 7,
+     "blank": 0
+    },
+    "wrong_but_checked": [
+     "new_mrr",
+     "expansion_mrr",
+     "contraction_mrr",
+     "churned_mrr"
+    ],
+    "wrong_left_for_review": [
+     "seats",
+     "cac",
+     "ltv"
+    ],
+    "verdicts": {
+     "data": 6,
+     "llm_only": 3,
+     "overruled": 6,
+     "agree": 1
+    }
+   },
+   {
+    "case": "ab_test",
+    "answer": [
+     {
+      "name": "converted",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "revenue",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "sessions",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     }
+    ],
+    "raw": {
+     "right": 2,
+     "wrong": 0,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 2,
+     "wrong": 0,
+     "blank": 0
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [],
+    "verdicts": {
+     "data": 2,
+     "agree": 3
+    }
+   },
+   {
+    "case": "platform_conversions",
+    "answer": [
+     {
+      "name": "conversion_value",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     }
+    ],
+    "raw": {
+     "right": 0,
+     "wrong": 1,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 1,
+     "wrong": 0,
+     "blank": 0
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [],
+    "verdicts": {
+     "data": 3,
+     "agree": 1
+    }
+   },
+   {
+    "case": "promo_orders",
+    "answer": [
+     {
+      "name": "order_revenue_local",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "fx_rate_to_usd",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "order_revenue_usd",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "discount_usd",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "discount_pct",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     }
+    ],
+    "raw": {
+     "right": 1,
+     "wrong": 4,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 2,
+     "wrong": 3,
+     "blank": 0
+    },
+    "wrong_but_checked": [
+     "order_revenue_local",
+     "discount_usd",
+     "discount_pct"
+    ],
+    "wrong_left_for_review": [],
+    "verdicts": {
+     "data": 6,
+     "agree": 2,
+     "overruled": 3
+    }
+   },
+   {
+    "case": "seo_rankings",
+    "answer": [
+     {
+      "name": "avg_position",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "search_volume",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "impressions",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "clicks",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     },
+     {
+      "name": "ctr",
+      "role": "measure",
+      "agg": "sum",
+      "confidence": 0.9
+     }
+    ],
+    "raw": {
+     "right": 2,
+     "wrong": 3,
+     "blank": 0
+    },
+    "filtered": {
+     "right": 5,
+     "wrong": 0,
+     "blank": 0
+    },
+    "wrong_but_checked": [],
+    "wrong_left_for_review": [],
+    "verdicts": {
+     "data": 4,
+     "overruled": 2,
+     "agree": 3
+    }
+   }
+  ]
+ },
+ "end_to_end": {
+  "figures": [
+   {
+    "check": "revenue_usd per channel, once per order",
+    "group": "affiliate",
+    "want": 56363.57,
+    "got": 56363.57,
+    "ok": true
+   },
+   {
+    "check": "revenue_usd per channel, once per order",
+    "group": "direct",
+    "want": 56170.39,
+    "got": 56170.39,
+    "ok": true
+   },
+   {
+    "check": "revenue_usd per channel, once per order",
+    "group": "paid_social",
+    "want": 56130.83,
+    "got": 56130.83,
+    "ok": true
+   },
+   {
+    "check": "revenue_usd per channel, once per order",
+    "group": "email",
+    "want": 56185.65,
+    "got": 56185.65,
+    "ok": true
+   },
+   {
+    "check": "conversion_value per platform",
+    "group": "google",
+    "want": 566142.0,
+    "got": null,
+    "ok": false
+   },
+   {
+    "check": "conversion_value per platform",
+    "group": "tiktok",
+    "want": 567240.0,
+    "got": null,
+    "ok": false
+   },
+   {
+    "check": "conversion_value per platform",
+    "group": "meta",
+    "want": 566040.0,
+    "got": null,
+    "ok": false
+   },
+   {
+    "check": "conversion_value total, de-duplicated",
+    "group": "(all)",
+    "want": 1377000.0,
+    "got": null,
+    "ok": true
+   },
+   {
+    "check": "conversion rate per variant",
+    "group": "control",
+    "want": 0.11969,
+    "got": 0.1197,
+    "ok": false
+   },
+   {
+    "check": "conversion rate per variant",
+    "group": "treatment",
+    "want": 0.100248,
+    "got": 0.1002,
+    "ok": false
+   },
+   {
+    "check": "win rate per channel",
+    "group": "events",
+    "want": 0.0,
+    "got": 0.0,
+    "ok": true
+   },
+   {
+    "check": "win rate per channel",
+    "group": "referral",
+    "want": 0.49875,
+    "got": 0.4988,
+    "ok": false
+   },
+   {
+    "check": "win rate per channel",
+    "group": "organic",
+    "want": 0.0,
+    "got": 0.0,
+    "ok": true
+   },
+   {
+    "check": "win rate per channel",
+    "group": "paid_search",
+    "want": 0.5,
+    "got": 0.5,
+    "ok": true
+   },
+   {
+    "check": "win rate per channel",
+    "group": "paid_social",
+    "want": 0.0,
+    "got": 0.0,
+    "ok": true
+   },
+   {
+    "check": "new MRR per plan",
+    "group": "growth",
+    "want": 76500.0,
+    "got": null,
+    "ok": false
+   },
+   {
+    "check": "new MRR per plan",
+    "group": "starter",
+    "want": 36000.0,
+    "got": null,
+    "ok": false
+   },
+   {
+    "check": "new MRR per plan",
+    "group": "pro",
+    "want": 112500.0,
+    "got": null,
+    "ok": false
+   },
+   {
+    "check": "new MRR per plan",
+    "group": "enterprise",
+    "want": 147000.0,
+    "got": null,
+    "ok": false
+   }
+  ],
+  "contracts": {
+   "promo_orders": "Contract stored for promo_orders, version 1.",
+   "platform_conversions": "Contract stored for platform_conversions, version 1.",
+   "ab_test": "Contract stored for ab_test, version 1.",
+   "crm_funnel": "Contract stored for crm_funnel, version 1.",
+   "saas_monthly": "Contract stored for saas_monthly, version 1."
+  },
+  "notes": {
+   "fan_out_inflation": {
+    "affiliate": 1.1,
+    "direct": 1.111,
+    "paid_social": 1.105,
+    "email": 2.117
+   },
+   "currency_caveat_in_reply": false,
+   "claims_inflation": 1.234,
+   "split_caveat_in_reply": true,
+   "contamination_caveat_in_reply": false,
+   "mrr_total_refused": true
+  }
+ }
+}

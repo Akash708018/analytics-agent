@@ -47,11 +47,16 @@ def _iso(value) -> str | None:
 
 
 def form_answers(rows: list[dict], grain: str, start, end, caveats: str,
-                 aggregations: dict | None = None, definitions: dict | None = None) -> dict:
+                 aggregations: dict | None = None, definitions: dict | None = None,
+                 per: dict | None = None, ratios: dict | None = None,
+                 rates: dict | None = None) -> dict:
     """The form as the engine's draft_contract takes it. Reading, not deciding: which of these
-    is enough is the engine's call."""
+    is enough is the engine's call. `ratios` are the ratio-of-sums measures ticked on, each
+    {name: {numerator, denominator, scale, definition}}; they are measures of their own."""
     aggregations, definitions = aggregations or {}, definitions or {}
-    return dict(
+    per, ratios = per or {}, ratios or {}
+    measures = [r["column"] for r in rows if r["role"] == "measure"]
+    answers = dict(
         grain=grain.strip() or None,
         primary_key=[r["column"] for r in rows if r["role"] == "key"],
         date_column=next((r["column"] for r in rows if r["role"] == "date"), None),
@@ -63,7 +68,73 @@ def form_answers(rows: list[dict], grain: str, start, end, caveats: str,
                              if r["role"] == "measure"
                              and (definitions.get(r["column"]) or "").strip()},
         analysis_window_start=_iso(start), analysis_window_end=_iso(end),
-        caveats=[c.strip() for c in caveats.splitlines() if c.strip()])
+        caveats=[c.strip() for c in caveats.splitlines() if c.strip()],
+        measure_per={m: list(per[m]) for m in measures if per.get(m)})
+    if ratios:
+        answers["measures"] = measures + [n for n in ratios if n not in measures]
+        answers["aggregations"].update({n: "ratio" for n in ratios})
+        answers["measure_definitions"].update({n: r["definition"] for n, r in ratios.items()})
+        answers["ratios"] = {n: {k: r[k] for k in ("numerator", "denominator", "scale")}
+                             for n, r in ratios.items()}
+    if rates:
+        # A flag's rate: a helper measure reading the 0/1 column, which stays a dimension.
+        answers["measures"] = answers["measures"] + [n for n in rates
+                                                     if n not in answers["measures"]]
+        answers["aggregations"].update({n: "mean" for n in rates})
+        answers["measure_definitions"].update(
+            {n: f"share of rows where {col} is 1 (true): the mean of a 0/1 column"
+             for n, col in rates.items()})
+        answers["measure_columns"] = dict(rates)
+    return answers
+
+
+#: How each verdict of contract/llm_filter.py reads under a field.
+BADGE = {
+    "agree": ":material/verified: checked by the data",
+    "llm_only": ":material/smart_toy: from the model; the data cannot check this",
+    "overruled": ":material/gavel: the data overruled the model",
+    "blocked": ":material/block: blocked",
+    "data": ":material/database: from the data",
+    "user": ":material/person: yours",
+}
+
+
+def badge(draft: ContractDraft, *paths: str) -> str | None:
+    """One caption line for the fields at `paths` that a model fill decided, or None."""
+    parts = []
+    for path in paths:
+        src = draft.sources.get(path)
+        if src is None:
+            continue
+        what = (path.rsplit(".", 1)[-1] if "." in path else "helper measure"
+                if path.startswith("measures[") else path.replace("_", " "))
+        said = (f" (it said {src.llm!r})" if src.status in ("overruled", "user")
+                and src.llm is not None else "")
+        conf = f", {src.confidence:.0%} sure" if src.confidence is not None else ""
+        parts.append(f"{BADGE.get(src.status, src.status)} · *{what}*{said}{conf} — {src.reason}")
+    return "  \n".join(parts) or None
+
+
+def _refill(name: str) -> None:
+    """Ask the model again: forget its fill and every seeded field of this dataset's form."""
+    ui.backend().refill_contract(ui.workspace_id(), name)
+    st.session_state.get("contract_draft", {}).pop(name, None)
+    for key in [k for k in st.session_state
+                if (k.startswith("c_") and f"_{name}" in k) or k == f"contract_cols_{name}"]:
+        st.session_state.pop(key, None)
+
+
+def _use_suggestions(name: str, draft: ContractDraft, measures: list[str]) -> None:
+    """The strong suggestions into the form, on the person's click -- a callback, so it runs
+    before the widgets it sets exist. Never overwrites an answer already given."""
+    for m in measures:
+        s = draft.suggestions.get(m)
+        if s is None or s.strength != "strong" or not s.agg:
+            continue
+        if st.session_state.get(f"c_agg_{name}_{m}") is None:
+            st.session_state[f"c_agg_{name}_{m}"] = s.agg
+            if s.per and not st.session_state.get(f"c_per_{name}_{m}"):
+                st.session_state[f"c_per_{name}_{m}"] = list(s.per)
 
 
 def submit(be, ws: str, name: str, answers: dict, *, confirm: bool):
@@ -107,11 +178,24 @@ def render() -> None:
     name = st.selectbox("Dataset", names)
     drafts = st.session_state.setdefault("contract_draft", {})
     if name not in drafts:
-        drafts[name] = be.draft_contract(ws, name)
+        # The first draft of a table without a contract asks a model to fill it (one call, kept
+        # for the table): 30-60 s on a free tier, measured 25/09/2026. Say so while it runs.
+        with st.spinner("A model is filling in this contract; the data then checks every "
+                        "choice. This happens once per table…"):
+            drafts[name] = be.draft_contract(ws, name)
     draft: ContractDraft = drafts[name]
     if draft.refusal:
         ui.show_refusal(draft.refusal)
         return
+    if draft.filled_by:
+        # The model filled every field; the data checked each choice (webapp/autofill.py).
+        note, again = st.columns([5, 1])
+        note.info(f"{draft.fill_note} Change anything that is wrong: your change wins, and "
+                  f"nothing is used until you confirm.", icon=":material/smart_toy:")
+        again.button("Fill again", on_click=_refill, args=(name,), width="stretch",
+                     help="Ask the model again. Your edits to this form are cleared.")
+    elif draft.fill_note:
+        st.caption(draft.fill_note)
 
     # Every field is keyed per dataset and seeded from the draft ONCE, so the form holds what the
     # person entered rather than whatever the latest draft echoes. For text and dates the engine
@@ -121,6 +205,8 @@ def render() -> None:
     st.subheader("What one row is")
     grain = st.text_input("Grain", key=_seed(f"c_grain_{name}", draft.grain or ""),
                           placeholder="one row = one order")
+    if (line := badge(draft, "grain", "primary_key")):
+        st.caption(line)
     c1, c2 = st.columns(2)
     # Any date. Streamlit's default range is ten years before today, so on 22/09/2026 nothing
     # before 22/09/2016 could be picked and an older start was dropped silently -- Olist's own
@@ -133,6 +219,8 @@ def render() -> None:
                         key=_seed(f"c_to_{name}", (
                             _dt.date.fromisoformat(draft.analysis_window_end)
                             if draft.analysis_window_end else None)))
+    if (line := badge(draft, "date_column", "analysis_window")):
+        st.caption(line)
 
     st.subheader("What each column is")
     # Seeded once too: the editor rebuilds when its data changes.
@@ -159,24 +247,82 @@ def render() -> None:
     measures = [r["column"] for r in edited if r["role"] == "measure"]
     aggregations: dict[str, str | None] = {}
     definitions: dict[str, str] = {}
+    per: dict[str, list[str]] = {}
+    ratios: dict[str, dict] = {}
     if measures:
         st.subheader("How each measure adds up")
         st.caption("For every measure, say how it may be combined and what it means. There is no "
                    "default on purpose: summing a price or a rate gives a number that means "
-                   "nothing. **none** = per row only, never combined.")
+                   "nothing. **none** = per row only, never combined. Under each, how the engine "
+                   "reads it and why.")
+        strong = [m for m in measures if (s := draft.suggestions.get(m)) is not None
+                  and s.strength == "strong" and s.agg]
+        if strong and not draft.filled_by:
+            st.button(f"Use the engine's {len(strong)} strong suggestion(s)", type="secondary",
+                      on_click=_use_suggestions, args=(name, draft, measures),
+                      help="Fills only the aggregations the data settles, and only where you "
+                           "have not chosen. Definitions stay yours to write.")
+        # Any column, not only dimensions: a unit the engine names must be an option, or the
+        # multiselect refuses the suggestion it was given.
+        units = [r["column"] for r in edited]
         for m in measures:
-            a, d = st.columns([1, 2])
+            a, u, d = st.columns([1, 1, 2])
             aggregations[m] = a.selectbox(
                 f"{m} — how it combines", AGGREGATIONS, index=None, placeholder="choose…",
                 key=_seed(f"c_agg_{name}_{m}", draft.aggregations.get(m)),
                 help=AGG_HELP)
+            per[m] = u.multiselect(
+                f"{m} — one value per", [c for c in units if c != m],
+                key=_seed(f"c_per_{name}_{m}", list(draft.measure_per.get(m, []))),
+                help="A value repeated on every line of an order (a fee, a rating) is one value "
+                     "per order: counted once each, not once per line.")
             definitions[m] = d.text_input(
                 f"{m} — what it means", placeholder="e.g. units x unit_price, before tax",
                 key=_seed(f"c_def_{name}_{m}", draft.measure_definitions.get(m, "")))
-    caveats = st.text_area("Caveats (one per line)",
-                           key=_seed(f"c_caveats_{name}", "\n".join(draft.caveats)))
+            s = draft.suggestions.get(m)
+            line = badge(draft, f"measures[{m}].agg", f"measures[{m}].per",
+                         f"measures[{m}].definition")
+            if line:
+                st.caption(line)
+            if s is not None:
+                shown = f"{s.agg}" + (f" per {' + '.join(s.per)}" if s.per else "")
+                if line:
+                    pass  # the model filled it and the data checked it: the badge says why
+                elif s.strength == "strong":
+                    st.caption(f":material/lightbulb: Engine: **{shown}** — {s.reason}")
+                else:
+                    st.caption(f":material/help: {s.question or s.reason}")
+                if s.ratio:
+                    r = s.ratio
+                    if st.checkbox(f"Also add **{r['name']}**: {r['definition']}",
+                                   key=_seed(f"c_ratio_{name}_{r['name']}",
+                                             r["name"] in draft.ratios)):
+                        ratios[r["name"]] = r
+    rates: dict[str, str] = {}
+    offered = {n: sg for n, sg in draft.suggestions.items() if sg.rule == "F1" and n not in measures
+               and n.endswith("_rate") and n[:-5] in {r["column"] for r in edited}}
+    if offered:
+        st.subheader("Rates from 0/1 columns")
+        st.caption("A column of 0 and 1 (or true and false) stays a dimension to group by; its "
+                   "rate -- the share of rows that are 1 -- is a measure beside it.")
+        for n, sg in offered.items():
+            col = n[:-5]
+            if st.checkbox(f"Add **{n}**: {sg.reason}",
+                           key=_seed(f"c_rate_{name}_{n}", n in draft.measure_columns)):
+                rates[n] = col
+            if (line := badge(draft, f"measures[{n}]")):
+                st.caption(line)
+    if draft.measured_caveats:
+        st.subheader("What the engine counted")
+        st.caption("Counted from the table, not typed. Every result carries these.")
+        st.markdown("\n".join(f"- {c}" for c in draft.measured_caveats))
+    caveats = st.text_area("Your caveats (one per line)",
+                           key=_seed(f"c_caveats_{name}", "\n".join(draft.caveats)),
+                           help="What the data cannot show. Results print these as declared, "
+                                "not measured -- a count here is checked against the table.")
 
-    answers = form_answers(edited, grain, start, end, caveats, aggregations, definitions)
+    answers = form_answers(edited, grain, start, end, caveats, aggregations, definitions,
+                           per, ratios, rates)
     left, right = st.columns([1, 1])
     check = left.button("Check what's missing", type="secondary", width="stretch")
     confirm = right.button("Confirm contract", width="stretch")
@@ -191,6 +337,11 @@ def render() -> None:
             st.session_state.pop("contract_result", None)
         st.rerun()  # redraw: the sidebar shows the new stage, the list below the fresh check
 
+    # A caveat the table contradicts is said where it cannot be missed: collapsed under "What the
+    # data showed", 3,470 was confirmed twice where the table held 3,471 and 3,473 (recheck).
+    for e in draft.evidence:
+        if e.startswith("CAVEAT DIFFERS"):
+            st.warning(e, icon=":material/rule:")
     if draft.evidence:
         with st.expander("What the data showed"):
             for e in draft.evidence:
