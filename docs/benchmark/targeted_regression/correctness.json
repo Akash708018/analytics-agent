@@ -5,7 +5,7 @@
   "defect": "D1",
   "severity": "HIGH",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "compute_analysis",
   "analysis": "top_n",
   "dataset": "ctl_text_count",
@@ -26,8 +26,8 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 0.055621,
-   "response": "Under contract v1 for ctl_text_count: one row.\n\n6 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/tr_d1/results/top_n_20260924-224536.csv\nfrom dataset   ctl_text_count\ncreated        2026-09-24 22:45:36\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - 6 group(s) of payment_method; the 6 largest by count of customer_id shown.\n  - Share is of 1,968, the count of customer_id across all 6 group(s).\n\nFirst 6 of 6 rows:\n\n| value | customer_id (count) | rows | share |\n|---|---|---|---|\n| card | 1,073 | 1,073 | 54.5% |\n| ach | 492 | 492 | 25.0% |\n| cash | 195 | 195 | 9.9% |\n| wire | 157 | 157 | 8.0% |\n| cheque | 45 | 45 | 2.3% |\n| (null) | 6 | 6 | 0.3% |",
+   "wall_time_seconds": 0.05786,
+   "response": "Under contract v1 for ctl_text_count: one row.\n\n6 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/tr_d1/results/top_n_20260924-231902.csv\nfrom dataset   ctl_text_count\ncreated        2026-09-24 23:19:02\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - 6 group(s) of payment_method; the 6 largest by count of customer_id shown.\n  - Share is of 1,968, the count of customer_id across all 6 group(s).\n\nFirst 6 of 6 rows:\n\n| value | customer_id (count) | rows | share |\n|---|---|---|---|\n| card | 1,073 | 1,073 | 54.5% |\n| ach | 492 | 492 | 25.0% |\n| cash | 195 | 195 | 9.9% |\n| wire | 157 | 157 | 8.0% |\n| cheque | 45 | 45 | 2.3% |\n| (null) | 6 | 6 | 0.3% |",
    "exception_type": null,
    "exception_message": null
   },
@@ -50,7 +50,7 @@
   "defect": "D1",
   "severity": "HIGH",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "compute_analysis",
   "analysis": "top_n",
   "dataset": "ctl_text_count_distinct",
@@ -71,8 +71,8 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 0.073846,
-   "response": "Under contract v1 for ctl_text_count_distinct: one row.\n\n6 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/tr_d1/results/top_n_20260924-224537.csv\nfrom dataset   ctl_text_count_distinct\ncreated        2026-09-24 22:45:37\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - 6 group(s) of payment_method; the 6 largest by count_distinct of customer_id shown.\n  - No share column: count_distinct does not add up across groups, so there is no total for a group to be a share of.\n\nFirst 6 of 6 rows:\n\n| value | customer_id (count_distinct) | rows | share |\n|---|---|---|---|\n| card | 377 | 1,073 |  |\n| ach | 273 | 492 |  |\n| cash | 151 | 195 |  |\n| wire | 130 | 157 |  |\n| cheque | 42 | 45 |  |\n| (null) | 6 | 6 |  |",
+   "wall_time_seconds": 0.064458,
+   "response": "Under contract v1 for ctl_text_count_distinct: one row.\n\n6 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/tr_d1/results/top_n_20260924-231904.csv\nfrom dataset   ctl_text_count_distinct\ncreated        2026-09-24 23:19:04\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - 6 group(s) of payment_method; the 6 largest by count_distinct of customer_id shown.\n  - No share column: count_distinct does not add up across groups, so there is no total for a group to be a share of.\n\nFirst 6 of 6 rows:\n\n| value | customer_id (count_distinct) | rows | share |\n|---|---|---|---|\n| card | 377 | 1,073 |  |\n| ach | 273 | 492 |  |\n| cash | 151 | 195 |  |\n| wire | 130 | 157 |  |\n| cheque | 42 | 45 |  |\n| (null) | 6 | 6 |  |",
    "exception_type": null,
    "exception_message": null
   },
@@ -95,7 +95,7 @@
   "defect": "D1",
   "severity": "HIGH",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "compute_analysis",
   "analysis": "mix_shift",
   "dataset": "ctl_numeric_sum",
@@ -118,8 +118,8 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 0.083005,
-   "response": "Under contract v1 for ctl_numeric_sum: one row.\n\n6 rows x 9 columns, written to\n  /home/user/analytics-agent/workspace/tr_d1/results/mix_shift_20260924-224539.csv\nfrom dataset   ctl_numeric_sum\ncreated        2026-09-24 22:45:39\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - Mean revenue per row was 98.714 across 90 row(s) in 2024-11 and 107.6535 across 85 in 2024-12: a change of +8.940.\n  - Of that, +14.663 is rate -- group averages moving -- and +5.496 is mix, the groups' shares of the rows moving. The interaction, -9.942, is both at once and is reported rather than folded into either: folding it is what choosing 2024-11 or 2024-12 as the weighting base does silently, and the two choices disagree by exactly that number.\n  - 1 member(s) appear only in 2024-11: (no payment_method). They have no rate and no mix above -- there is no second mean to subtract and no share to reweight -- so their whole effect sits in the contribution column.\n\nFirst 6 of 6 rows:\n\n| payment_method | mean in 2024-11 | mean in 2024-12 | share in 2024-11 | share in 2024-12 | rate | mix | interaction | contribution |\n|---|---|---|---|---|---|---|---|---|\n| card | 94.1146 | 108.5054 | 0.456 | 0.565 | +6.556 | +10.273 | +1.571 | +18.399 |\n| cash | 99.0336 | 62.9243 | 0.122 | 0.082 | -4.413 | -3.948 | +1.440 | -6.922 |\n| wire | 158.9017 | 69.3522 | 0.067 | 0.106 | -5.970 | +6.231 | -3.512 | -3.250 |\n| ach | 90.2077 |",
+   "wall_time_seconds": 0.072728,
+   "response": "Under contract v1 for ctl_numeric_sum: one row.\n\n6 rows x 9 columns, written to\n  /home/user/analytics-agent/workspace/tr_d1/results/mix_shift_20260924-231905.csv\nfrom dataset   ctl_numeric_sum\ncreated        2026-09-24 23:19:05\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - Mean revenue per row was 98.714 across 90 row(s) in 2024-11 and 107.6535 across 85 in 2024-12: a change of +8.940.\n  - Of that, +14.663 is rate -- group averages moving -- and +5.496 is mix, the groups' shares of the rows moving. The interaction, -9.942, is both at once and is reported rather than folded into either: folding it is what choosing 2024-11 or 2024-12 as the weighting base does silently, and the two choices disagree by exactly that number.\n  - 1 member(s) appear only in 2024-11: (no payment_method). They have no rate and no mix above -- there is no second mean to subtract and no share to reweight -- so their whole effect sits in the contribution column.\n\nFirst 6 of 6 rows:\n\n| payment_method | mean in 2024-11 | mean in 2024-12 | share in 2024-11 | share in 2024-12 | rate | mix | interaction | contribution |\n|---|---|---|---|---|---|---|---|---|\n| card | 94.1146 | 108.5054 | 0.456 | 0.565 | +6.556 | +10.273 | +1.571 | +18.399 |\n| cash | 99.0336 | 62.9243 | 0.122 | 0.082 | -4.413 | -3.948 | +1.440 | -6.922 |\n| wire | 158.9017 | 69.3522 | 0.067 | 0.106 | -5.970 | +6.231 | -3.512 | -3.250 |\n| ach | 90.2077 |",
    "exception_type": null,
    "exception_message": null
   },
@@ -142,7 +142,7 @@
   "defect": "D1",
   "severity": "HIGH",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "compute_analysis",
   "analysis": "mix_shift",
   "dataset": "ctl_numeric_mean",
@@ -165,8 +165,8 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 0.070394,
-   "response": "Under contract v1 for ctl_numeric_mean: one row.\n\n6 rows x 9 columns, written to\n  /home/user/analytics-agent/workspace/tr_d1/results/mix_shift_20260924-224541.csv\nfrom dataset   ctl_numeric_mean\ncreated        2026-09-24 22:45:41\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - Mean revenue per row was 98.714 across 90 row(s) in 2024-11 and 107.6535 across 85 in 2024-12: a change of +8.940.\n  - Of that, +14.663 is rate -- group averages moving -- and +5.496 is mix, the groups' shares of the rows moving. The interaction, -9.942, is both at once and is reported rather than folded into either: folding it is what choosing 2024-11 or 2024-12 as the weighting base does silently, and the two choices disagree by exactly that number.\n  - 1 member(s) appear only in 2024-11: (no payment_method). They have no rate and no mix above -- there is no second mean to subtract and no share to reweight -- so their whole effect sits in the contribution column.\n\nFirst 6 of 6 rows:\n\n| payment_method | mean in 2024-11 | mean in 2024-12 | share in 2024-11 | share in 2024-12 | rate | mix | interaction | contribution |\n|---|---|---|---|---|---|---|---|---|\n| card | 94.1146 | 108.5054 | 0.456 | 0.565 | +6.556 | +10.273 | +1.571 | +18.399 |\n| cash | 99.0336 | 62.9243 | 0.122 | 0.082 | -4.413 | -3.948 | +1.440 | -6.922 |\n| wire | 158.9017 | 69.3522 | 0.067 | 0.106 | -5.970 | +6.231 | -3.512 | -3.250 |\n| ach | 90.2077",
+   "wall_time_seconds": 0.075494,
+   "response": "Under contract v1 for ctl_numeric_mean: one row.\n\n6 rows x 9 columns, written to\n  /home/user/analytics-agent/workspace/tr_d1/results/mix_shift_20260924-231907.csv\nfrom dataset   ctl_numeric_mean\ncreated        2026-09-24 23:19:07\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - Mean revenue per row was 98.714 across 90 row(s) in 2024-11 and 107.6535 across 85 in 2024-12: a change of +8.940.\n  - Of that, +14.663 is rate -- group averages moving -- and +5.496 is mix, the groups' shares of the rows moving. The interaction, -9.942, is both at once and is reported rather than folded into either: folding it is what choosing 2024-11 or 2024-12 as the weighting base does silently, and the two choices disagree by exactly that number.\n  - 1 member(s) appear only in 2024-11: (no payment_method). They have no rate and no mix above -- there is no second mean to subtract and no share to reweight -- so their whole effect sits in the contribution column.\n\nFirst 6 of 6 rows:\n\n| payment_method | mean in 2024-11 | mean in 2024-12 | share in 2024-11 | share in 2024-12 | rate | mix | interaction | contribution |\n|---|---|---|---|---|---|---|---|---|\n| card | 94.1146 | 108.5054 | 0.456 | 0.565 | +6.556 | +10.273 | +1.571 | +18.399 |\n| cash | 99.0336 | 62.9243 | 0.122 | 0.082 | -4.413 | -3.948 | +1.440 | -6.922 |\n| wire | 158.9017 | 69.3522 | 0.067 | 0.106 | -5.970 | +6.231 | -3.512 | -3.250 |\n| ach | 90.2077",
    "exception_type": null,
    "exception_message": null
   },
@@ -189,7 +189,7 @@
   "defect": "D1",
   "severity": "HIGH",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "compute_analysis",
   "analysis": "top_n",
   "dataset": "ctl_numeric_median",
@@ -210,8 +210,8 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 0.069045,
-   "response": "Under contract v1 for ctl_numeric_median: one row.\n\n6 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/tr_d1/results/top_n_20260924-224542.csv\nfrom dataset   ctl_numeric_median\ncreated        2026-09-24 22:45:42\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - 6 group(s) of payment_method; the 6 largest by median of revenue shown.\n  - No share column: median does not add up across groups, so there is no total for a group to be a share of.\n\nFirst 6 of 6 rows:\n\n| value | revenue (median) | rows | share |\n|---|---|---|---|\n| (null) | 69.68 | 6 |  |\n| card | 60.09 | 1,073 |  |\n| cheque | 53.865 | 45 |  |\n| wire | 53.47 | 157 |  |\n| cash | 50.01 | 195 |  |\n| ach | 48.68 | 492 |  |",
+   "wall_time_seconds": 0.067956,
+   "response": "Under contract v1 for ctl_numeric_median: one row.\n\n6 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/tr_d1/results/top_n_20260924-231908.csv\nfrom dataset   ctl_numeric_median\ncreated        2026-09-24 23:19:08\n\nWhat this shows:\n  - 1,968 of 2,000 row(s) analysed. 21 outside 2023-01-01 to 2024-12-31. 11 undated and so not placed in the window.\n  - 6 group(s) of payment_method; the 6 largest by median of revenue shown.\n  - No share column: median does not add up across groups, so there is no total for a group to be a share of.\n\nFirst 6 of 6 rows:\n\n| value | revenue (median) | rows | share |\n|---|---|---|---|\n| (null) | 69.68 | 6 |  |\n| card | 60.09 | 1,073 |  |\n| cheque | 53.865 | 45 |  |\n| wire | 53.47 | 157 |  |\n| cash | 50.01 | 195 |  |\n| ach | 48.68 | 492 |  |",
    "exception_type": null,
    "exception_message": null
   },
@@ -234,7 +234,7 @@
   "defect": "D2",
   "severity": "HIGH",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "compute_analysis",
   "analysis": "hypothesis_test",
   "dataset": "a_zero_variance_only",
@@ -252,8 +252,8 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 0.079749,
-   "response": "Under contract v1 for a_zero_variance_only: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-224546_2.csv\nfrom dataset   a_zero_variance_only\ncreated        2026-09-24 22:45:46\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic 0.5222, df 9, p 0.614117.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g 0.2237. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew nan.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 5 | 0 | nan |\n| b | 10 | 4.5 | 3.0277 | 0 |",
+   "wall_time_seconds": 0.062585,
+   "response": "Under contract v1 for a_zero_variance_only: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-231912_2.csv\nfrom dataset   a_zero_variance_only\ncreated        2026-09-24 23:19:12\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic 0.5222, df 9, p 0.614117.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g 0.2237. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew nan.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 5 | 0 | nan |\n| b | 10 | 4.5 | 3.0277 | 0 |",
    "exception_type": null,
    "exception_message": null
   },
@@ -288,7 +288,7 @@
   "defect": "D2",
   "severity": "HIGH",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "compute_analysis",
   "analysis": "hypothesis_test",
   "dataset": "a_zero_variance_only",
@@ -307,8 +307,8 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 0.067151,
-   "response": "Under contract v1 for a_zero_variance_only: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-224546_3.csv\nfrom dataset   a_zero_variance_only\ncreated        2026-09-24 22:45:46\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 55, df n/a, p 0.709628.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew nan.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 5 | 0 | nan |\n| b | 10 | 4.5 | 3.0277 | 0 |",
+   "wall_time_seconds": 0.068681,
+   "response": "Under contract v1 for a_zero_variance_only: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-231912_3.csv\nfrom dataset   a_zero_variance_only\ncreated        2026-09-24 23:19:12\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 55, df n/a, p 0.709628.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew nan.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 5 | 0 | nan |\n| b | 10 | 4.5 | 3.0277 | 0 |",
    "exception_type": null,
    "exception_message": null
   },
@@ -343,7 +343,7 @@
   "defect": "D2",
   "severity": "HIGH",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "compute_analysis",
   "analysis": "effect_size",
   "dataset": "a_zero_variance_only",
@@ -361,8 +361,8 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 0.071361,
-   "response": "Under contract v1 for a_zero_variance_only: row.\n\n2 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/effect_size_20260924-224546_2.csv\nfrom dataset   a_zero_variance_only\ncreated        2026-09-24 22:45:46\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Hedges' g 0.2237 \u2014 small by Cohen's convention. a exceeds b by 0.5, which is 0.2237 standard deviation(s).\n  - g rather than d: P10-D17 measured the small-sample correction at 0.9578 for ten rows per group and 0.9962 for a hundred, so it matters where group breakdowns actually land.\n  - Cohen's bands are a vocabulary, not a verdict: they were proposed for psychology and what counts as large is a question about the subject, not about the arithmetic.\n  - An effect size does not fall as rows are added, which is the whole point of reading it beside a p-value rather than instead of one.\n  - Excluded and shown: 0 with no g, 0 with no v. The counts add back to the 20 row(s) in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 10 | 5 | 0 |\n| b | 10 | 4.5 | 3.0277 |",
+   "wall_time_seconds": 0.06687,
+   "response": "Under contract v1 for a_zero_variance_only: row.\n\n2 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/effect_size_20260924-231912_2.csv\nfrom dataset   a_zero_variance_only\ncreated        2026-09-24 23:19:12\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Hedges' g 0.2237 \u2014 small by Cohen's convention. a exceeds b by 0.5, which is 0.2237 standard deviation(s).\n  - g rather than d: P10-D17 measured the small-sample correction at 0.9578 for ten rows per group and 0.9962 for a hundred, so it matters where group breakdowns actually land.\n  - Cohen's bands are a vocabulary, not a verdict: they were proposed for psychology and what counts as large is a question about the subject, not about the arithmetic.\n  - An effect size does not fall as rows are added, which is the whole point of reading it beside a p-value rather than instead of one.\n  - Excluded and shown: 0 with no g, 0 with no v. The counts add back to the 20 row(s) in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 10 | 5 | 0 |\n| b | 10 | 4.5 | 3.0277 |",
    "exception_type": null,
    "exception_message": null
   },
@@ -397,7 +397,7 @@
   "defect": "D2",
   "severity": "HIGH",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "compute_analysis",
   "analysis": "hypothesis_test",
   "dataset": "b_zero_variance_only",
@@ -415,8 +415,8 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 0.061755,
-   "response": "Under contract v1 for b_zero_variance_only: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-224546_4.csv\nfrom dataset   b_zero_variance_only\ncreated        2026-09-24 22:45:46\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic 1.5667, df 9, p 0.151627.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g 0.671. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 4.5 | 3.0277 | 0 |\n| b | 10 | 3 | 0 | nan |",
+   "wall_time_seconds": 0.061296,
+   "response": "Under contract v1 for b_zero_variance_only: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-231912_4.csv\nfrom dataset   b_zero_variance_only\ncreated        2026-09-24 23:19:12\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic 1.5667, df 9, p 0.151627.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g 0.671. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 4.5 | 3.0277 | 0 |\n| b | 10 | 3 | 0 | nan |",
    "exception_type": null,
    "exception_message": null
   },
@@ -451,7 +451,7 @@
   "defect": "D2",
   "severity": "HIGH",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "compute_analysis",
   "analysis": "hypothesis_test",
   "dataset": "b_zero_variance_only",
@@ -470,8 +470,8 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 0.071837,
-   "response": "Under contract v1 for b_zero_variance_only: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-224546_5.csv\nfrom dataset   b_zero_variance_only\ncreated        2026-09-24 22:45:46\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 65, df n/a, p 0.230212.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 4.5 | 3.0277 | 0 |\n| b | 10 | 3 | 0 | nan |",
+   "wall_time_seconds": 0.068647,
+   "response": "Under contract v1 for b_zero_variance_only: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-231912_5.csv\nfrom dataset   b_zero_variance_only\ncreated        2026-09-24 23:19:12\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 65, df n/a, p 0.230212.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 4.5 | 3.0277 | 0 |\n| b | 10 | 3 | 0 | nan |",
    "exception_type": null,
    "exception_message": null
   },
@@ -506,7 +506,7 @@
   "defect": "D2",
   "severity": "HIGH",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "compute_analysis",
   "analysis": "effect_size",
   "dataset": "b_zero_variance_only",
@@ -524,8 +524,8 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 0.065028,
-   "response": "Under contract v1 for b_zero_variance_only: row.\n\n2 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/effect_size_20260924-224546_3.csv\nfrom dataset   b_zero_variance_only\ncreated        2026-09-24 22:45:46\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Hedges' g 0.671 \u2014 medium by Cohen's convention. a exceeds b by 1.5, which is 0.671 standard deviation(s).\n  - g rather than d: P10-D17 measured the small-sample correction at 0.9578 for ten rows per group and 0.9962 for a hundred, so it matters where group breakdowns actually land.\n  - Cohen's bands are a vocabulary, not a verdict: they were proposed for psychology and what counts as large is a question about the subject, not about the arithmetic.\n  - An effect size does not fall as rows are added, which is the whole point of reading it beside a p-value rather than instead of one.\n  - Excluded and shown: 0 with no g, 0 with no v. The counts add back to the 20 row(s) in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 10 | 4.5 | 3.0277 |\n| b | 10 | 3 | 0 |",
+   "wall_time_seconds": 0.062616,
+   "response": "Under contract v1 for b_zero_variance_only: row.\n\n2 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/effect_size_20260924-231912_3.csv\nfrom dataset   b_zero_variance_only\ncreated        2026-09-24 23:19:12\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Hedges' g 0.671 \u2014 medium by Cohen's convention. a exceeds b by 1.5, which is 0.671 standard deviation(s).\n  - g rather than d: P10-D17 measured the small-sample correction at 0.9578 for ten rows per group and 0.9962 for a hundred, so it matters where group breakdowns actually land.\n  - Cohen's bands are a vocabulary, not a verdict: they were proposed for psychology and what counts as large is a question about the subject, not about the arithmetic.\n  - An effect size does not fall as rows are added, which is the whole point of reading it beside a p-value rather than instead of one.\n  - Excluded and shown: 0 with no g, 0 with no v. The counts add back to the 20 row(s) in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 10 | 4.5 | 3.0277 |\n| b | 10 | 3 | 0 |",
    "exception_type": null,
    "exception_message": null
   },
@@ -560,7 +560,7 @@
   "defect": "D2",
   "severity": "HIGH",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "compute_analysis",
   "analysis": "hypothesis_test",
   "dataset": "identical_groups",
@@ -578,8 +578,8 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 0.065457,
-   "response": "Under contract v1 for identical_groups: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-224547.csv\nfrom dataset   identical_groups\ncreated        2026-09-24 22:45:47\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic 0, df 18, p 1.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g 0. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 3 | 1.4907 | 0 |\n| b | 10 | 3 | 1.4907 | 0 |",
+   "wall_time_seconds": 0.061549,
+   "response": "Under contract v1 for identical_groups: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-231913.csv\nfrom dataset   identical_groups\ncreated        2026-09-24 23:19:13\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic 0, df 18, p 1.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g 0. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 3 | 1.4907 | 0 |\n| b | 10 | 3 | 1.4907 | 0 |",
    "exception_type": null,
    "exception_message": null
   },
@@ -614,7 +614,7 @@
   "defect": "D2",
   "severity": "HIGH",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "compute_analysis",
   "analysis": "hypothesis_test",
   "dataset": "identical_groups",
@@ -633,8 +633,8 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 0.066982,
-   "response": "Under contract v1 for identical_groups: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-224547_2.csv\nfrom dataset   identical_groups\ncreated        2026-09-24 22:45:47\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 50, df n/a, p 1.03073.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 3 | 1.4907 | 0 |\n| b | 10 | 3 | 1.4907 | 0 |",
+   "wall_time_seconds": 0.068754,
+   "response": "Under contract v1 for identical_groups: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-231913_2.csv\nfrom dataset   identical_groups\ncreated        2026-09-24 23:19:13\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 50, df n/a, p 1.03073.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 3 | 1.4907 | 0 |\n| b | 10 | 3 | 1.4907 | 0 |",
    "exception_type": null,
    "exception_message": null
   },
@@ -669,7 +669,7 @@
   "defect": "D2",
   "severity": "HIGH",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "compute_analysis",
   "analysis": "effect_size",
   "dataset": "identical_groups",
@@ -687,8 +687,8 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 0.074753,
-   "response": "Under contract v1 for identical_groups: row.\n\n2 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/effect_size_20260924-224547.csv\nfrom dataset   identical_groups\ncreated        2026-09-24 22:45:47\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Hedges' g 0 \u2014 negligible by Cohen's convention. b exceeds a by 0, which is 0 standard deviation(s).\n  - g rather than d: P10-D17 measured the small-sample correction at 0.9578 for ten rows per group and 0.9962 for a hundred, so it matters where group breakdowns actually land.\n  - Cohen's bands are a vocabulary, not a verdict: they were proposed for psychology and what counts as large is a question about the subject, not about the arithmetic.\n  - An effect size does not fall as rows are added, which is the whole point of reading it beside a p-value rather than instead of one.\n  - Excluded and shown: 0 with no g, 0 with no v. The counts add back to the 20 row(s) in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 10 | 3 | 1.4907 |\n| b | 10 | 3 | 1.4907 |",
+   "wall_time_seconds": 0.057835,
+   "response": "Under contract v1 for identical_groups: row.\n\n2 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/effect_size_20260924-231913.csv\nfrom dataset   identical_groups\ncreated        2026-09-24 23:19:13\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Hedges' g 0 \u2014 negligible by Cohen's convention. b exceeds a by 0, which is 0 standard deviation(s).\n  - g rather than d: P10-D17 measured the small-sample correction at 0.9578 for ten rows per group and 0.9962 for a hundred, so it matters where group breakdowns actually land.\n  - Cohen's bands are a vocabulary, not a verdict: they were proposed for psychology and what counts as large is a question about the subject, not about the arithmetic.\n  - An effect size does not fall as rows are added, which is the whole point of reading it beside a p-value rather than instead of one.\n  - Excluded and shown: 0 with no g, 0 with no v. The counts add back to the 20 row(s) in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 10 | 3 | 1.4907 |\n| b | 10 | 3 | 1.4907 |",
    "exception_type": null,
    "exception_message": null
   },
@@ -723,7 +723,7 @@
   "defect": "D2",
   "severity": "HIGH",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "compute_analysis",
   "analysis": "hypothesis_test",
   "dataset": "tiny_two_each",
@@ -741,8 +741,8 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 0.061594,
-   "response": "Under contract v1 for tiny_two_each: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-224547_5.csv\nfrom dataset   tiny_two_each\ncreated        2026-09-24 22:45:47\n\nWhat this shows:\n  - 4 of 4 row(s) analysed.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic -2.2361, df 1.471, p 0.198727.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g -1.2778. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 2 row(s).\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 4 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 2 | 1.5 | 0.7071 |  |\n| b | 2 | 4 | 1.4142 |  |",
+   "wall_time_seconds": 0.065283,
+   "response": "Under contract v1 for tiny_two_each: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-231913_5.csv\nfrom dataset   tiny_two_each\ncreated        2026-09-24 23:19:13\n\nWhat this shows:\n  - 4 of 4 row(s) analysed.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic -2.2361, df 1.471, p 0.198727.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g -1.2778. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 2 row(s).\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 4 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 2 | 1.5 | 0.7071 |  |\n| b | 2 | 4 | 1.4142 |  |",
    "exception_type": null,
    "exception_message": null
   },
@@ -777,7 +777,7 @@
   "defect": "D2",
   "severity": "HIGH",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "compute_analysis",
   "analysis": "hypothesis_test",
   "dataset": "tiny_two_each",
@@ -796,8 +796,8 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 0.068113,
-   "response": "Under contract v1 for tiny_two_each: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-224547_6.csv\nfrom dataset   tiny_two_each\ncreated        2026-09-24 22:45:47\n\nWhat this shows:\n  - 4 of 4 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 0, df n/a, p 0.245278.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 2 row(s).\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 4 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 2 | 1.5 | 0.7071 |  |\n| b | 2 | 4 | 1.4142 |  |",
+   "wall_time_seconds": 0.067403,
+   "response": "Under contract v1 for tiny_two_each: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-231913_6.csv\nfrom dataset   tiny_two_each\ncreated        2026-09-24 23:19:13\n\nWhat this shows:\n  - 4 of 4 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 0, df n/a, p 0.245278.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 2 row(s).\n  - At the conventional 5% threshold, this many rows cannot distinguish v between the groups of g. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 4 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 2 | 1.5 | 0.7071 |  |\n| b | 2 | 4 | 1.4142 |  |",
    "exception_type": null,
    "exception_message": null
   },
@@ -832,7 +832,7 @@
   "defect": "D2",
   "severity": "HIGH",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "compute_analysis",
   "analysis": "effect_size",
   "dataset": "tiny_two_each",
@@ -850,8 +850,8 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 0.061992,
-   "response": "Under contract v1 for tiny_two_each: row.\n\n2 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/effect_size_20260924-224547_3.csv\nfrom dataset   tiny_two_each\ncreated        2026-09-24 22:45:47\n\nWhat this shows:\n  - 4 of 4 row(s) analysed.\n  - Hedges' g -1.2778 \u2014 large by Cohen's convention. b exceeds a by 2.5, which is 1.2778 standard deviation(s).\n  - g rather than d: P10-D17 measured the small-sample correction at 0.9578 for ten rows per group and 0.9962 for a hundred, so it matters where group breakdowns actually land.\n  - Cohen's bands are a vocabulary, not a verdict: they were proposed for psychology and what counts as large is a question about the subject, not about the arithmetic.\n  - An effect size does not fall as rows are added, which is the whole point of reading it beside a p-value rather than instead of one.\n  - Excluded and shown: 0 with no g, 0 with no v. The counts add back to the 4 row(s) in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 2 | 1.5 | 0.7071 |\n| b | 2 | 4 | 1.4142 |",
+   "wall_time_seconds": 0.061957,
+   "response": "Under contract v1 for tiny_two_each: row.\n\n2 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/effect_size_20260924-231913_3.csv\nfrom dataset   tiny_two_each\ncreated        2026-09-24 23:19:13\n\nWhat this shows:\n  - 4 of 4 row(s) analysed.\n  - Hedges' g -1.2778 \u2014 large by Cohen's convention. b exceeds a by 2.5, which is 1.2778 standard deviation(s).\n  - g rather than d: P10-D17 measured the small-sample correction at 0.9578 for ten rows per group and 0.9962 for a hundred, so it matters where group breakdowns actually land.\n  - Cohen's bands are a vocabulary, not a verdict: they were proposed for psychology and what counts as large is a question about the subject, not about the arithmetic.\n  - An effect size does not fall as rows are added, which is the whole point of reading it beside a p-value rather than instead of one.\n  - Excluded and shown: 0 with no g, 0 with no v. The counts add back to the 4 row(s) in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 2 | 1.5 | 0.7071 |\n| b | 2 | 4 | 1.4142 |",
    "exception_type": null,
    "exception_message": null
   },
@@ -886,7 +886,7 @@
   "defect": "D2",
   "severity": "HIGH",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "compute_analysis",
   "analysis": "hypothesis_test",
   "dataset": "normal_valid",
@@ -904,8 +904,8 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 0.088101,
-   "response": "Under contract v1 for normal_valid: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-224548.csv\nfrom dataset   normal_valid\ncreated        2026-09-24 22:45:48\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic -11.4827, df 16.26, p 3.25262e-09.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g -4.9182. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.1278.\n  - At the conventional 5% threshold, v differs between the groups of g by more than sampling alone would produce. That is a statement about these rows, not a cause.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 11.5 | 1.5811 | 0 |\n| b | 10 | 21.4 | 2.2211 | 0.1278 |",
+   "wall_time_seconds": 0.060375,
+   "response": "Under contract v1 for normal_valid: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-231914.csv\nfrom dataset   normal_valid\ncreated        2026-09-24 23:19:14\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic -11.4827, df 16.26, p 3.25262e-09.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g -4.9182. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.1278.\n  - At the conventional 5% threshold, v differs between the groups of g by more than sampling alone would produce. That is a statement about these rows, not a cause.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 11.5 | 1.5811 | 0 |\n| b | 10 | 21.4 | 2.2211 | 0.1278 |",
    "exception_type": null,
    "exception_message": null
   },
@@ -940,7 +940,7 @@
   "defect": "D2",
   "severity": "HIGH",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "compute_analysis",
   "analysis": "hypothesis_test",
   "dataset": "normal_valid",
@@ -959,8 +959,8 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 0.099238,
-   "response": "Under contract v1 for normal_valid: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-224548_2.csv\nfrom dataset   normal_valid\ncreated        2026-09-24 22:45:48\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 0, df n/a, p 0.000176611.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.1278.\n  - At the conventional 5% threshold, v differs between the groups of g by more than sampling alone would produce. That is a statement about these rows, not a cause.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 11.5 | 1.5811 | 0 |\n| b | 10 | 21.4 | 2.2211 | 0.1278 |",
+   "wall_time_seconds": 0.070136,
+   "response": "Under contract v1 for normal_valid: row.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/hypothesis_test_20260924-231914_2.csv\nfrom dataset   normal_valid\ncreated        2026-09-24 23:19:14\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Test: Mann-Whitney U (two-sided, normal approximation, tie-corrected). Statistic 0, df n/a, p 0.000176611.\n  - Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\n  - Assumption reported, not judged: smallest group 10 row(s), largest absolute skew 0.1278.\n  - At the conventional 5% threshold, v differs between the groups of g by more than sampling alone would produce. That is a statement about these rows, not a cause.\n  - 0 analysed row(s) have no v and are excluded from the test, 0 have no g. Both are rows in the table above, so the counts add back to the 20 in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| a | 10 | 11.5 | 1.5811 | 0 |\n| b | 10 | 21.4 | 2.2211 | 0.1278 |",
    "exception_type": null,
    "exception_message": null
   },
@@ -995,7 +995,7 @@
   "defect": "D2",
   "severity": "HIGH",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "compute_analysis",
   "analysis": "effect_size",
   "dataset": "normal_valid",
@@ -1013,8 +1013,8 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 0.06738,
-   "response": "Under contract v1 for normal_valid: row.\n\n2 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/effect_size_20260924-224548.csv\nfrom dataset   normal_valid\ncreated        2026-09-24 22:45:48\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Hedges' g -4.9182 \u2014 large by Cohen's convention. b exceeds a by 9.9, which is 4.9182 standard deviation(s).\n  - g rather than d: P10-D17 measured the small-sample correction at 0.9578 for ten rows per group and 0.9962 for a hundred, so it matters where group breakdowns actually land.\n  - Cohen's bands are a vocabulary, not a verdict: they were proposed for psychology and what counts as large is a question about the subject, not about the arithmetic.\n  - An effect size does not fall as rows are added, which is the whole point of reading it beside a p-value rather than instead of one.\n  - Excluded and shown: 0 with no g, 0 with no v. The counts add back to the 20 row(s) in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 10 | 11.5 | 1.5811 |\n| b | 10 | 21.4 | 2.2211 |",
+   "wall_time_seconds": 0.063477,
+   "response": "Under contract v1 for normal_valid: row.\n\n2 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/tr_d2/results/effect_size_20260924-231914.csv\nfrom dataset   normal_valid\ncreated        2026-09-24 23:19:14\n\nWhat this shows:\n  - 20 of 20 row(s) analysed.\n  - Hedges' g -4.9182 \u2014 large by Cohen's convention. b exceeds a by 9.9, which is 4.9182 standard deviation(s).\n  - g rather than d: P10-D17 measured the small-sample correction at 0.9578 for ten rows per group and 0.9962 for a hundred, so it matters where group breakdowns actually land.\n  - Cohen's bands are a vocabulary, not a verdict: they were proposed for psychology and what counts as large is a question about the subject, not about the arithmetic.\n  - An effect size does not fall as rows are added, which is the whole point of reading it beside a p-value rather than instead of one.\n  - Excluded and shown: 0 with no g, 0 with no v. The counts add back to the 20 row(s) in scope.\n\nFirst 2 of 2 rows:\n\n| group | n | mean | stddev |\n|---|---|---|---|\n| a | 10 | 11.5 | 1.5811 |\n| b | 10 | 21.4 | 2.2211 |",
    "exception_type": null,
    "exception_message": null
   },
@@ -1049,7 +1049,7 @@
   "defect": "D3",
   "severity": "HIGH",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "propose_dataset_contract",
   "analysis": null,
   "dataset": "words",
@@ -1067,7 +1067,7 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 0.04215,
+   "wall_time_seconds": 0.0437,
    "response": "dataset        words\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       5 columns, 30 rows, fingerprint 6b7556f5d151\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| v | count | - | v |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 30 of 30 rows, with no nulls.\n  - v holds 7 distinct value(s): name0, name1, name2, name3, name4, name5, name6. Declare domains={\"v\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - w were not paired: their suggested role is measure or free text, and a key is made of columns that name a row rather than measure one. A near-continuous number is unique alongside almost anything, which says nothing.\n  - 1 pair(s) containing id, w were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"words\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"count\",\n      \"definition\": \"v\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"exc",
    "exception_type": null,
    "exception_message": null
@@ -1099,7 +1099,7 @@
   "defect": "D3",
   "severity": "HIGH",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "propose_dataset_contract",
   "analysis": null,
   "dataset": "words",
@@ -1117,7 +1117,7 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 0.052768,
+   "wall_time_seconds": 0.042012,
    "response": "dataset        words\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       5 columns, 30 rows, fingerprint 6b7556f5d151\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| v | count_distinct | - | v |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 30 of 30 rows, with no nulls.\n  - v holds 7 distinct value(s): name0, name1, name2, name3, name4, name5, name6. Declare domains={\"v\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - w were not paired: their suggested role is measure or free text, and a key is made of columns that name a row rather than measure one. A near-continuous number is unique alongside almost anything, which says nothing.\n  - 1 pair(s) containing id, w were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"words\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"v\",\n      \"agg\": \"count_distinct\",\n      \"definition\": \"v\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_val",
    "exception_type": null,
    "exception_message": null
@@ -1149,7 +1149,7 @@
   "defect": "D3",
   "severity": "HIGH",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "propose_dataset_contract",
   "analysis": null,
   "dataset": "words",
@@ -1167,7 +1167,7 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 0.063957,
+   "wall_time_seconds": 0.044037,
    "response": "dataset        words\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       5 columns, 30 rows, fingerprint 6b7556f5d151\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| w | sum | - | w |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 30 of 30 rows, with no nulls.\n  - v holds 7 distinct value(s): name0, name1, name2, name3, name4, name5, name6. Declare domains={\"v\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - w were not paired: their suggested role is measure or free text, and a key is made of columns that name a row rather than measure one. A near-continuous number is unique alongside almost anything, which says nothing.\n  - 1 pair(s) containing id, w were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"words\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"w\",\n      \"agg\": \"sum\",\n      \"definition\": \"w\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"exclude",
    "exception_type": null,
    "exception_message": null
@@ -1199,7 +1199,7 @@
   "defect": "D3",
   "severity": "HIGH",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "propose_dataset_contract",
   "analysis": null,
   "dataset": "words",
@@ -1217,7 +1217,7 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 0.04649,
+   "wall_time_seconds": 0.041954,
    "response": "dataset        words\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       5 columns, 30 rows, fingerprint 6b7556f5d151\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| w | mean | - | w |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 30 of 30 rows, with no nulls.\n  - v holds 7 distinct value(s): name0, name1, name2, name3, name4, name5, name6. Declare domains={\"v\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - w were not paired: their suggested role is measure or free text, and a key is made of columns that name a row rather than measure one. A near-continuous number is unique alongside almost anything, which says nothing.\n  - 1 pair(s) containing id, w were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"words\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"w\",\n      \"agg\": \"mean\",\n      \"definition\": \"w\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"exclu",
    "exception_type": null,
    "exception_message": null
@@ -1249,7 +1249,7 @@
   "defect": "D3",
   "severity": "HIGH",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "propose_dataset_contract",
   "analysis": null,
   "dataset": "words",
@@ -1267,7 +1267,7 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 0.044545,
+   "wall_time_seconds": 0.049268,
    "response": "dataset        words\ngrain          one row\nprimary key    id\ndate column    d\nwindow         2024-01-01 to 2024-12-31\nbound to       5 columns, 30 rows, fingerprint 6b7556f5d151\n\n1 measure(s):\n| column | agg | unit | definition |\n| --- | --- | --- | --- |\n| w | median | - | w |\n\ndimensions     g\n\nWhat the data showed:\n  - Key as stated: id is unique across 30 of 30 rows, with no nulls.\n  - v holds 7 distinct value(s): name0, name1, name2, name3, name4, name5, name6. Declare domains={\"v\": [...]} if that is the complete set -- the data cannot tell you whether another value is legal and merely absent.\n  - w were not paired: their suggested role is measure or free text, and a key is made of columns that name a row rather than measure one. A near-continuous number is unique alongside almost anything, which says nothing.\n  - 1 pair(s) containing id, w were not probed. They would all be unique, because that column already is -- a key with a spare column in it is not a key.\n\nNothing is stored yet. To store exactly this, pass the JSON below back to confirm_dataset_contract.\n\n```json\n{\n  \"dataset_name\": \"words\",\n  \"grain\": \"one row\",\n  \"primary_key\": [\n    \"id\"\n  ],\n  \"date_column\": \"d\",\n  \"analysis_window\": {\n    \"start\": \"2024-01-01\",\n    \"end\": \"2024-12-31\"\n  },\n  \"measures\": [\n    {\n      \"name\": \"w\",\n      \"agg\": \"median\",\n      \"definition\": \"w\",\n      \"unit\": null\n    }\n  ],\n  \"dimensions\": [\n    \"g\"\n  ],\n  \"known_exclusions\": [],\n  \"caveats\": [],\n  \"missing_values\": null,\n  \"e",
    "exception_type": null,
    "exception_message": null
@@ -1299,7 +1299,7 @@
   "defect": "D5",
   "severity": "HIGH",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "ebe38dc48b220fdbf0dde50542a94ad27d395ba8",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "mann_whitney",
   "analysis": "hypothesis_test (rank)",
   "dataset": "ties",
@@ -1314,7 +1314,7 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 0.040161,
+   "wall_time_seconds": 0.036513,
    "response": "TestResult(name='Mann-Whitney U (two-sided, normal approximation, tie-corrected)', statistic=1249998913.0, p=0.9994624822984789, df='n/a', note=\"Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\")",
    "exception_type": null,
    "exception_message": null
@@ -1350,7 +1350,7 @@
   "defect": "D5",
   "severity": "HIGH",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "ebe38dc48b220fdbf0dde50542a94ad27d395ba8",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "kruskal_wallis",
   "analysis": "hypothesis_test (rank)",
   "dataset": "ties",
@@ -1365,7 +1365,7 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 0.037353,
+   "wall_time_seconds": 0.034564,
    "response": "TestResult(name='Kruskal-Wallis H (tie-corrected)', statistic=0.00043998555433205557, p=0.9997800314194706, df='2', note='The rank test for 3 groups. Like Mann-Whitney it compares whole distributions rather than means, and needs no variance.')",
    "exception_type": null,
    "exception_message": null
@@ -1401,7 +1401,7 @@
   "defect": "D5",
   "severity": "HIGH",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "ebe38dc48b220fdbf0dde50542a94ad27d395ba8",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "mann_whitney",
   "analysis": "hypothesis_test (rank)",
   "dataset": "ties",
@@ -1416,7 +1416,7 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 0.128006,
+   "wall_time_seconds": 0.127487,
    "response": "TestResult(name='Mann-Whitney U (two-sided, normal approximation, tie-corrected)', statistic=124999750000.0, p=0.9960888254143285, df='n/a', note=\"Tests whether a draw from 'a' tends to exceed one from 'b'. P10-D12: it is not a test of medians -- two groups with the same median can separate here.\")",
    "exception_type": null,
    "exception_message": null
@@ -1452,7 +1452,7 @@
   "defect": "D5",
   "severity": "HIGH",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "ebe38dc48b220fdbf0dde50542a94ad27d395ba8",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "kruskal_wallis",
   "analysis": "hypothesis_test (rank)",
   "dataset": "ties",
@@ -1467,7 +1467,7 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 0.119036,
+   "wall_time_seconds": 0.087295,
    "response": "TestResult(name='Kruskal-Wallis H (tie-corrected)', statistic=2.9838624440632e-08, p=0.9999999850806879, df='2', note='The rank test for 3 groups. Like Mann-Whitney it compares whole distributions rather than means, and needs no variance.')",
    "exception_type": null,
    "exception_message": null
@@ -1503,7 +1503,7 @@
   "defect": "D6-D9",
   "severity": "MEDIUM",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "compute_analysis",
   "analysis": "top_n",
   "dataset": "nope",
@@ -1523,7 +1523,7 @@
   },
   "after": {
    "status": "REFUSED",
-   "wall_time_seconds": 0.022425,
+   "wall_time_seconds": 0.032007,
    "response": "BLOCKED: there is no dataset called 'nope' in this workspace.\nWHY: analysis runs on a loaded table, and nothing is read from disk here.\nCURRENT STATE: loaded: dupkey, fin, one_measure, two_measures\nNEXT STEP: call propose_ingest_spec(path=\"...\") then confirm_ingest_spec, or list_datasets() to see what is already here\n\nreason: DATASET_NOT_LOADED",
    "exception_type": null,
    "exception_message": null
@@ -1557,7 +1557,7 @@
   "defect": "D6-D9",
   "severity": "MEDIUM",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "render_chart",
   "analysis": "trend",
   "dataset": "fin",
@@ -1577,7 +1577,7 @@
   },
   "after": {
    "status": "REFUSED",
-   "wall_time_seconds": 0.493151,
+   "wall_time_seconds": 0.478048,
    "response": "BLOCKED: trend was computed and cannot be drawn as a 'pie' chart.\nWHY: there is no chart called 'pie'. Available: line, bar, grouped_bar, scatter, histogram, box, heatmap, waterfall.\nDETAIL: The numbers are not in question -- the analysis ran. This is about the shape a chart needs, which is not the shape this result has. Nothing was written.\nCURRENT STATE: contract v1 for fin\nNEXT STEP: call compute_analysis(dataset_name=\"fin\", analysis_type=\"trend\", measure=\"revenue\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
    "exception_type": null,
    "exception_message": null
@@ -1611,7 +1611,7 @@
    "executable": true,
    "followed": {
     "status": "OK",
-    "head": "Under contract v1 for fin: one row = one financial record.\n\n24 rows x 3 columns, written to\n  /home/user/analytics-agent/workspace/tr_recs/results/trend_20260924-224604.csv\nfrom dataset   fin\ncreated        2026-09-24 22:46:04\n\nWhat this shows:\n  - 1,863 of 2,000 row(s) analysed. 108 excluded by the contract. 19 outside 2023-01-01 to 2024-12-31. 10 undated and so not placed in the window.\n  - Excl",
+    "head": "Under contract v1 for fin: one row = one financial record.\n\n24 rows x 3 columns, written to\n  /home/user/analytics-agent/workspace/tr_recs/results/trend_20260924-231947.csv\nfrom dataset   fin\ncreated        2026-09-24 23:19:47\n\nWhat this shows:\n  - 1,863 of 2,000 row(s) analysed. 108 excluded by the contract. 19 outside 2023-01-01 to 2024-12-31. 10 undated and so not placed in the window.\n  - Excl",
     "exception_type": null
    },
    "role": "control"
@@ -1627,7 +1627,7 @@
   "defect": "D6-D9",
   "severity": "MEDIUM",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "compute_analysis",
   "analysis": "pareto",
   "dataset": "fin",
@@ -1647,7 +1647,7 @@
   },
   "after": {
    "status": "REFUSED",
-   "wall_time_seconds": 0.048897,
+   "wall_time_seconds": 0.049171,
    "response": "BLOCKED: pareto cannot answer that under this contract.\nWHY: customer_id has 397 group(s), NULL counted as a group, against a cap of 49. top_n on customer_id says which of its groups matter.\nCURRENT STATE: contract v1 for fin\nNEXT STEP: call compute_analysis(dataset_name=\"fin\", analysis_type=\"top_n\", dimension=\"customer_id\", measure=\"revenue\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
    "exception_type": null,
    "exception_message": null
@@ -1683,7 +1683,7 @@
    "executable": true,
    "followed": {
     "status": "OK",
-    "head": "Under contract v1 for fin: one row = one financial record.\n\n10 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/tr_recs/results/top_n_20260924-224604.csv\nfrom dataset   fin\ncreated        2026-09-24 22:46:04\n\nWhat this shows:\n  - 1,863 of 2,000 row(s) analysed. 108 excluded by the contract. 19 outside 2023-01-01 to 2024-12-31. 10 undated and so not placed in the window.\n  - Excl",
+    "head": "Under contract v1 for fin: one row = one financial record.\n\n10 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/tr_recs/results/top_n_20260924-231947.csv\nfrom dataset   fin\ncreated        2026-09-24 23:19:47\n\nWhat this shows:\n  - 1,863 of 2,000 row(s) analysed. 108 excluded by the contract. 19 outside 2023-01-01 to 2024-12-31. 10 undated and so not placed in the window.\n  - Excl",
     "exception_type": null
    },
    "role": "control"
@@ -1694,12 +1694,1324 @@
   "regression_passed": true
  },
  {
+  "case_id": "PROFILE_CORRECTNESS.fin.record_id",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "fin",
+  "rows": null,
+  "parameters": {
+   "column": "record_id"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 1.187235,
+   "response": "fin.record_id\n\n  record_id (VARCHAR): 100,000 distinct value(s) across 100,278 rows, no nulls, range FIN000000000 to FIN000099999.\n\nMost frequent value(s), 10 of 100,000 distinct:\n\n  FIN000000487          2    0.0%\n  FIN000000853          2    0.0%\n  FIN000001019          2    0.0%\n  FIN000001358          2    0.0%\n  FIN000001948          2    0.0%\n  FIN000001970          2    0.0%\n  FIN000002179          2    0.0%\n  FIN000002348          2    0.0%\n  FIN000002580          2    0.0%\n  FIN000002753          2    0.0%\n\n99,990 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"record_id\", top_n=50)\n\nRead that list for values that MEAN absent. This profile counts only the published missing-value vocabulary (pandas/pyarrow), which deliberately excludes judgement calls, so anything of that kind is a decision for you rather than for a constant.\n\nValue length: every value is 12 characters. Fixed width usually means a code rather than free text.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.206705,
+   "response": "fin.record_id\n\n  record_id (VARCHAR): 100,000 distinct value(s) across 100,278 rows, no nulls, range FIN000000000 to FIN000099999.\n\nMost frequent value(s), 10 of 100,000 distinct:\n\n  FIN000000487          2    0.0%\n  FIN000000853          2    0.0%\n  FIN000001019          2    0.0%\n  FIN000001358          2    0.0%\n  FIN000001948          2    0.0%\n  FIN000001970          2    0.0%\n  FIN000002179          2    0.0%\n  FIN000002348          2    0.0%\n  FIN000002580          2    0.0%\n  FIN000002753          2    0.0%\n\n99,990 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"record_id\", top_n=50)\n\nRead that list for values that MEAN absent. This profile counts only the published missing-value vocabulary (pandas/pyarrow), which deliberately excludes judgement calls, so anything of that kind is a decision for you rather than for a constant.\n\nValue length: every value is 12 characters. Fixed width usually means a code rather than free text.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.fin.transaction_id",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "fin",
+  "rows": null,
+  "parameters": {
+   "column": "transaction_id"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 1.234628,
+   "response": "fin.transaction_id\n\n  transaction_id (VARCHAR): 99,804 distinct value(s) across 100,278 rows, no nulls, range T00000000 to T00099999.\n\nMost frequent value(s), 10 of 99,804 distinct:\n\n  T00056926          3    0.0%\n  T00000157          2    0.0%\n  T00000263          2    0.0%\n  T00000351          2    0.0%\n  T00000487          2    0.0%\n  T00000853          2    0.0%\n  T00001019          2    0.0%\n  T00001138          2    0.0%\n  T00001358          2    0.0%\n  T00001948          2    0.0%\n\n99,794 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"transaction_id\", top_n=50)\n\nRead that list for values that MEAN absent. This profile counts only the published missing-value vocabulary (pandas/pyarrow), which deliberately excludes judgement calls, so anything of that kind is a decision for you rather than for a constant.\n\nValue length: every value is 9 characters. Fixed width usually means a code rather than free text.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.217236,
+   "response": "fin.transaction_id\n\n  transaction_id (VARCHAR): 99,804 distinct value(s) across 100,278 rows, no nulls, range T00000000 to T00099999.\n\nMost frequent value(s), 10 of 99,804 distinct:\n\n  T00056926          3    0.0%\n  T00000157          2    0.0%\n  T00000263          2    0.0%\n  T00000351          2    0.0%\n  T00000487          2    0.0%\n  T00000853          2    0.0%\n  T00001019          2    0.0%\n  T00001138          2    0.0%\n  T00001358          2    0.0%\n  T00001948          2    0.0%\n\n99,794 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"transaction_id\", top_n=50)\n\nRead that list for values that MEAN absent. This profile counts only the published missing-value vocabulary (pandas/pyarrow), which deliberately excludes judgement calls, so anything of that kind is a decision for you rather than for a constant.\n\nValue length: every value is 9 characters. Fixed width usually means a code rather than free text.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.fin.account_id",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "fin",
+  "rows": null,
+  "parameters": {
+   "column": "account_id"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 1.140255,
+   "response": "fin.account_id\n\n  account_id (VARCHAR): 9,999 distinct value(s) across 100,278 rows, no nulls, range A0000000 to A0009999.\n\nMost frequent value(s), 10 of 9,999 distinct:\n\n  A0004333         25    0.0%\n  A0000508         23    0.0%\n  A0001001         22    0.0%\n  A0001712         22    0.0%\n  A0004671         22    0.0%\n  A0006779         22    0.0%\n  A0008135         22    0.0%\n  A0008547         22    0.0%\n  A0002127         21    0.0%\n  A0002536         21    0.0%\n\n9,989 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"account_id\", top_n=50)\n\nRead that list for values that MEAN absent. This profile counts only the published missing-value vocabulary (pandas/pyarrow), which deliberately excludes judgement calls, so anything of that kind is a decision for you rather than for a constant.\n\nValue length: every value is 8 characters. Fixed width usually means a code rather than free text.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.086246,
+   "response": "fin.account_id\n\n  account_id (VARCHAR): 9,999 distinct value(s) across 100,278 rows, no nulls, range A0000000 to A0009999.\n\nMost frequent value(s), 10 of 9,999 distinct:\n\n  A0004333         25    0.0%\n  A0000508         23    0.0%\n  A0001001         22    0.0%\n  A0001712         22    0.0%\n  A0004671         22    0.0%\n  A0006779         22    0.0%\n  A0008135         22    0.0%\n  A0008547         22    0.0%\n  A0002127         21    0.0%\n  A0002536         21    0.0%\n\n9,989 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"account_id\", top_n=50)\n\nRead that list for values that MEAN absent. This profile counts only the published missing-value vocabulary (pandas/pyarrow), which deliberately excludes judgement calls, so anything of that kind is a decision for you rather than for a constant.\n\nValue length: every value is 8 characters. Fixed width usually means a code rather than free text.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.fin.customer_id",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "fin",
+  "rows": null,
+  "parameters": {
+   "column": "customer_id"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 1.150987,
+   "response": "fin.customer_id\n\n  customer_id (VARCHAR): 19,856 distinct value(s) across 100,278 rows, no nulls, range C0000000 to C0019999.\n\nMost frequent value(s), 10 of 19,856 distinct:\n\n  C0009003         18    0.0%\n  C0002182         15    0.0%\n  C0011241         15    0.0%\n  C0011959         15    0.0%\n  C0014479         15    0.0%\n  C0017307         15    0.0%\n  C0018392         15    0.0%\n  C0000178         14    0.0%\n  C0002021         14    0.0%\n  C0004277         14    0.0%\n\n19,846 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"customer_id\", top_n=50)\n\nRead that list for values that MEAN absent. This profile counts only the published missing-value vocabulary (pandas/pyarrow), which deliberately excludes judgement calls, so anything of that kind is a decision for you rather than for a constant.\n\nValue length: every value is 8 characters. Fixed width usually means a code rather than free text.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.104223,
+   "response": "fin.customer_id\n\n  customer_id (VARCHAR): 19,856 distinct value(s) across 100,278 rows, no nulls, range C0000000 to C0019999.\n\nMost frequent value(s), 10 of 19,856 distinct:\n\n  C0009003         18    0.0%\n  C0002182         15    0.0%\n  C0011241         15    0.0%\n  C0011959         15    0.0%\n  C0014479         15    0.0%\n  C0017307         15    0.0%\n  C0018392         15    0.0%\n  C0000178         14    0.0%\n  C0002021         14    0.0%\n  C0004277         14    0.0%\n\n19,846 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"customer_id\", top_n=50)\n\nRead that list for values that MEAN absent. This profile counts only the published missing-value vocabulary (pandas/pyarrow), which deliberately excludes judgement calls, so anything of that kind is a decision for you rather than for a constant.\n\nValue length: every value is 8 characters. Fixed width usually means a code rather than free text.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.fin.transaction_date",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "fin",
+  "rows": null,
+  "parameters": {
+   "column": "transaction_date"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 1.100121,
+   "response": "fin.transaction_date\n\n  transaction_date (DATE): 759 distinct value(s) across 100,278 rows, 484 null (0.5%), range 2023-01-01 to 2025-01-28.\n\nMost frequent value(s), 10 of 759 distinct:\n\n  (null)            484    0.5%\n  2024-02-29        243    0.2%\n  2023-01-01        184    0.2%\n  2023-03-23        171    0.2%\n  2024-12-22        170    0.2%\n  2024-11-17        169    0.2%\n  2023-08-18        166    0.2%\n  2024-12-09        166    0.2%\n  2024-01-22        165    0.2%\n  2024-01-09        164    0.2%\n\n749 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"transaction_date\", top_n=50)\n\nCalendar: 2023-01-01 to 2025-01-28, 759 of 759 days present (100.0%).",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.044119,
+   "response": "fin.transaction_date\n\n  transaction_date (DATE): 759 distinct value(s) across 100,278 rows, 484 null (0.5%), range 2023-01-01 to 2025-01-28.\n\nMost frequent value(s), 10 of 759 distinct:\n\n  (null)            484    0.5%\n  2024-02-29        243    0.2%\n  2023-01-01        184    0.2%\n  2023-03-23        171    0.2%\n  2024-12-22        170    0.2%\n  2024-11-17        169    0.2%\n  2023-08-18        166    0.2%\n  2024-12-09        166    0.2%\n  2024-01-22        165    0.2%\n  2024-01-09        164    0.2%\n\n749 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"transaction_date\", top_n=50)\n\nCalendar: 2023-01-01 to 2025-01-28, 759 of 759 days present (100.0%).",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.fin.posted_at",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "fin",
+  "rows": null,
+  "parameters": {
+   "column": "posted_at"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 1.170243,
+   "response": "fin.posted_at\n\n  posted_at (TIMESTAMP): 99,914 distinct value(s) across 100,278 rows, no nulls, range 2023-01-01 00:01:32 to 2025-01-28 23:33:27.\n\nMost frequent value(s), 10 of 99,914 distinct:\n\n  2023-01-02 23:49:17          2    0.0%\n  2023-01-07 08:12:25          2    0.0%\n  2023-01-09 06:29:27          2    0.0%\n  2023-01-16 12:11:41          2    0.0%\n  2023-01-17 03:21:43          2    0.0%\n  2023-01-19 10:15:33          2    0.0%\n  2023-01-19 23:21:42          2    0.0%\n  2023-01-20 09:50:54          2    0.0%\n  2023-01-20 18:15:35          2    0.0%\n  2023-01-22 02:00:55          2    0.0%\n\n99,904 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"posted_at\", top_n=50)\n\nCalendar: 2023-01-01 to 2025-01-28, 759 of 759 days present (100.0%).",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.057147,
+   "response": "fin.posted_at\n\n  posted_at (TIMESTAMP): 99,914 distinct value(s) across 100,278 rows, no nulls, range 2023-01-01 00:01:32 to 2025-01-28 23:33:27.\n\nMost frequent value(s), 10 of 99,914 distinct:\n\n  2023-01-02 23:49:17          2    0.0%\n  2023-01-07 08:12:25          2    0.0%\n  2023-01-09 06:29:27          2    0.0%\n  2023-01-16 12:11:41          2    0.0%\n  2023-01-17 03:21:43          2    0.0%\n  2023-01-19 10:15:33          2    0.0%\n  2023-01-19 23:21:42          2    0.0%\n  2023-01-20 09:50:54          2    0.0%\n  2023-01-20 18:15:35          2    0.0%\n  2023-01-22 02:00:55          2    0.0%\n\n99,904 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"posted_at\", top_n=50)\n\nCalendar: 2023-01-01 to 2025-01-28, 759 of 759 days present (100.0%).",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.fin.transaction_type",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "fin",
+  "rows": null,
+  "parameters": {
+   "column": "transaction_type"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 1.140566,
+   "response": "fin.transaction_type\n\n  transaction_type (VARCHAR): 5 distinct value(s) across 100,278 rows, no nulls, range fee to transfer.\n\nMost frequent value(s), 5 of 5 distinct:\n\n  purchase     60,125   60.0%\n  transfer     20,214   20.2%\n  refund        8,039    8.0%\n  fee           6,925    6.9%\n  reversal      4,975    5.0%\n\nRead that list for values that MEAN absent. This profile counts only the published missing-value vocabulary (pandas/pyarrow), which deliberately excludes judgement calls, so anything of that kind is a decision for you rather than for a constant.\n\nValue length: 3 to 8 characters, mean 7.5",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.045743,
+   "response": "fin.transaction_type\n\n  transaction_type (VARCHAR): 5 distinct value(s) across 100,278 rows, no nulls, range fee to transfer.\n\nMost frequent value(s), 5 of 5 distinct:\n\n  purchase     60,125   60.0%\n  transfer     20,214   20.2%\n  refund        8,039    8.0%\n  fee           6,925    6.9%\n  reversal      4,975    5.0%\n\nRead that list for values that MEAN absent. This profile counts only the published missing-value vocabulary (pandas/pyarrow), which deliberately excludes judgement calls, so anything of that kind is a decision for you rather than for a constant.\n\nValue length: 3 to 8 characters, mean 7.5",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.fin.category",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "fin",
+  "rows": null,
+  "parameters": {
+   "column": "category"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 1.134478,
+   "response": "fin.category\n\n  category (VARCHAR): 12 distinct value(s) across 100,278 rows, 969 null (1.0%), range crypto to utilities.\n\nMost frequent value(s), 10 of 12 distinct:\n\n  groceries         17,811   17.8%\n  dining            12,102   12.1%\n  transfer          11,922   11.9%\n  salary             9,915    9.9%\n  entertainment      9,010    9.0%\n  utilities          8,921    8.9%\n  rent               7,743    7.7%\n  travel             6,809    6.8%\n  insurance          5,957    5.9%\n  healthcare         5,035    5.0%\n\n2 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"category\", top_n=50)\n\nRead that list for values that MEAN absent. This profile counts only the published missing-value vocabulary (pandas/pyarrow), which deliberately excludes judgement calls, so anything of that kind is a decision for you rather than for a constant.\n\nValue length: 4 to 13 characters, mean 8.0",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.076121,
+   "response": "fin.category\n\n  category (VARCHAR): 12 distinct value(s) across 100,278 rows, 969 null (1.0%), range crypto to utilities.\n\nMost frequent value(s), 10 of 12 distinct:\n\n  groceries         17,811   17.8%\n  dining            12,102   12.1%\n  transfer          11,922   11.9%\n  salary             9,915    9.9%\n  entertainment      9,010    9.0%\n  utilities          8,921    8.9%\n  rent               7,743    7.7%\n  travel             6,809    6.8%\n  insurance          5,957    5.9%\n  healthcare         5,035    5.0%\n\n2 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"category\", top_n=50)\n\nRead that list for values that MEAN absent. This profile counts only the published missing-value vocabulary (pandas/pyarrow), which deliberately excludes judgement calls, so anything of that kind is a decision for you rather than for a constant.\n\nValue length: 4 to 13 characters, mean 8.0",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.fin.debit",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "fin",
+  "rows": null,
+  "parameters": {
+   "column": "debit"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 1.217948,
+   "response": "fin.debit\n\n  debit (DOUBLE): 26,823 distinct value(s) across 100,278 rows, no nulls, range 0.0 to 7856.72. It has 8,442 value(s) outside [-110.9, 237.7] (0 below, 8,442 above; Tukey IQR fences, k=1.5).\n\nMost frequent value(s), 10 of 26,823 distinct:\n\n  0.0        8,039    8.0%\n  18.36         22    0.0%\n  19.75         22    0.0%\n  20.5          22    0.0%\n  25.64         22    0.0%\n  11.8          21    0.0%\n  19.45         21    0.0%\n  9.16          20    0.0%\n  10.35         20    0.0%\n  14.22         20    0.0%\n\n26,813 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"debit\", top_n=50)\n\nDistribution:\n\n               0 to 1,000             99,861  ##############################\n           1,000 to 2,000                359  #\n           2,000 to 3,000                 41  #\n           3,000 to 4,000                 11  #\n           4,000 to 5,000                  4  #\n           5,000 to 6,000                  0  \n           6,000 to 7,000                  1  #\n           7,000 to 8,000                  1  #",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.076361,
+   "response": "fin.debit\n\n  debit (DOUBLE): 26,823 distinct value(s) across 100,278 rows, no nulls, range 0.0 to 7856.72. It has 8,442 value(s) outside [-110.9, 237.7] (0 below, 8,442 above; Tukey IQR fences, k=1.5).\n\nMost frequent value(s), 10 of 26,823 distinct:\n\n  0.0        8,039    8.0%\n  18.36         22    0.0%\n  19.75         22    0.0%\n  20.5          22    0.0%\n  25.64         22    0.0%\n  11.8          21    0.0%\n  19.45         21    0.0%\n  9.16          20    0.0%\n  10.35         20    0.0%\n  14.22         20    0.0%\n\n26,813 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"debit\", top_n=50)\n\nDistribution:\n\n               0 to 1,000             99,861  ##############################\n           1,000 to 2,000                359  #\n           2,000 to 3,000                 41  #\n           3,000 to 4,000                 11  #\n           4,000 to 5,000                  4  #\n           5,000 to 6,000                  0  \n           6,000 to 7,000                  1  #\n           7,000 to 8,000                  1  #",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.fin.credit",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "fin",
+  "rows": null,
+  "parameters": {
+   "column": "credit"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 1.22865,
+   "response": "fin.credit\n\n  credit (DOUBLE): 6,390 distinct value(s) across 100,278 rows, no nulls, range 0.0 to 4380.22.\n\nMost frequent value(s), 10 of 6,390 distinct:\n\n  0.0       92,239   92.0%\n  6.93           5    0.0%\n  11.06          5    0.0%\n  14.97          5    0.0%\n  15.1           5    0.0%\n  16.12          5    0.0%\n  18.48          5    0.0%\n  37.41          5    0.0%\n  5.7            4    0.0%\n  6.75           4    0.0%\n\n6,380 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"credit\", top_n=50)\n\nDistribution:\n\n               0 to 500              100,080  ##############################\n             500 to 1,000                160  #\n           1,000 to 1,500                 24  #\n           1,500 to 2,000                  8  #\n           2,000 to 2,500                  2  #\n           2,500 to 3,000                  1  #\n           3,000 to 3,500                  1  #\n           3,500 to 4,000                  1  #\n           4,000 to 4,500                  1  #",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.06464,
+   "response": "fin.credit\n\n  credit (DOUBLE): 6,390 distinct value(s) across 100,278 rows, no nulls, range 0.0 to 4380.22.\n\nMost frequent value(s), 10 of 6,390 distinct:\n\n  0.0       92,239   92.0%\n  6.93           5    0.0%\n  11.06          5    0.0%\n  14.97          5    0.0%\n  15.1           5    0.0%\n  16.12          5    0.0%\n  18.48          5    0.0%\n  37.41          5    0.0%\n  5.7            4    0.0%\n  6.75           4    0.0%\n\n6,380 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"credit\", top_n=50)\n\nDistribution:\n\n               0 to 500              100,080  ##############################\n             500 to 1,000                160  #\n           1,000 to 1,500                 24  #\n           1,500 to 2,000                  8  #\n           2,000 to 2,500                  2  #\n           2,500 to 3,000                  1  #\n           3,000 to 3,500                  1  #\n           3,500 to 4,000                  1  #\n           4,000 to 4,500                  1  #",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.fin.amount",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "fin",
+  "rows": null,
+  "parameters": {
+   "column": "amount"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 1.182991,
+   "response": "fin.amount\n\n  amount (DOUBLE): 33,211 distinct value(s) across 100,278 rows, no nulls, range -4380.22 to 7856.72. It has 10,521 value(s) outside [-110.9, 237.7] (2,079 below, 8,442 above; Tukey IQR fences, k=1.5).\n\nMost frequent value(s), 10 of 33,211 distinct:\n\n  18.36         22    0.0%\n  19.75         22    0.0%\n  20.5          22    0.0%\n  25.64         22    0.0%\n  11.8          21    0.0%\n  19.45         21    0.0%\n  9.16          20    0.0%\n  10.35         20    0.0%\n  14.22         20    0.0%\n  14.97         20    0.0%\n\n33,201 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"amount\", top_n=50)\n\nDistribution:\n\n       -4,380.22 to -4,000                 1  #\n          -4,000 to -3,000                 2  #\n          -3,000 to -2,000                 3  #\n          -2,000 to -1,000                32  #\n          -1,000 to 0                  8,001  ###\n               0 to 1,000             91,822  ##############################\n           1,000 to 2,000                359  #\n           2,000 to 3,000                 41  #\n           3,000 to 4,000                 11  #\n           4,000 to 5,000                  4  #\n           5,000 to 6,000                  0  \n           6,000 to 7,000                  1  #\n           7,000 to 8,000                  1  #",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.072832,
+   "response": "fin.amount\n\n  amount (DOUBLE): 33,211 distinct value(s) across 100,278 rows, no nulls, range -4380.22 to 7856.72. It has 10,521 value(s) outside [-110.9, 237.7] (2,079 below, 8,442 above; Tukey IQR fences, k=1.5).\n\nMost frequent value(s), 10 of 33,211 distinct:\n\n  18.36         22    0.0%\n  19.75         22    0.0%\n  20.5          22    0.0%\n  25.64         22    0.0%\n  11.8          21    0.0%\n  19.45         21    0.0%\n  9.16          20    0.0%\n  10.35         20    0.0%\n  14.22         20    0.0%\n  14.97         20    0.0%\n\n33,201 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"amount\", top_n=50)\n\nDistribution:\n\n       -4,380.22 to -4,000                 1  #\n          -4,000 to -3,000                 2  #\n          -3,000 to -2,000                 3  #\n          -2,000 to -1,000                32  #\n          -1,000 to 0                  8,001  ###\n               0 to 1,000             91,822  ##############################\n           1,000 to 2,000                359  #\n           2,000 to 3,000                 41  #\n           3,000 to 4,000                 11  #\n           4,000 to 5,000                  4  #\n           5,000 to 6,000                  0  \n           6,000 to 7,000                  1  #\n           7,000 to 8,000                  1  #",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.fin.balance",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "fin",
+  "rows": null,
+  "parameters": {
+   "column": "balance"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 1.232729,
+   "response": "fin.balance\n\n  balance (DOUBLE): 96,602 distinct value(s) across 100,278 rows, no nulls, range -14763.05 to 21404.11. It has 754 value(s) outside [-8,234, 1.324e+04] (367 below, 387 above; Tukey IQR fences, k=1.5).\n\nMost frequent value(s), 10 of 96,602 distinct:\n\n  5193.05           4    0.0%\n  -3798.98          3    0.0%\n  -3017.1           3    0.0%\n  -2134.34          3    0.0%\n  -1883.33          3    0.0%\n  -1737.14          3    0.0%\n  -1271.6           3    0.0%\n  -1079.49          3    0.0%\n  -619.14           3    0.0%\n  -357.31           3    0.0%\n\n96,592 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"balance\", top_n=50)\n\nDistribution:\n\n         -14,763 to -10,000               92  #\n         -10,000 to -5,000             2,837  ##\n          -5,000 to 0                 23,639  ###############\n               0 to 5,000             47,039  ##############################\n           5,000 to 10,000            23,622  ###############\n          10,000 to 15,000             2,951  ##\n          15,000 to 20,000                96  #\n          20,000 to 25,000                 2  #",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.074129,
+   "response": "fin.balance\n\n  balance (DOUBLE): 96,602 distinct value(s) across 100,278 rows, no nulls, range -14763.05 to 21404.11. It has 754 value(s) outside [-8,234, 1.324e+04] (367 below, 387 above; Tukey IQR fences, k=1.5).\n\nMost frequent value(s), 10 of 96,602 distinct:\n\n  5193.05           4    0.0%\n  -3798.98          3    0.0%\n  -3017.1           3    0.0%\n  -2134.34          3    0.0%\n  -1883.33          3    0.0%\n  -1737.14          3    0.0%\n  -1271.6           3    0.0%\n  -1079.49          3    0.0%\n  -619.14           3    0.0%\n  -357.31           3    0.0%\n\n96,592 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"balance\", top_n=50)\n\nDistribution:\n\n         -14,763 to -10,000               92  #\n         -10,000 to -5,000             2,837  ##\n          -5,000 to 0                 23,639  ###############\n               0 to 5,000             47,039  ##############################\n           5,000 to 10,000            23,622  ###############\n          10,000 to 15,000             2,951  ##\n          15,000 to 20,000                96  #\n          20,000 to 25,000                 2  #",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.fin.currency",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "fin",
+  "rows": null,
+  "parameters": {
+   "column": "currency"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 1.186533,
+   "response": "fin.currency\n\n  currency (VARCHAR): 2 distinct value(s) across 100,278 rows, no nulls, range EUR to USD.\n\nMost frequent value(s), 2 of 2 distinct:\n\n  USD    100,162   99.9%\n  EUR        116    0.1%\n\nRead that list for values that MEAN absent. This profile counts only the published missing-value vocabulary (pandas/pyarrow), which deliberately excludes judgement calls, so anything of that kind is a decision for you rather than for a constant.\n\nValue length: every value is 3 characters. Fixed width usually means a code rather than free text.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.04692,
+   "response": "fin.currency\n\n  currency (VARCHAR): 2 distinct value(s) across 100,278 rows, no nulls, range EUR to USD.\n\nMost frequent value(s), 2 of 2 distinct:\n\n  USD    100,162   99.9%\n  EUR        116    0.1%\n\nRead that list for values that MEAN absent. This profile counts only the published missing-value vocabulary (pandas/pyarrow), which deliberately excludes judgement calls, so anything of that kind is a decision for you rather than for a constant.\n\nValue length: every value is 3 characters. Fixed width usually means a code rather than free text.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.fin.branch",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "fin",
+  "rows": null,
+  "parameters": {
+   "column": "branch"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 1.171964,
+   "response": "fin.branch\n\n  branch (VARCHAR): 40 distinct value(s) across 100,278 rows, 207 null (0.2%), range BR00 to BR39.\n\nMost frequent value(s), 10 of 40 distinct:\n\n  BR38      2,594    2.6%\n  BR16      2,589    2.6%\n  BR36      2,586    2.6%\n  BR20      2,581    2.6%\n  BR15      2,571    2.6%\n  BR32      2,540    2.5%\n  BR17      2,536    2.5%\n  BR11      2,530    2.5%\n  BR22      2,529    2.5%\n  BR00      2,522    2.5%\n\n30 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"branch\", top_n=50)\n\nRead that list for values that MEAN absent. This profile counts only the published missing-value vocabulary (pandas/pyarrow), which deliberately excludes judgement calls, so anything of that kind is a decision for you rather than for a constant.\n\nValue length: every value is 4 characters. Fixed width usually means a code rather than free text.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.065985,
+   "response": "fin.branch\n\n  branch (VARCHAR): 40 distinct value(s) across 100,278 rows, 207 null (0.2%), range BR00 to BR39.\n\nMost frequent value(s), 10 of 40 distinct:\n\n  BR38      2,594    2.6%\n  BR16      2,589    2.6%\n  BR36      2,586    2.6%\n  BR20      2,581    2.6%\n  BR15      2,571    2.6%\n  BR32      2,540    2.5%\n  BR17      2,536    2.5%\n  BR11      2,530    2.5%\n  BR22      2,529    2.5%\n  BR00      2,522    2.5%\n\n30 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"branch\", top_n=50)\n\nRead that list for values that MEAN absent. This profile counts only the published missing-value vocabulary (pandas/pyarrow), which deliberately excludes judgement calls, so anything of that kind is a decision for you rather than for a constant.\n\nValue length: every value is 4 characters. Fixed width usually means a code rather than free text.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.fin.payment_method",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "fin",
+  "rows": null,
+  "parameters": {
+   "column": "payment_method"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 1.192397,
+   "response": "fin.payment_method\n\n  payment_method (VARCHAR): 5 distinct value(s) across 100,278 rows, 555 null (0.6%), range ach to wire.\n\nMost frequent value(s), 6 of 5 distinct:\n\n  card       55,172   55.0%\n  ach        24,952   24.9%\n  cash        9,873    9.8%\n  wire        7,804    7.8%\n  cheque      1,922    1.9%\n  (null)        555    0.6%\n\nRead that list for values that MEAN absent. This profile counts only the published missing-value vocabulary (pandas/pyarrow), which deliberately excludes judgement calls, so anything of that kind is a decision for you rather than for a constant.\n\nValue length: 3 to 6 characters, mean 3.8",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.0661,
+   "response": "fin.payment_method\n\n  payment_method (VARCHAR): 5 distinct value(s) across 100,278 rows, 555 null (0.6%), range ach to wire.\n\nMost frequent value(s), 6 of 5 distinct:\n\n  card       55,172   55.0%\n  ach        24,952   24.9%\n  cash        9,873    9.8%\n  wire        7,804    7.8%\n  cheque      1,922    1.9%\n  (null)        555    0.6%\n\nRead that list for values that MEAN absent. This profile counts only the published missing-value vocabulary (pandas/pyarrow), which deliberately excludes judgement calls, so anything of that kind is a decision for you rather than for a constant.\n\nValue length: 3 to 6 characters, mean 3.8",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.fin.risk_score",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "fin",
+  "rows": null,
+  "parameters": {
+   "column": "risk_score"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 1.226464,
+   "response": "fin.risk_score\n\n  risk_score (DOUBLE): 6,006 distinct value(s) across 100,278 rows, 2,014 null (2.0%), range 0.0006 to 0.8558. It has 1,434 value(s) outside [-0.1392, 0.5189] (0 below, 1,434 above; Tukey IQR fences, k=1.5).\n\nMost frequent value(s), 10 of 6,006 distinct:\n\n  (null)      2,014    2.0%\n  0.1413         53    0.1%\n  0.1362         52    0.1%\n  0.1289         51    0.1%\n  0.1506         51    0.1%\n  0.1692         51    0.1%\n  0.115          50    0.0%\n  0.1464         49    0.0%\n  0.1571         49    0.0%\n  0.0956         48    0.0%\n\n5,996 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"risk_score\", top_n=50)\n\nDistribution:\n\n          0.0006 to 0.1               21,932  ####################\n             0.1 to 0.2               33,478  ##############################\n             0.2 to 0.3               23,589  #####################\n             0.3 to 0.4               12,317  ###########\n             0.4 to 0.5                5,036  #####\n             0.5 to 0.6                1,569  #\n             0.6 to 0.7                  299  #\n             0.7 to 0.8                   41  #\n             0.8 to 0.9                    3  #",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.06665,
+   "response": "fin.risk_score\n\n  risk_score (DOUBLE): 6,006 distinct value(s) across 100,278 rows, 2,014 null (2.0%), range 0.0006 to 0.8558. It has 1,434 value(s) outside [-0.1392, 0.5189] (0 below, 1,434 above; Tukey IQR fences, k=1.5).\n\nMost frequent value(s), 10 of 6,006 distinct:\n\n  (null)      2,014    2.0%\n  0.1413         53    0.1%\n  0.1362         52    0.1%\n  0.1289         51    0.1%\n  0.1506         51    0.1%\n  0.1692         51    0.1%\n  0.115          50    0.0%\n  0.1464         49    0.0%\n  0.1571         49    0.0%\n  0.0956         48    0.0%\n\n5,996 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"risk_score\", top_n=50)\n\nDistribution:\n\n          0.0006 to 0.1               21,932  ####################\n             0.1 to 0.2               33,478  ##############################\n             0.2 to 0.3               23,589  #####################\n             0.3 to 0.4               12,317  ###########\n             0.4 to 0.5                5,036  #####\n             0.5 to 0.6                1,569  #\n             0.6 to 0.7                  299  #\n             0.7 to 0.8                   41  #\n             0.8 to 0.9                    3  #",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.fin.fraud_flag",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "fin",
+  "rows": null,
+  "parameters": {
+   "column": "fraud_flag"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 1.271415,
+   "response": "fin.fraud_flag\n\n  fraud_flag (BOOLEAN): 2 distinct value(s) across 100,278 rows, no nulls, range false to true.\n\nMost frequent value(s), 2 of 2 distinct:\n\n  False     99,852   99.6%\n  True         426    0.4%",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.037858,
+   "response": "fin.fraud_flag\n\n  fraud_flag (BOOLEAN): 2 distinct value(s) across 100,278 rows, no nulls, range false to true.\n\nMost frequent value(s), 2 of 2 distinct:\n\n  False     99,852   99.6%\n  True         426    0.4%",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.fin.revenue",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "fin",
+  "rows": null,
+  "parameters": {
+   "column": "revenue"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 1.308699,
+   "response": "fin.revenue\n\n  revenue (DOUBLE): 27,774 distinct value(s) across 100,278 rows, 495 null (0.5%), range 0.29 to 1000000000.0. It has 8,472 value(s) outside [-108.8, 249.6] (0 below, 8,472 above; Tukey IQR fences, k=1.5).\n\nMost frequent value(s), 10 of 27,774 distinct:\n\n  (null)        495    0.5%\n  14.97          25    0.0%\n  9.16           23    0.0%\n  18.36          23    0.0%\n  19.75          23    0.0%\n  14.32          22    0.0%\n  14.63          22    0.0%\n  20.5           22    0.0%\n  25.64          22    0.0%\n  10.28          21    0.0%\n\n27,764 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"revenue\", top_n=50)\n\nDistribution:\n\n            0.29 to 1e+08             99,780  ##############################\n           1e+08 to 2e+08                  0  \n           2e+08 to 3e+08                  0  \n           3e+08 to 4e+08                  0  \n           4e+08 to 5e+08                  0  \n           5e+08 to 6e+08                  0  \n           6e+08 to 7e+08                  0  \n           7e+08 to 8e+08                  0  \n           8e+08 to 9e+08                  0  \n           9e+08 to 1e+09                  3  #",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.077392,
+   "response": "fin.revenue\n\n  revenue (DOUBLE): 27,774 distinct value(s) across 100,278 rows, 495 null (0.5%), range 0.29 to 1000000000.0. It has 8,472 value(s) outside [-108.8, 249.6] (0 below, 8,472 above; Tukey IQR fences, k=1.5).\n\nMost frequent value(s), 10 of 27,774 distinct:\n\n  (null)        495    0.5%\n  14.97          25    0.0%\n  9.16           23    0.0%\n  18.36          23    0.0%\n  19.75          23    0.0%\n  14.32          22    0.0%\n  14.63          22    0.0%\n  20.5           22    0.0%\n  25.64          22    0.0%\n  10.28          21    0.0%\n\n27,764 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"revenue\", top_n=50)\n\nDistribution:\n\n            0.29 to 1e+08             99,780  ##############################\n           1e+08 to 2e+08                  0  \n           2e+08 to 3e+08                  0  \n           3e+08 to 4e+08                  0  \n           4e+08 to 5e+08                  0  \n           5e+08 to 6e+08                  0  \n           6e+08 to 7e+08                  0  \n           7e+08 to 8e+08                  0  \n           8e+08 to 9e+08                  0  \n           9e+08 to 1e+09                  3  #",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.fin.expense",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "fin",
+  "rows": null,
+  "parameters": {
+   "column": "expense"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 1.256213,
+   "response": "fin.expense\n\n  expense (DOUBLE): 21,321 distinct value(s) across 100,278 rows, no nulls, range -13.57 to 4939.4. It has 8,534 value(s) outside [-65.1, 149.5] (0 below, 8,534 above; Tukey IQR fences, k=1.5).\n\nMost frequent value(s), 10 of 21,321 distinct:\n\n  10.92         33    0.0%\n  11.41         33    0.0%\n  7.69          32    0.0%\n  14.18         32    0.0%\n  12.65         31    0.0%\n  16.06         31    0.0%\n  10.89         30    0.0%\n  18.32         30    0.0%\n  23.56         30    0.0%\n  10.07         29    0.0%\n\n21,311 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"expense\", top_n=50)\n\nDistribution:\n\n          -13.57 to 0                  2,152  #\n               0 to 500               97,397  ##############################\n             500 to 1,000                620  #\n           1,000 to 1,500                 78  #\n           1,500 to 2,000                 21  #\n           2,000 to 2,500                  5  #\n           2,500 to 3,000                  2  #\n           3,000 to 3,500                  1  #\n           3,500 to 4,000                  1  #\n           4,000 to 4,500                  0  \n           4,500 to 5,000                  1  #",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.066643,
+   "response": "fin.expense\n\n  expense (DOUBLE): 21,321 distinct value(s) across 100,278 rows, no nulls, range -13.57 to 4939.4. It has 8,534 value(s) outside [-65.1, 149.5] (0 below, 8,534 above; Tukey IQR fences, k=1.5).\n\nMost frequent value(s), 10 of 21,321 distinct:\n\n  10.92         33    0.0%\n  11.41         33    0.0%\n  7.69          32    0.0%\n  14.18         32    0.0%\n  12.65         31    0.0%\n  16.06         31    0.0%\n  10.89         30    0.0%\n  18.32         30    0.0%\n  23.56         30    0.0%\n  10.07         29    0.0%\n\n21,311 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"expense\", top_n=50)\n\nDistribution:\n\n          -13.57 to 0                  2,152  #\n               0 to 500               97,397  ##############################\n             500 to 1,000                620  #\n           1,000 to 1,500                 78  #\n           1,500 to 2,000                 21  #\n           2,000 to 2,500                  5  #\n           2,500 to 3,000                  2  #\n           3,000 to 3,500                  1  #\n           3,500 to 4,000                  1  #\n           4,000 to 4,500                  0  \n           4,500 to 5,000                  1  #",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.fin.profit",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "fin",
+  "rows": null,
+  "parameters": {
+   "column": "profit"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 1.181312,
+   "response": "fin.profit\n\n  profit (DOUBLE): 17,019 distinct value(s) across 100,278 rows, no nulls, range -14.65 to 2917.32. It has 8,579 value(s) outside [-43.68, 99.84] (0 below, 8,579 above; Tukey IQR fences, k=1.5).\n\nMost frequent value(s), 10 of 17,019 distinct:\n\n  12.8          42    0.0%\n  11.3          40    0.0%\n  3.93          39    0.0%\n  5.85          39    0.0%\n  5.22          38    0.0%\n  8.69          38    0.0%\n  10.0          38    0.0%\n  11.0          38    0.0%\n  11.03         38    0.0%\n  11.12         38    0.0%\n\n17,009 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"profit\", top_n=50)\n\nDistribution:\n\n          -14.65 to 0                  4,014  #\n               0 to 200               93,914  ##############################\n             200 to 400                1,857  #\n             400 to 600                  322  #\n             600 to 800                   98  #\n             800 to 1,000                 40  #\n           1,000 to 1,200                 13  #\n           1,200 to 1,400                  7  #\n           1,400 to 1,600                  2  #\n           1,600 to 1,800                  6  #\n           1,800 to 2,000                  1  #\n           2,000 to 2,200                  1  #\n           2,200 to 2,400                  1  #\n           2,400 to 2,600                  1  #\n           2,600 to 2,800                  0  \n           2,800 to 3,000                  1  #",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.067131,
+   "response": "fin.profit\n\n  profit (DOUBLE): 17,019 distinct value(s) across 100,278 rows, no nulls, range -14.65 to 2917.32. It has 8,579 value(s) outside [-43.68, 99.84] (0 below, 8,579 above; Tukey IQR fences, k=1.5).\n\nMost frequent value(s), 10 of 17,019 distinct:\n\n  12.8          42    0.0%\n  11.3          40    0.0%\n  3.93          39    0.0%\n  5.85          39    0.0%\n  5.22          38    0.0%\n  8.69          38    0.0%\n  10.0          38    0.0%\n  11.0          38    0.0%\n  11.03         38    0.0%\n  11.12         38    0.0%\n\n17,009 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"profit\", top_n=50)\n\nDistribution:\n\n          -14.65 to 0                  4,014  #\n               0 to 200               93,914  ##############################\n             200 to 400                1,857  #\n             400 to 600                  322  #\n             600 to 800                   98  #\n             800 to 1,000                 40  #\n           1,000 to 1,200                 13  #\n           1,200 to 1,400                  7  #\n           1,400 to 1,600                  2  #\n           1,600 to 1,800                  6  #\n           1,800 to 2,000                  1  #\n           2,000 to 2,200                  1  #\n           2,200 to 2,400                  1  #\n           2,400 to 2,600                  1  #\n           2,600 to 2,800                  0  \n           2,800 to 3,000                  1  #",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.fin.budget",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "fin",
+  "rows": null,
+  "parameters": {
+   "column": "budget"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 1.208466,
+   "response": "fin.budget\n\n  budget (DOUBLE): 32,984 distinct value(s) across 100,278 rows, no nulls, range 50.0 to 400.0.\n\nMost frequent value(s), 10 of 32,984 distinct:\n\n  372.86         13    0.0%\n  86.37          12    0.0%\n  125.77         12    0.0%\n  201.67         12    0.0%\n  280.62         12    0.0%\n  102.4          11    0.0%\n  105.74         11    0.0%\n  197.57         11    0.0%\n  272.41         11    0.0%\n  64.93          10    0.0%\n\n32,974 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"budget\", top_n=50)\n\nDistribution:\n\n              50 to 100               14,221  #############################\n             100 to 150               14,347  ##############################\n             150 to 200               14,393  ##############################\n             200 to 250               14,473  ##############################\n             250 to 300               14,428  ##############################\n             300 to 350               14,162  #############################\n             350 to 400               14,254  ##############################",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.073255,
+   "response": "fin.budget\n\n  budget (DOUBLE): 32,984 distinct value(s) across 100,278 rows, no nulls, range 50.0 to 400.0.\n\nMost frequent value(s), 10 of 32,984 distinct:\n\n  372.86         13    0.0%\n  86.37          12    0.0%\n  125.77         12    0.0%\n  201.67         12    0.0%\n  280.62         12    0.0%\n  102.4          11    0.0%\n  105.74         11    0.0%\n  197.57         11    0.0%\n  272.41         11    0.0%\n  64.93          10    0.0%\n\n32,974 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"budget\", top_n=50)\n\nDistribution:\n\n              50 to 100               14,221  #############################\n             100 to 150               14,347  ##############################\n             150 to 200               14,393  ##############################\n             200 to 250               14,473  ##############################\n             250 to 300               14,428  ##############################\n             300 to 350               14,162  #############################\n             350 to 400               14,254  ##############################",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.fin.actual",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "fin",
+  "rows": null,
+  "parameters": {
+   "column": "actual"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 1.187699,
+   "response": "fin.actual\n\n  actual (DOUBLE): 37,711 distinct value(s) across 100,278 rows, no nulls, range 35.36 to 518.86.\n\nMost frequent value(s), 10 of 37,711 distinct:\n\n  77.26          11    0.0%\n  141.61         11    0.0%\n  225.27         11    0.0%\n  112.91         10    0.0%\n  145.84         10    0.0%\n  167.88         10    0.0%\n  168.66         10    0.0%\n  206.17         10    0.0%\n  221.77         10    0.0%\n  232.54         10    0.0%\n\n37,701 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"actual\", top_n=50)\n\nDistribution:\n\n           35.36 to 50                 1,314  ###\n              50 to 100               13,925  ############################\n             100 to 150               14,683  #############################\n             150 to 200               14,801  ##############################\n             200 to 250               14,940  ##############################\n             250 to 300               14,540  #############################\n             300 to 350               11,102  ######################\n             350 to 400                7,819  ################\n             400 to 450                4,773  ##########\n             450 to 500                2,189  ####\n             500 to 550                  192  #",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.082969,
+   "response": "fin.actual\n\n  actual (DOUBLE): 37,711 distinct value(s) across 100,278 rows, no nulls, range 35.36 to 518.86.\n\nMost frequent value(s), 10 of 37,711 distinct:\n\n  77.26          11    0.0%\n  141.61         11    0.0%\n  225.27         11    0.0%\n  112.91         10    0.0%\n  145.84         10    0.0%\n  167.88         10    0.0%\n  168.66         10    0.0%\n  206.17         10    0.0%\n  221.77         10    0.0%\n  232.54         10    0.0%\n\n37,701 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"fin\", column=\"actual\", top_n=50)\n\nDistribution:\n\n           35.36 to 50                 1,314  ###\n              50 to 100               13,925  ############################\n             100 to 150               14,683  #############################\n             150 to 200               14,801  ##############################\n             200 to 250               14,940  ##############################\n             250 to 300               14,540  #############################\n             300 to 350               11,102  ######################\n             350 to 400                7,819  ################\n             400 to 450                4,773  ##########\n             450 to 500                2,189  ####\n             500 to 550                  192  #",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.fin.fiscal_period",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "fin",
+  "rows": null,
+  "parameters": {
+   "column": "fiscal_period"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 1.196113,
+   "response": "fin.fiscal_period\n\n  fiscal_period (VARCHAR): 9 distinct value(s) across 100,278 rows, no nulls, range FY2023-Q1 to FY2025-Q1.\n\nMost frequent value(s), 9 of 9 distinct:\n\n  FY2024-Q1     12,660   12.6%\n  FY2024-Q4     12,592   12.6%\n  FY2023-Q3     12,470   12.4%\n  FY2023-Q4     12,420   12.4%\n  FY2023-Q2     12,379   12.3%\n  FY2024-Q2     12,375   12.3%\n  FY2024-Q3     12,195   12.2%\n  FY2023-Q1     12,161   12.1%\n  FY2025-Q1      1,026    1.0%\n\nRead that list for values that MEAN absent. This profile counts only the published missing-value vocabulary (pandas/pyarrow), which deliberately excludes judgement calls, so anything of that kind is a decision for you rather than for a constant.\n\nValue length: every value is 9 characters. Fixed width usually means a code rather than free text.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.053953,
+   "response": "fin.fiscal_period\n\n  fiscal_period (VARCHAR): 9 distinct value(s) across 100,278 rows, no nulls, range FY2023-Q1 to FY2025-Q1.\n\nMost frequent value(s), 9 of 9 distinct:\n\n  FY2024-Q1     12,660   12.6%\n  FY2024-Q4     12,592   12.6%\n  FY2023-Q3     12,470   12.4%\n  FY2023-Q4     12,420   12.4%\n  FY2023-Q2     12,379   12.3%\n  FY2024-Q2     12,375   12.3%\n  FY2024-Q3     12,195   12.2%\n  FY2023-Q1     12,161   12.1%\n  FY2025-Q1      1,026    1.0%\n\nRead that list for values that MEAN absent. This profile counts only the published missing-value vocabulary (pandas/pyarrow), which deliberately excludes judgement calls, so anything of that kind is a decision for you rather than for a constant.\n\nValue length: every value is 9 characters. Fixed width usually means a code rather than free text.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.fin.source_system",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "fin",
+  "rows": null,
+  "parameters": {
+   "column": "source_system"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 1.189636,
+   "response": "fin.source_system\n\n  source_system (VARCHAR): 1 distinct value(s) across 100,278 rows, no nulls.\n\nMost frequent value(s), 1 of 1 distinct:\n\n  CORE    100,278  100.0%\n\nRead that list for values that MEAN absent. This profile counts only the published missing-value vocabulary (pandas/pyarrow), which deliberately excludes judgement calls, so anything of that kind is a decision for you rather than for a constant.\n\nValue length: every value is 4 characters. Fixed width usually means a code rather than free text.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.056484,
+   "response": "fin.source_system\n\n  source_system (VARCHAR): 1 distinct value(s) across 100,278 rows, no nulls.\n\nMost frequent value(s), 1 of 1 distinct:\n\n  CORE    100,278  100.0%\n\nRead that list for values that MEAN absent. This profile counts only the published missing-value vocabulary (pandas/pyarrow), which deliberately excludes judgement calls, so anything of that kind is a decision for you rather than for a constant.\n\nValue length: every value is 4 characters. Fixed width usually means a code rather than free text.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.specials.id",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "specials",
+  "rows": null,
+  "parameters": {
+   "column": "id"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.085959,
+   "response": "specials.id\n\n  id (VARCHAR): 5,000 distinct value(s) across 5,000 rows, no nulls, range id000000 to id004999.\n\nEvery one of the 5,000 values occurs exactly once, so there is no frequency table to show. What a unique column has to say is below.\n\nValue length: every value is 8 characters. Fixed width usually means a code rather than free text.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.052129,
+   "response": "specials.id\n\n  id (VARCHAR): 5,000 distinct value(s) across 5,000 rows, no nulls, range id000000 to id004999.\n\nEvery one of the 5,000 values occurs exactly once, so there is no frequency table to show. What a unique column has to say is below.\n\nValue length: every value is 8 characters. Fixed width usually means a code rather than free text.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.specials.num",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "specials",
+  "rows": null,
+  "parameters": {
+   "column": "num"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.081207,
+   "response": "specials.num\n\n  num (DOUBLE): 5,000 distinct value(s) across 5,000 rows, no nulls, range 0.0 to 7498.5.\n\nEvery one of the 5,000 values occurs exactly once, so there is no frequency table to show. What a unique column has to say is below.\n\nDistribution:\n\n               0 to 500                  334  ##############################\n             500 to 1,000                333  ##############################\n           1,000 to 1,500                334  ##############################\n           1,500 to 2,000                333  ##############################\n           2,000 to 2,500                333  ##############################\n           2,500 to 3,000                334  ##############################\n           3,000 to 3,500                333  ##############################\n           3,500 to 4,000                333  ##############################\n           4,000 to 4,500                334  ##############################\n           4,500 to 5,000                333  ##############################\n           5,000 to 5,500                333  ##############################\n           5,500 to 6,000                334  ##############################\n           6,000 to 6,500                333  ##############################\n           6,500 to 7,000                333  ##############################\n           7,000 to 7,500                333  ##############################",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.041797,
+   "response": "specials.num\n\n  num (DOUBLE): 5,000 distinct value(s) across 5,000 rows, no nulls, range 0.0 to 7498.5.\n\nEvery one of the 5,000 values occurs exactly once, so there is no frequency table to show. What a unique column has to say is below.\n\nDistribution:\n\n               0 to 500                  334  ##############################\n             500 to 1,000                333  ##############################\n           1,000 to 1,500                334  ##############################\n           1,500 to 2,000                333  ##############################\n           2,000 to 2,500                333  ##############################\n           2,500 to 3,000                334  ##############################\n           3,000 to 3,500                333  ##############################\n           3,500 to 4,000                333  ##############################\n           4,000 to 4,500                334  ##############################\n           4,500 to 5,000                333  ##############################\n           5,000 to 5,500                333  ##############################\n           5,500 to 6,000                334  ##############################\n           6,000 to 6,500                333  ##############################\n           6,500 to 7,000                333  ##############################\n           7,000 to 7,500                333  ##############################",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.specials.cat",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "specials",
+  "rows": null,
+  "parameters": {
+   "column": "cat"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.08797,
+   "response": "specials.cat\n\n  cat (VARCHAR): 3 distinct value(s) across 5,000 rows, no nulls, range a to c.\n\nMost frequent value(s), 3 of 3 distinct:\n\n  a      1,667   33.3%\n  b      1,667   33.3%\n  c      1,666   33.3%\n\nRead that list for values that MEAN absent. This profile counts only the published missing-value vocabulary (pandas/pyarrow), which deliberately excludes judgement calls, so anything of that kind is a decision for you rather than for a constant.\n\nValue length: every value is 1 characters. Fixed width usually means a code rather than free text.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.042734,
+   "response": "specials.cat\n\n  cat (VARCHAR): 3 distinct value(s) across 5,000 rows, no nulls, range a to c.\n\nMost frequent value(s), 3 of 3 distinct:\n\n  a      1,667   33.3%\n  b      1,667   33.3%\n  c      1,666   33.3%\n\nRead that list for values that MEAN absent. This profile counts only the published missing-value vocabulary (pandas/pyarrow), which deliberately excludes judgement calls, so anything of that kind is a decision for you rather than for a constant.\n\nValue length: every value is 1 characters. Fixed width usually means a code rather than free text.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.specials.when",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "specials",
+  "rows": null,
+  "parameters": {
+   "column": "when"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.093635,
+   "response": "specials.when\n\n  when (DATE): 28 distinct value(s) across 5,000 rows, no nulls, range 2024-01-01 to 2024-01-28.\n\nMost frequent value(s), 10 of 28 distinct:\n\n  2024-01-01        179    3.6%\n  2024-01-02        179    3.6%\n  2024-01-03        179    3.6%\n  2024-01-04        179    3.6%\n  2024-01-05        179    3.6%\n  2024-01-06        179    3.6%\n  2024-01-07        179    3.6%\n  2024-01-08        179    3.6%\n  2024-01-09        179    3.6%\n  2024-01-10        179    3.6%\n\n18 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"specials\", column=\"when\", top_n=50)\n\nCalendar: 2024-01-01 to 2024-01-28, 28 of 28 days present (100.0%).",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.037286,
+   "response": "specials.when\n\n  when (DATE): 28 distinct value(s) across 5,000 rows, no nulls, range 2024-01-01 to 2024-01-28.\n\nMost frequent value(s), 10 of 28 distinct:\n\n  2024-01-01        179    3.6%\n  2024-01-02        179    3.6%\n  2024-01-03        179    3.6%\n  2024-01-04        179    3.6%\n  2024-01-05        179    3.6%\n  2024-01-06        179    3.6%\n  2024-01-07        179    3.6%\n  2024-01-08        179    3.6%\n  2024-01-09        179    3.6%\n  2024-01-10        179    3.6%\n\n18 further distinct value(s) are not shown. To widen the list:\n  profile_column(dataset_name=\"specials\", column=\"when\", top_n=50)\n\nCalendar: 2024-01-01 to 2024-01-28, 28 of 28 days present (100.0%).",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.specials.hi_text",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "specials",
+  "rows": null,
+  "parameters": {
+   "column": "hi_text"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.08203,
+   "response": "specials.hi_text\n\n  hi_text (VARCHAR): 5,000 distinct value(s) across 5,000 rows, no nulls, range text value 0 0 to text value 999 62.\n\nEvery one of the 5,000 values occurs exactly once, so there is no frequency table to show. What a unique column has to say is below.\n\nValue length: 14 to 19 characters, mean 18.7",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.056872,
+   "response": "specials.hi_text\n\n  hi_text (VARCHAR): 5,000 distinct value(s) across 5,000 rows, no nulls, range text value 0 0 to text value 999 62.\n\nEvery one of the 5,000 values occurs exactly once, so there is no frequency table to show. What a unique column has to say is below.\n\nValue length: 14 to 19 characters, mean 18.7",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.specials.nully",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "specials",
+  "rows": null,
+  "parameters": {
+   "column": "nully"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.083841,
+   "response": "specials.nully\n\n  nully (VARCHAR): 1 distinct value(s) across 5,000 rows, 4,500 null (90.0%).\n\nMost frequent value(s), 2 of 1 distinct:\n\n  (null)      4,500   90.0%\n  x             500   10.0%\n\nRead that list for values that MEAN absent. This profile counts only the published missing-value vocabulary (pandas/pyarrow), which deliberately excludes judgement calls, so anything of that kind is a decision for you rather than for a constant.\n\nValue length: every value is 1 characters. Fixed width usually means a code rather than free text.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.038369,
+   "response": "specials.nully\n\n  nully (VARCHAR): 1 distinct value(s) across 5,000 rows, 4,500 null (90.0%).\n\nMost frequent value(s), 2 of 1 distinct:\n\n  (null)      4,500   90.0%\n  x             500   10.0%\n\nRead that list for values that MEAN absent. This profile counts only the published missing-value vocabulary (pandas/pyarrow), which deliberately excludes judgement calls, so anything of that kind is a decision for you rather than for a constant.\n\nValue length: every value is 1 characters. Fixed width usually means a code rather than free text.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.specials.const",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "specials",
+  "rows": null,
+  "parameters": {
+   "column": "const"
+  },
+  "before": {
+   "status": "OK",
+   "wall_time_seconds": 0.079172,
+   "response": "specials.const\n\n  const (VARCHAR): 1 distinct value(s) across 5,000 rows, no nulls.\n\nMost frequent value(s), 1 of 1 distinct:\n\n  k      5,000  100.0%\n\nRead that list for values that MEAN absent. This profile counts only the published missing-value vocabulary (pandas/pyarrow), which deliberately excludes judgement calls, so anything of that kind is a decision for you rather than for a constant.\n\nValue length: every value is 1 characters. Fixed width usually means a code rather than free text.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "OK",
+   "wall_time_seconds": 0.036084,
+   "response": "specials.const\n\n  const (VARCHAR): 1 distinct value(s) across 5,000 rows, no nulls.\n\nMost frequent value(s), 1 of 1 distinct:\n\n  k      5,000  100.0%\n\nRead that list for values that MEAN absent. This profile counts only the published missing-value vocabulary (pandas/pyarrow), which deliberately excludes judgement calls, so anything of that kind is a decision for you rather than for a constant.\n\nValue length: every value is 1 characters. Fixed width usually means a code rather than free text.",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": [],
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
+  "case_id": "PROFILE_CORRECTNESS.specials.nope",
+  "category": "CORRECTNESS",
+  "defect": "P1",
+  "severity": "MEDIUM",
+  "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+  "tool": "profile_column",
+  "analysis": null,
+  "dataset": "specials",
+  "rows": null,
+  "parameters": {
+   "column": "nope"
+  },
+  "before": {
+   "status": "REFUSED",
+   "wall_time_seconds": 0.079933,
+   "response": "BLOCKED: 'specials' has no column called 'nope'.\nWHY: the column list comes from the loaded table, so a name that is not in it cannot be profiled -- including a name that was correct before the table was reloaded.\nCURRENT STATE: columns: id, num, cat, when, hi_text, nully, const\nNEXT STEP: call profile_dataset(dataset_name=\"specials\")\n\nreason: COLUMN_NOT_FOUND",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "after": {
+   "status": "REFUSED",
+   "wall_time_seconds": 0.078779,
+   "response": "BLOCKED: 'specials' has no column called 'nope'.\nWHY: the column list comes from the loaded table, so a name that is not in it cannot be profiled -- including a name that was correct before the table was reloaded.\nCURRENT STATE: columns: id, num, cat, when, hi_text, nully, const\nNEXT STEP: call profile_dataset(dataset_name=\"specials\")\n\nreason: COLUMN_NOT_FOUND",
+   "exception_type": null,
+   "exception_message": null
+  },
+  "before_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "after_extra": {
+   "field_differences": null,
+   "role": "correctness"
+  },
+  "expected_behavior": "same reply as the whole-table path, 0 field differences",
+  "original_failure_reproduced": null,
+  "correctness_equal_where_required": true,
+  "regression_passed": true
+ },
+ {
   "case_id": "PRESCREEN.prescreen",
   "category": "GROUND_FACT",
   "defect": "P2",
   "severity": "MEDIUM",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "7ff28b46bc55076da741751b6a17c437fd19ef31",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "detect.DATE_PREFIX",
   "analysis": null,
   "dataset": null,
@@ -1714,7 +3026,7 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 11.063,
+   "wall_time_seconds": 11.088,
    "response": "",
    "exception_type": null,
    "exception_message": null
@@ -1758,7 +3070,7 @@
   "defect": "D13",
   "severity": "LOW",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "tool": "read_result_file",
   "analysis": null,
   "dataset": null,
@@ -1776,7 +3088,7 @@
   },
   "after": {
    "status": "OK",
-   "wall_time_seconds": 0.000408,
+   "wall_time_seconds": 0.000388,
    "response": "frequency_many.csv: rows 1 to 10 of 984, columns 1 to 2 of 2.\n\n| k | v |\n|---|---|\n| k0 | 0 |\n| k1 | 1 |\n| k2 | 2 |\n| k3 | 3 |\n| k4 | 4 |\n| k5 | 5 |\n| k6 | 6 |\n| k7 | 7 |\n| k8 | 8 |\n| k9 | 9 |\n\n974 rows after this page:\n  read_result_file(path=\"/home/user/analytics-agent/workspace/tr_page/results/frequency_many.csv\", start=11, limit=10)",
    "exception_type": null,
    "exception_message": null

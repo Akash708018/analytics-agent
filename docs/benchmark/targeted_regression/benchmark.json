@@ -1,21 +1,23 @@
 {
- "generated": "2026-09-24T23:13:46",
+ "generated": "2026-09-25T05:12:21",
  "environment": {
   "python": "3.12.3",
   "original_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-  "fixed_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+  "fixed_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
   "fixed_src_dirty": [],
   "duckdb": "1.5.5"
  },
  "summary": {
-  "regression_cases": 95,
-  "product_defects_tested": 11,
+  "regression_cases": 129,
+  "product_defects_tested": 13,
   "product_defects": [
    "D1",
    "D10",
    "D11",
    "D12",
    "D13",
+   "D15",
+   "D16",
    "D2",
    "D3",
    "D4",
@@ -23,20 +25,11 @@
    "D6-D9",
    "H chart (harness)"
   ],
-  "product_defect_cases": 43,
-  "original_failures_reproduced": 43,
-  "fixed_passes": 40,
-  "cases_failing": [
-   "D4.threads_2",
-   "D4.threads_5",
-   "D4.threads_10",
-   "CLEANING.plan_dirty_1000000",
-   "CLEANING.plan_clean_1000000"
-  ],
-  "defects_still_failing": [
-   "D4",
-   "P2"
-  ],
+  "product_defect_cases": 45,
+  "original_failures_reproduced": 45,
+  "fixed_passes": 45,
+  "cases_failing": [],
+  "defects_still_failing": [],
   "controls": 33,
   "controls_changed": [],
   "harness_errors": {},
@@ -46,85 +39,103 @@
  "cases": {
   "D1": {
    "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-   "after_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+   "after_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
    "after_src_dirty": [],
    "harness_errors": []
   },
   "D2": {
    "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-   "after_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+   "after_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
    "after_src_dirty": [],
    "harness_errors": []
   },
   "D3": {
    "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-   "after_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+   "after_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
    "after_src_dirty": [],
    "harness_errors": []
   },
   "D4": {
    "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-   "after_commit": "a0f393b4507b156c1c9fad79600a0f2f74e93708",
+   "after_commit": "8aa3ef8c4ee1b7cd91fb0f2d10a478e6e41b6ac1",
    "after_src_dirty": [],
    "harness_errors": []
   },
   "D5": {
    "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-   "after_commit": "ebe38dc48b220fdbf0dde50542a94ad27d395ba8",
+   "after_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
    "after_src_dirty": [],
    "harness_errors": []
   },
   "D12": {
    "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-   "after_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+   "after_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+   "after_src_dirty": [],
+   "harness_errors": []
+  },
+  "D15": {
+   "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+   "after_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+   "after_src_dirty": [],
+   "harness_errors": []
+  },
+  "D16": {
+   "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+   "after_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
    "after_src_dirty": [],
    "harness_errors": []
   },
   "RECS": {
    "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-   "after_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+   "after_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+   "after_src_dirty": [],
+   "harness_errors": []
+  },
+  "PROFILE_CORRECTNESS": {
+   "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+   "after_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
    "after_src_dirty": [],
    "harness_errors": []
   },
   "PROFILE_PERF": {
    "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-   "after_commit": "5785935d2ad5a87234e8db54732b01a858e18189",
+   "after_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
    "after_src_dirty": [],
    "harness_errors": []
   },
   "CLEANING": {
    "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-   "after_commit": "84ef09197ca396c2347bcab7ece4cff86aa8fb10",
+   "after_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
    "after_src_dirty": [],
    "harness_errors": []
   },
   "PRESCREEN": {
    "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-   "after_commit": "7ff28b46bc55076da741751b6a17c437fd19ef31",
+   "after_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
    "after_src_dirty": [],
    "harness_errors": []
   },
   "COHORT": {
    "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-   "after_commit": "63e304f8a59f49a5633a31af0ac45d5864195667",
+   "after_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
    "after_src_dirty": [],
    "harness_errors": []
   },
   "WELCH": {
    "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-   "after_commit": "916a5d2192e07e48864549b1af6aaea18124eae7",
+   "after_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
    "after_src_dirty": [],
    "harness_errors": []
   },
   "PAGING": {
    "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-   "after_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+   "after_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
    "after_src_dirty": [],
    "harness_errors": []
   },
   "CHART_ISOLATION": {
    "before_commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
-   "after_commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+   "after_commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
    "after_src_dirty": [],
    "harness_errors": []
   }
@@ -216,8 +227,7 @@
   },
   "after": {
    "concurrency_correctness": {
-    "PASS": 43,
-    "ORACLE_ERROR": 1
+    "PASS": 44
    },
    "isolation": {
     "correctness": {

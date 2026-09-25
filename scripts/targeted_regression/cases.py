@@ -385,8 +385,10 @@ def case_d4() -> list[dict]:
             if "analysis" in t and "run" in t:
                 run_rows = con.execute(f'SELECT count(*) FROM "{t}"').fetchone()[0]
         con.close()
-        bodies = {r["response"].split("Result written", 1)[0] for r in results
-                  if r["status"] == "OK"}
+        # one answer: the replies with each thread's own file name and time taken out (since
+        # D16 concurrent results are, rightly, written to distinct files)
+        bodies = {re.sub(r"\S*/workspace/\S*|\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}", "<x>",
+                         r["response"]) for r in results if r["status"] == "OK"}
         agg = {"status": "OK" if all(r["status"] == "OK" for r in results) else "EXCEPTION"
                if any(r["status"] == "EXCEPTION" for r in results) else "REFUSED",
                "wall_time_seconds": round(elapsed, 6), "response": "",

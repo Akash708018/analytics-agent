@@ -1,11 +1,11 @@
 {
  "case": "D4",
  "src": "/home/user/analytics-agent/src",
- "commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+ "commit": "8aa3ef8c4ee1b7cd91fb0f2d10a478e6e41b6ac1",
  "src_dirty": [],
  "python": "3.12.3",
  "duckdb": "1.5.5",
- "seconds": 5.22,
+ "seconds": 4.66,
  "harness_error": null,
  "observations": [
   {
@@ -16,7 +16,7 @@
    "rows": null,
    "parameters": {},
    "status": "OK",
-   "wall_time_seconds": 0.063661,
+   "wall_time_seconds": 0.063968,
    "response": "None",
    "exception_type": null,
    "exception_message": null,
@@ -36,7 +36,7 @@
    "rows": null,
    "parameters": {},
    "status": "OK",
-   "wall_time_seconds": 0.063977,
+   "wall_time_seconds": 0.063505,
    "response": "None",
    "exception_type": null,
    "exception_message": null,
@@ -56,7 +56,7 @@
    "rows": null,
    "parameters": {},
    "status": "OK",
-   "wall_time_seconds": 0.064284,
+   "wall_time_seconds": 0.063432,
    "response": "None",
    "exception_type": null,
    "exception_message": null,
@@ -76,7 +76,7 @@
    "rows": null,
    "parameters": {},
    "status": "OK",
-   "wall_time_seconds": 0.064645,
+   "wall_time_seconds": 0.063573,
    "response": "None",
    "exception_type": null,
    "exception_message": null,
@@ -96,7 +96,7 @@
    "rows": null,
    "parameters": {},
    "status": "OK",
-   "wall_time_seconds": 0.064396,
+   "wall_time_seconds": 0.066772,
    "response": "None",
    "exception_type": null,
    "exception_message": null,
@@ -116,7 +116,7 @@
    "rows": null,
    "parameters": {},
    "status": "OK",
-   "wall_time_seconds": 0.064696,
+   "wall_time_seconds": 0.063335,
    "response": "None",
    "exception_type": null,
    "exception_message": null,
@@ -136,7 +136,7 @@
    "rows": 2000,
    "parameters": {},
    "status": "OK",
-   "wall_time_seconds": 0.092135,
+   "wall_time_seconds": 0.100454,
    "response": "",
    "exception_type": null,
    "exception_message": null,
@@ -156,7 +156,7 @@
      "fin"
     ],
     "analysis_run_rows": 2,
-    "distinct_answers": 2,
+    "distinct_answers": 1,
     "role": "defect"
    }
   },
@@ -168,7 +168,7 @@
    "rows": 2000,
    "parameters": {},
    "status": "OK",
-   "wall_time_seconds": 0.112703,
+   "wall_time_seconds": 0.09958,
    "response": "",
    "exception_type": null,
    "exception_message": null,
@@ -191,7 +191,7 @@
      "fin"
     ],
     "analysis_run_rows": 5,
-    "distinct_answers": 5,
+    "distinct_answers": 1,
     "role": "defect"
    }
   },
@@ -203,7 +203,7 @@
    "rows": 2000,
    "parameters": {},
    "status": "OK",
-   "wall_time_seconds": 0.204941,
+   "wall_time_seconds": 0.189223,
    "response": "",
    "exception_type": null,
    "exception_message": null,
@@ -231,7 +231,7 @@
      "fin"
     ],
     "analysis_run_rows": 10,
-    "distinct_answers": 10,
+    "distinct_answers": 1,
     "role": "defect"
    }
   }

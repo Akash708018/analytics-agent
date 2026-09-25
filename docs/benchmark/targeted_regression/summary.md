@@ -1,25 +1,17 @@
 # Targeted regression: the Step 13 defects, before and after
 
-Original revision `2d3d52f3667b3c920859f657addca7313f21bf3f` (the code the cross-domain benchmark measured); fixed revision `a7573c62b0f282ab9a35f48e12cf385887d80084`. Python 3.12.3, DuckDB 1.5.5.
+Original revision `2d3d52f3667b3c920859f657addca7313f21bf3f` (the code the cross-domain benchmark measured); fixed revision `eb138e3b5cc16e5080737f24cdaada72f930f7c6`. Python 3.12.3, DuckDB 1.5.5.
 
 | measure | value |
 |---|---|
-| regression cases | 95 |
-| product defects tested | 11 (D1, D10, D11, D12, D13, D2, D3, D4, D5, D6-D9, H chart (harness)) |
-| defect cases whose original failure reproduced | 43 of 43 |
-| defect cases passing on the fixed code | 40 of 43 |
+| regression cases | 129 |
+| product defects tested | 13 (D1, D10, D11, D12, D13, D15, D16, D2, D3, D4, D5, D6-D9, H chart (harness)) |
+| defect cases whose original failure reproduced | 45 of 45 |
+| defect cases passing on the fixed code | 45 of 45 |
 | controls | 33, changed: 0 |
-| cases failing | 5 |
+| cases failing | 0 |
 | concurrency isolation (H, fixed code) | PASS |
 | reproducibility (J, fixed code) | PASS |
-
-Failing cases:
-
-- D4.threads_2
-- D4.threads_5
-- D4.threads_10
-- CLEANING.plan_dirty_1000000
-- CLEANING.plan_clean_1000000
 
 ## By case
 
@@ -71,9 +63,9 @@ Failing cases:
 | D4.site_contract.store | PRODUCT_DEFECT | EXCEPTION TransactionException | OK | yes | the losing creator retries and the table exists once |
 | D4.site_profile.runs | PRODUCT_DEFECT | EXCEPTION TransactionException | OK | yes | the losing creator retries and the table exists once |
 | D4.site_validate.runs | PRODUCT_DEFECT | EXCEPTION TransactionException | OK | yes | the losing creator retries and the table exists once |
-| D4.threads_2 | PRODUCT_DEFECT | OK | OK | NO | every thread answers, one answer, one run row each |
-| D4.threads_5 | PRODUCT_DEFECT | OK | OK | NO | every thread answers, one answer, one run row each |
-| D4.threads_10 | PRODUCT_DEFECT | EXCEPTION IndexError | OK | NO | every thread answers, one answer, one run row each |
+| D4.threads_2 | PRODUCT_DEFECT | OK | OK | yes | every thread answers, one answer, one run row each |
+| D4.threads_5 | PRODUCT_DEFECT | OK | OK | yes | every thread answers, one answer, one run row each |
+| D4.threads_10 | PRODUCT_DEFECT | EXCEPTION IndexError | OK | yes | every thread answers, one answer, one run row each |
 | D5.mann_whitney_100000 | CONTROL | OK | OK | yes | matches scipy before and after |
 | D5.kruskal_wallis_100000 | CONTROL | OK | OK | yes | matches scipy before and after |
 | D5.mann_whitney_1000000 | CONTROL | OK | OK | yes | matches scipy before and after |
@@ -83,6 +75,8 @@ Failing cases:
 | D5.mann_whitney_6000000 | PRODUCT_DEFECT | EXCEPTION OutOfRangeException | OK | yes | matches scipy's statistic and p |
 | D5.kruskal_wallis_6000000 | PRODUCT_DEFECT | EXCEPTION OutOfRangeException | OK | yes | matches scipy's statistic and p |
 | D12.parser_16_threads | PRODUCT_DEFECT | EXCEPTION IndexError | OK | yes | 16 threads, 3,200 parses, none swapped or raised |
+| D15.plan_twice_300k | PRODUCT_DEFECT | WRONG | OK | yes | the same plan text, examples included, twice |
+| D16.write_result_24_threads | PRODUCT_DEFECT | WRONG | OK | yes | 24 distinct files, each holding its own writer's rows |
 | RECS.dup_rows_key | PRODUCT_DEFECT | REFUSED | REFUSED | yes | names the cleaning plan, runnable |
 | RECS.correlation_one_measure | PRODUCT_DEFECT | REFUSED | REFUSED | yes | asks for a contract, not v against v |
 | RECS.correlation_two_measures | PRODUCT_DEFECT | REFUSED | REFUSED | yes | measure v against w, runnable |
@@ -91,6 +85,38 @@ Failing cases:
 | RECS.nonexistent_dataset | CONTROL | REFUSED | REFUSED | yes | unchanged refusal and next step |
 | RECS.invalid_chart | CONTROL | REFUSED | REFUSED | yes | unchanged refusal and next step |
 | RECS.group_cap | CONTROL | REFUSED | REFUSED | yes | unchanged refusal and next step |
+| PROFILE_CORRECTNESS.fin.record_id | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.fin.transaction_id | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.fin.account_id | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.fin.customer_id | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.fin.transaction_date | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.fin.posted_at | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.fin.transaction_type | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.fin.category | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.fin.debit | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.fin.credit | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.fin.amount | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.fin.balance | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.fin.currency | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.fin.branch | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.fin.payment_method | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.fin.risk_score | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.fin.fraud_flag | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.fin.revenue | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.fin.expense | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.fin.profit | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.fin.budget | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.fin.actual | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.fin.fiscal_period | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.fin.source_system | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.specials.id | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.specials.num | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.specials.cat | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.specials.when | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.specials.hi_text | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.specials.nully | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.specials.const | CORRECTNESS | OK | OK | yes | same reply as the whole-table path, 0 field differences |
+| PROFILE_CORRECTNESS.specials.nope | CORRECTNESS | REFUSED | REFUSED | yes | same reply as the whole-table path, 0 field differences |
 | PROFILE_PERF.100000_record_id | PERFORMANCE | OK | OK | yes | faster, same reply head |
 | PROFILE_PERF.100000_region | PERFORMANCE | OK | OK | yes | faster, same reply head |
 | PROFILE_PERF.100000_net_sales | PERFORMANCE | OK | OK | yes | faster, same reply head |
@@ -107,8 +133,8 @@ Failing cases:
 | PROFILE_PERF.10000000_region | PERFORMANCE | OK | OK | yes | faster, same reply head |
 | PROFILE_PERF.10000000_net_sales | PERFORMANCE | OK | OK | yes | faster, same reply head |
 | PROFILE_PERF.10000000_order_date | PERFORMANCE | OK | OK | yes | faster, same reply head |
-| CLEANING.plan_dirty_1000000 | PERFORMANCE | OK | OK | NO | the same actions, word for word, in less time |
-| CLEANING.plan_clean_1000000 | PERFORMANCE | OK | OK | NO | the same actions, word for word, in less time |
+| CLEANING.plan_dirty_1000000 | PERFORMANCE | OK | OK | yes | the same actions, word for word, in less time |
+| CLEANING.plan_clean_1000000 | PERFORMANCE | OK | OK | yes | the same actions, word for word, in less time |
 | PRESCREEN.prescreen | GROUND_FACT | NOT_APPLICABLE | OK | yes | 0 parseable values screened out |
 | COHORT.heatmap_1000 | PRODUCT_DEFECT | OK | OK | yes | under 8,000 characters, same points drawn |
 | COHORT.heatmap_100000 | PRODUCT_DEFECT | OK | OK | yes | under 8,000 characters, same points drawn |
@@ -125,19 +151,19 @@ Failing cases:
 
 | rows | before | after | speedup |
 |---:|---:|---:|---:|
-| 100,000 | 0.8944 | 0.0701 | 12.76x |
-| 1,000,000 | 4.7486 | 0.1793 | 26.48x |
-| 5,000,000 | 23.4537 | 0.6479 | 36.2x |
-| 10,000,000 | 45.2674 | 1.3394 | 33.8x |
+| 100,000 | 0.8944 | 0.0711 | 12.58x |
+| 1,000,000 | 4.7486 | 0.1755 | 27.06x |
+| 5,000,000 | 23.4537 | 0.6929 | 33.85x |
+| 10,000,000 | 45.2674 | 1.3003 | 34.81x |
 
-Time growth between sizes (before -> after): 100,000->1,000,000: 5.31x -> 2.56x; 1,000,000->5,000,000: 4.94x -> 3.61x; 5,000,000->10,000,000: 1.93x -> 2.07x
+Time growth between sizes (before -> after): 100,000->1,000,000: 5.31x -> 2.47x; 1,000,000->5,000,000: 4.94x -> 3.95x; 5,000,000->10,000,000: 1.93x -> 1.88x
 
 ## propose_cleaning_plan
 
 | case | before s | after s | speedup |
 |---|---:|---:|---:|
-| CLEANING.plan_dirty_1000000 | 23.0109 | 14.9440995 | 1.54x |
-| CLEANING.plan_clean_1000000 | 16.2218295 | 7.906575999999999 | 2.05x |
+| CLEANING.plan_dirty_1000000 | 23.0109 | 14.5126615 | 1.59x |
+| CLEANING.plan_clean_1000000 | 16.2218295 | 7.7559404999999995 | 2.09x |
 
 ## Phases H and J
 
@@ -229,8 +255,7 @@ Time growth between sizes (before -> after): 100,000->1,000,000: 5.31x -> 2.56x;
  },
  "after": {
   "concurrency_correctness": {
-   "PASS": 43,
-   "ORACLE_ERROR": 1
+   "PASS": 44
   },
   "isolation": {
    "correctness": {

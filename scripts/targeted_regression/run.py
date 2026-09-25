@@ -207,9 +207,15 @@ def _judge_perf(sub, b, a):
         "faster, same reply head", True
 
 
+def _plan_key(x):
+    # the quoted examples are left out: the original code chose them at random (D15), so no
+    # fixed text could equal them; D15's own case holds the fixed code to one text
+    return x["kind"], x["column"], re.sub(r"'[^']*'(?:, '[^']*')*", "<examples>", x["text"])
+
+
 def _judge_cleaning(sub, b, a):
-    same = [(x["kind"], x["column"], x["text"]) for x in a["extra"]["actions"]] == \
-        [(x["kind"], x["column"], x["text"]) for x in b["extra"]["actions"]]
+    same = [_plan_key(x) for x in a["extra"]["actions"]] == \
+        [_plan_key(x) for x in b["extra"]["actions"]]
     real = a["status"] == b["status"] == "OK" and a["extra"]["actions"]
     return bool(real) and same and a["wall_time_seconds"] < b["wall_time_seconds"], \
         "the same actions, word for word, in less time", True

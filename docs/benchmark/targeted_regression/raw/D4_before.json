@@ -5,7 +5,7 @@
  "src_dirty": [],
  "python": "3.12.3",
  "duckdb": "1.5.5",
- "seconds": 5.21,
+ "seconds": 4.67,
  "harness_error": null,
  "observations": [
   {
@@ -16,7 +16,7 @@
    "rows": null,
    "parameters": {},
    "status": "EXCEPTION",
-   "wall_time_seconds": 0.000825,
+   "wall_time_seconds": 0.125578,
    "response": "",
    "exception_type": "TransactionException",
    "exception_message": "TransactionContext Error: Catalog write-write conflict on create with \"Schema\\0main\\0main\\0Table\\0main\\0_agent_analysis_runs\"",
@@ -36,7 +36,7 @@
    "rows": null,
    "parameters": {},
    "status": "EXCEPTION",
-   "wall_time_seconds": 0.000765,
+   "wall_time_seconds": 0.000518,
    "response": "",
    "exception_type": "TransactionException",
    "exception_message": "TransactionContext Error: Catalog write-write conflict on create with \"Schema\\0main\\0main\\0Table\\0main\\0_agent_cleaning_ledger\"",
@@ -56,7 +56,7 @@
    "rows": null,
    "parameters": {},
    "status": "EXCEPTION",
-   "wall_time_seconds": 0.000702,
+   "wall_time_seconds": 0.000651,
    "response": "",
    "exception_type": "TransactionException",
    "exception_message": "TransactionContext Error: Catalog write-write conflict on create with \"Schema\\0main\\0main\\0Table\\0main\\0_agent_cleaning_plans\"",
@@ -76,7 +76,7 @@
    "rows": null,
    "parameters": {},
    "status": "EXCEPTION",
-   "wall_time_seconds": 0.000744,
+   "wall_time_seconds": 0.000625,
    "response": "",
    "exception_type": "TransactionException",
    "exception_message": "TransactionContext Error: Catalog write-write conflict on create with \"Schema\\0main\\0main\\0Table\\0main\\0_agent_contracts\"",
@@ -96,7 +96,7 @@
    "rows": null,
    "parameters": {},
    "status": "EXCEPTION",
-   "wall_time_seconds": 0.000593,
+   "wall_time_seconds": 0.000511,
    "response": "",
    "exception_type": "TransactionException",
    "exception_message": "TransactionContext Error: Catalog write-write conflict on create with \"Schema\\0main\\0main\\0Table\\0main\\0_agent_profiles\"",
@@ -116,7 +116,7 @@
    "rows": null,
    "parameters": {},
    "status": "EXCEPTION",
-   "wall_time_seconds": 0.000606,
+   "wall_time_seconds": 0.000797,
    "response": "",
    "exception_type": "TransactionException",
    "exception_message": "TransactionContext Error: Catalog write-write conflict on create with \"Schema\\0main\\0main\\0Table\\0main\\0_agent_validations\"",
@@ -136,7 +136,7 @@
    "rows": 2000,
    "parameters": {},
    "status": "OK",
-   "wall_time_seconds": 0.099042,
+   "wall_time_seconds": 0.081663,
    "response": "",
    "exception_type": null,
    "exception_message": null,
@@ -156,7 +156,7 @@
      "fin"
     ],
     "analysis_run_rows": 2,
-    "distinct_answers": 2,
+    "distinct_answers": 1,
     "role": "defect"
    }
   },
@@ -168,7 +168,7 @@
    "rows": 2000,
    "parameters": {},
    "status": "OK",
-   "wall_time_seconds": 0.100836,
+   "wall_time_seconds": 0.079306,
    "response": "",
    "exception_type": null,
    "exception_message": null,
@@ -191,7 +191,7 @@
      "fin"
     ],
     "analysis_run_rows": 5,
-    "distinct_answers": 4,
+    "distinct_answers": 1,
     "role": "defect"
    }
   },
@@ -203,19 +203,19 @@
    "rows": 2000,
    "parameters": {},
    "status": "EXCEPTION",
-   "wall_time_seconds": 0.127203,
+   "wall_time_seconds": 0.141109,
    "response": "",
    "exception_type": "IndexError",
    "exception_message": "list index out of range",
    "extra": {
     "threads": 10,
     "statuses": [
-     "OK",
+     "EXCEPTION",
      "EXCEPTION",
      "OK",
      "OK",
      "OK",
-     "EXCEPTION",
+     "OK",
      "OK",
      "OK",
      "OK",
@@ -231,7 +231,7 @@
      "fin"
     ],
     "analysis_run_rows": 8,
-    "distinct_answers": 8,
+    "distinct_answers": 1,
     "role": "defect"
    }
   }
