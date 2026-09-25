@@ -1,6 +1,6 @@
 {
- "run_at": "2026-09-24T14:36:55",
- "seconds": 55.4,
+ "run_at": "2026-09-25T07:22:44",
+ "seconds": 43.7,
  "datasets": [
   {
    "name": "constant_measure",
@@ -41,13 +41,13 @@
   {
    "name": "xlsx_three_header_rows",
    "file": "three.xlsx",
-   "bytes": 11444,
+   "bytes": 11443,
    "what": "three stacked, merged header rows"
   },
   {
    "name": "xlsx_unicode_sheet_name",
    "file": "donnees.xlsx",
-   "bytes": 11370,
+   "bytes": 11369,
    "what": "a sheet named 'Données 2024'"
   },
   {
@@ -83,7 +83,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "constant.csv saved.",
-   "seconds": 0.00039017199992485985
+   "seconds": 0.00032688600003893953
   },
   {
    "dataset": "constant_measure",
@@ -92,7 +92,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Ready to load: every field was read from the file or answered by you.",
-   "seconds": 0.004665822999982083
+   "seconds": 0.00390432599988344
   },
   {
    "dataset": "constant_measure",
@@ -101,7 +101,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Loaded constant: 150 rows, 9 columns.",
-   "seconds": 0.09600903399996241
+   "seconds": 0.09722019499986345
   },
   {
    "dataset": "constant_measure",
@@ -155,7 +155,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "# constant",
-   "seconds": 0.04513438399999359
+   "seconds": 0.040894449000006716
   },
   {
    "dataset": "constant_measure",
@@ -164,7 +164,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Profile of constant: 150 rows, 9 columns.",
-   "seconds": 0.07857585599992944
+   "seconds": 0.06435330599970257
   },
   {
    "dataset": "constant_measure",
@@ -173,7 +173,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Nothing to clean in constant. 150 row(s), no exact duplicates, no declared missing tokens, no padding, no case variants, and every column already reads as the type it holds.",
-   "seconds": 0.1950066209999477
+   "seconds": 0.17066015399996104
   },
   {
    "dataset": "constant_measure",
@@ -182,7 +182,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "PROVISIONAL -- settle what is listed before confirming.",
-   "seconds": 0.06354656399992109
+   "seconds": 0.0450572929998998
   },
   {
    "dataset": "constant_measure",
@@ -191,7 +191,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Ready to confirm: nothing in it is a guess.",
-   "seconds": 0.06491861300003166
+   "seconds": 0.045427216999996745
   },
   {
    "dataset": "constant_measure",
@@ -200,7 +200,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Contract stored for constant, version 1.",
-   "seconds": 0.07931738100000985
+   "seconds": 0.0571169669997289
   },
   {
    "dataset": "constant_measure",
@@ -209,7 +209,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "constant: all 6 check(s) passed.",
-   "seconds": 0.09981268900003215
+   "seconds": 0.06480781800019031
   },
   {
    "dataset": "constant_measure",
@@ -218,7 +218,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for constant: one row = one record.",
-   "seconds": 0.07741870199993173
+   "seconds": 0.06208549100028904
   },
   {
    "dataset": "constant_measure",
@@ -227,7 +227,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for constant: one row = one record.",
-   "seconds": 0.06810756999993828
+   "seconds": 0.08333654499983822
   },
   {
    "dataset": "constant_measure",
@@ -236,7 +236,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for constant: one row = one record.",
-   "seconds": 0.07042685900000833
+   "seconds": 0.06749005199981184
   },
   {
    "dataset": "constant_measure",
@@ -245,7 +245,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for constant: one row = one record.",
-   "seconds": 0.07318315700001676
+   "seconds": 0.05752676700012671
   },
   {
    "dataset": "constant_measure",
@@ -254,7 +254,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for constant: one row = one record.",
-   "seconds": 0.07612557599998127
+   "seconds": 0.06122269599973151
   },
   {
    "dataset": "constant_measure",
@@ -263,7 +263,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for constant: one row = one record.",
-   "seconds": 0.07797195900002407
+   "seconds": 0.06674817600014649
   },
   {
    "dataset": "constant_measure",
@@ -272,7 +272,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for constant: one row = one record.",
-   "seconds": 0.062232536999999866
+   "seconds": 0.05534055299995089
   },
   {
    "dataset": "constant_measure",
@@ -281,7 +281,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for constant: one row = one record.",
-   "seconds": 0.06370733599999312
+   "seconds": 0.05661281599986978
   },
   {
    "dataset": "constant_measure",
@@ -290,7 +290,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for constant: one row = one record.",
-   "seconds": 0.06615369999997256
+   "seconds": 0.06185976100005064
   },
   {
    "dataset": "constant_measure",
@@ -299,7 +299,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for constant: one row = one record.",
-   "seconds": 0.07078712600002746
+   "seconds": 0.07218665100026556
   },
   {
    "dataset": "constant_measure",
@@ -308,7 +308,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for constant: one row = one record.",
-   "seconds": 0.0688471710000158
+   "seconds": 0.053128647999983514
   },
   {
    "dataset": "constant_measure",
@@ -317,7 +317,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for constant: one row = one record.",
-   "seconds": 0.07657069300000785
+   "seconds": 0.054383749999942665
   },
   {
    "dataset": "constant_measure",
@@ -326,7 +326,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for constant: one row = one record.",
-   "seconds": 0.07345467199991162
+   "seconds": 0.05432981200010545
   },
   {
    "dataset": "constant_measure",
@@ -335,7 +335,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for constant: one row = one record.",
-   "seconds": 0.0730771519999962
+   "seconds": 0.053172155000083876
   },
   {
    "dataset": "constant_measure",
@@ -344,7 +344,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for constant: one row = one record.",
-   "seconds": 0.07072480199997244
+   "seconds": 0.052038723999885406
   },
   {
    "dataset": "constant_measure",
@@ -353,7 +353,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for constant: one row = one record.",
-   "seconds": 0.06579081500001394
+   "seconds": 0.052421937999952206
   },
   {
    "dataset": "constant_measure",
@@ -362,7 +362,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for constant: one row = one record.",
-   "seconds": 0.07332871099993099
+   "seconds": 0.057992350999938935
   },
   {
    "dataset": "constant_measure",
@@ -371,7 +371,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for constant: one row = one record.",
-   "seconds": 0.07348440299995218
+   "seconds": 0.053778095000325266
   },
   {
    "dataset": "constant_measure",
@@ -380,7 +380,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for constant: one row = one record.",
-   "seconds": 0.0708956579999267
+   "seconds": 0.0532003349999286
   },
   {
    "dataset": "constant_measure",
@@ -389,7 +389,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for constant: one row = one record.",
-   "seconds": 0.06780442700005551
+   "seconds": 0.05085254499999792
   },
   {
    "dataset": "constant_measure",
@@ -398,7 +398,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for constant: one row = one record.",
-   "seconds": 0.07288140599996495
+   "seconds": 0.052378072000010434
   },
   {
    "dataset": "constant_measure",
@@ -407,7 +407,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for constant: one row = one record.",
-   "seconds": 0.07007733399996141
+   "seconds": 0.06285190299968235
   },
   {
    "dataset": "constant_measure",
@@ -416,7 +416,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for constant: one row = one record.",
-   "seconds": 0.06641014799993172
+   "seconds": 0.0620353320000504
   },
   {
    "dataset": "constant_measure",
@@ -425,7 +425,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for constant: one row = one record.",
-   "seconds": 0.07387092499993742
+   "seconds": 0.06373637700016843
   },
   {
    "dataset": "constant_measure",
@@ -434,7 +434,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for constant: one row = one record.",
-   "seconds": 0.07117984300009539
+   "seconds": 0.06028390300025421
   },
   {
    "dataset": "constant_measure",
@@ -443,7 +443,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for constant: one row = one record.",
-   "seconds": 0.08793276200003675
+   "seconds": 0.07010480599956281
   },
   {
    "dataset": "constant_measure",
@@ -452,7 +452,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for constant: one row = one record.",
-   "seconds": 0.08576471100002436
+   "seconds": 0.06917684100017141
   },
   {
    "dataset": "constant_measure",
@@ -461,7 +461,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for constant: one row = one record.",
-   "seconds": 0.16851360299995122
+   "seconds": 0.1608263509997414
   },
   {
    "dataset": "constant_measure",
@@ -470,7 +470,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for constant: one row = one record.",
-   "seconds": 0.23164209199990182
+   "seconds": 0.18286507899983917
   },
   {
    "dataset": "constant_measure",
@@ -479,7 +479,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for constant: one row = one record.",
-   "seconds": 0.16346000800001548
+   "seconds": 0.14363210300007268
   },
   {
    "dataset": "constant_measure",
@@ -487,8 +487,8 @@
    "call": "build_report",
    "outcome": "OK",
    "reason": "",
-   "detail": "Report written: /home/user/analytics-agent/workspace/ws_50ea0629a96b/reports/constant_20260924-143603.md",
-   "seconds": 0.04285313100001531
+   "detail": "Report written: /home/user/analytics-agent/workspace/ws_01ba708b0af3/reports/constant_20260925-072203.md",
+   "seconds": 0.03645877000008113
   },
   {
    "dataset": "empty_and_null_groups",
@@ -497,7 +497,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "groups.csv saved.",
-   "seconds": 0.0003405219999876863
+   "seconds": 0.00027132400009577395
   },
   {
    "dataset": "empty_and_null_groups",
@@ -506,7 +506,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Ready to load: every field was read from the file or answered by you.",
-   "seconds": 0.0026491460000670486
+   "seconds": 0.0024437360002593778
   },
   {
    "dataset": "empty_and_null_groups",
@@ -515,7 +515,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Loaded groups: 160 rows, 9 columns.",
-   "seconds": 0.0849621950000028
+   "seconds": 0.0820755489999101
   },
   {
    "dataset": "empty_and_null_groups",
@@ -569,7 +569,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "# groups",
-   "seconds": 0.054133246999981566
+   "seconds": 0.037656085999969946
   },
   {
    "dataset": "empty_and_null_groups",
@@ -578,7 +578,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Profile of groups: 160 rows, 9 columns.",
-   "seconds": 0.07892592399991827
+   "seconds": 0.06252315900019312
   },
   {
    "dataset": "empty_and_null_groups",
@@ -587,7 +587,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Nothing to clean in groups. 160 row(s), no exact duplicates, no declared missing tokens, no padding, no case variants, and every column already reads as the type it holds.",
-   "seconds": 0.18172529100002066
+   "seconds": 0.17771928499996648
   },
   {
    "dataset": "empty_and_null_groups",
@@ -596,7 +596,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "PROVISIONAL -- settle what is listed before confirming.",
-   "seconds": 0.06607039599998643
+   "seconds": 0.04513872100005756
   },
   {
    "dataset": "empty_and_null_groups",
@@ -605,7 +605,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Ready to confirm: nothing in it is a guess.",
-   "seconds": 0.06677146900005937
+   "seconds": 0.050670326999807
   },
   {
    "dataset": "empty_and_null_groups",
@@ -614,7 +614,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Contract stored for groups, version 1.",
-   "seconds": 0.08319251300008546
+   "seconds": 0.06849939399990035
   },
   {
    "dataset": "empty_and_null_groups",
@@ -623,7 +623,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "groups: all 6 check(s) passed.",
-   "seconds": 0.09977151099997172
+   "seconds": 0.06021832099986568
   },
   {
    "dataset": "empty_and_null_groups",
@@ -632,7 +632,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for groups: one row = one record.",
-   "seconds": 0.06374571100002413
+   "seconds": 0.05167632200027583
   },
   {
    "dataset": "empty_and_null_groups",
@@ -641,7 +641,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for groups: one row = one record.",
-   "seconds": 0.07147375700003522
+   "seconds": 0.0513380719999077
   },
   {
    "dataset": "empty_and_null_groups",
@@ -650,7 +650,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for groups: one row = one record.",
-   "seconds": 0.06941274300004352
+   "seconds": 0.049086433999946166
   },
   {
    "dataset": "empty_and_null_groups",
@@ -659,7 +659,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for groups: one row = one record.",
-   "seconds": 0.06226086499998473
+   "seconds": 0.04645832900041569
   },
   {
    "dataset": "empty_and_null_groups",
@@ -668,7 +668,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for groups: one row = one record.",
-   "seconds": 0.06956804999992983
+   "seconds": 0.049048043000311736
   },
   {
    "dataset": "empty_and_null_groups",
@@ -677,7 +677,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for groups: one row = one record.",
-   "seconds": 0.06731049799998345
+   "seconds": 0.04856606900011684
   },
   {
    "dataset": "empty_and_null_groups",
@@ -686,7 +686,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for groups: one row = one record.",
-   "seconds": 0.06452483200007464
+   "seconds": 0.054622368999844184
   },
   {
    "dataset": "empty_and_null_groups",
@@ -695,7 +695,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for groups: one row = one record.",
-   "seconds": 0.06369021599994085
+   "seconds": 0.05629792100035047
   },
   {
    "dataset": "empty_and_null_groups",
@@ -704,7 +704,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for groups: one row = one record.",
-   "seconds": 0.07001607799998055
+   "seconds": 0.06085541900029057
   },
   {
    "dataset": "empty_and_null_groups",
@@ -713,7 +713,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for groups: one row = one record.",
-   "seconds": 0.07358229699991625
+   "seconds": 0.06389818700017713
   },
   {
    "dataset": "empty_and_null_groups",
@@ -722,7 +722,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for groups: one row = one record.",
-   "seconds": 0.08033001600006173
+   "seconds": 0.0677094819998274
   },
   {
    "dataset": "empty_and_null_groups",
@@ -731,7 +731,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for groups: one row = one record.",
-   "seconds": 0.07796820399994431
+   "seconds": 0.05579819400009001
   },
   {
    "dataset": "empty_and_null_groups",
@@ -740,7 +740,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for groups: one row = one record.",
-   "seconds": 0.07088818299996547
+   "seconds": 0.05560779100005675
   },
   {
    "dataset": "empty_and_null_groups",
@@ -749,7 +749,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for groups: one row = one record.",
-   "seconds": 0.07221870399996533
+   "seconds": 0.05811956099978488
   },
   {
    "dataset": "empty_and_null_groups",
@@ -758,7 +758,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for groups: one row = one record.",
-   "seconds": 0.07121617600000718
+   "seconds": 0.06207379800025592
   },
   {
    "dataset": "empty_and_null_groups",
@@ -767,7 +767,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for groups: one row = one record.",
-   "seconds": 0.06606000900001163
+   "seconds": 0.05806239399998958
   },
   {
    "dataset": "empty_and_null_groups",
@@ -776,7 +776,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for groups: one row = one record.",
-   "seconds": 0.0848931169999787
+   "seconds": 0.06908503900012875
   },
   {
    "dataset": "empty_and_null_groups",
@@ -785,7 +785,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for groups: one row = one record.",
-   "seconds": 0.07347685100000945
+   "seconds": 0.054817596999782836
   },
   {
    "dataset": "empty_and_null_groups",
@@ -794,7 +794,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for groups: one row = one record.",
-   "seconds": 0.07640384299998004
+   "seconds": 0.06469476999973267
   },
   {
    "dataset": "empty_and_null_groups",
@@ -803,7 +803,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for groups: one row = one record.",
-   "seconds": 0.07819497200000569
+   "seconds": 0.05648548099998152
   },
   {
    "dataset": "empty_and_null_groups",
@@ -812,7 +812,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for groups: one row = one record.",
-   "seconds": 0.07670629199992618
+   "seconds": 0.051574067999808904
   },
   {
    "dataset": "empty_and_null_groups",
@@ -821,7 +821,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for groups: one row = one record.",
-   "seconds": 0.07286305200000243
+   "seconds": 0.051171863000035955
   },
   {
    "dataset": "empty_and_null_groups",
@@ -830,7 +830,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for groups: one row = one record.",
-   "seconds": 0.06872986000007586
+   "seconds": 0.049907165999684366
   },
   {
    "dataset": "empty_and_null_groups",
@@ -839,7 +839,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for groups: one row = one record.",
-   "seconds": 0.0692665469999838
+   "seconds": 0.052046546999918064
   },
   {
    "dataset": "empty_and_null_groups",
@@ -848,7 +848,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for groups: one row = one record.",
-   "seconds": 0.06835876799993912
+   "seconds": 0.052284237000094436
   },
   {
    "dataset": "empty_and_null_groups",
@@ -857,7 +857,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for groups: one row = one record.",
-   "seconds": 0.08024368799999593
+   "seconds": 0.07269348199997694
   },
   {
    "dataset": "empty_and_null_groups",
@@ -866,7 +866,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for groups: one row = one record.",
-   "seconds": 0.10575756399998681
+   "seconds": 0.058537666000120225
   },
   {
    "dataset": "empty_and_null_groups",
@@ -875,7 +875,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for groups: one row = one record.",
-   "seconds": 0.18217902399999275
+   "seconds": 0.11504255499994542
   },
   {
    "dataset": "empty_and_null_groups",
@@ -884,7 +884,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for groups: one row = one record.",
-   "seconds": 0.24797014100010983
+   "seconds": 0.1547016560002703
   },
   {
    "dataset": "empty_and_null_groups",
@@ -893,7 +893,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for groups: one row = one record.",
-   "seconds": 0.18703520600001866
+   "seconds": 0.13028141699987827
   },
   {
    "dataset": "empty_and_null_groups",
@@ -901,8 +901,8 @@
    "call": "build_report",
    "outcome": "OK",
    "reason": "",
-   "detail": "Report written: /home/user/analytics-agent/workspace/ws_edc45429cb58/reports/groups_20260924-143607.md",
-   "seconds": 0.05174633800004358
+   "detail": "Report written: /home/user/analytics-agent/workspace/ws_5eda11f567d1/reports/groups_20260925-072206.md",
+   "seconds": 0.03856027700021514
   },
   {
    "dataset": "extreme_dates",
@@ -911,7 +911,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "extreme.csv saved.",
-   "seconds": 0.00032872799999950075
+   "seconds": 0.00023822900038794614
   },
   {
    "dataset": "extreme_dates",
@@ -920,7 +920,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Ready to load: every field was read from the file or answered by you.",
-   "seconds": 0.005054127999983393
+   "seconds": 0.0037718280000262894
   },
   {
    "dataset": "extreme_dates",
@@ -929,7 +929,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Loaded extreme: 150 rows, 9 columns.",
-   "seconds": 0.10383890499997506
+   "seconds": 0.09980738700005531
   },
   {
    "dataset": "extreme_dates",
@@ -983,7 +983,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "# extreme",
-   "seconds": 0.05459428400001798
+   "seconds": 0.0399461209999572
   },
   {
    "dataset": "extreme_dates",
@@ -992,7 +992,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Profile of extreme: 150 rows, 9 columns.",
-   "seconds": 0.08007346700003382
+   "seconds": 0.06803505100015173
   },
   {
    "dataset": "extreme_dates",
@@ -1001,7 +1001,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Nothing to clean in extreme. 150 row(s), no exact duplicates, no declared missing tokens, no padding, no case variants, and every column already reads as the type it holds.",
-   "seconds": 0.19083196999997654
+   "seconds": 0.17119674799960194
   },
   {
    "dataset": "extreme_dates",
@@ -1010,7 +1010,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "PROVISIONAL -- settle what is listed before confirming.",
-   "seconds": 0.05789977799997814
+   "seconds": 0.04452877499988972
   },
   {
    "dataset": "extreme_dates",
@@ -1019,7 +1019,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Ready to confirm: nothing in it is a guess.",
-   "seconds": 0.0644772059999923
+   "seconds": 0.04747692399996595
   },
   {
    "dataset": "extreme_dates",
@@ -1028,7 +1028,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Contract stored for extreme, version 1.",
-   "seconds": 0.07999135699992621
+   "seconds": 0.060620171000209666
   },
   {
    "dataset": "extreme_dates",
@@ -1037,7 +1037,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "extreme: 1 of 6 check(s) failed, 5 passed.",
-   "seconds": 0.10245398999995814
+   "seconds": 0.06883667099964441
   },
   {
    "dataset": "extreme_dates",
@@ -1046,7 +1046,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for extreme: one row = one record.",
-   "seconds": 0.0631693489999634
+   "seconds": 0.05322496600001614
   },
   {
    "dataset": "extreme_dates",
@@ -1055,7 +1055,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for extreme: one row = one record.",
-   "seconds": 0.070509095000034
+   "seconds": 0.05921483099973557
   },
   {
    "dataset": "extreme_dates",
@@ -1064,7 +1064,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for extreme: one row = one record.",
-   "seconds": 0.06432928900005663
+   "seconds": 0.050549528999908944
   },
   {
    "dataset": "extreme_dates",
@@ -1073,7 +1073,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for extreme: one row = one record.",
-   "seconds": 0.07440609200000381
+   "seconds": 0.04875364100007573
   },
   {
    "dataset": "extreme_dates",
@@ -1082,7 +1082,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for extreme: one row = one record.",
-   "seconds": 0.07134282200001962
+   "seconds": 0.059205961000316165
   },
   {
    "dataset": "extreme_dates",
@@ -1091,7 +1091,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for extreme: one row = one record.",
-   "seconds": 0.07142564100001891
+   "seconds": 0.05995573299969692
   },
   {
    "dataset": "extreme_dates",
@@ -1100,7 +1100,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for extreme: one row = one record.",
-   "seconds": 0.0643535830000701
+   "seconds": 0.06468004999987897
   },
   {
    "dataset": "extreme_dates",
@@ -1109,7 +1109,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for extreme: one row = one record.",
-   "seconds": 0.06335757300007572
+   "seconds": 0.06394734000014068
   },
   {
    "dataset": "extreme_dates",
@@ -1118,7 +1118,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for extreme: one row = one record.",
-   "seconds": 0.06627797299995564
+   "seconds": 0.060129328000130045
   },
   {
    "dataset": "extreme_dates",
@@ -1127,7 +1127,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for extreme: one row = one record.",
-   "seconds": 0.2769959149999295
+   "seconds": 0.08788717500010534
   },
   {
    "dataset": "extreme_dates",
@@ -1136,7 +1136,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for extreme: one row = one record.",
-   "seconds": 0.11460070999999061
+   "seconds": 0.23367766199999096
   },
   {
    "dataset": "extreme_dates",
@@ -1145,7 +1145,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for extreme: one row = one record.",
-   "seconds": 0.08348630600005436
+   "seconds": 0.06340613900010794
   },
   {
    "dataset": "extreme_dates",
@@ -1154,7 +1154,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for extreme: one row = one record.",
-   "seconds": 0.09228230900009748
+   "seconds": 0.0801372440000705
   },
   {
    "dataset": "extreme_dates",
@@ -1163,7 +1163,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for extreme: one row = one record.",
-   "seconds": 0.08659472299996196
+   "seconds": 0.0723513850002746
   },
   {
    "dataset": "extreme_dates",
@@ -1172,7 +1172,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for extreme: one row = one record.",
-   "seconds": 0.07106009199992513
+   "seconds": 0.05796259099997769
   },
   {
    "dataset": "extreme_dates",
@@ -1181,7 +1181,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for extreme: one row = one record.",
-   "seconds": 0.06927719800000887
+   "seconds": 0.053517419999934646
   },
   {
    "dataset": "extreme_dates",
@@ -1190,7 +1190,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for extreme: one row = one record.",
-   "seconds": 0.07544924100000117
+   "seconds": 0.0610697820002315
   },
   {
    "dataset": "extreme_dates",
@@ -1199,7 +1199,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for extreme: one row = one record.",
-   "seconds": 0.08593654000003426
+   "seconds": 0.077835819000029
   },
   {
    "dataset": "extreme_dates",
@@ -1208,7 +1208,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for extreme: one row = one record.",
-   "seconds": 0.07457418900003177
+   "seconds": 0.0567441940002027
   },
   {
    "dataset": "extreme_dates",
@@ -1217,7 +1217,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for extreme: one row = one record.",
-   "seconds": 4.066011989000003
+   "seconds": 2.9876623400000426
   },
   {
    "dataset": "extreme_dates",
@@ -1226,7 +1226,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for extreme: one row = one record.",
-   "seconds": 11.258470945999989
+   "seconds": 7.981357630000275
   },
   {
    "dataset": "extreme_dates",
@@ -1235,7 +1235,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for extreme: one row = one record.",
-   "seconds": 0.07232927999996264
+   "seconds": 0.06341622099989763
   },
   {
    "dataset": "extreme_dates",
@@ -1244,7 +1244,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for extreme: one row = one record.",
-   "seconds": 0.07518484199999875
+   "seconds": 0.05723871800000779
   },
   {
    "dataset": "extreme_dates",
@@ -1253,7 +1253,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for extreme: one row = one record.",
-   "seconds": 0.07811702200001491
+   "seconds": 0.06043186999977479
   },
   {
    "dataset": "extreme_dates",
@@ -1262,7 +1262,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for extreme: one row = one record.",
-   "seconds": 0.06796295200001623
+   "seconds": 0.05297852100011369
   },
   {
    "dataset": "extreme_dates",
@@ -1271,7 +1271,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for extreme: one row = one record.",
-   "seconds": 0.0741678359999014
+   "seconds": 0.06787214299993138
   },
   {
    "dataset": "extreme_dates",
@@ -1280,7 +1280,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for extreme: one row = one record.",
-   "seconds": 0.06882050700005493
+   "seconds": 0.05791785700012042
   },
   {
    "dataset": "extreme_dates",
@@ -1289,7 +1289,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for extreme: one row = one record.",
-   "seconds": 0.15789564800002154
+   "seconds": 0.1388008290000471
   },
   {
    "dataset": "extreme_dates",
@@ -1298,7 +1298,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for extreme: one row = one record.",
-   "seconds": 0.27968302600004336
+   "seconds": 0.21173987999964083
   },
   {
    "dataset": "extreme_dates",
@@ -1307,7 +1307,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for extreme: one row = one record.",
-   "seconds": 0.18639936499994292
+   "seconds": 0.14895885399982944
   },
   {
    "dataset": "extreme_dates",
@@ -1315,8 +1315,8 @@
    "call": "build_report",
    "outcome": "OK",
    "reason": "",
-   "detail": "Report written: /home/user/analytics-agent/workspace/ws_d13dc75b33e3/reports/extreme_20260924-143626.md",
-   "seconds": 0.048037087000011525
+   "detail": "Report written: /home/user/analytics-agent/workspace/ws_2759bb6a3272/reports/extreme_20260925-072220.md",
+   "seconds": 0.03732924299993101
   },
   {
    "dataset": "extreme_outlier",
@@ -1325,7 +1325,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "outlier.csv saved.",
-   "seconds": 0.0003480249999938678
+   "seconds": 0.0002797819997795159
   },
   {
    "dataset": "extreme_outlier",
@@ -1334,7 +1334,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Ready to load: every field was read from the file or answered by you.",
-   "seconds": 0.004997745000082432
+   "seconds": 0.003708027999891783
   },
   {
    "dataset": "extreme_outlier",
@@ -1343,7 +1343,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Loaded outlier: 150 rows, 9 columns.",
-   "seconds": 0.11594598000010592
+   "seconds": 0.09465568599989638
   },
   {
    "dataset": "extreme_outlier",
@@ -1397,7 +1397,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "# outlier",
-   "seconds": 0.05281181399993784
+   "seconds": 0.03603220399963902
   },
   {
    "dataset": "extreme_outlier",
@@ -1406,7 +1406,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Profile of outlier: 150 rows, 9 columns.",
-   "seconds": 0.06928384000002552
+   "seconds": 0.06754127299973334
   },
   {
    "dataset": "extreme_outlier",
@@ -1415,7 +1415,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Nothing to clean in outlier. 150 row(s), no exact duplicates, no declared missing tokens, no padding, no case variants, and every column already reads as the type it holds.",
-   "seconds": 0.17254181999999219
+   "seconds": 0.1863932510000268
   },
   {
    "dataset": "extreme_outlier",
@@ -1424,7 +1424,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "PROVISIONAL -- settle what is listed before confirming.",
-   "seconds": 0.05279033600004368
+   "seconds": 0.05021374099987952
   },
   {
    "dataset": "extreme_outlier",
@@ -1433,7 +1433,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Ready to confirm: nothing in it is a guess.",
-   "seconds": 0.05819587799999226
+   "seconds": 0.05195303700020304
   },
   {
    "dataset": "extreme_outlier",
@@ -1442,7 +1442,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Contract stored for outlier, version 1.",
-   "seconds": 0.07965912300005584
+   "seconds": 0.059179712000059226
   },
   {
    "dataset": "extreme_outlier",
@@ -1451,7 +1451,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "outlier: all 6 check(s) passed.",
-   "seconds": 0.08836814300002516
+   "seconds": 0.070607611000014
   },
   {
    "dataset": "extreme_outlier",
@@ -1460,7 +1460,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for outlier: one row = one record.",
-   "seconds": 0.05739347500002623
+   "seconds": 0.05737868599999274
   },
   {
    "dataset": "extreme_outlier",
@@ -1469,7 +1469,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for outlier: one row = one record.",
-   "seconds": 0.08736900200005948
+   "seconds": 0.061862366999775986
   },
   {
    "dataset": "extreme_outlier",
@@ -1478,7 +1478,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for outlier: one row = one record.",
-   "seconds": 0.07313808499998231
+   "seconds": 0.05714224900020781
   },
   {
    "dataset": "extreme_outlier",
@@ -1487,7 +1487,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for outlier: one row = one record.",
-   "seconds": 0.05775844100003269
+   "seconds": 0.05639059899976928
   },
   {
    "dataset": "extreme_outlier",
@@ -1496,7 +1496,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for outlier: one row = one record.",
-   "seconds": 0.060995065000042814
+   "seconds": 0.0629997020000701
   },
   {
    "dataset": "extreme_outlier",
@@ -1505,7 +1505,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for outlier: one row = one record.",
-   "seconds": 0.06280453500005478
+   "seconds": 0.06667768500028615
   },
   {
    "dataset": "extreme_outlier",
@@ -1514,7 +1514,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for outlier: one row = one record.",
-   "seconds": 0.056969617999925504
+   "seconds": 0.05590403199994398
   },
   {
    "dataset": "extreme_outlier",
@@ -1523,7 +1523,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for outlier: one row = one record.",
-   "seconds": 0.05479807699998673
+   "seconds": 0.05685285900017334
   },
   {
    "dataset": "extreme_outlier",
@@ -1532,7 +1532,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for outlier: one row = one record.",
-   "seconds": 0.0622729149999941
+   "seconds": 0.05383824700038531
   },
   {
    "dataset": "extreme_outlier",
@@ -1541,7 +1541,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for outlier: one row = one record.",
-   "seconds": 0.06612215299992386
+   "seconds": 0.0669421960001273
   },
   {
    "dataset": "extreme_outlier",
@@ -1550,7 +1550,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for outlier: one row = one record.",
-   "seconds": 0.06223251500000515
+   "seconds": 0.06202682000002824
   },
   {
    "dataset": "extreme_outlier",
@@ -1559,7 +1559,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for outlier: one row = one record.",
-   "seconds": 0.066328838000004
+   "seconds": 0.061162028000126156
   },
   {
    "dataset": "extreme_outlier",
@@ -1568,7 +1568,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for outlier: one row = one record.",
-   "seconds": 0.06348764100005155
+   "seconds": 0.06203865299994504
   },
   {
    "dataset": "extreme_outlier",
@@ -1577,7 +1577,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for outlier: one row = one record.",
-   "seconds": 0.06580325300001277
+   "seconds": 0.06697412099993016
   },
   {
    "dataset": "extreme_outlier",
@@ -1586,7 +1586,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for outlier: one row = one record.",
-   "seconds": 0.06786154899998564
+   "seconds": 0.06416776600008234
   },
   {
    "dataset": "extreme_outlier",
@@ -1595,7 +1595,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for outlier: one row = one record.",
-   "seconds": 0.060257940000042254
+   "seconds": 0.05577111499997045
   },
   {
    "dataset": "extreme_outlier",
@@ -1604,7 +1604,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for outlier: one row = one record.",
-   "seconds": 0.06770827299999382
+   "seconds": 0.07060923900007765
   },
   {
    "dataset": "extreme_outlier",
@@ -1613,7 +1613,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for outlier: one row = one record.",
-   "seconds": 0.06432591299994783
+   "seconds": 0.06450017999986812
   },
   {
    "dataset": "extreme_outlier",
@@ -1622,7 +1622,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for outlier: one row = one record.",
-   "seconds": 0.06477286699998785
+   "seconds": 0.06347500599986233
   },
   {
    "dataset": "extreme_outlier",
@@ -1631,7 +1631,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for outlier: one row = one record.",
-   "seconds": 0.06377241999996386
+   "seconds": 0.059790459999931045
   },
   {
    "dataset": "extreme_outlier",
@@ -1640,7 +1640,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for outlier: one row = one record.",
-   "seconds": 0.061728485000003275
+   "seconds": 0.055349719999867375
   },
   {
    "dataset": "extreme_outlier",
@@ -1649,7 +1649,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for outlier: one row = one record.",
-   "seconds": 0.061678783999923326
+   "seconds": 0.07085917799986419
   },
   {
    "dataset": "extreme_outlier",
@@ -1658,7 +1658,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for outlier: one row = one record.",
-   "seconds": 0.060330519999979515
+   "seconds": 0.05186905399978059
   },
   {
    "dataset": "extreme_outlier",
@@ -1667,7 +1667,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for outlier: one row = one record.",
-   "seconds": 0.06166528800008564
+   "seconds": 0.052459461000125884
   },
   {
    "dataset": "extreme_outlier",
@@ -1676,7 +1676,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for outlier: one row = one record.",
-   "seconds": 0.062099714999931166
+   "seconds": 0.05793108399984703
   },
   {
    "dataset": "extreme_outlier",
@@ -1685,7 +1685,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for outlier: one row = one record.",
-   "seconds": 0.0667535960000123
+   "seconds": 0.07414534700001241
   },
   {
    "dataset": "extreme_outlier",
@@ -1694,7 +1694,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for outlier: one row = one record.",
-   "seconds": 0.06582533899995724
+   "seconds": 0.06635837499970876
   },
   {
    "dataset": "extreme_outlier",
@@ -1703,7 +1703,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for outlier: one row = one record.",
-   "seconds": 0.14943592200006606
+   "seconds": 0.12113646600028005
   },
   {
    "dataset": "extreme_outlier",
@@ -1712,7 +1712,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for outlier: one row = one record.",
-   "seconds": 0.22687394400008998
+   "seconds": 0.19619901399983064
   },
   {
    "dataset": "extreme_outlier",
@@ -1721,7 +1721,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for outlier: one row = one record.",
-   "seconds": 0.17434157100001357
+   "seconds": 0.12886590100015383
   },
   {
    "dataset": "extreme_outlier",
@@ -1729,8 +1729,8 @@
    "call": "build_report",
    "outcome": "OK",
    "reason": "",
-   "detail": "Report written: /home/user/analytics-agent/workspace/ws_d35a276e8bb7/reports/outlier_20260924-143629.md",
-   "seconds": 0.04263702399998692
+   "detail": "Report written: /home/user/analytics-agent/workspace/ws_9cb872392da9/reports/outlier_20260925-072222.md",
+   "seconds": 0.03882168699965405
   },
   {
    "dataset": "all_negative_measure",
@@ -1739,7 +1739,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "negative.csv saved.",
-   "seconds": 0.0003377189999582697
+   "seconds": 0.000271078999958263
   },
   {
    "dataset": "all_negative_measure",
@@ -1748,7 +1748,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Ready to load: every field was read from the file or answered by you.",
-   "seconds": 0.005889440000032664
+   "seconds": 0.004181926000001113
   },
   {
    "dataset": "all_negative_measure",
@@ -1757,7 +1757,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Loaded negative: 150 rows, 9 columns.",
-   "seconds": 0.09639899199999036
+   "seconds": 0.09688856599996143
   },
   {
    "dataset": "all_negative_measure",
@@ -1811,7 +1811,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "# negative",
-   "seconds": 0.04596630699995785
+   "seconds": 0.03447611499996128
   },
   {
    "dataset": "all_negative_measure",
@@ -1820,7 +1820,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Profile of negative: 150 rows, 9 columns.",
-   "seconds": 0.0684274389999473
+   "seconds": 0.056205129000318266
   },
   {
    "dataset": "all_negative_measure",
@@ -1829,7 +1829,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Nothing to clean in negative. 150 row(s), no exact duplicates, no declared missing tokens, no padding, no case variants, and every column already reads as the type it holds.",
-   "seconds": 0.16826096199997664
+   "seconds": 0.16511952600012592
   },
   {
    "dataset": "all_negative_measure",
@@ -1838,7 +1838,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "PROVISIONAL -- settle what is listed before confirming.",
-   "seconds": 0.06348298099999283
+   "seconds": 0.042675330999827565
   },
   {
    "dataset": "all_negative_measure",
@@ -1847,7 +1847,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Ready to confirm: nothing in it is a guess.",
-   "seconds": 0.06590242800007218
+   "seconds": 0.04658859500023027
   },
   {
    "dataset": "all_negative_measure",
@@ -1856,7 +1856,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Contract stored for negative, version 1.",
-   "seconds": 0.07831907900003898
+   "seconds": 0.06919859099980386
   },
   {
    "dataset": "all_negative_measure",
@@ -1865,7 +1865,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "negative: all 6 check(s) passed.",
-   "seconds": 0.09040703999994548
+   "seconds": 0.07433661400000346
   },
   {
    "dataset": "all_negative_measure",
@@ -1874,7 +1874,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for negative: one row = one record.",
-   "seconds": 0.07682880100003331
+   "seconds": 0.061428691999935836
   },
   {
    "dataset": "all_negative_measure",
@@ -1883,7 +1883,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for negative: one row = one record.",
-   "seconds": 0.0854359290000275
+   "seconds": 0.0872578909998083
   },
   {
    "dataset": "all_negative_measure",
@@ -1892,7 +1892,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for negative: one row = one record.",
-   "seconds": 0.0662522950000266
+   "seconds": 0.0541659929999696
   },
   {
    "dataset": "all_negative_measure",
@@ -1901,7 +1901,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for negative: one row = one record.",
-   "seconds": 0.06559727000001203
+   "seconds": 0.05640082599984453
   },
   {
    "dataset": "all_negative_measure",
@@ -1910,7 +1910,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for negative: one row = one record.",
-   "seconds": 0.06730191600001945
+   "seconds": 0.06208383400007733
   },
   {
    "dataset": "all_negative_measure",
@@ -1919,7 +1919,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for negative: one row = one record.",
-   "seconds": 0.0701397809999662
+   "seconds": 0.06034141700001783
   },
   {
    "dataset": "all_negative_measure",
@@ -1928,7 +1928,7 @@
    "outcome": "REFUSED",
    "reason": "ANALYSIS_NOT_POSSIBLE",
    "detail": "BLOCKED: pareto cannot answer that under this contract. | WHY: there is no share of units by channel to report: 3 group(s) total below zero, and a share of a signed total is not a proportion -- it can exceed 100% or change sign. | CURRENT STATE: contract v1 for negative | NEXT STEP: call propose_dataset_contract(dataset_name=\"negative\")",
-   "seconds": 0.04517537100002755
+   "seconds": 0.045619997000358126
   },
   {
    "dataset": "all_negative_measure",
@@ -1937,7 +1937,7 @@
    "outcome": "REFUSED",
    "reason": "ANALYSIS_NOT_POSSIBLE",
    "detail": "BLOCKED: concentration cannot answer that under this contract. | WHY: there is no share of units by channel to report: 3 group(s) total below zero, and a share of a signed total is not a proportion -- it can exceed 100% or change sign. | CURRENT STATE: contract v1 for negative | NEXT STEP: call propose_dataset_contract(dataset_name=\"negative\")",
-   "seconds": 0.04446825400009402
+   "seconds": 0.04834272300013254
   },
   {
    "dataset": "all_negative_measure",
@@ -1946,7 +1946,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for negative: one row = one record.",
-   "seconds": 0.06737419900002806
+   "seconds": 0.07037779900019814
   },
   {
    "dataset": "all_negative_measure",
@@ -1955,7 +1955,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for negative: one row = one record.",
-   "seconds": 0.07111486099995545
+   "seconds": 0.06742587799999455
   },
   {
    "dataset": "all_negative_measure",
@@ -1964,7 +1964,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for negative: one row = one record.",
-   "seconds": 0.06720823900002415
+   "seconds": 0.0709541710002668
   },
   {
    "dataset": "all_negative_measure",
@@ -1973,7 +1973,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for negative: one row = one record.",
-   "seconds": 0.07380466699999033
+   "seconds": 0.06714306499998202
   },
   {
    "dataset": "all_negative_measure",
@@ -1982,7 +1982,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for negative: one row = one record.",
-   "seconds": 0.07103197799995087
+   "seconds": 0.058613793999938935
   },
   {
    "dataset": "all_negative_measure",
@@ -1991,7 +1991,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for negative: one row = one record.",
-   "seconds": 0.06653094099999635
+   "seconds": 0.06138266400012071
   },
   {
    "dataset": "all_negative_measure",
@@ -2000,7 +2000,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for negative: one row = one record.",
-   "seconds": 0.07010852399992018
+   "seconds": 0.06333859599999414
   },
   {
    "dataset": "all_negative_measure",
@@ -2009,7 +2009,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for negative: one row = one record.",
-   "seconds": 0.06420400700005757
+   "seconds": 0.07087625100029982
   },
   {
    "dataset": "all_negative_measure",
@@ -2018,7 +2018,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for negative: one row = one record.",
-   "seconds": 0.07443061499998294
+   "seconds": 0.06366073799972582
   },
   {
    "dataset": "all_negative_measure",
@@ -2027,7 +2027,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for negative: one row = one record.",
-   "seconds": 0.07128762199999983
+   "seconds": 0.058040270999754284
   },
   {
    "dataset": "all_negative_measure",
@@ -2036,7 +2036,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for negative: one row = one record.",
-   "seconds": 0.07255910800006404
+   "seconds": 0.05660730700037675
   },
   {
    "dataset": "all_negative_measure",
@@ -2045,7 +2045,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for negative: one row = one record.",
-   "seconds": 0.06682877299999745
+   "seconds": 0.055788236999887886
   },
   {
    "dataset": "all_negative_measure",
@@ -2054,7 +2054,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for negative: one row = one record.",
-   "seconds": 0.067558589999976
+   "seconds": 0.055161977000352636
   },
   {
    "dataset": "all_negative_measure",
@@ -2063,7 +2063,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for negative: one row = one record.",
-   "seconds": 0.06921635499998047
+   "seconds": 0.05367472399984763
   },
   {
    "dataset": "all_negative_measure",
@@ -2072,7 +2072,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for negative: one row = one record.",
-   "seconds": 0.06650997500003086
+   "seconds": 0.05952504900005806
   },
   {
    "dataset": "all_negative_measure",
@@ -2081,7 +2081,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for negative: one row = one record.",
-   "seconds": 0.06998860900000636
+   "seconds": 0.05857508400004008
   },
   {
    "dataset": "all_negative_measure",
@@ -2090,7 +2090,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for negative: one row = one record.",
-   "seconds": 0.07067987100003847
+   "seconds": 0.05285519400013072
   },
   {
    "dataset": "all_negative_measure",
@@ -2099,7 +2099,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for negative: one row = one record.",
-   "seconds": 0.07088079899995137
+   "seconds": 0.06124920399997791
   },
   {
    "dataset": "all_negative_measure",
@@ -2108,7 +2108,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for negative: one row = one record.",
-   "seconds": 0.07074631800003317
+   "seconds": 0.055464456000208884
   },
   {
    "dataset": "all_negative_measure",
@@ -2117,7 +2117,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for negative: one row = one record.",
-   "seconds": 0.15286387699995885
+   "seconds": 0.10892910999973537
   },
   {
    "dataset": "all_negative_measure",
@@ -2126,7 +2126,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for negative: one row = one record.",
-   "seconds": 0.21729397000001427
+   "seconds": 0.14845527400029823
   },
   {
    "dataset": "all_negative_measure",
@@ -2135,7 +2135,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for negative: one row = one record.",
-   "seconds": 0.17528643499997543
+   "seconds": 0.12442125699999451
   },
   {
    "dataset": "all_negative_measure",
@@ -2143,8 +2143,8 @@
    "call": "build_report",
    "outcome": "OK",
    "reason": "",
-   "detail": "Report written: /home/user/analytics-agent/workspace/ws_ca9e34009707/reports/negative_20260924-143632.md",
-   "seconds": 0.04195008900001085
+   "detail": "Report written: /home/user/analytics-agent/workspace/ws_a8d2f0efa219/reports/negative_20260925-072225.md",
+   "seconds": 0.030990004000159388
   },
   {
    "dataset": "two_rows",
@@ -2153,7 +2153,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "tworows.csv saved.",
-   "seconds": 0.0003656720000435598
+   "seconds": 0.00021764800021628616
   },
   {
    "dataset": "two_rows",
@@ -2162,7 +2162,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Ready to load: every field was read from the file or answered by you.",
-   "seconds": 0.00206247199992049
+   "seconds": 0.0013695269999516313
   },
   {
    "dataset": "two_rows",
@@ -2171,7 +2171,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Loaded tworows: 2 rows, 9 columns.",
-   "seconds": 0.0698345179999933
+   "seconds": 0.05823749299997871
   },
   {
    "dataset": "two_rows",
@@ -2225,7 +2225,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "# tworows",
-   "seconds": 0.04458962800003974
+   "seconds": 0.030647408999811887
   },
   {
    "dataset": "two_rows",
@@ -2234,7 +2234,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Profile of tworows: 2 rows, 9 columns.",
-   "seconds": 0.06594282399998974
+   "seconds": 0.05497830400008752
   },
   {
    "dataset": "two_rows",
@@ -2243,7 +2243,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Nothing to clean in tworows. 2 row(s), no exact duplicates, no declared missing tokens, no padding, no case variants, and every column already reads as the type it holds.",
-   "seconds": 0.18168360200002098
+   "seconds": 0.1587951379997321
   },
   {
    "dataset": "two_rows",
@@ -2252,7 +2252,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "PROVISIONAL -- settle what is listed before confirming.",
-   "seconds": 0.05520515599994269
+   "seconds": 0.028828184000303736
   },
   {
    "dataset": "two_rows",
@@ -2261,7 +2261,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Ready to confirm: nothing in it is a guess.",
-   "seconds": 0.04487285899995186
+   "seconds": 0.035842533000050025
   },
   {
    "dataset": "two_rows",
@@ -2270,7 +2270,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Contract stored for tworows, version 1.",
-   "seconds": 0.07067312399999537
+   "seconds": 0.05086373599988292
   },
   {
    "dataset": "two_rows",
@@ -2279,7 +2279,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "tworows: all 6 check(s) passed.",
-   "seconds": 0.08798822599999312
+   "seconds": 0.06933853300006376
   },
   {
    "dataset": "two_rows",
@@ -2287,8 +2287,8 @@
    "call": "compute_analysis(\"cross_tab\", rows='units')",
    "outcome": "REFUSED",
    "reason": "ANALYSIS_PARAMS_INVALID",
-   "detail": "BLOCKED: cross_tab was called without columns. | WHY: cross_tab needs columns, and it was not given. | CURRENT STATE: declared measures: unit_price, revenue; declared dimensions: units | NEXT STEP: call compute_analysis(dataset_name=\"tworows\", analysis_type=\"cross_tab\", columns=\"units\")",
-   "seconds": 0.042357488999982706
+   "detail": "BLOCKED: cross_tab was called without columns. | WHY: cross_tab needs columns, and it was not given. | CURRENT STATE: declared measures: unit_price, revenue; declared dimensions: units | NEXT STEP: call propose_dataset_contract(dataset_name=\"tworows\") -- cross_tab needs another declared dimension for columns",
+   "seconds": 0.036649525000029826
   },
   {
    "dataset": "two_rows",
@@ -2297,7 +2297,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tworows: one row = one record.",
-   "seconds": 0.06007135200002267
+   "seconds": 0.05639702100006616
   },
   {
    "dataset": "two_rows",
@@ -2306,7 +2306,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tworows: one row = one record.",
-   "seconds": 0.06054961299992101
+   "seconds": 0.047082255000077566
   },
   {
    "dataset": "two_rows",
@@ -2315,7 +2315,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tworows: one row = one record.",
-   "seconds": 0.07271494300005088
+   "seconds": 0.048911695999777294
   },
   {
    "dataset": "two_rows",
@@ -2324,7 +2324,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tworows: one row = one record.",
-   "seconds": 0.0734560110000757
+   "seconds": 0.05978063899965491
   },
   {
    "dataset": "two_rows",
@@ -2333,7 +2333,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tworows: one row = one record.",
-   "seconds": 0.082822927000052
+   "seconds": 0.05923077400029797
   },
   {
    "dataset": "two_rows",
@@ -2342,7 +2342,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tworows: one row = one record.",
-   "seconds": 0.060745262999944316
+   "seconds": 0.04750053799989473
   },
   {
    "dataset": "two_rows",
@@ -2351,7 +2351,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tworows: one row = one record.",
-   "seconds": 0.06141030399999181
+   "seconds": 0.045022381999842764
   },
   {
    "dataset": "two_rows",
@@ -2360,7 +2360,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tworows: one row = one record.",
-   "seconds": 0.06758622999996078
+   "seconds": 0.04616402700003164
   },
   {
    "dataset": "two_rows",
@@ -2369,7 +2369,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tworows: one row = one record.",
-   "seconds": 0.07180646200004048
+   "seconds": 0.051356418000068516
   },
   {
    "dataset": "two_rows",
@@ -2378,7 +2378,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tworows: one row = one record.",
-   "seconds": 0.0717559209999763
+   "seconds": 0.056642396000370354
   },
   {
    "dataset": "two_rows",
@@ -2387,7 +2387,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tworows: one row = one record.",
-   "seconds": 0.07637004699995487
+   "seconds": 0.06211684799973227
   },
   {
    "dataset": "two_rows",
@@ -2395,8 +2395,8 @@
    "call": "compute_analysis(\"period_compare\", measure='unit_price', grain='month')",
    "outcome": "REFUSED",
    "reason": "ANALYSIS_PARAMS_INVALID",
-   "detail": "BLOCKED: period_compare was called without period, baseline. | WHY: period_compare needs period, baseline, and they were not given. | CURRENT STATE: declared measures: unit_price, revenue; declared dimensions: units | NEXT STEP: call compute_analysis(dataset_name=\"tworows\", analysis_type=\"period_compare\", period=\"YYYY-MM\", baseline=\"YYYY-MM\")",
-   "seconds": 0.046329280999998446
+   "detail": "BLOCKED: period_compare was called without period, baseline. | WHY: period_compare needs period, baseline, and they were not given. | CURRENT STATE: declared measures: unit_price, revenue; declared dimensions: units | NEXT STEP: call compute_analysis(dataset_name=\"tworows\", analysis_type=\"period_compare\", measure=\"unit_price\", grain=\"month\", period=\"YYYY-MM\", baseline=\"YYYY-MM\")",
+   "seconds": 0.03680572700022822
   },
   {
    "dataset": "two_rows",
@@ -2404,8 +2404,8 @@
    "call": "compute_analysis(\"growth_decomposition\", measure='unit_price', dimension='units', grain='month')",
    "outcome": "REFUSED",
    "reason": "ANALYSIS_PARAMS_INVALID",
-   "detail": "BLOCKED: growth_decomposition was called without period, baseline. | WHY: growth_decomposition needs period, baseline, and they were not given. | CURRENT STATE: declared measures: unit_price, revenue; declared dimensions: units | NEXT STEP: call compute_analysis(dataset_name=\"tworows\", analysis_type=\"growth_decomposition\", period=\"YYYY-MM\", baseline=\"YYYY-MM\")",
-   "seconds": 0.051755796999941595
+   "detail": "BLOCKED: growth_decomposition was called without period, baseline. | WHY: growth_decomposition needs period, baseline, and they were not given. | CURRENT STATE: declared measures: unit_price, revenue; declared dimensions: units | NEXT STEP: call compute_analysis(dataset_name=\"tworows\", analysis_type=\"growth_decomposition\", dimension=\"units\", measure=\"unit_price\", grain=\"month\", period=\"YYYY-MM\", b",
+   "seconds": 0.034010302999831765
   },
   {
    "dataset": "two_rows",
@@ -2414,7 +2414,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tworows: one row = one record.",
-   "seconds": 0.09479121899994425
+   "seconds": 0.053593532999911986
   },
   {
    "dataset": "two_rows",
@@ -2423,7 +2423,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tworows: one row = one record.",
-   "seconds": 0.07295941300003506
+   "seconds": 0.05826039900011892
   },
   {
    "dataset": "two_rows",
@@ -2432,7 +2432,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tworows: one row = one record.",
-   "seconds": 0.07348960700005591
+   "seconds": 0.06786459300019487
   },
   {
    "dataset": "two_rows",
@@ -2440,8 +2440,8 @@
    "call": "compute_analysis(\"mix_shift\", measure='unit_price', dimension='units', grain='month')",
    "outcome": "REFUSED",
    "reason": "ANALYSIS_PARAMS_INVALID",
-   "detail": "BLOCKED: mix_shift was called without period, baseline. | WHY: mix_shift needs period, baseline, and they were not given. | CURRENT STATE: declared measures: unit_price, revenue; declared dimensions: units | NEXT STEP: call compute_analysis(dataset_name=\"tworows\", analysis_type=\"mix_shift\", period=\"YYYY-MM\", baseline=\"YYYY-MM\")",
-   "seconds": 0.04298841900003936
+   "detail": "BLOCKED: mix_shift was called without period, baseline. | WHY: mix_shift needs period, baseline, and they were not given. | CURRENT STATE: declared measures: unit_price, revenue; declared dimensions: units | NEXT STEP: call compute_analysis(dataset_name=\"tworows\", analysis_type=\"mix_shift\", dimension=\"units\", measure=\"unit_price\", grain=\"month\", period=\"YYYY-MM\", baseline=\"YYYY-MM\")",
+   "seconds": 0.04217076299983091
   },
   {
    "dataset": "two_rows",
@@ -2450,7 +2450,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tworows: one row = one record.",
-   "seconds": 0.06895017900001221
+   "seconds": 0.05849556000021039
   },
   {
    "dataset": "two_rows",
@@ -2459,7 +2459,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tworows: one row = one record.",
-   "seconds": 0.07774529899995741
+   "seconds": 0.06291296899962617
   },
   {
    "dataset": "two_rows",
@@ -2468,7 +2468,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tworows: one row = one record.",
-   "seconds": 0.06812302899993483
+   "seconds": 0.0520114249998187
   },
   {
    "dataset": "two_rows",
@@ -2477,7 +2477,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tworows: one row = one record.",
-   "seconds": 0.07961949200000618
+   "seconds": 0.055150169000171445
   },
   {
    "dataset": "two_rows",
@@ -2486,7 +2486,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tworows: one row = one record.",
-   "seconds": 0.06450277500005086
+   "seconds": 0.054231672000241815
   },
   {
    "dataset": "two_rows",
@@ -2495,7 +2495,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tworows: one row = one record.",
-   "seconds": 0.08022787599998082
+   "seconds": 0.052331592999962595
   },
   {
    "dataset": "two_rows",
@@ -2504,7 +2504,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tworows: one row = one record.",
-   "seconds": 0.07122850700000072
+   "seconds": 0.0577563659999214
   },
   {
    "dataset": "two_rows",
@@ -2513,7 +2513,7 @@
    "outcome": "REFUSED",
    "reason": "ANALYSIS_NOT_POSSIBLE",
    "detail": "BLOCKED: repeat_behaviour cannot answer that under this contract. | WHY: repeat_behaviour cannot use 'units': it holds 2 distinct value(s) across 2 row(s), one per row. A key that never repeats describes events rather than people, and this analysis would report that nobody ever returns -- which would be a fact about the column, not about anybody's behaviour. Name the column that identifies a perso",
-   "seconds": 0.05301778000000468
+   "seconds": 0.0366813219998221
   },
   {
    "dataset": "two_rows",
@@ -2522,7 +2522,7 @@
    "outcome": "REFUSED",
    "reason": "ANALYSIS_NOT_POSSIBLE",
    "detail": "BLOCKED: cohort_retention cannot answer that under this contract. | WHY: cohort_retention cannot use 'units': it holds 2 distinct value(s) across 2 row(s), one per row. Every cohort would have exactly one member and retention would be zero in every cell — a fact about the column, not about anybody coming back. Name the column that identifies a person across their events. | CURRENT STATE: contract ",
-   "seconds": 0.046101237000016226
+   "seconds": 0.03559734700002082
   },
   {
    "dataset": "two_rows",
@@ -2531,7 +2531,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tworows: one row = one record.",
-   "seconds": 0.13933787299993128
+   "seconds": 0.10918429799994556
   },
   {
    "dataset": "two_rows",
@@ -2540,7 +2540,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tworows: one row = one record.",
-   "seconds": 0.1322099019999996
+   "seconds": 0.126129654000124
   },
   {
    "dataset": "two_rows",
@@ -2549,7 +2549,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tworows: one row = one record.",
-   "seconds": 0.21307032899994738
+   "seconds": 0.15047132200015767
   },
   {
    "dataset": "two_rows",
@@ -2557,8 +2557,8 @@
    "call": "build_report",
    "outcome": "OK",
    "reason": "",
-   "detail": "Report written: /home/user/analytics-agent/workspace/ws_8a804bef491f/reports/tworows_20260924-143635.md",
-   "seconds": 0.04717179900001156
+   "detail": "Report written: /home/user/analytics-agent/workspace/ws_ec266de75550/reports/tworows_20260925-072227.md",
+   "seconds": 0.0380722190002416
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2567,7 +2567,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "three.xlsx saved.",
-   "seconds": 0.0057448899999599234
+   "seconds": 0.00411459199995079
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2576,7 +2576,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Ready to load: every field was read from the file or answered by you.",
-   "seconds": 0.06106106800007183
+   "seconds": 0.04967606900027022
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2585,7 +2585,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Loaded three: 120 rows, 9 columns.",
-   "seconds": 0.09692461600002389
+   "seconds": 0.0752859389999685
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2621,7 +2621,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "# three",
-   "seconds": 0.04930248300001949
+   "seconds": 0.03280585399988922
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2630,7 +2630,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Profile of three: 120 rows, 9 columns.",
-   "seconds": 0.07410550800000237
+   "seconds": 0.05786323499978607
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2639,7 +2639,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Nothing to clean in three. 120 row(s), no exact duplicates, no declared missing tokens, no padding, no case variants, and every column already reads as the type it holds.",
-   "seconds": 0.17583816400008345
+   "seconds": 0.15395702899968455
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2648,7 +2648,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "PROVISIONAL -- settle what is listed before confirming.",
-   "seconds": 0.05884229299999788
+   "seconds": 0.040560342999924615
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2657,7 +2657,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Ready to confirm: nothing in it is a guess.",
-   "seconds": 0.06014293400005499
+   "seconds": 0.044324033000066265
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2666,7 +2666,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Contract stored for three, version 1.",
-   "seconds": 0.0748084500000914
+   "seconds": 0.06532897099987167
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2675,7 +2675,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "three: all 6 check(s) passed.",
-   "seconds": 0.09263869299991256
+   "seconds": 0.06901272499999322
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2684,7 +2684,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for three: one row = one record.",
-   "seconds": 0.06355423000002247
+   "seconds": 0.05125258899988694
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2693,7 +2693,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for three: one row = one record.",
-   "seconds": 0.06902152999998634
+   "seconds": 0.058798087000013766
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2702,7 +2702,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for three: one row = one record.",
-   "seconds": 0.09163916099998914
+   "seconds": 0.05173773899969092
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2711,7 +2711,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for three: one row = one record.",
-   "seconds": 0.06837046199996166
+   "seconds": 0.05342755599986049
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2720,7 +2720,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for three: one row = one record.",
-   "seconds": 0.08141421700008777
+   "seconds": 0.05735431699986293
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2729,7 +2729,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for three: one row = one record.",
-   "seconds": 0.08123308400001861
+   "seconds": 0.05773147099989728
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2738,7 +2738,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for three: one row = one record.",
-   "seconds": 0.06823849199997767
+   "seconds": 0.05371471599983124
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2747,7 +2747,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for three: one row = one record.",
-   "seconds": 0.06940776999999798
+   "seconds": 0.05620633100033956
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2756,7 +2756,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for three: one row = one record.",
-   "seconds": 0.07819889700010663
+   "seconds": 0.058868848999736656
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2765,7 +2765,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for three: one row = one record.",
-   "seconds": 0.08853222300001562
+   "seconds": 0.06438619099981224
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2774,7 +2774,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for three: one row = one record.",
-   "seconds": 0.06982696099998975
+   "seconds": 0.06376540500014016
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2783,7 +2783,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for three: one row = one record.",
-   "seconds": 0.06883801599997241
+   "seconds": 0.06377620500006742
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2792,7 +2792,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for three: one row = one record.",
-   "seconds": 0.06894500299995343
+   "seconds": 0.06078921999960585
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2801,7 +2801,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for three: one row = one record.",
-   "seconds": 0.07071700899996358
+   "seconds": 0.059641843999997946
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2810,7 +2810,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for three: one row = one record.",
-   "seconds": 0.07152251399998022
+   "seconds": 0.05606321699997352
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2819,7 +2819,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for three: one row = one record.",
-   "seconds": 0.06705192899994472
+   "seconds": 0.06083664600009797
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2828,7 +2828,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for three: one row = one record.",
-   "seconds": 0.07520751999993536
+   "seconds": 0.06851650599992354
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2837,7 +2837,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for three: one row = one record.",
-   "seconds": 0.06955959699996583
+   "seconds": 0.06386790100032158
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2846,7 +2846,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for three: one row = one record.",
-   "seconds": 0.07679249499994967
+   "seconds": 0.06566811999982747
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2855,7 +2855,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for three: one row = one record.",
-   "seconds": 0.07401881600003435
+   "seconds": 0.06007022500034509
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2864,7 +2864,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for three: one row = one record.",
-   "seconds": 0.07297291299994413
+   "seconds": 0.05951026200000342
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2873,7 +2873,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for three: one row = one record.",
-   "seconds": 0.0692349229999536
+   "seconds": 0.06332422700006646
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2882,7 +2882,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for three: one row = one record.",
-   "seconds": 0.0732123519999277
+   "seconds": 0.06639400799986106
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2891,7 +2891,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for three: one row = one record.",
-   "seconds": 0.0749316669999871
+   "seconds": 0.06421371700025702
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2900,7 +2900,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for three: one row = one record.",
-   "seconds": 0.07080211300001338
+   "seconds": 0.0631783290000385
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2909,7 +2909,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for three: one row = one record.",
-   "seconds": 0.07641076899994914
+   "seconds": 0.07681145600008676
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2918,7 +2918,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for three: one row = one record.",
-   "seconds": 0.07911969600002067
+   "seconds": 0.06835503299998891
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2927,7 +2927,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for three: one row = one record.",
-   "seconds": 0.163409248999983
+   "seconds": 0.12475361699989662
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2936,7 +2936,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for three: one row = one record.",
-   "seconds": 0.24115908399994623
+   "seconds": 0.19305701399980535
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2945,7 +2945,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for three: one row = one record.",
-   "seconds": 0.1831733810000742
+   "seconds": 0.14880999300021358
   },
   {
    "dataset": "xlsx_three_header_rows",
@@ -2953,8 +2953,8 @@
    "call": "build_report",
    "outcome": "OK",
    "reason": "",
-   "detail": "Report written: /home/user/analytics-agent/workspace/ws_df2dc4aa74b3/reports/three_20260924-143639.md",
-   "seconds": 0.04726831499999662
+   "detail": "Report written: /home/user/analytics-agent/workspace/ws_5196c5a5a2d4/reports/three_20260925-072230.md",
+   "seconds": 0.0376874499997939
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -2963,7 +2963,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "donnees.xlsx saved.",
-   "seconds": 0.005064536999952907
+   "seconds": 0.00397558900021977
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -2972,7 +2972,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Ready to load: every field was read from the file or answered by you.",
-   "seconds": 0.22337523600003806
+   "seconds": 0.046772827000040706
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -2981,7 +2981,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Loaded donnees: 120 rows, 9 columns.",
-   "seconds": 0.0938233350000246
+   "seconds": 0.06478787800006103
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3035,7 +3035,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "# donnees",
-   "seconds": 0.05214450999994824
+   "seconds": 0.040862109000045166
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3044,7 +3044,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Profile of donnees: 120 rows, 9 columns.",
-   "seconds": 0.06847601700007999
+   "seconds": 0.06791451799972492
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3053,7 +3053,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Nothing to clean in donnees. 120 row(s), no exact duplicates, no declared missing tokens, no padding, no case variants, and every column already reads as the type it holds.",
-   "seconds": 0.17666860700001052
+   "seconds": 0.1670013090001703
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3062,7 +3062,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "PROVISIONAL -- settle what is listed before confirming.",
-   "seconds": 0.06006143799993424
+   "seconds": 0.05087341299986292
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3071,7 +3071,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Ready to confirm: nothing in it is a guess.",
-   "seconds": 0.06694744300000366
+   "seconds": 0.05344057899992549
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3080,7 +3080,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Contract stored for donnees, version 1.",
-   "seconds": 0.08138231500004167
+   "seconds": 0.06481832899999063
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3089,7 +3089,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "donnees: all 6 check(s) passed.",
-   "seconds": 0.1213574209999706
+   "seconds": 0.06909287200005565
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3098,7 +3098,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for donnees: one row = one record.",
-   "seconds": 0.07087128800003484
+   "seconds": 0.05673519799984206
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3107,7 +3107,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for donnees: one row = one record.",
-   "seconds": 0.0663725729999669
+   "seconds": 0.05912282099961885
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3116,7 +3116,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for donnees: one row = one record.",
-   "seconds": 0.061519500999906995
+   "seconds": 0.04852828999992198
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3125,7 +3125,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for donnees: one row = one record.",
-   "seconds": 0.05759639699999752
+   "seconds": 0.051607736999812914
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3134,7 +3134,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for donnees: one row = one record.",
-   "seconds": 0.06283053399999972
+   "seconds": 0.06474953100041603
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3143,7 +3143,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for donnees: one row = one record.",
-   "seconds": 0.06311184999992747
+   "seconds": 0.06518156899983296
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3152,7 +3152,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for donnees: one row = one record.",
-   "seconds": 0.06679838599995946
+   "seconds": 0.05847707100019761
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3161,7 +3161,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for donnees: one row = one record.",
-   "seconds": 0.06762330300000485
+   "seconds": 0.06092987700003505
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3170,7 +3170,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for donnees: one row = one record.",
-   "seconds": 0.0718941119999954
+   "seconds": 0.06379102299979422
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3179,7 +3179,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for donnees: one row = one record.",
-   "seconds": 0.07239925199996833
+   "seconds": 0.05748907599991071
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3188,7 +3188,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for donnees: one row = one record.",
-   "seconds": 0.06973915200001102
+   "seconds": 0.05992605999972511
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3197,7 +3197,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for donnees: one row = one record.",
-   "seconds": 0.0668952480000371
+   "seconds": 0.05682553099995857
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3206,7 +3206,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for donnees: one row = one record.",
-   "seconds": 0.0676776579999796
+   "seconds": 0.0598555110000234
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3215,7 +3215,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for donnees: one row = one record.",
-   "seconds": 0.06670823299998574
+   "seconds": 0.06128565500011973
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3224,7 +3224,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for donnees: one row = one record.",
-   "seconds": 0.06788128300001972
+   "seconds": 0.060166891000335454
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3233,7 +3233,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for donnees: one row = one record.",
-   "seconds": 0.06871627999998964
+   "seconds": 0.05197375999978249
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3242,7 +3242,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for donnees: one row = one record.",
-   "seconds": 0.08531832400001349
+   "seconds": 0.05834338300019226
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3251,7 +3251,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for donnees: one row = one record.",
-   "seconds": 0.07278044899999259
+   "seconds": 0.050663952999912
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3260,7 +3260,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for donnees: one row = one record.",
-   "seconds": 0.07711320100008834
+   "seconds": 0.05199039299986907
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3269,7 +3269,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for donnees: one row = one record.",
-   "seconds": 0.08961118100000931
+   "seconds": 0.0493626630000108
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3278,7 +3278,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for donnees: one row = one record.",
-   "seconds": 0.08153666099997281
+   "seconds": 0.049748264999834646
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3287,7 +3287,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for donnees: one row = one record.",
-   "seconds": 0.06831163499998638
+   "seconds": 0.052394899999853806
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3296,7 +3296,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for donnees: one row = one record.",
-   "seconds": 0.06965740800001186
+   "seconds": 0.05960785699971893
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3305,7 +3305,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for donnees: one row = one record.",
-   "seconds": 0.07175929400000314
+   "seconds": 0.060465363999810506
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3314,7 +3314,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for donnees: one row = one record.",
-   "seconds": 0.06853301199998896
+   "seconds": 0.05732569200017679
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3323,7 +3323,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for donnees: one row = one record.",
-   "seconds": 0.06987047299992355
+   "seconds": 0.0687210060000325
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3332,7 +3332,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for donnees: one row = one record.",
-   "seconds": 0.06881407200000922
+   "seconds": 0.06365487100038081
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3341,7 +3341,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for donnees: one row = one record.",
-   "seconds": 0.14211499800001093
+   "seconds": 0.12163423800029705
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3350,7 +3350,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for donnees: one row = one record.",
-   "seconds": 0.23108447599997817
+   "seconds": 0.1878591760000745
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3359,7 +3359,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for donnees: one row = one record.",
-   "seconds": 0.19326106300002266
+   "seconds": 0.1205337840001448
   },
   {
    "dataset": "xlsx_unicode_sheet_name",
@@ -3367,8 +3367,8 @@
    "call": "build_report",
    "outcome": "OK",
    "reason": "",
-   "detail": "Report written: /home/user/analytics-agent/workspace/ws_82edb342c688/reports/donnees_20260924-143642.md",
-   "seconds": 0.05742617200007771
+   "detail": "Report written: /home/user/analytics-agent/workspace/ws_27822695b956/reports/donnees_20260925-072233.md",
+   "seconds": 0.036340596999707486
   },
   {
    "dataset": "all_null_measure",
@@ -3377,7 +3377,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "nullmeasure.csv saved.",
-   "seconds": 0.000358985000048051
+   "seconds": 0.0002972910001517448
   },
   {
    "dataset": "all_null_measure",
@@ -3386,7 +3386,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Ready to load: every field was read from the file or answered by you.",
-   "seconds": 0.006149962999984382
+   "seconds": 0.0038393470003939
   },
   {
    "dataset": "all_null_measure",
@@ -3395,7 +3395,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Loaded nullmeasure: 150 rows, 9 columns.",
-   "seconds": 0.12016376799999762
+   "seconds": 0.10181372300030489
   },
   {
    "dataset": "all_null_measure",
@@ -3440,7 +3440,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "# nullmeasure",
-   "seconds": 0.05033181800001785
+   "seconds": 0.033038244000181294
   },
   {
    "dataset": "all_null_measure",
@@ -3449,7 +3449,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Profile of nullmeasure: 150 rows, 9 columns.",
-   "seconds": 0.0804882520000092
+   "seconds": 0.06947133899984692
   },
   {
    "dataset": "all_null_measure",
@@ -3458,7 +3458,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Nothing to clean in nullmeasure. 150 row(s), no exact duplicates, no declared missing tokens, no padding, no case variants, and every column already reads as the type it holds.",
-   "seconds": 0.19702107499995236
+   "seconds": 0.19519202999981644
   },
   {
    "dataset": "all_null_measure",
@@ -3467,7 +3467,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "PROVISIONAL -- settle what is listed before confirming.",
-   "seconds": 0.05881511899997349
+   "seconds": 0.05069759299976795
   },
   {
    "dataset": "all_null_measure",
@@ -3476,7 +3476,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Ready to confirm: nothing in it is a guess.",
-   "seconds": 0.07207125499996891
+   "seconds": 0.053019290000065666
   },
   {
    "dataset": "all_null_measure",
@@ -3485,7 +3485,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Contract stored for nullmeasure, version 1.",
-   "seconds": 0.08748850100005257
+   "seconds": 0.05806296499986274
   },
   {
    "dataset": "all_null_measure",
@@ -3494,7 +3494,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "nullmeasure: all 6 check(s) passed.",
-   "seconds": 0.09342122400005337
+   "seconds": 0.071194222000031
   },
   {
    "dataset": "all_null_measure",
@@ -3503,7 +3503,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullmeasure: one row = one record.",
-   "seconds": 0.06505826099999013
+   "seconds": 0.04988776899972436
   },
   {
    "dataset": "all_null_measure",
@@ -3512,7 +3512,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullmeasure: one row = one record.",
-   "seconds": 0.06213527900001736
+   "seconds": 0.049807147000137775
   },
   {
    "dataset": "all_null_measure",
@@ -3521,7 +3521,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullmeasure: one row = one record.",
-   "seconds": 0.06470769100008056
+   "seconds": 0.04916769299961743
   },
   {
    "dataset": "all_null_measure",
@@ -3530,7 +3530,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullmeasure: one row = one record.",
-   "seconds": 0.07079913400002624
+   "seconds": 0.048701660000006086
   },
   {
    "dataset": "all_null_measure",
@@ -3539,7 +3539,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullmeasure: one row = one record.",
-   "seconds": 0.07087893100003839
+   "seconds": 0.048752124999737134
   },
   {
    "dataset": "all_null_measure",
@@ -3548,7 +3548,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullmeasure: one row = one record.",
-   "seconds": 0.0732428249999657
+   "seconds": 0.04913282600000457
   },
   {
    "dataset": "all_null_measure",
@@ -3557,7 +3557,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullmeasure: one row = one record.",
-   "seconds": 0.07212028599997211
+   "seconds": 0.04959716400026082
   },
   {
    "dataset": "all_null_measure",
@@ -3566,7 +3566,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullmeasure: one row = one record.",
-   "seconds": 0.06818250499998157
+   "seconds": 0.05534273500006748
   },
   {
    "dataset": "all_null_measure",
@@ -3575,7 +3575,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullmeasure: one row = one record.",
-   "seconds": 0.07650666400002137
+   "seconds": 0.06214335200002097
   },
   {
    "dataset": "all_null_measure",
@@ -3584,7 +3584,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullmeasure: one row = one record.",
-   "seconds": 0.07881775800001378
+   "seconds": 0.06294370800014804
   },
   {
    "dataset": "all_null_measure",
@@ -3593,7 +3593,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullmeasure: one row = one record.",
-   "seconds": 0.07131412399996861
+   "seconds": 0.05675734399983412
   },
   {
    "dataset": "all_null_measure",
@@ -3602,7 +3602,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullmeasure: one row = one record.",
-   "seconds": 0.06885016900002938
+   "seconds": 0.06531533899988062
   },
   {
    "dataset": "all_null_measure",
@@ -3611,7 +3611,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullmeasure: one row = one record.",
-   "seconds": 0.07713322900008279
+   "seconds": 0.06088472900000852
   },
   {
    "dataset": "all_null_measure",
@@ -3620,7 +3620,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullmeasure: one row = one record.",
-   "seconds": 0.08346049500005392
+   "seconds": 0.06258963700020104
   },
   {
    "dataset": "all_null_measure",
@@ -3629,7 +3629,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullmeasure: one row = one record.",
-   "seconds": 0.08859194499996192
+   "seconds": 0.06323237299966422
   },
   {
    "dataset": "all_null_measure",
@@ -3638,7 +3638,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullmeasure: one row = one record.",
-   "seconds": 0.0720944759999611
+   "seconds": 0.057382339000014326
   },
   {
    "dataset": "all_null_measure",
@@ -3647,7 +3647,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullmeasure: one row = one record.",
-   "seconds": 0.0891621020000457
+   "seconds": 0.0660901510000258
   },
   {
    "dataset": "all_null_measure",
@@ -3656,7 +3656,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullmeasure: one row = one record.",
-   "seconds": 0.07488260000002356
+   "seconds": 0.06068038700004763
   },
   {
    "dataset": "all_null_measure",
@@ -3665,7 +3665,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullmeasure: one row = one record.",
-   "seconds": 0.07679444999996576
+   "seconds": 0.06583917699981612
   },
   {
    "dataset": "all_null_measure",
@@ -3674,7 +3674,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullmeasure: one row = one record.",
-   "seconds": 0.06671332899998106
+   "seconds": 0.05481716000031156
   },
   {
    "dataset": "all_null_measure",
@@ -3683,7 +3683,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullmeasure: one row = one record.",
-   "seconds": 0.06664899999998397
+   "seconds": 0.05668706899996323
   },
   {
    "dataset": "all_null_measure",
@@ -3692,7 +3692,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullmeasure: one row = one record.",
-   "seconds": 0.06649289300003147
+   "seconds": 0.05529736799962848
   },
   {
    "dataset": "all_null_measure",
@@ -3701,7 +3701,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullmeasure: one row = one record.",
-   "seconds": 0.06323147900002368
+   "seconds": 0.05434224499958873
   },
   {
    "dataset": "all_null_measure",
@@ -3710,7 +3710,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullmeasure: one row = one record.",
-   "seconds": 0.07163516000002801
+   "seconds": 0.05409987599978194
   },
   {
    "dataset": "all_null_measure",
@@ -3719,7 +3719,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullmeasure: one row = one record.",
-   "seconds": 0.06494104400007927
+   "seconds": 0.0563559469997017
   },
   {
    "dataset": "all_null_measure",
@@ -3728,7 +3728,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullmeasure: one row = one record.",
-   "seconds": 0.07950407700002415
+   "seconds": 0.06885763799982669
   },
   {
    "dataset": "all_null_measure",
@@ -3737,7 +3737,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullmeasure: one row = one record.",
-   "seconds": 0.06890232099999594
+   "seconds": 0.06446824200020274
   },
   {
    "dataset": "all_null_measure",
@@ -3746,7 +3746,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullmeasure: one row = one record.",
-   "seconds": 0.1620904949999158
+   "seconds": 0.1349091669999325
   },
   {
    "dataset": "all_null_measure",
@@ -3755,7 +3755,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullmeasure: one row = one record.",
-   "seconds": 0.23069668400000864
+   "seconds": 0.2028276679998271
   },
   {
    "dataset": "all_null_measure",
@@ -3764,7 +3764,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullmeasure: one row = one record.",
-   "seconds": 0.1823276600000554
+   "seconds": 0.12927793300013946
   },
   {
    "dataset": "all_null_measure",
@@ -3772,8 +3772,8 @@
    "call": "build_report",
    "outcome": "OK",
    "reason": "",
-   "detail": "Report written: /home/user/analytics-agent/workspace/ws_4f3f4b2b17fd/reports/nullmeasure_20260924-143646.md",
-   "seconds": 0.044637958999942384
+   "detail": "Report written: /home/user/analytics-agent/workspace/ws_41ecaa9bb417/reports/nullmeasure_20260925-072236.md",
+   "seconds": 0.04319835599972066
   },
   {
    "dataset": "key_with_nulls",
@@ -3782,7 +3782,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "nullkey.csv saved.",
-   "seconds": 0.0003833629999689947
+   "seconds": 0.0003519309998409881
   },
   {
    "dataset": "key_with_nulls",
@@ -3791,7 +3791,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Ready to load: every field was read from the file or answered by you.",
-   "seconds": 0.00510533800002122
+   "seconds": 0.005770902000222122
   },
   {
    "dataset": "key_with_nulls",
@@ -3800,7 +3800,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Loaded nullkey: 150 rows, 9 columns.",
-   "seconds": 0.10093072500001199
+   "seconds": 0.08512213199992402
   },
   {
    "dataset": "key_with_nulls",
@@ -3854,7 +3854,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "# nullkey",
-   "seconds": 0.04784774799998104
+   "seconds": 0.03972835500007932
   },
   {
    "dataset": "key_with_nulls",
@@ -3863,7 +3863,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Profile of nullkey: 150 rows, 9 columns.",
-   "seconds": 0.07224406899990754
+   "seconds": 0.05389024500027517
   },
   {
    "dataset": "key_with_nulls",
@@ -3872,7 +3872,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Nothing to clean in nullkey. 150 row(s), no exact duplicates, no declared missing tokens, no padding, no case variants, and every column already reads as the type it holds.",
-   "seconds": 0.1768491710000717
+   "seconds": 0.17317235800010167
   },
   {
    "dataset": "key_with_nulls",
@@ -3881,7 +3881,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "PROVISIONAL -- settle what is listed before confirming.",
-   "seconds": 0.06288689500001965
+   "seconds": 0.05070371100009652
   },
   {
    "dataset": "key_with_nulls",
@@ -3890,7 +3890,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Ready to confirm: nothing in it is a guess.",
-   "seconds": 0.06690885699993032
+   "seconds": 0.05468059599979824
   },
   {
    "dataset": "key_with_nulls",
@@ -3899,7 +3899,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Contract stored for nullkey, version 1.",
-   "seconds": 0.09748127099999238
+   "seconds": 0.07459185099969545
   },
   {
    "dataset": "key_with_nulls",
@@ -3908,7 +3908,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "nullkey: all 6 check(s) passed.",
-   "seconds": 0.09308096899997054
+   "seconds": 0.0648795029997018
   },
   {
    "dataset": "key_with_nulls",
@@ -3917,7 +3917,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullkey: one row = one record.",
-   "seconds": 0.0588352989999521
+   "seconds": 0.05133979700030977
   },
   {
    "dataset": "key_with_nulls",
@@ -3926,7 +3926,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullkey: one row = one record.",
-   "seconds": 0.06174647900002128
+   "seconds": 0.05488015700029791
   },
   {
    "dataset": "key_with_nulls",
@@ -3935,7 +3935,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullkey: one row = one record.",
-   "seconds": 0.060509891000037896
+   "seconds": 0.05582098200011387
   },
   {
    "dataset": "key_with_nulls",
@@ -3944,7 +3944,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullkey: one row = one record.",
-   "seconds": 0.05956567900000209
+   "seconds": 0.054275381000024936
   },
   {
    "dataset": "key_with_nulls",
@@ -3953,7 +3953,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullkey: one row = one record.",
-   "seconds": 0.06244452900000397
+   "seconds": 0.05772787700016124
   },
   {
    "dataset": "key_with_nulls",
@@ -3962,7 +3962,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullkey: one row = one record.",
-   "seconds": 0.06712223099998482
+   "seconds": 0.05884845500031588
   },
   {
    "dataset": "key_with_nulls",
@@ -3971,7 +3971,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullkey: one row = one record.",
-   "seconds": 0.06697071400003551
+   "seconds": 0.05430254699967918
   },
   {
    "dataset": "key_with_nulls",
@@ -3980,7 +3980,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullkey: one row = one record.",
-   "seconds": 0.07760995900002854
+   "seconds": 0.05461304899972674
   },
   {
    "dataset": "key_with_nulls",
@@ -3989,7 +3989,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullkey: one row = one record.",
-   "seconds": 0.06886708799993357
+   "seconds": 0.05974939899988385
   },
   {
    "dataset": "key_with_nulls",
@@ -3998,7 +3998,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullkey: one row = one record.",
-   "seconds": 0.07126863300004516
+   "seconds": 0.06326219499987928
   },
   {
    "dataset": "key_with_nulls",
@@ -4007,7 +4007,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullkey: one row = one record.",
-   "seconds": 0.06808527600003345
+   "seconds": 0.057570453000153066
   },
   {
    "dataset": "key_with_nulls",
@@ -4016,7 +4016,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullkey: one row = one record.",
-   "seconds": 0.06985611999994035
+   "seconds": 0.05285999100033223
   },
   {
    "dataset": "key_with_nulls",
@@ -4025,7 +4025,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullkey: one row = one record.",
-   "seconds": 0.08400550299995757
+   "seconds": 0.05066052199981641
   },
   {
    "dataset": "key_with_nulls",
@@ -4034,7 +4034,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullkey: one row = one record.",
-   "seconds": 0.07298562200003289
+   "seconds": 0.05602521400032856
   },
   {
    "dataset": "key_with_nulls",
@@ -4043,7 +4043,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullkey: one row = one record.",
-   "seconds": 0.06370044899995264
+   "seconds": 0.05769220399997721
   },
   {
    "dataset": "key_with_nulls",
@@ -4052,7 +4052,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullkey: one row = one record.",
-   "seconds": 0.06347631899996031
+   "seconds": 0.06340906900004484
   },
   {
    "dataset": "key_with_nulls",
@@ -4061,7 +4061,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullkey: one row = one record.",
-   "seconds": 0.07030539300001237
+   "seconds": 0.08391358400012905
   },
   {
    "dataset": "key_with_nulls",
@@ -4070,7 +4070,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullkey: one row = one record.",
-   "seconds": 0.06578758799992102
+   "seconds": 0.059368661000007705
   },
   {
    "dataset": "key_with_nulls",
@@ -4079,7 +4079,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullkey: one row = one record.",
-   "seconds": 0.06694462500001919
+   "seconds": 0.06756893400006447
   },
   {
    "dataset": "key_with_nulls",
@@ -4088,7 +4088,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullkey: one row = one record.",
-   "seconds": 0.06619327900000371
+   "seconds": 0.06280843600006847
   },
   {
    "dataset": "key_with_nulls",
@@ -4097,7 +4097,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullkey: one row = one record.",
-   "seconds": 0.06850965499995709
+   "seconds": 0.059185971999795584
   },
   {
    "dataset": "key_with_nulls",
@@ -4106,7 +4106,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullkey: one row = one record.",
-   "seconds": 0.06624404900003356
+   "seconds": 0.05451849899964145
   },
   {
    "dataset": "key_with_nulls",
@@ -4115,7 +4115,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullkey: one row = one record.",
-   "seconds": 0.06713634900006582
+   "seconds": 0.05579313399994135
   },
   {
    "dataset": "key_with_nulls",
@@ -4124,7 +4124,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullkey: one row = one record.",
-   "seconds": 0.06912688399995659
+   "seconds": 0.07042911799999274
   },
   {
    "dataset": "key_with_nulls",
@@ -4133,7 +4133,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullkey: one row = one record.",
-   "seconds": 0.07007599099995332
+   "seconds": 0.052829433000169956
   },
   {
    "dataset": "key_with_nulls",
@@ -4142,7 +4142,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullkey: one row = one record.",
-   "seconds": 0.07506499900000563
+   "seconds": 0.06907087699983094
   },
   {
    "dataset": "key_with_nulls",
@@ -4151,7 +4151,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullkey: one row = one record.",
-   "seconds": 0.07412381900007858
+   "seconds": 0.06852192799988188
   },
   {
    "dataset": "key_with_nulls",
@@ -4160,7 +4160,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullkey: one row = one record.",
-   "seconds": 0.1590774449999799
+   "seconds": 0.11462111199989522
   },
   {
    "dataset": "key_with_nulls",
@@ -4169,7 +4169,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullkey: one row = one record.",
-   "seconds": 0.22548488099994302
+   "seconds": 0.3472846589997971
   },
   {
    "dataset": "key_with_nulls",
@@ -4178,7 +4178,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for nullkey: one row = one record.",
-   "seconds": 0.17821229900005164
+   "seconds": 0.15414421700006642
   },
   {
    "dataset": "key_with_nulls",
@@ -4186,8 +4186,8 @@
    "call": "build_report",
    "outcome": "OK",
    "reason": "",
-   "detail": "Report written: /home/user/analytics-agent/workspace/ws_9eca19b7d40d/reports/nullkey_20260924-143649.md",
-   "seconds": 0.048183832000063376
+   "detail": "Report written: /home/user/analytics-agent/workspace/ws_f4d409027539/reports/nullkey_20260925-072239.md",
+   "seconds": 0.03791911300004358
   },
   {
    "dataset": "tiny_decimals",
@@ -4196,7 +4196,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "tiny.csv saved.",
-   "seconds": 0.00035718799995265726
+   "seconds": 0.0002496140000403102
   },
   {
    "dataset": "tiny_decimals",
@@ -4205,7 +4205,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Ready to load: every field was read from the file or answered by you.",
-   "seconds": 0.004592689999981303
+   "seconds": 0.0028486759997576883
   },
   {
    "dataset": "tiny_decimals",
@@ -4214,7 +4214,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Loaded tiny: 150 rows, 3 columns.",
-   "seconds": 0.06899624300001506
+   "seconds": 0.06108824900002219
   },
   {
    "dataset": "tiny_decimals",
@@ -4241,7 +4241,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "# tiny",
-   "seconds": 0.0405352259999745
+   "seconds": 0.03498966000006476
   },
   {
    "dataset": "tiny_decimals",
@@ -4250,7 +4250,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Profile of tiny: 150 rows, 3 columns.",
-   "seconds": 0.051768820999996024
+   "seconds": 0.04777844299997014
   },
   {
    "dataset": "tiny_decimals",
@@ -4259,7 +4259,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Nothing to clean in tiny. 150 row(s), no exact duplicates, no declared missing tokens, no padding, no case variants, and every column already reads as the type it holds.",
-   "seconds": 0.12877581899999768
+   "seconds": 0.11174705699977494
   },
   {
    "dataset": "tiny_decimals",
@@ -4268,7 +4268,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "PROVISIONAL -- settle what is listed before confirming.",
-   "seconds": 0.04447046500001761
+   "seconds": 0.03235405199984598
   },
   {
    "dataset": "tiny_decimals",
@@ -4277,7 +4277,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Ready to confirm: nothing in it is a guess.",
-   "seconds": 0.05477031700002044
+   "seconds": 0.03366729600020335
   },
   {
    "dataset": "tiny_decimals",
@@ -4286,7 +4286,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Contract stored for tiny, version 1.",
-   "seconds": 0.08337445500001195
+   "seconds": 0.04752125699997123
   },
   {
    "dataset": "tiny_decimals",
@@ -4295,7 +4295,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "tiny: 3 of 6 check(s) passed, 3 could not run. Nothing failed, and nothing is claimed about what was not checked.",
-   "seconds": 0.09079936299997371
+   "seconds": 0.06377805600004649
   },
   {
    "dataset": "tiny_decimals",
@@ -4303,8 +4303,8 @@
    "call": "compute_analysis(\"cross_tab\", rows='region')",
    "outcome": "REFUSED",
    "reason": "ANALYSIS_PARAMS_INVALID",
-   "detail": "BLOCKED: cross_tab was called without columns. | WHY: cross_tab needs columns, and it was not given. | CURRENT STATE: declared measures: dose; declared dimensions: region | NEXT STEP: call compute_analysis(dataset_name=\"tiny\", analysis_type=\"cross_tab\", columns=\"region\")",
-   "seconds": 0.04308190400001877
+   "detail": "BLOCKED: cross_tab was called without columns. | WHY: cross_tab needs columns, and it was not given. | CURRENT STATE: declared measures: dose; declared dimensions: region | NEXT STEP: call propose_dataset_contract(dataset_name=\"tiny\") -- cross_tab needs another declared dimension for columns",
+   "seconds": 0.03700793000007252
   },
   {
    "dataset": "tiny_decimals",
@@ -4313,7 +4313,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tiny: one row = one record.",
-   "seconds": 0.06379034199994749
+   "seconds": 0.054433403000075486
   },
   {
    "dataset": "tiny_decimals",
@@ -4322,7 +4322,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tiny: one row = one record.",
-   "seconds": 0.06152956999994785
+   "seconds": 0.0514488750000055
   },
   {
    "dataset": "tiny_decimals",
@@ -4331,7 +4331,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tiny: one row = one record.",
-   "seconds": 0.05894544499994936
+   "seconds": 0.053456114000255184
   },
   {
    "dataset": "tiny_decimals",
@@ -4340,7 +4340,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tiny: one row = one record.",
-   "seconds": 0.0642805990000852
+   "seconds": 0.05866789499987135
   },
   {
    "dataset": "tiny_decimals",
@@ -4349,7 +4349,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tiny: one row = one record.",
-   "seconds": 0.06894450100003269
+   "seconds": 0.06377595300000394
   },
   {
    "dataset": "tiny_decimals",
@@ -4358,7 +4358,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tiny: one row = one record.",
-   "seconds": 0.06208724199996141
+   "seconds": 0.0698155019999831
   },
   {
    "dataset": "tiny_decimals",
@@ -4367,7 +4367,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tiny: one row = one record.",
-   "seconds": 0.05950184600010289
+   "seconds": 0.055933657999958086
   },
   {
    "dataset": "tiny_decimals",
@@ -4375,8 +4375,8 @@
    "call": "compute_analysis(\"ranking_shift\", dimension='region', measure='dose')",
    "outcome": "REFUSED",
    "reason": "ANALYSIS_PARAMS_INVALID",
-   "detail": "BLOCKED: ranking_shift was called without before_start, before_end, after_start, after_end. | WHY: ranking_shift needs before_start, before_end, after_start, after_end, and they were not given. | CURRENT STATE: declared measures: dose; declared dimensions: region | NEXT STEP: call compute_analysis(dataset_name=\"tiny\", analysis_type=\"ranking_shift\", before_start=\"YYYY-MM-DD\", before_end=\"YYYY-MM-DD",
-   "seconds": 0.04322313500006203
+   "detail": "BLOCKED: ranking_shift was called without before_start, before_end, after_start, after_end. | WHY: ranking_shift needs before_start, before_end, after_start, after_end, and they were not given. | CURRENT STATE: declared measures: dose; declared dimensions: region | NEXT STEP: call compute_analysis(dataset_name=\"tiny\", analysis_type=\"ranking_shift\", dimension=\"region\", measure=\"dose\", before_start=",
+   "seconds": 0.03309250099982819
   },
   {
    "dataset": "tiny_decimals",
@@ -4385,7 +4385,7 @@
    "outcome": "REFUSED",
    "reason": "ANALYSIS_NOT_POSSIBLE",
    "detail": "BLOCKED: calendar_coverage cannot answer that under this contract. | WHY: tiny has no date_column, so there is no calendar to check. confirm_dataset_contract with date_column set is what fixes that -- and until it is set, no temporal analysis can say what period a row belongs to. | CURRENT STATE: contract v1 for tiny | NEXT STEP: call propose_dataset_contract(dataset_name=\"tiny\")",
-   "seconds": 0.04229437999993024
+   "seconds": 0.03360341500001596
   },
   {
    "dataset": "tiny_decimals",
@@ -4394,7 +4394,7 @@
    "outcome": "REFUSED",
    "reason": "ANALYSIS_NOT_POSSIBLE",
    "detail": "BLOCKED: trend cannot answer that under this contract. | WHY: tiny has no date_column, so there is no calendar to check. confirm_dataset_contract with date_column set is what fixes that -- and until it is set, no temporal analysis can say what period a row belongs to. | CURRENT STATE: contract v1 for tiny | NEXT STEP: call propose_dataset_contract(dataset_name=\"tiny\")",
-   "seconds": 0.04111417500007519
+   "seconds": 0.03184967899960611
   },
   {
    "dataset": "tiny_decimals",
@@ -4403,7 +4403,7 @@
    "outcome": "REFUSED",
    "reason": "ANALYSIS_NOT_POSSIBLE",
    "detail": "BLOCKED: seasonality cannot answer that under this contract. | WHY: tiny has no date_column, so there is no calendar to check. confirm_dataset_contract with date_column set is what fixes that -- and until it is set, no temporal analysis can say what period a row belongs to. | CURRENT STATE: contract v1 for tiny | NEXT STEP: call propose_dataset_contract(dataset_name=\"tiny\")",
-   "seconds": 0.041851796999935686
+   "seconds": 0.03154962100006742
   },
   {
    "dataset": "tiny_decimals",
@@ -4411,8 +4411,8 @@
    "call": "compute_analysis(\"period_compare\", measure='dose', grain='month')",
    "outcome": "REFUSED",
    "reason": "ANALYSIS_PARAMS_INVALID",
-   "detail": "BLOCKED: period_compare was called without period, baseline. | WHY: period_compare needs period, baseline, and they were not given. | CURRENT STATE: declared measures: dose; declared dimensions: region | NEXT STEP: call compute_analysis(dataset_name=\"tiny\", analysis_type=\"period_compare\", period=\"YYYY-MM\", baseline=\"YYYY-MM\")",
-   "seconds": 0.04121007499998086
+   "detail": "BLOCKED: period_compare was called without period, baseline. | WHY: period_compare needs period, baseline, and they were not given. | CURRENT STATE: declared measures: dose; declared dimensions: region | NEXT STEP: call compute_analysis(dataset_name=\"tiny\", analysis_type=\"period_compare\", measure=\"dose\", grain=\"month\", period=\"YYYY-MM\", baseline=\"YYYY-MM\")",
+   "seconds": 0.03187417799972536
   },
   {
    "dataset": "tiny_decimals",
@@ -4420,8 +4420,8 @@
    "call": "compute_analysis(\"growth_decomposition\", measure='dose', dimension='region', grain='month')",
    "outcome": "REFUSED",
    "reason": "ANALYSIS_PARAMS_INVALID",
-   "detail": "BLOCKED: growth_decomposition was called without period, baseline. | WHY: growth_decomposition needs period, baseline, and they were not given. | CURRENT STATE: declared measures: dose; declared dimensions: region | NEXT STEP: call compute_analysis(dataset_name=\"tiny\", analysis_type=\"growth_decomposition\", period=\"YYYY-MM\", baseline=\"YYYY-MM\")",
-   "seconds": 0.043961379999927885
+   "detail": "BLOCKED: growth_decomposition was called without period, baseline. | WHY: growth_decomposition needs period, baseline, and they were not given. | CURRENT STATE: declared measures: dose; declared dimensions: region | NEXT STEP: call compute_analysis(dataset_name=\"tiny\", analysis_type=\"growth_decomposition\", dimension=\"region\", measure=\"dose\", grain=\"month\", period=\"YYYY-MM\", baseline=\"YYYY-MM\")",
+   "seconds": 0.03225873900009901
   },
   {
    "dataset": "tiny_decimals",
@@ -4429,8 +4429,8 @@
    "call": "compute_analysis(\"correlation\", measure='dose')",
    "outcome": "REFUSED",
    "reason": "ANALYSIS_PARAMS_INVALID",
-   "detail": "BLOCKED: correlation was called without against. | WHY: correlation needs against, and it was not given. | CURRENT STATE: declared measures: dose; declared dimensions: region | NEXT STEP: call compute_analysis(dataset_name=\"tiny\", analysis_type=\"correlation\", against=\"dose\")",
-   "seconds": 0.04359067299992603
+   "detail": "BLOCKED: correlation was called without against. | WHY: correlation needs against, and it was not given. | CURRENT STATE: declared measures: dose; declared dimensions: region | NEXT STEP: call propose_dataset_contract(dataset_name=\"tiny\") -- correlation needs another declared measure for against",
+   "seconds": 0.03375563899999179
   },
   {
    "dataset": "tiny_decimals",
@@ -4438,8 +4438,8 @@
    "call": "compute_analysis(\"bivariate\", measure='dose')",
    "outcome": "REFUSED",
    "reason": "ANALYSIS_PARAMS_INVALID",
-   "detail": "BLOCKED: bivariate was called without against. | WHY: bivariate needs against, and it was not given. | CURRENT STATE: declared measures: dose; declared dimensions: region | NEXT STEP: call compute_analysis(dataset_name=\"tiny\", analysis_type=\"bivariate\", against=\"dose\")",
-   "seconds": 0.04441552299999785
+   "detail": "BLOCKED: bivariate was called without against. | WHY: bivariate needs against, and it was not given. | CURRENT STATE: declared measures: dose; declared dimensions: region | NEXT STEP: call propose_dataset_contract(dataset_name=\"tiny\") -- bivariate needs another declared measure for against",
+   "seconds": 0.0337023360002604
   },
   {
    "dataset": "tiny_decimals",
@@ -4448,7 +4448,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tiny: one row = one record.",
-   "seconds": 0.0641721619999771
+   "seconds": 0.05198273599989989
   },
   {
    "dataset": "tiny_decimals",
@@ -4456,8 +4456,8 @@
    "call": "compute_analysis(\"mix_shift\", measure='dose', dimension='region', grain='month')",
    "outcome": "REFUSED",
    "reason": "ANALYSIS_PARAMS_INVALID",
-   "detail": "BLOCKED: mix_shift was called without period, baseline. | WHY: mix_shift needs period, baseline, and they were not given. | CURRENT STATE: declared measures: dose; declared dimensions: region | NEXT STEP: call compute_analysis(dataset_name=\"tiny\", analysis_type=\"mix_shift\", period=\"YYYY-MM\", baseline=\"YYYY-MM\")",
-   "seconds": 0.04023552200010272
+   "detail": "BLOCKED: mix_shift was called without period, baseline. | WHY: mix_shift needs period, baseline, and they were not given. | CURRENT STATE: declared measures: dose; declared dimensions: region | NEXT STEP: call compute_analysis(dataset_name=\"tiny\", analysis_type=\"mix_shift\", dimension=\"region\", measure=\"dose\", grain=\"month\", period=\"YYYY-MM\", baseline=\"YYYY-MM\")",
+   "seconds": 0.033336358000269684
   },
   {
    "dataset": "tiny_decimals",
@@ -4466,7 +4466,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tiny: one row = one record.",
-   "seconds": 0.06349291600008655
+   "seconds": 0.053685287999996945
   },
   {
    "dataset": "tiny_decimals",
@@ -4475,7 +4475,7 @@
    "outcome": "REFUSED",
    "reason": "ANALYSIS_NOT_POSSIBLE",
    "detail": "BLOCKED: changepoint cannot answer that under this contract. | WHY: tiny has no date_column, so there is no calendar to check. confirm_dataset_contract with date_column set is what fixes that -- and until it is set, no temporal analysis can say what period a row belongs to. | CURRENT STATE: contract v1 for tiny | NEXT STEP: call propose_dataset_contract(dataset_name=\"tiny\")",
-   "seconds": 0.03942140500021196
+   "seconds": 0.0373257010000998
   },
   {
    "dataset": "tiny_decimals",
@@ -4483,8 +4483,8 @@
    "call": "compute_analysis(\"correlated_shift\", measure='dose', grain='month')",
    "outcome": "REFUSED",
    "reason": "ANALYSIS_PARAMS_INVALID",
-   "detail": "BLOCKED: correlated_shift was called without against. | WHY: correlated_shift needs against, and it was not given. | CURRENT STATE: declared measures: dose; declared dimensions: region | NEXT STEP: call compute_analysis(dataset_name=\"tiny\", analysis_type=\"correlated_shift\", against=\"dose\")",
-   "seconds": 0.040221947999953045
+   "detail": "BLOCKED: correlated_shift was called without against. | WHY: correlated_shift needs against, and it was not given. | CURRENT STATE: declared measures: dose; declared dimensions: region | NEXT STEP: call propose_dataset_contract(dataset_name=\"tiny\") -- correlated_shift needs another declared measure for against",
+   "seconds": 0.0392054270000699
   },
   {
    "dataset": "tiny_decimals",
@@ -4493,7 +4493,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tiny: one row = one record.",
-   "seconds": 0.06264085599991631
+   "seconds": 0.06462186599992492
   },
   {
    "dataset": "tiny_decimals",
@@ -4502,7 +4502,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tiny: one row = one record.",
-   "seconds": 0.06098580899993067
+   "seconds": 0.06094435800014253
   },
   {
    "dataset": "tiny_decimals",
@@ -4511,7 +4511,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tiny: one row = one record.",
-   "seconds": 0.06324801200003094
+   "seconds": 0.057535101999746985
   },
   {
    "dataset": "tiny_decimals",
@@ -4520,7 +4520,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tiny: one row = one record.",
-   "seconds": 0.0740213629999289
+   "seconds": 0.05871585900013088
   },
   {
    "dataset": "tiny_decimals",
@@ -4529,7 +4529,7 @@
    "outcome": "REFUSED",
    "reason": "ANALYSIS_NOT_POSSIBLE",
    "detail": "BLOCKED: repeat_behaviour cannot answer that under this contract. | WHY: repeat_behaviour needs a date column on the contract: coming back is a statement about time, and without one every event is simultaneous. | CURRENT STATE: contract v1 for tiny | NEXT STEP: call propose_dataset_contract(dataset_name=\"tiny\")",
-   "seconds": 0.04868532699993011
+   "seconds": 0.03558354799997687
   },
   {
    "dataset": "tiny_decimals",
@@ -4538,7 +4538,7 @@
    "outcome": "REFUSED",
    "reason": "ANALYSIS_NOT_POSSIBLE",
    "detail": "BLOCKED: cohort_retention cannot answer that under this contract. | WHY: cohort_retention needs a date column on the contract: a cohort is a group of people who started at the same time, and without one nobody started. | CURRENT STATE: contract v1 for tiny | NEXT STEP: call propose_dataset_contract(dataset_name=\"tiny\")",
-   "seconds": 0.064632685000106
+   "seconds": 0.03711445899989485
   },
   {
    "dataset": "tiny_decimals",
@@ -4547,7 +4547,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tiny: one row = one record.",
-   "seconds": 0.15181177699992077
+   "seconds": 0.11206073999983346
   },
   {
    "dataset": "tiny_decimals",
@@ -4556,7 +4556,7 @@
    "outcome": "REFUSED",
    "reason": "ANALYSIS_NOT_POSSIBLE",
    "detail": "BLOCKED: trend cannot answer that under this contract. | WHY: tiny has no date_column, so there is no calendar to check. confirm_dataset_contract with date_column set is what fixes that -- and until it is set, no temporal analysis can say what period a row belongs to. | CURRENT STATE: contract v1 for tiny | NEXT STEP: call propose_dataset_contract(dataset_name=\"tiny\")",
-   "seconds": 0.04503019499998118
+   "seconds": 0.03883883700018487
   },
   {
    "dataset": "tiny_decimals",
@@ -4565,7 +4565,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for tiny: one row = one record.",
-   "seconds": 0.17093117099989286
+   "seconds": 0.14275916900032826
   },
   {
    "dataset": "tiny_decimals",
@@ -4573,8 +4573,8 @@
    "call": "build_report",
    "outcome": "OK",
    "reason": "",
-   "detail": "Report written: /home/user/analytics-agent/workspace/ws_cc94f5365d17/reports/tiny_20260924-143651.md",
-   "seconds": 0.04765628099994501
+   "detail": "Report written: /home/user/analytics-agent/workspace/ws_fe6e3dba4541/reports/tiny_20260925-072241.md",
+   "seconds": 0.03716665700039812
   },
   {
    "dataset": "time_only_column",
@@ -4583,7 +4583,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "times.csv saved.",
-   "seconds": 0.0003758210000341933
+   "seconds": 0.00032214999964708113
   },
   {
    "dataset": "time_only_column",
@@ -4592,7 +4592,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Ready to load: every field was read from the file or answered by you.",
-   "seconds": 0.005150862999926176
+   "seconds": 0.0041103510002358234
   },
   {
    "dataset": "time_only_column",
@@ -4601,7 +4601,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Loaded times: 150 rows, 10 columns.",
-   "seconds": 0.09477819699986867
+   "seconds": 0.09461676299997634
   },
   {
    "dataset": "time_only_column",
@@ -4655,7 +4655,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "# times",
-   "seconds": 0.05686915000001136
+   "seconds": 0.03925026400020215
   },
   {
    "dataset": "time_only_column",
@@ -4664,7 +4664,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Profile of times: 150 rows, 10 columns.",
-   "seconds": 0.07697203299994726
+   "seconds": 0.06358306299989636
   },
   {
    "dataset": "time_only_column",
@@ -4673,7 +4673,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Nothing to clean in times. 150 row(s), no exact duplicates, no declared missing tokens, no padding, no case variants, and every column already reads as the type it holds.",
-   "seconds": 0.18853342900001735
+   "seconds": 0.18208413999991535
   },
   {
    "dataset": "time_only_column",
@@ -4682,7 +4682,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "PROVISIONAL -- settle what is listed before confirming.",
-   "seconds": 0.06576914299989767
+   "seconds": 0.05055333500013148
   },
   {
    "dataset": "time_only_column",
@@ -4691,7 +4691,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Ready to confirm: nothing in it is a guess.",
-   "seconds": 0.06816251000009288
+   "seconds": 0.050687853999988874
   },
   {
    "dataset": "time_only_column",
@@ -4700,7 +4700,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Contract stored for times, version 1.",
-   "seconds": 0.08363011400001596
+   "seconds": 0.0677643909998551
   },
   {
    "dataset": "time_only_column",
@@ -4709,7 +4709,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "times: all 6 check(s) passed.",
-   "seconds": 0.10101792599994042
+   "seconds": 0.06932815000027404
   },
   {
    "dataset": "time_only_column",
@@ -4718,7 +4718,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for times: one row = one record.",
-   "seconds": 0.07154164799999307
+   "seconds": 0.04975288199966599
   },
   {
    "dataset": "time_only_column",
@@ -4727,7 +4727,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for times: one row = one record.",
-   "seconds": 0.07911922800008142
+   "seconds": 0.06630784099979792
   },
   {
    "dataset": "time_only_column",
@@ -4736,7 +4736,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for times: one row = one record.",
-   "seconds": 0.060681373000079475
+   "seconds": 0.06155860400031088
   },
   {
    "dataset": "time_only_column",
@@ -4745,7 +4745,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for times: one row = one record.",
-   "seconds": 0.06275150900000881
+   "seconds": 0.05778943799987246
   },
   {
    "dataset": "time_only_column",
@@ -4754,7 +4754,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for times: one row = one record.",
-   "seconds": 0.07034322000004067
+   "seconds": 0.062100529999952414
   },
   {
    "dataset": "time_only_column",
@@ -4763,7 +4763,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for times: one row = one record.",
-   "seconds": 0.07616390100019998
+   "seconds": 0.06491369700006544
   },
   {
    "dataset": "time_only_column",
@@ -4772,7 +4772,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for times: one row = one record.",
-   "seconds": 0.06290296900010617
+   "seconds": 0.053974105999714084
   },
   {
    "dataset": "time_only_column",
@@ -4781,7 +4781,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for times: one row = one record.",
-   "seconds": 0.06688024899995071
+   "seconds": 0.055364909999752854
   },
   {
    "dataset": "time_only_column",
@@ -4790,7 +4790,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for times: one row = one record.",
-   "seconds": 0.06736772099998234
+   "seconds": 0.060807097000179056
   },
   {
    "dataset": "time_only_column",
@@ -4799,7 +4799,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for times: one row = one record.",
-   "seconds": 0.07371453599989763
+   "seconds": 0.06344299800002773
   },
   {
    "dataset": "time_only_column",
@@ -4808,7 +4808,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for times: one row = one record.",
-   "seconds": 0.06750858600003085
+   "seconds": 0.060989344000063284
   },
   {
    "dataset": "time_only_column",
@@ -4817,7 +4817,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for times: one row = one record.",
-   "seconds": 0.08058915300011904
+   "seconds": 0.05423296199978722
   },
   {
    "dataset": "time_only_column",
@@ -4826,7 +4826,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for times: one row = one record.",
-   "seconds": 0.08377739299999121
+   "seconds": 0.052517531999910716
   },
   {
    "dataset": "time_only_column",
@@ -4835,7 +4835,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for times: one row = one record.",
-   "seconds": 0.08806209199997284
+   "seconds": 0.060919376999663655
   },
   {
    "dataset": "time_only_column",
@@ -4844,7 +4844,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for times: one row = one record.",
-   "seconds": 0.07172108400004618
+   "seconds": 0.0646500420002667
   },
   {
    "dataset": "time_only_column",
@@ -4853,7 +4853,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for times: one row = one record.",
-   "seconds": 0.06840982100015935
+   "seconds": 0.06058110100002523
   },
   {
    "dataset": "time_only_column",
@@ -4862,7 +4862,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for times: one row = one record.",
-   "seconds": 0.07702615500011234
+   "seconds": 0.06689721000020654
   },
   {
    "dataset": "time_only_column",
@@ -4871,7 +4871,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for times: one row = one record.",
-   "seconds": 0.07476221100000657
+   "seconds": 0.06638609299989184
   },
   {
    "dataset": "time_only_column",
@@ -4880,7 +4880,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for times: one row = one record.",
-   "seconds": 0.07303603800005476
+   "seconds": 0.06750235199979215
   },
   {
    "dataset": "time_only_column",
@@ -4889,7 +4889,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for times: one row = one record.",
-   "seconds": 0.06973844999993162
+   "seconds": 0.061190263999833405
   },
   {
    "dataset": "time_only_column",
@@ -4898,7 +4898,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for times: one row = one record.",
-   "seconds": 0.0731609380000009
+   "seconds": 0.06365412400009518
   },
   {
    "dataset": "time_only_column",
@@ -4907,7 +4907,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for times: one row = one record.",
-   "seconds": 0.06862656499993136
+   "seconds": 0.06482274499967389
   },
   {
    "dataset": "time_only_column",
@@ -4916,7 +4916,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for times: one row = one record.",
-   "seconds": 0.07389445199987676
+   "seconds": 0.06693093800004135
   },
   {
    "dataset": "time_only_column",
@@ -4925,7 +4925,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for times: one row = one record.",
-   "seconds": 0.09809993700014275
+   "seconds": 0.061718152000139526
   },
   {
    "dataset": "time_only_column",
@@ -4934,7 +4934,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for times: one row = one record.",
-   "seconds": 0.07133533699993677
+   "seconds": 0.06441683100001683
   },
   {
    "dataset": "time_only_column",
@@ -4943,7 +4943,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for times: one row = one record.",
-   "seconds": 0.07348989499996605
+   "seconds": 0.07104462500001318
   },
   {
    "dataset": "time_only_column",
@@ -4952,7 +4952,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for times: one row = one record.",
-   "seconds": 0.07404833900000085
+   "seconds": 0.05996934799986775
   },
   {
    "dataset": "time_only_column",
@@ -4961,7 +4961,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for times: one row = one record.",
-   "seconds": 0.15360131399984311
+   "seconds": 0.12615549899965117
   },
   {
    "dataset": "time_only_column",
@@ -4970,7 +4970,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for times: one row = one record.",
-   "seconds": 0.248524598999893
+   "seconds": 0.19456087300022773
   },
   {
    "dataset": "time_only_column",
@@ -4979,7 +4979,7 @@
    "outcome": "OK",
    "reason": "",
    "detail": "Under contract v1 for times: one row = one record.",
-   "seconds": 0.18486694199987141
+   "seconds": 0.13287988899992342
   },
   {
    "dataset": "time_only_column",
@@ -4987,8 +4987,8 @@
    "call": "build_report",
    "outcome": "OK",
    "reason": "",
-   "detail": "Report written: /home/user/analytics-agent/workspace/ws_026b1908802e/reports/times_20260924-143655.md",
-   "seconds": 0.057295866000004025
+   "detail": "Report written: /home/user/analytics-agent/workspace/ws_c2d25c1a3dd7/reports/times_20260925-072244.md",
+   "seconds": 0.0338646959999096
   }
  ]
 }

@@ -7171,3 +7171,24 @@ phrases are exempted and "not possible" is a hedge; checked on eight written sen
 found one more fault -- the hedge "may" matched the month "May" -- fixed (case-sensitive). 17.5% ->
 0.0%; end-to-end 92.45 -> 93.33. Scores are recomputed from stored answers for every provider, so
 Groq, when it runs, meets the same rubric.
+
+## The merge of main's Cleanup Steps 8-16 into Phase 14 Step 14, 25/09/2026
+
+P14-D86. MERGED, BOTH SIDES KEPT. The branches had parted at e494da6; 12 files conflicted. Main's
+rules were adopted where the two disagreed on policy -- a zero-padded code is offered as no
+number at all (RF-O5), an id whose rows share one moment is not a person to retain -- and Phase
+14's conversions run ahead of main's currency reading, which alone read '12,5' as 125. Main was
+fast-forwarded to the merge (13a83c2 -> 2894f9f); nothing on it was rewritten.
+
+P14-D87. D17: A LONG CALENDAR DREW A LABEL PER PERIOD. Main's rule that a chart keeps its empty
+periods gave the stress matrix's extreme_dates (1800 and 2999 among ordinary dates) 14,400 monthly
+slots and a tick for each: the line chart went from 0.28 s to 60.76 s (SUSPECT, SLOW), measured
+98.8 s on a reproduction, the profile almost all matplotlib laying out labels. At most 24
+labelled ticks now, evenly spaced, first and last kept; the slots stay. 98.8 -> 0.59 s, still
+"14 of 14,400 point(s) drawn". tests/test_domain_benchmark_defects.py::test_d17.
+
+MEASURED VALIDATION, 25/09/2026, merged tree. Engine 2105 passed; phases 8-12 55/0/3, 0/0/1,
+0/0/1, 26/0/0, 36/0/0; eval 76/76; UI 50; scenario 30/30. Stress matrix, all four rounds, 4,335
+records, 0 crashes, against the pre-merge baseline: 3 records changed, each a merged rule
+(leading_zero_ids gets no numeric conversion; single_day's cohort_retention and repeat_behaviour
+refused), and extreme_dates' SUSPECT gone with D17. The stress files are the new baseline.

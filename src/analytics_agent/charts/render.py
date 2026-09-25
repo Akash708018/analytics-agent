@@ -377,8 +377,9 @@ def _draw(ax, kind: str, extract: Extract) -> int:
         image = ax.imshow(grid, aspect="auto")
         ax.set_yticks(_positions(len(series)))
         ax.set_yticklabels([s.name for s in series])
-        ax.set_xticks(_positions(width))
-        ax.set_xticklabels(extract.x[:width], rotation=45, ha="right")
+        ticks, names = _tick_subset(_positions(width), list(extract.x[:width]))
+        ax.set_xticks(ticks)
+        ax.set_xticklabels(names, rotation=45, ha="right")
         ax.figure.colorbar(image, ax=ax)
         return sum(len(s.present) for s in series)
 
@@ -459,10 +460,29 @@ def _draw(ax, kind: str, extract: Extract) -> int:
     else:  # pragma: no cover -- render() checks the name before this is reached
         raise ChartRefused(f"{kind!r} is not a chart this engine draws.")
 
+    at, labels = _tick_subset(list(at), list(labels))
     ax.set_xticks(at)
     ax.set_xticklabels(labels, rotation=45 if any(len(s) > 4 for s in labels) else 0,
                        ha="right" if any(len(s) > 4 for s in labels) else "center")
     return drawn
+
+
+MAX_TICKS = 24
+
+
+def _tick_subset(at: list[float], labels: list[str]) -> tuple[list[float], list[str]]:
+    """At most MAX_TICKS labelled ticks, evenly spaced, the first and last always among them.
+
+    Keeping every empty period (Cleanup Step 9) gave a trend over 1800-2999 14,400 monthly slots,
+    and a tick and label for each: 98.8 s to draw 14 points, almost all of it matplotlib laying
+    out labels no one could read (stress matrix, extreme_dates, after the merge of 25/09/2026).
+    The slots stay; only their labels thin out.
+    """
+    n = len(at)
+    if n <= MAX_TICKS:
+        return list(at), list(labels)
+    keep = sorted({round(i * (n - 1) / (MAX_TICKS - 1)) for i in range(MAX_TICKS)})
+    return [at[i] for i in keep], [labels[i] for i in keep]
 
 
 def empty_slots(extract: Extract) -> list[str]:

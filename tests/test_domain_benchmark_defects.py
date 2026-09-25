@@ -338,3 +338,28 @@ def test_d15_a_plan_proposed_twice_quotes_the_same_examples(tmp_path, ws):
     body = [t.split("NEXT STEP", 1)[0] for t in texts]
     assert "DROP_DUPLICATE_ROWS" in body[0] and "NORMALISE_CASE" in body[0], body[0][:800]
     assert body[0] == body[1]
+
+
+def test_d17_a_long_calendar_is_labelled_sparsely_and_drawn_fast(tmp_path, ws):
+    """Keeping every empty period gave 1800-2999 a tick per month: 14,400 labels, 98.8 s to draw
+    14 points (stress matrix after the merge of 25/09/2026). The slots stay; the labels thin."""
+    import time
+
+    from analytics_agent.charts import render
+    at = [float(i) for i in range(14_400)]
+    ticks, names = render._tick_subset(at, [f"p{i}" for i in range(14_400)])
+    assert len(ticks) <= render.MAX_TICKS and ticks[0] == 0.0 and ticks[-1] == 14_399.0
+    assert names[0] == "p0" and names[-1] == "p14399"
+    assert render._tick_subset([0.0, 1.0], ["a", "b"]) == ([0.0, 1.0], ["a", "b"])
+
+    rows = [f"r{i},{'1800-03-05' if i == 0 else '2999-11-20' if i == 1 else f'2024-{1 + i % 12:02d}-05'},"
+            f"{i + 1}" for i in range(60)]
+    _load(tmp_path, ws, "ex", "id,d,v", rows)
+    _contract(ws, "ex", grain="row", primary_key=["id"], date_column="d", measures=["v"],
+              dimensions=[], aggregations={"v": "sum"}, measure_definitions={"v": "v"},
+              analysis_window_start="1800-01-01", analysis_window_end="2999-12-31")
+    t0 = time.perf_counter()
+    out = server.render_chart(dataset_name="ex", analysis_type="trend", chart="line",
+                              measure="v", grain="month", workspace_id=ws)
+    assert "of 14,400 point(s) drawn" in out, out[:400]
+    assert time.perf_counter() - t0 < 15, "a long calendar must not take a minute to draw"
