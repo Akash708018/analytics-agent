@@ -1,4 +1,540 @@
 {
- "gemini": [],
+ "gemini": [
+  {
+   "id": "FIN01",
+   "calls": [
+    {
+     "analysis": "top_n",
+     "params": {
+      "dimension": "branch",
+      "measure": "revenue",
+      "n": 5
+     },
+     "status": "OK",
+     "seconds": 0.065,
+     "result_head": "Under contract v1 for financial: one row = one financial record.\n\n5 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/llm_financial/results/top_n_20260925-051302.csv\nfrom dataset   financial\ncreated        2026-09-25 05:13:02\n\nWhat this shows:\n  - 9,394 of 10,000 row(s) analysed. 4"
+    }
+   ]
+  },
+  {
+   "id": "FIN04",
+   "calls": [
+    {
+     "analysis": "growth_decomposition",
+     "params": {
+      "measure": "revenue",
+      "dimension": "payment_method",
+      "period": "2024-12",
+      "baseline": "2024-11",
+      "grain": "month"
+     },
+     "status": "OK",
+     "seconds": 0.089,
+     "result_head": "Under contract v1 for financial: one row = one financial record.\n\n6 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/llm_financial/results/growth_decomposition_20260925-051320.csv\nfrom dataset   financial\ncreated        2026-09-25 05:13:20\n\nWhat this shows:\n  - 9,394 of 10,000 row"
+    }
+   ]
+  },
+  {
+   "id": "FIN08",
+   "calls": [
+    {
+     "analysis": "changepoint",
+     "params": {
+      "measure": "profit",
+      "grain": "month"
+     },
+     "status": "OK",
+     "seconds": 0.076,
+     "result_head": "Under contract v1 for financial: one row = one financial record.\n\n19 rows x 6 columns, written to\n  /home/user/analytics-agent/workspace/llm_financial/results/changepoint_20260925-051339.csv\nfrom dataset   financial\ncreated        2026-09-25 05:13:39\n\nWhat this shows:\n  - 9,394 of 10,000 row(s) anal"
+    },
+    {
+     "analysis": "growth_decomposition",
+     "params": {
+      "measure": "profit",
+      "dimension": "category",
+      "period": "2024-Q4",
+      "baseline": "2024-Q3",
+      "grain": "quarter"
+     },
+     "status": "OK",
+     "seconds": 0.093,
+     "result_head": "Under contract v1 for financial: one row = one financial record.\n\n13 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/llm_financial/results/growth_decomposition_20260925-051345.csv\nfrom dataset   financial\ncreated        2026-09-25 05:13:45\n\nWhat this shows:\n  - 9,394 of 10,000 ro"
+    },
+    {
+     "analysis": "seasonality",
+     "params": {
+      "measure": "profit",
+      "grain": "month"
+     },
+     "status": "OK",
+     "seconds": 0.067,
+     "result_head": "Under contract v1 for financial: one row = one financial record.\n\n12 rows x 6 columns, written to\n  /home/user/analytics-agent/workspace/llm_financial/results/seasonality_20260925-051350.csv\nfrom dataset   financial\ncreated        2026-09-25 05:13:50\n\nWhat this shows:\n  - 9,394 of 10,000 row(s) anal"
+    }
+   ]
+  },
+  {
+   "id": "FIN11",
+   "calls": []
+  },
+  {
+   "id": "HR01",
+   "calls": [
+    {
+     "analysis": "top_n",
+     "params": {
+      "dimension": "department",
+      "measure": "attrition_flag",
+      "n": 5
+     },
+     "status": "REFUSED",
+     "seconds": 0.04,
+     "result_head": "BLOCKED: top_n cannot answer that under this contract.\nWHY: 'attrition_flag' is not a declared measure of hr. Declared: age, attendance_rate, bonus, overtime_hours, performance_score, promotion_count, salary, tenure, training_hours, years_experience.\nCURRENT STATE: contract v1 for hr\nNEXT STEP: call"
+    },
+    {
+     "analysis": "group_compare",
+     "params": {
+      "dimension": "department",
+      "measure": "tenure"
+     },
+     "status": "OK",
+     "seconds": 0.062,
+     "result_head": "Under contract v1 for hr: one row = one hr record.\n\n12 rows x 9 columns, written to\n  /home/user/analytics-agent/workspace/llm_hr/results/group_compare_20260925-051427.csv\nfrom dataset   hr\ncreated        2026-09-25 05:14:27\n\nWhat this shows:\n  - 7,885 of 10,000 row(s) analysed. 2,069 outside 2015-0"
+    },
+    {
+     "analysis": "frequency",
+     "params": {
+      "column": "attrition_flag"
+     },
+     "status": "OK",
+     "seconds": 0.055,
+     "result_head": "Under contract v1 for hr: one row = one hr record.\n\n2 rows x 3 columns, written to\n  /home/user/analytics-agent/workspace/llm_hr/results/frequency_20260925-051433.csv\nfrom dataset   hr\ncreated        2026-09-25 05:14:33\n\nWhat this shows:\n  - 7,885 of 10,000 row(s) analysed. 2,069 outside 2015-01-01 "
+    },
+    {
+     "analysis": "cross_tab",
+     "params": {
+      "columns": "attrition_flag",
+      "rows": "department"
+     },
+     "status": "OK",
+     "seconds": 0.076,
+     "result_head": "Under contract v1 for hr: one row = one hr record.\n\n12 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/llm_hr/results/cross_tab_20260925-051439.csv\nfrom dataset   hr\ncreated        2026-09-25 05:14:39\n\nWhat this shows:\n  - 7,885 of 10,000 row(s) analysed. 2,069 outside 2015-01-01"
+    }
+   ]
+  },
+  {
+   "id": "HR04",
+   "calls": [
+    {
+     "analysis": "group_compare",
+     "params": {
+      "dimension": "attrition_flag",
+      "measure": "performance_score"
+     },
+     "status": "OK",
+     "seconds": 0.068,
+     "result_head": "Under contract v1 for hr: one row = one hr record.\n\n3 rows x 9 columns, written to\n  /home/user/analytics-agent/workspace/llm_hr/results/group_compare_20260925-051458.csv\nfrom dataset   hr\ncreated        2026-09-25 05:14:58\n\nWhat this shows:\n  - 7,885 of 10,000 row(s) analysed. 2,069 outside 2015-01"
+    }
+   ]
+  },
+  {
+   "id": "HR08",
+   "calls": [
+    {
+     "analysis": "cross_tab",
+     "params": {
+      "rows": "location",
+      "columns": "attrition_flag"
+     },
+     "status": "OK",
+     "seconds": 0.069,
+     "result_head": "Under contract v1 for hr: one row = one hr record.\n\n10 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/llm_hr/results/cross_tab_20260925-051516.csv\nfrom dataset   hr\ncreated        2026-09-25 05:15:16\n\nWhat this shows:\n  - 7,885 of 10,000 row(s) analysed. 2,069 outside 2015-01-01"
+    },
+    {
+     "analysis": "hypothesis_test",
+     "params": {
+      "dimension": "location",
+      "second_dimension": "attrition_flag"
+     },
+     "status": "OK",
+     "seconds": 0.077,
+     "result_head": "Under contract v1 for hr: one row = one hr record.\n\n9 rows x 3 columns, written to\n  /home/user/analytics-agent/workspace/llm_hr/results/hypothesis_test_20260925-051522.csv\nfrom dataset   hr\ncreated        2026-09-25 05:15:22\n\nWhat this shows:\n  - 7,885 of 10,000 row(s) analysed. 2,069 outside 2015-"
+    },
+    {
+     "analysis": "effect_size",
+     "params": {
+      "dimension": "location",
+      "second_dimension": "attrition_flag"
+     },
+     "status": "OK",
+     "seconds": 0.061,
+     "result_head": "Under contract v1 for hr: one row = one hr record.\n\n9 rows x 3 columns, written to\n  /home/user/analytics-agent/workspace/llm_hr/results/effect_size_20260925-051528.csv\nfrom dataset   hr\ncreated        2026-09-25 05:15:28\n\nWhat this shows:\n  - 7,885 of 10,000 row(s) analysed. 2,069 outside 2015-01-0"
+    }
+   ]
+  },
+  {
+   "id": "HR11",
+   "calls": []
+  },
+  {
+   "id": "SAL01",
+   "calls": [
+    {
+     "analysis": "top_n",
+     "params": {
+      "dimension": "product_category",
+      "measure": "profit"
+     },
+     "status": "OK",
+     "seconds": 0.058,
+     "result_head": "Under contract v1 for sales: one row = one sales record.\n\n10 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/llm_sales/results/top_n_20260925-051558.csv\nfrom dataset   sales\ncreated        2026-09-25 05:15:58\n\nWhat this shows:\n  - 9,857 of 10,000 row(s) analysed. 91 outside 2023-"
+    }
+   ]
+  },
+  {
+   "id": "SAL04",
+   "calls": [
+    {
+     "analysis": "period_compare",
+     "params": {
+      "measure": "net_sales",
+      "period": "2024-Q4",
+      "baseline": "2024-Q3",
+      "grain": "quarter"
+     },
+     "status": "OK",
+     "seconds": 0.071,
+     "result_head": "Under contract v1 for sales: one row = one sales record.\n\n2 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/llm_sales/results/period_compare_20260925-051617.csv\nfrom dataset   sales\ncreated        2026-09-25 05:16:17\n\nWhat this shows:\n  - 9,857 of 10,000 row(s) analysed. 91 outsi"
+    }
+   ]
+  },
+  {
+   "id": "SAL08",
+   "calls": [
+    {
+     "analysis": "trend",
+     "params": {
+      "measure": "net_sales",
+      "grain": "quarter"
+     },
+     "status": "OK",
+     "seconds": 0.062,
+     "result_head": "Under contract v1 for sales: one row = one sales record.\n\n8 rows x 3 columns, written to\n  /home/user/analytics-agent/workspace/llm_sales/results/trend_20260925-051637.csv\nfrom dataset   sales\ncreated        2026-09-25 05:16:37\n\nWhat this shows:\n  - 9,857 of 10,000 row(s) analysed. 91 outside 2023-0"
+    },
+    {
+     "analysis": "seasonality",
+     "params": {
+      "measure": "net_sales",
+      "grain": "quarter"
+     },
+     "status": "OK",
+     "seconds": 0.089,
+     "result_head": "Under contract v1 for sales: one row = one sales record.\n\n4 rows x 6 columns, written to\n  /home/user/analytics-agent/workspace/llm_sales/results/seasonality_20260925-051643.csv\nfrom dataset   sales\ncreated        2026-09-25 05:16:43\n\nWhat this shows:\n  - 9,857 of 10,000 row(s) analysed. 91 outside "
+    },
+    {
+     "analysis": "growth_decomposition",
+     "params": {
+      "measure": "net_sales",
+      "dimension": "product_category",
+      "period": "2024-Q4",
+      "baseline": "2024-Q3",
+      "grain": "quarter"
+     },
+     "status": "OK",
+     "seconds": 0.071,
+     "result_head": "Under contract v1 for sales: one row = one sales record.\n\n10 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/llm_sales/results/growth_decomposition_20260925-051649.csv\nfrom dataset   sales\ncreated        2026-09-25 05:16:49\n\nWhat this shows:\n  - 9,857 of 10,000 row(s) analysed. 9"
+    },
+    {
+     "analysis": "growth_decomposition",
+     "params": {
+      "measure": "net_sales",
+      "dimension": "region",
+      "period": "2024-Q4",
+      "baseline": "2024-Q3",
+      "grain": "quarter"
+     },
+     "status": "OK",
+     "seconds": 0.064,
+     "result_head": "Under contract v1 for sales: one row = one sales record.\n\n6 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/llm_sales/results/growth_decomposition_20260925-051655.csv\nfrom dataset   sales\ncreated        2026-09-25 05:16:55\n\nWhat this shows:\n  - 9,857 of 10,000 row(s) analysed. 91"
+    },
+    {
+     "analysis": "growth_decomposition",
+     "params": {
+      "measure": "net_sales",
+      "dimension": "channel",
+      "period": "2024-Q4",
+      "baseline": "2024-Q3",
+      "grain": "quarter"
+     },
+     "status": "OK",
+     "seconds": 0.072,
+     "result_head": "Under contract v1 for sales: one row = one sales record.\n\n3 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/llm_sales/results/growth_decomposition_20260925-051701.csv\nfrom dataset   sales\ncreated        2026-09-25 05:17:01\n\nWhat this shows:\n  - 9,857 of 10,000 row(s) analysed. 91"
+    },
+    {
+     "analysis": "mix_shift",
+     "params": {
+      "measure": "net_sales",
+      "dimension": "product_category",
+      "period": "2024-Q4",
+      "baseline": "2024-Q3",
+      "grain": "quarter"
+     },
+     "status": "OK",
+     "seconds": 0.077,
+     "result_head": "Under contract v1 for sales: one row = one sales record.\n\n10 rows x 9 columns, written to\n  /home/user/analytics-agent/workspace/llm_sales/results/mix_shift_20260925-051707.csv\nfrom dataset   sales\ncreated        2026-09-25 05:17:07\n\nWhat this shows:\n  - 9,857 of 10,000 row(s) analysed. 91 outside 2"
+    },
+    {
+     "analysis": "changepoint",
+     "params": {
+      "measure": "net_sales",
+      "grain": "month"
+     },
+     "status": "OK",
+     "seconds": 0.06,
+     "result_head": "Under contract v1 for sales: one row = one sales record.\n\n19 rows x 6 columns, written to\n  /home/user/analytics-agent/workspace/llm_sales/results/changepoint_20260925-051717.csv\nfrom dataset   sales\ncreated        2026-09-25 05:17:17\n\nWhat this shows:\n  - 9,857 of 10,000 row(s) analysed. 91 outside"
+    }
+   ]
+  },
+  {
+   "id": "SAL11",
+   "calls": []
+  },
+  {
+   "id": "MAR01",
+   "calls": [
+    {
+     "analysis": "top_n",
+     "params": {
+      "dimension": "campaign_id",
+      "measure": "revenue",
+      "n": 5
+     },
+     "status": "OK",
+     "seconds": 0.056,
+     "result_head": "Under contract v1 for marketing: one row = one marketing record.\n\n5 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/llm_marketing/results/top_n_20260925-051748.csv\nfrom dataset   marketing\ncreated        2026-09-25 05:17:48\n\nWhat this shows:\n  - 9,845 of 10,000 row(s) analysed. 1"
+    }
+   ]
+  },
+  {
+   "id": "MAR04",
+   "calls": [
+    {
+     "analysis": "period_compare",
+     "params": {
+      "measure": "conversions",
+      "period": "2024-Q4",
+      "baseline": "2024-Q3",
+      "grain": "quarter"
+     },
+     "status": "OK",
+     "seconds": 0.066,
+     "result_head": "Under contract v1 for marketing: one row = one marketing record.\n\n2 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/llm_marketing/results/period_compare_20260925-051807.csv\nfrom dataset   marketing\ncreated        2026-09-25 05:18:07\n\nWhat this shows:\n  - 9,845 of 10,000 row(s) an"
+    },
+    {
+     "analysis": "growth_decomposition",
+     "params": {
+      "measure": "conversions",
+      "dimension": "channel",
+      "period": "2024-Q4",
+      "baseline": "2024-Q3",
+      "grain": "quarter"
+     },
+     "status": "OK",
+     "seconds": 0.086,
+     "result_head": "Under contract v1 for marketing: one row = one marketing record.\n\n7 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/llm_marketing/results/growth_decomposition_20260925-051812.csv\nfrom dataset   marketing\ncreated        2026-09-25 05:18:12\n\nWhat this shows:\n  - 9,845 of 10,000 row"
+    }
+   ]
+  },
+  {
+   "id": "MAR08",
+   "calls": [
+    {
+     "analysis": "growth_decomposition",
+     "params": {
+      "measure": "revenue",
+      "dimension": "channel",
+      "period": "2024",
+      "baseline": "2023",
+      "grain": "year"
+     },
+     "status": "OK",
+     "seconds": 0.08,
+     "result_head": "Under contract v1 for marketing: one row = one marketing record.\n\n7 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/llm_marketing/results/growth_decomposition_20260925-051832.csv\nfrom dataset   marketing\ncreated        2026-09-25 05:18:32\n\nWhat this shows:\n  - 9,845 of 10,000 row"
+    },
+    {
+     "analysis": "growth_decomposition",
+     "params": {
+      "measure": "spend",
+      "dimension": "channel",
+      "period": "2024",
+      "baseline": "2023",
+      "grain": "year"
+     },
+     "status": "OK",
+     "seconds": 0.073,
+     "result_head": "Under contract v1 for marketing: one row = one marketing record.\n\n7 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/llm_marketing/results/growth_decomposition_20260925-051837.csv\nfrom dataset   marketing\ncreated        2026-09-25 05:18:37\n\nWhat this shows:\n  - 9,845 of 10,000 row"
+    },
+    {
+     "analysis": "mix_shift",
+     "params": {
+      "measure": "roas",
+      "dimension": "channel",
+      "period": "2024",
+      "baseline": "2023",
+      "grain": "year"
+     },
+     "status": "OK",
+     "seconds": 0.078,
+     "result_head": "Under contract v1 for marketing: one row = one marketing record.\n\n7 rows x 9 columns, written to\n  /home/user/analytics-agent/workspace/llm_marketing/results/mix_shift_20260925-051843.csv\nfrom dataset   marketing\ncreated        2026-09-25 05:18:43\n\nWhat this shows:\n  - 9,845 of 10,000 row(s) analyse"
+    }
+   ]
+  },
+  {
+   "id": "MAR11",
+   "calls": []
+  },
+  {
+   "id": "CRM01",
+   "calls": [
+    {
+     "analysis": "top_n",
+     "params": {
+      "dimension": "segment",
+      "measure": "total_spend"
+     },
+     "status": "OK",
+     "seconds": 0.064,
+     "result_head": "Under contract v1 for crm: one row = one crm record.\n\n3 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/llm_crm/results/top_n_20260925-051914.csv\nfrom dataset   crm\ncreated        2026-09-25 05:19:14\n\nWhat this shows:\n  - 9,847 of 10,000 row(s) analysed. 97 outside 2022-01-01 to "
+    }
+   ]
+  },
+  {
+   "id": "CRM04",
+   "calls": [
+    {
+     "analysis": "group_compare",
+     "params": {
+      "dimension": "churn_flag",
+      "measure": "satisfaction_score"
+     },
+     "status": "OK",
+     "seconds": 0.071,
+     "result_head": "Under contract v1 for crm: one row = one crm record.\n\n3 rows x 9 columns, written to\n  /home/user/analytics-agent/workspace/llm_crm/results/group_compare_20260925-051933.csv\nfrom dataset   crm\ncreated        2026-09-25 05:19:33\n\nWhat this shows:\n  - 9,847 of 10,000 row(s) analysed. 97 outside 2022-0"
+    },
+    {
+     "analysis": "hypothesis_test",
+     "params": {
+      "dimension": "churn_flag",
+      "measure": "satisfaction_score"
+     },
+     "status": "OK",
+     "seconds": 0.06,
+     "result_head": "Under contract v1 for crm: one row = one crm record.\n\n3 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/llm_crm/results/hypothesis_test_20260925-051939.csv\nfrom dataset   crm\ncreated        2026-09-25 05:19:39\n\nWhat this shows:\n  - 9,847 of 10,000 row(s) analysed. 97 outside 2022"
+    },
+    {
+     "analysis": "effect_size",
+     "params": {
+      "dimension": "churn_flag",
+      "measure": "satisfaction_score"
+     },
+     "status": "OK",
+     "seconds": 0.06,
+     "result_head": "Under contract v1 for crm: one row = one crm record.\n\n3 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/llm_crm/results/effect_size_20260925-051944.csv\nfrom dataset   crm\ncreated        2026-09-25 05:19:44\n\nWhat this shows:\n  - 9,847 of 10,000 row(s) analysed. 97 outside 2022-01-"
+    }
+   ]
+  },
+  {
+   "id": "CRM08",
+   "calls": [
+    {
+     "analysis": "cohort_retention",
+     "params": {
+      "entity": "customer_id",
+      "period": "month"
+     },
+     "status": "OK",
+     "seconds": 0.078,
+     "result_head": "Under contract v1 for crm: one row = one crm record.\n\n36 rows x 33 columns, written to\n  /home/user/analytics-agent/workspace/llm_crm/results/cohort_retention_20260925-052004.csv\nfrom dataset   crm\ncreated        2026-09-25 05:20:04\n\nWhat this shows:\n  - 9,847 of 10,000 row(s) analysed. 97 outside 2"
+    },
+    {
+     "analysis": "changepoint",
+     "params": {
+      "measure": "orders_count",
+      "grain": "month"
+     },
+     "status": "OK",
+     "seconds": 0.082,
+     "result_head": "Under contract v1 for crm: one row = one crm record.\n\n31 rows x 6 columns, written to\n  /home/user/analytics-agent/workspace/llm_crm/results/changepoint_20260925-052010.csv\nfrom dataset   crm\ncreated        2026-09-25 05:20:10\n\nWhat this shows:\n  - 9,847 of 10,000 row(s) analysed. 97 outside 2022-01"
+    },
+    {
+     "analysis": "hypothesis_test",
+     "params": {
+      "dimension": "churn_flag"
+     },
+     "status": "REFUSED",
+     "seconds": 0.048,
+     "result_head": "BLOCKED: hypothesis_test cannot answer that under this contract.\nWHY: hypothesis_test compares one measure across the groups of a dimension, or one dimension against another. Pass exactly one of measure, second_dimension.\nCURRENT STATE: contract v1 for crm\nNEXT STEP: call propose_dataset_contract(da"
+    },
+    {
+     "analysis": "hypothesis_test",
+     "params": {
+      "dimension": "churn_flag",
+      "measure": "orders_count"
+     },
+     "status": "OK",
+     "seconds": 0.083,
+     "result_head": "Under contract v1 for crm: one row = one crm record.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/llm_crm/results/hypothesis_test_20260925-052021.csv\nfrom dataset   crm\ncreated        2026-09-25 05:20:21\n\nWhat this shows:\n  - 9,847 of 10,000 row(s) analysed. 97 outside 2022"
+    }
+   ]
+  },
+  {
+   "id": "CRM11",
+   "calls": []
+  },
+  {
+   "id": "ECO01",
+   "calls": [
+    {
+     "analysis": "top_n",
+     "params": {
+      "dimension": "category",
+      "measure": "payment_value"
+     },
+     "status": "OK",
+     "seconds": 0.049,
+     "result_head": "Under contract v1 for ecommerce: one row = one ecommerce record.\n\n9 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/llm_ecommerce/results/top_n_20260925-052052.csv\nfrom dataset   ecommerce\ncreated        2026-09-25 05:20:52\n\nWhat this shows:\n  - 9,825 of 10,000 row(s) analysed. 1"
+    }
+   ]
+  },
+  {
+   "id": "ECO04",
+   "calls": [
+    {
+     "analysis": "period_compare",
+     "params": {
+      "measure": "payment_value",
+      "period": "2024-12",
+      "baseline": "2024-11",
+      "grain": "month"
+     },
+     "status": "OK",
+     "seconds": 0.064,
+     "result_head": "Under contract v1 for ecommerce: one row = one ecommerce record.\n\n2 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/llm_ecommerce/results/period_compare_20260925-052111.csv\nfrom dataset   ecommerce\ncreated        2026-09-25 05:21:11\n\nWhat this shows:\n  - 9,825 of 10,000 row(s) an"
+    },
+    {
+     "analysis": "growth_decomposition",
+     "params": {
+      "measure": "payment_value",
+      "dimension": "traffic_source",
+      "period": "2024-12",
+      "baseline": "2024-11",
+      "grain": "month"
+     },
+     "status": "OK",
+     "seconds": 0.064,
+     "result_head": "Under contract v1 for ecommerce: one row = one ecommerce record.\n\n5 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/llm_ecommerce/results/growth_decomposition_20260925-052116.csv\nfrom dataset   ecommerce\ncreated        2026-09-25 05:21:16\n\nWhat this shows:\n  - 9,825 of 10,000 row"
+    }
+   ]
+  }
+ ],
  "groq": []
 }

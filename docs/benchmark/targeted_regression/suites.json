@@ -1,0 +1,16 @@
+{
+ "tree": "f123362 (plus scripts only since)",
+ "measured": "2026-09-25",
+ "engine": {"passed": 1996, "failed": 0, "command": "uv run pytest -q", "printed": "1996 passed in 108.29s (0:01:48)"},
+ "phase8": "55 passed, 0 failed, 3 skipped",
+ "phase9": "0 passed, 0 failed, 1 skipped",
+ "phase10": "0 passed, 0 failed, 1 skipped",
+ "phase11": "26 passed, 0 failed, 0 skipped",
+ "phase12": "36 passed, 0 failed, 0 skipped",
+ "eval": "SCORE: 76/76 (100%)",
+ "ui": "50 passed in 11.82s",
+ "scenario_matrix": "30 checks: CRASH 0, WRONG 0, OK 30",
+ "benchmark_and_defect_tests": "49 passed in 11.40s",
+ "stress_matrix": "4 rounds, 4,336 records, 0 changed against the committed records (last round: CRASH 0, WRONG 0, SUSPECT 0, REFUSED 23, OK 523)",
+ "summary_line": "phases 8-12 55/0/3, 0/0/1, 0/0/1, 26/0/0, 36/0/0 (Olist clauses skip without Postgres); eval 76/76; UI 50; scenario 30/30; stress 4,336 records unchanged"
+}

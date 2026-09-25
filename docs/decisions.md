@@ -6548,3 +6548,102 @@ CRASH 0, WRONG 10/3/8/0, 4,336 records identical; scenario matrix 30/30; benchma
   86a8dcbdec0257bb41fa6d7f9660a28b74090a0427e5083d0d017b55e88f981b  docs/benchmark/BENCHMARK.md
   e534e3db45dc77ab13d0042aab228979e35fff2748439af2555a1ec690f02395  docs/benchmark/results.md
   2451a4a147dbe2f13320d5b47681d1d46dd753a9dabeea13322598bdbf1f80d1  docs/benchmark/benchmark.json
+
+## Phase 14 Steps 13-14: the cross-domain benchmark, its fixes, and the targeted regression
+
+P14-D81. THE CROSS-DOMAIN BENCHMARK (Step 13, scripts/domain_benchmark/). Ten generated domains at
+1k, 100k and 1M rows, stress tiers of 2M, 5M and 10M for sales and logistics, every tool and all
+27 analyses, known answers, adversarial calls, dirty variants, concurrency, isolation and
+reproducibility. Every figure judged by an oracle that reads the CSV itself and imports nothing
+from analytics_agent. On the original code (2d3d52f): 12,763 calls, 6,159,473 checks, 0 incorrect
+after the oracle's own faults were fixed; 0 worker crashes, 18 exceptions -- all product defects
+(D1-D5, D12). Sales 10M 63/63 in 2,618 s, logistics 10M 61/61. Outputs:
+docs/benchmark/domain_benchmark/ (correctness.json keeps per-call totals and every non-passing
+check; the full 1.5 GB list stays outside the repository).
+
+P14-D82. SIXTEEN PRODUCT DEFECTS, ALL FIXED, EACH WITH A TEST THAT FAILS ON THE OLD CODE
+(tests/test_domain_benchmark_defects.py, D1-D16). D1 an engine type error (a text measure
+averaged) escaped as BinderException -- now ANALYSIS_NOT_POSSIBLE naming the column and its type.
+D2 zero-variance groups raised ZeroDivisionError -- now a stated "No test", no p-value made up.
+D3 a text column was accepted as a sum/mean/median measure -- refused at the contract. D4 threads
+first using one workspace raced to create a log table -- create_if_missing retries. D5 the rank
+tests' tie term overflowed INT64 at 2.2M ties -- HUGEINT, matching scipy at 6M rows. D6-D9 next
+steps that could not run (a duplicate-row key, one-measure correlation, a corrupt workbook, the
+only result file). D10 cohort chart replies over 8,000 characters. D11 Welch df as "2e+06", and
+an unstated narrow last bin. D12 threads sharing sql_guard's one parser connection. D13 a page
+cap applied without a word. D14 the dedupe rebuild reordered rows, so a DOUBLE total printed two
+ways in two identical runs. D15 cleaning samples chosen by LIMIT alone. D16 concurrent writers of
+one workspace could take one result, chart or report name -- a reply naming a file that held
+another dataset's rows (CRITICAL, found by H on the fixed code).
+
+P14-D83. TWO PERFORMANCE FIXES. P1: profile_column profiled the whole table; it now profiles its
+column -- median of four columns 4.75 -> 0.18 s at 1M (27.1x), 45.3 -> 1.30 s at 10M (34.8x),
+0 field differences against the whole-table path. A unique-id text column stays the slow one
+(11.7 s at 10M: its cast checks run over 10M distinct strings) -- recorded, not fixed. P2: the
+cleaning plan tried 16 date formats on every text value; an exact pre-screen (a date opens with
+whitespace, a sign, a digit or a month name -- fuzzed, 0 of 140,232 parseable values screened
+out) keeps them off ids and labels: 1M dirty 23.0 -> 14.5 s, clean 16.2 -> 7.8 s, date-query time
+8.9 -> 0.2 s, the same actions.
+
+P14-D84. THE TARGETED REGRESSION (Step 14, scripts/targeted_regression/). Each case runs in its
+own process against the original revision's src (a detached worktree) and the fixed one; the
+runner checks which tree it imported. Expectations are written in JUDGES before results are read.
+129 cases: 13 defects, 45 of 45 defect cases pass, 45 original failures reproduced, 0 controls
+changed. H on the fixed code: 506 calls OK, concurrency 44/44, isolation 20/20 and 10/10 x3. J:
+6/6. docs/benchmark/targeted_regression/.
+
+P14-D85. THE LLM BENCHMARK (scripts/llm_benchmark/). 120 planner questions (12 per domain, 17
+marketing), 40 end-to-end, 20 frozen research packets; gold annotations and the rubric written
+before any scored item; one rubric re-scores both providers from stored answers. The user chose
+Groq (the configured provider) over "Grok". Gemini: the configured alias's free tier gives 20
+requests a day (gemini-3.8-flash), so gemini-3.5-flash-lite -- the app's own ladder entry -- is
+pinned for every item. Groq: NOT_RUN_PROVIDER_UNAVAILABLE, api.groq.com denied by the
+environment's network policy. docs/benchmark/llm_benchmark/, docs/benchmark/
+targeted_regression_llm_summary.md.
+
+C107. THE ORACLE'S FAULTS WERE THE 28 "INCORRECT" CHECKS. Every one of the first judgement's
+failures was the harness: blanks judged as zeros, a NULL group's label, negative statistics,
+integer bins, a root-finder's tolerance, scientific df, a p-bound's full stop, scipy NaN at 1M
+df. Re-judged from preserved evidence, 0 incorrect. The run was stopped twice for harness speed
+(quadratic oracle loops) and memory (ru_maxrss inherited across fork+exec) and resumed from
+checkpoints.
+
+C108. SETUP THAT NEVER REACHED ITS TEST. G, H and J contracted on record_id without dropping the
+generated duplicate rows, so every later call met the contract gate: H and J measured refusals,
+J compared identical refusals and called them reproducible. Superseded in state.json with the
+reason, re-run with C001 first. Found only by reading the statuses, not the verdicts.
+
+C109. A FIX OF MINE REGRESSED, AND A CONTROL CAUGHT IT. D11 printed Welch df with one decimal:
+1.471 became 1.5. Four significant figures below 1,000 now. Controls exist for this.
+
+C110. TWO EQUAL FAILURES ARE NOT "UNCHANGED". PROFILE_CORRECTNESS held a read-only connection
+across the tool calls, so every call on both revisions raised, and a judge comparing texts
+passed it. Judges now require a real result; D4's judge compared replies that rightly name
+distinct files (D16), and the cleaning judge demanded randomly chosen examples word for word.
+Each fixed and re-run; the invalid files kept outside the repository.
+
+C111. PREDICTIONS THAT WERE WRONG. profile_column after: predicted 0.3-0.8 s at 1M and 3-6 s at
+10M; measured 0.18 and 1.30 (typical columns faster, a unique-id column slower). Cohort reply at
+100k: predicted under 3,000 characters; measured 3,738. Sum over one table: predicted to vary
+run to run; it did not -- the rebuild did (D14).
+
+MEASURED VALIDATION, 25/09/2026, tree f123362 (scripts only since). Engine 1947 -> 1996; UI 50;
+phase8 55/0/3, phase9 0/0/1, phase10 0/0/1, phase11 26/0/0, phase12 36/0/0; eval 76/76;
+scenario 30/30; stress 4,336 records unchanged; benchmark and defect tests 49; targeted
+regression 45/45 defect cases, 0 controls changed. Digests:
+  1b2db2f0ba180d4a0273a3948bfd1cab3a9e5d7543e4878f8e2efbb0247606db  src/analytics_agent/clean/sql.py
+  244db3920cde7d280eecb91a42e7da7171ea6d9a83151196d789e1ffd596a711  src/analytics_agent/clean/detect.py
+  0b9dd61959cef513899ef2c45acf899e99e46901877d886e13bf20c290854488  src/analytics_agent/util/results.py
+  2bf346a5bd1d56690ba6c030cd190515364704460469f4819ee12a59ab7b283f  src/analytics_agent/util/db.py
+  5d9c2884627954d9b7aa9feabc3729984f035b9a5c15e4a405cfe8e262768f82  src/analytics_agent/util/sql_guard.py
+  ea1563fed141ad5a099f4d50945621f2a7d1cd82f2f2b4a7601b95eb9abf17e3  src/analytics_agent/analysis/inferential.py
+  fb1e82ff79a5bb33098634fdeceb2d7a833cbd6726bceb7e175f22b1dafc8e35  src/analytics_agent/analysis/tools.py
+  37312eb92028e4f9fe8da3d08a84e6391c3f4189c5315ed000adf426d8431def  src/analytics_agent/contract/propose.py
+  5e5dead98c8a65c6e1c5264f376cdb5b2f91832e9c3f6b211ec165f700e5f148  src/analytics_agent/contract/compatibility.py
+  ee721a495529d172c08166e9f79b68833d822b50b9d19bc32a14c050854c3fd4  src/analytics_agent/charts/render.py
+  fffb6a85f8701e4dc72b2404fe50361a829aef81b914c281a675b440dcc3ac63  src/analytics_agent/report/assemble.py
+  712e2804ac6695fc45cfe64a7d2b5ce69dfc3bf9912b96a000826dd9be9fe1cc  src/analytics_agent/profile/table_profile.py
+  f6b45cfc9144f5192208cb7b1da2748d15e337483b6da6d11348d3fec2af0dcf  tests/test_domain_benchmark_defects.py
+  d7d05d0fefe2ec30848ab719c20601bc29fa38c18304d5d3cc31dbd755da0d49  tests/test_date_prescreen_facts.py
+  35f9c464f7a988f8274c44f44ab932c8e3638ad829d746edf0305d7dd81b89f3  docs/benchmark/targeted_regression/before_after.json
+  181bf90d3926014911d01a5dfad5bd328e14882ad12321c9263e168ff89eb67c  docs/benchmark/domain_benchmark/benchmark.json

@@ -251,6 +251,120 @@
  },
  {
   "provider": "gemini",
+  "track": "e2e",
+  "id": "FIN04",
+  "failures": [
+   "INTENT_ERROR",
+   "PREMATURE_STOP",
+   "UNSUPPORTED_CLAIM"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "e2e",
+  "id": "FIN08",
+  "failures": [
+   "CAUSAL_OVERREACH",
+   "UNSUPPORTED_CLAIM"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "e2e",
+  "id": "HR01",
+  "failures": [
+   "INVALID_TOOL",
+   "METRIC_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "e2e",
+  "id": "HR04",
+  "failures": [
+   "INTENT_ERROR",
+   "WRONG_FINAL_ANSWER"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "e2e",
+  "id": "HR08",
+  "failures": [
+   "METRIC_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "e2e",
+  "id": "SAL04",
+  "failures": [
+   "INTENT_ERROR",
+   "WRONG_FINAL_ANSWER"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "e2e",
+  "id": "SAL08",
+  "failures": [
+   "CAUSAL_OVERREACH"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "e2e",
+  "id": "MAR04",
+  "failures": [
+   "INTENT_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "e2e",
+  "id": "MAR08",
+  "failures": [
+   "CAUSAL_OVERREACH"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "e2e",
+  "id": "MAR11",
+  "failures": [
+   "CAUSAL_OVERREACH"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "e2e",
+  "id": "CRM04",
+  "failures": [
+   "CAUSAL_OVERREACH"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "e2e",
+  "id": "CRM08",
+  "failures": [
+   "DIMENSION_ERROR",
+   "INTENT_ERROR",
+   "INVALID_TOOL",
+   "METRIC_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "e2e",
+  "id": "ECO04",
+  "failures": [
+   "TIME_RANGE_ERROR",
+   "UNSUPPORTED_CLAIM"
+  ]
+ },
+ {
+  "provider": "gemini",
   "track": "research",
   "id": "R02",
   "failures": [

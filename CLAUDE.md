@@ -2,12 +2,17 @@
 
 MCP server exposing data loading, profiling, cleaning and contract-gated analysis
 to Claude Desktop. Phases 1-13 done, then Cleanup Steps 4-7; Phase 14
-(Track B) in progress, Steps 1-12 done (UI in ui/, on the fake backend or the engine with
+(Track B) in progress, Steps 1-14 done (UI in ui/, on the fake backend or the engine with
 ANALYTICS_UI_BACKEND=real;
 `uv run --group ui streamlit run ui/app.py`; its 50 tests: `uv run --group ui pytest ui/tests`;
 the behaviour matrix: `uv run python scripts/scenario_matrix.py` (30 checks);
 the benchmark: `uv run python scripts/benchmark.py` (1,932 ground-truth checks at 1k/100k/1M rows;
-its 14 negatives, P14-O13 to O26, closed at Step 12: 12 fixed, 2 by decision);
+its 14 negatives, P14-O13 to O26, closed at Step 12: 12 fixed, 2 by decision;
+the cross-domain benchmark: `uv run python scripts/domain_benchmark/run.py` (hours; checkpointed,
+data in /tmp/domain_benchmark_data; results docs/benchmark/domain_benchmark/);
+the targeted regression of its 16 defects on two revisions: `uv run python
+scripts/targeted_regression/run.py cases|hj|report` (needs the original tree as a worktree,
+TR_ORIGINAL_SRC); the LLM benchmark: docs/benchmark/llm_benchmark/RUN.md);
 the browser walk: `uv run --group ui --with playwright python scripts/browser_check.py`;
 the demo: docs/DEMO.md). P14-O1 and P14-O2 closed at Step 5
 (idle web workspaces expire; cleaning has a screen). The stress matrix's 14 bugs
@@ -28,11 +33,11 @@ Layout: `src/analytics_agent/{ingest,profile,clean,contract,validate,analysis,ch
 
 ## Verify before committing
 All six, every time. Run the suite BEFORE committing, not after (C76: two commits
-recorded a broken tree). Engine suite last measured 24/09/2026, at Phase 14 Step 12; phases 8-10
+recorded a broken tree). Engine suite last measured 24/09/2026, at Phase 14 Step 14 (25/09); phases 8-10
 at Step 4 (21/09) -- they need the Postgres `olist` source, and without it their Olist clauses
 skip (55/0/3, 0/0/1, 0/0/1 in a container lacking it):
 
-    uv run pytest -q                      # 1947 passed
+    uv run pytest -q                      # 1996 passed
     uv run python tests/test_phase8.py    # 99 passed, 0 failed, 2 skipped
     uv run python tests/test_phase9.py    # 19 passed, 0 failed, 0 skipped
     uv run python tests/test_phase10.py   # 35 passed, 0 failed, 1 skipped
@@ -46,7 +51,7 @@ because a suite that must be 100% cannot carry a score (P13-D1):
     uv run python eval/run_eval.py        # SCORE: 76/76 (100%), 40 questions
 
 The acceptance scripts are scripts, not pytest files -- `pytest` collects nothing
-from them, so 1947 excludes them. The three skips are each deliberate and
+from them, so 1996 excludes them. The three skips are each deliberate and
 recorded: ANALYSIS_RESULT_UNSOUND and the rendered MCP schema in phase8, the
 non-finite screen in phase10. A skip is an outstanding clause, not a passing one
 -- count them against this line, which is how C80 was found.
