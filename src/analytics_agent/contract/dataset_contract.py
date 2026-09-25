@@ -356,6 +356,14 @@ class DatasetContract(BaseModel):
     known_exclusions: list[Exclusion] = Field(default_factory=list)
     expectations: list[Expectation] = Field(default_factory=list)
     caveats: list[str] = Field(default_factory=list)
+    #: Counted by the engine from the table (contract/measured_caveats.py), at proposal and again
+    #: at confirmation -- never typed. `caveats` above are the person's (25/09/2026).
+    measured_caveats: list[str] = Field(default_factory=list)
+    #: Who decided each field: {"measures[unit_price].agg": {"status": "overruled", "llm": "sum",
+    #: "final": "none", "reason": ..., "model": ...}} -- the model, the data, both, or the person
+    #: (webapp/autofill.py, contract/llm_filter.py). An audit, not a definition: not tracked as a
+    #: change between versions.
+    provenance: dict[str, dict] = Field(default_factory=dict)
 
     missing_values: list[str] | None = Field(
         default=None,
@@ -625,8 +633,10 @@ class DatasetContract(BaseModel):
         if self.expectations:
             lines += ["", "Rules every row must satisfy:"]
             lines += [f"  - {x.rule} -- {x.reason}" for x in self.expectations]
+        if self.measured_caveats:
+            lines += ["", "Measured by the engine:"] + [f"  - {c}" for c in self.measured_caveats]
         if self.caveats:
-            lines += ["", "Caveats:"] + [f"  - {c}" for c in self.caveats]
+            lines += ["", "Caveats (declared, not measured):"] + [f"  - {c}" for c in self.caveats]
         return "\n".join(lines)
 
     @model_validator(mode="after")
@@ -704,6 +714,8 @@ class DatasetContract(BaseModel):
             ],
             "expectations": [{"rule": x.rule, "reason": x.reason} for x in self.expectations],
             "caveats": list(self.caveats),
+            "measured_caveats": list(self.measured_caveats),
+            "provenance": {k: dict(v) for k, v in self.provenance.items()},
             "foreign_keys": [
                 {
                     "columns": list(fk.columns),

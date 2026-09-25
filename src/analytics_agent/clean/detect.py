@@ -361,6 +361,26 @@ def _date_conversion(con, table: str, column: str) -> tuple[str, str, str] | Non
     return to_type, expression, f"from the date formats it is written in{order}"
 
 
+def _more_dates(con, table: str, column: str, to_type: str | None
+                ) -> tuple[str, str, str] | None:
+    """The formats reading of a date column, when it reads more values than the plain cast.
+
+    proposed_type accepts a DATE cast that reads CONVERT_MIN_SHARE of a column and counts the
+    rest as lost. The retail fixture's delivery_date is 98.1% yyyy-mm-dd and 3,030 dd/mm/yyyy:
+    the plan offered the cast discarding all 3,030, while _date_conversion reads both formats
+    (recheck, 25/09/2026). None when the cast already reads as much, or the column is no date.
+    """
+    if to_type not in ("DATE", "TIMESTAMP"):
+        return None
+    dated = _date_conversion(con, table, column)
+    if dated is None:
+        return None
+    t, c = sql.ident(table), sql.ident(column)
+    plain = _scalar(con, f"SELECT count(*) FROM {t} WHERE TRY_CAST({c} AS {to_type}) IS NOT NULL")
+    formats = _scalar(con, f"SELECT count(*) FROM {t} WHERE ({dated[1]}) IS NOT NULL")
+    return dated if formats > plain else None
+
+
 def _action(
     con, *, action_id: str, kind: ActionKind, rendering: sql.Rendering,
     intent: str, column: str | None, loss_unit: str,
@@ -444,7 +464,8 @@ def detect(
         t, c = sql.ident(source), sql.ident(column)
 
         to_type = proposed_type(con, source, column)
-        if to_type:
+        dated = _more_dates(con, source, column, to_type)
+        if to_type and not dated:
             numeric = to_type in NUMERIC_TYPES
             lead = numeric and _scalar(
                 con, f"SELECT count(*) FROM {t} WHERE "
@@ -464,7 +485,7 @@ def detect(
             # percent signs, mixed date formats (P14-O10) -- first: they tell a decimal comma
             # from a thousands separator. Main's currency reading (Cleanup Step 12) stands behind
             # them; ahead of them it read '12,5' as 125 (found at the merge, 25/09/2026).
-            alternatives = alternative_conversion(con, source, column)
+            alternatives = [dated] if dated else alternative_conversion(con, source, column)
             for alt_type, expression, how in alternatives:
                 add(
                     ActionKind.CONVERT_TYPE,

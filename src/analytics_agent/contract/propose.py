@@ -71,6 +71,8 @@ from analytics_agent.contract.dataset_contract import (
     ForeignKey,
     Measure,
 )
+from analytics_agent.contract import caveat_check, measured_caveats
+from analytics_agent.contract import suggest as suggesting
 from analytics_agent.contract.evidence import (
     DatasetEvidence, _is_numeric, gather, suggest_role,
 )
@@ -94,6 +96,9 @@ class Proposal:
     evidence: DatasetEvidence
     key_verdict: KeyVerdict | None = None
     notes: list[str] = field(default_factory=list)
+    #: The engine's reading of how each measure combines (contract/suggest.py). Never applied:
+    #: shown beside the blank, with its reason, for a person to take or not.
+    suggestions: dict[str, suggesting.Suggestion] = field(default_factory=dict)
 
     @property
     def needs_answer(self) -> bool:
@@ -114,6 +119,25 @@ class Proposal:
         if self.notes:
             out += ["", "What the data showed:"]
             out += [f"  - {n}" for n in self.notes]
+
+        open_aggs = {m.name for m in self.contract.measures if m.agg is None}
+        shown = [s for s in self.suggestions.values() if s.measure in open_aggs]
+        have = {m.name for m in self.contract.measures}
+        rates = [s for s in self.suggestions.values() if s.column and s.measure not in have]
+        if rates:
+            out += ["", "Flags that could be rates (0/1 columns; nothing added):"]
+            out += [f'  - {s.measure}: {s.reason} Add measure_columns={{"{s.measure}": '
+                    f'"{s.column}"}}, aggregations={{"{s.measure}": "mean"}}.' for s in rates]
+        if shown:
+            out += ["", "How each open measure combines, as the engine reads it (nothing applied "
+                        "-- show these to the user; they confirm or correct):"]
+            out += [f"  - {s.to_text()}" for s in shown]
+            strong = [s for s in shown if s.strength == suggesting.STRONG and s.agg]
+            if strong:
+                aggs = {s.measure: s.agg for s in strong}
+                per = {s.measure: s.per for s in strong if s.per}
+                out.append(f"  The strong ones, as answers if the user agrees: aggregations={aggs}"
+                           + (f", measure_per={per}" if per else ""))
 
         if self.contract.unresolved:
             out += [
@@ -573,6 +597,11 @@ def propose_contract(
         if measures is not None
         else [c.name for c in ev.columns if roles[c.name] == "measure"]
     )
+    # A ratio or an alias answered without `measures` is still a measure: it was dropped, and the
+    # contract confirmed without it (found adding the ratio suggestion, 25/09/2026).
+    if measures is None:
+        measure_names += [n for n in [*(ratios or {}), *(measure_columns or {})]
+                          if n not in measure_names]
     # A repeating identifier is exactly what people group by -- seller_id,
     # customer_id, product_id. Excluding every identifier from the dimensions
     # left `status` as the only thing this table could be broken down by,
@@ -599,6 +628,10 @@ def propose_contract(
     aggs = dict(aggregations or {})
     built: list[Measure] = []
     types = {c.name: c.dtype for c in ev.columns}
+    suggested = suggesting.suggest(
+        con, dataset_name, ev,
+        [n for n in measure_names if n in types and n not in (ratios or {})
+         and n not in (measure_columns or {})], date_col)
     for name in measure_names:
         definition = definitions.get(name, "").strip()
         agg = aggs.get(name)
@@ -637,7 +670,17 @@ def propose_contract(
                 )
             questions.append(
                 f"What does {name} mean: {', and '.join(wanted)}?"
+                + _suggested_clause(suggested.get(name), agg)
             )
+        # A stated aggregation the engine reads otherwise, on strong evidence, is said -- not
+        # refused: the person may know better (a 'price' column that is a line total).
+        s = suggested.get(name)
+        if (agg is not None and s is not None and s.strength == suggesting.STRONG and s.agg
+                and agg not in (s.agg, "ratio") and not (s.agg == "none" and agg in ("mean",
+                                                                                   "median"))):
+            notes.append(f"{name} is stated as agg='{agg}', but the engine reads it as "
+                         f"'{s.agg}' ({s.rule}): {s.reason} Keep '{agg}' only if that reading "
+                         f"is wrong.")
 
     if not built:
         notes.append(
@@ -689,13 +732,33 @@ def propose_contract(
     )
 
     notes += _domain_notes(con, dataset_name, ev, contract.domains)
+    contract.measured_caveats = measured_caveats.measure(
+        con, dataset_name, ev, date_column=date_col, roles=roles)
+    # A caveat's number is printed beside every measured figure; one the table contradicts is
+    # said here, before it is confirmed (retail fixture, 25/09/2026: 3,470 twice, 3,471 and 3,473).
+    notes += caveat_check.notes(caveat_check.check_caveats(con, dataset_name, contract.caveats))
     notes += ev.notes
+    # A 0/1 column that is not a measure is offered as a rate beside it (rule F1): the flag stays
+    # a dimension to group by. Offered, not added.
+    for f in suggesting.flag_rates(ev, [m.name for m in built]):
+        if f.measure not in suggested and f.column not in key:
+            suggested[f.measure] = f
     return Proposal(
         contract=contract,
         evidence=ev,
         key_verdict=key_verdict,
         notes=notes,
+        suggestions=suggested,
     )
+
+
+def _suggested_clause(s: suggesting.Suggestion | None, agg: str | None) -> str:
+    if agg is not None or s is None:
+        return ""
+    if s.strength == suggesting.STRONG and s.agg:
+        per = f" per {' + '.join(s.per)}" if s.per else ""
+        return f" The engine suggests {s.agg}{per}: {s.reason}"
+    return f" {s.question()}"
 
 
 __all__ = ["Proposal", "propose_contract"]

@@ -26,6 +26,7 @@ import threading
 import time
 import unicodedata
 from collections import defaultdict
+from dataclasses import asdict
 from contextlib import contextmanager
 from pathlib import Path
 
@@ -49,10 +50,11 @@ from analytics_agent.util import db
 from analytics_agent.util.results import RESULTS_DIRNAME
 from analytics_agent.analysis import runs as analysis_runs
 
+from . import autofill
 from .contract import (
     ActionResult, AnalysisMenu, AnalysisParam, AnalysisRun, AnalysisSpec, Artifact, ChatTurn,
     CleaningProposal, CleaningStep, ColumnDraft, ContractColumn, ContractDraft, DatasetSummary,
-    GridPreview, IngestDraft, Limits, Refusal, UploadResult,
+    FieldSource, GridPreview, IngestDraft, Limits, MeasureSuggestion, Refusal, UploadResult,
 )
 
 UPLOADS_DIRNAME = "uploads"
@@ -62,6 +64,44 @@ _ARTIFACT_DIRS = {CHARTS_DIRNAME: "chart", REPORTS_DIRNAME: "report", RESULTS_DI
 _GRID_ROWS = 40  # rows of the sheet shown in the editor
 DEFAULT_TTL_HOURS = 72  # a web workspace unused this long is removed (P14-O1)
 SWEEP_EVERY = 3600  # seconds between sweeps triggered by new visitors
+
+
+_FIELD = re.compile(r"^measures\[(.+)\](?:\.(agg|per|definition))?$")
+
+
+def _value_at(answers: dict, path: str):
+    """One field of a form's answers by its path ('measures[fee].per'), normalised so a fill and
+    a person's answers compare equal when they say the same thing."""
+    if path == "analysis_window":
+        return [answers.get("analysis_window_start"), answers.get("analysis_window_end")]
+    if path in ("grain", "date_column"):
+        return answers.get(path) or None
+    if path == "primary_key":
+        return list(answers.get("primary_key") or [])
+    m = _FIELD.match(path)
+    if not m:
+        return None
+    name, part = m.group(1), m.group(2)
+    if part is None:
+        return name in (answers.get("measures") or [])
+    if part == "agg":
+        return (answers.get("aggregations") or {}).get(name)
+    if part == "per":
+        return list((answers.get("measure_per") or {}).get(name) or [])
+    return ((answers.get("measure_definitions") or {}).get(name) or "").strip() or None
+
+
+def _ready(filled, answers: dict) -> str:
+    """"Nothing in it is a guess" is false after a model's fill: say how many fields are its
+    alone (live walk, 25/09/2026)."""
+    if filled is None:
+        return "Ready to confirm: nothing in it is a guess."
+    alone = sum(1 for chk in filled.checks if chk.status == "llm_only"
+                and _value_at(answers, chk.path) == _value_at(
+                    RealBackend._answers_from_fill(filled), chk.path))
+    return (f"Ready to confirm. {alone} field(s) are the model's alone -- marked 'from the model' "
+            f"above: read those before you confirm." if alone else
+            "Ready to confirm: every field was checked by the data or given by you.")
 
 
 def redact(text: str) -> str:
@@ -388,26 +428,79 @@ class RealBackend:
             analysis_window=self._window(answers.get("analysis_window_start"),
                                          answers.get("analysis_window_end")),
             caveats=answers.get("caveats"),
+            measure_per=answers.get("measure_per") or None,
+            ratios=answers.get("ratios") or None,
+            measure_columns=answers.get("measure_columns") or None,
             loaded_at=getattr(record, "loaded_at", None) if record else None)
+
+    @staticmethod
+    def _answers_from_fill(filled) -> dict:
+        """contract/llm_filter.py's answers in the shape the form sends."""
+        a = dict(filled.answers)
+        window = a.pop("analysis_window", None)
+        a["analysis_window_start"] = window[0].isoformat() if window else None
+        a["analysis_window_end"] = window[1].isoformat() if window else None
+        return a
+
+    @staticmethod
+    def _sources(filled, answers: dict) -> dict[str, FieldSource]:
+        """Each filled field's verdict -- or `user`, where the answer now differs from the fill.
+        The person's change is the authority; what the model and the data said is kept beside it."""
+        if filled is None:
+            return {}
+        given = RealBackend._answers_from_fill(filled)
+        out: dict[str, FieldSource] = {}
+        for chk in filled.checks:
+            now, then = _value_at(answers, chk.path), _value_at(given, chk.path)
+            if now == then:
+                out[chk.path] = FieldSource(chk.status, chk.reason, chk.llm, chk.confidence,
+                                            chk.rule)
+            else:
+                out[chk.path] = FieldSource(
+                    "user", f"you changed it from {then!r}" + (
+                        f" (the model said {chk.llm!r}; {chk.status})" if chk.llm is not None
+                        else ""), chk.llm, chk.confidence, chk.rule)
+        return out
+
+    def refill_contract(self, workspace_id: str, dataset_name: str) -> None:
+        with self._workspace(workspace_id):
+            autofill.forget(workspace_id, dataset_name)
 
     def draft_contract(self, workspace_id, dataset_name, *, grain=None, primary_key=None,
                        date_column=None, measures=None, dimensions=None, aggregations=None,
                        measure_definitions=None, analysis_window_start=None,
-                       analysis_window_end=None, caveats=None) -> ContractDraft:
+                       analysis_window_end=None, caveats=None, measure_per=None,
+                       ratios=None, measure_columns=None) -> ContractDraft:
         answers = dict(grain=grain, primary_key=primary_key, date_column=date_column,
                        measures=measures, dimensions=dimensions, aggregations=aggregations,
                        measure_definitions=measure_definitions,
                        analysis_window_start=analysis_window_start,
-                       analysis_window_end=analysis_window_end, caveats=caveats)
+                       analysis_window_end=analysis_window_end, caveats=caveats,
+                       measure_per=measure_per, ratios=ratios, measure_columns=measure_columns)
         in_force = None
+        fill = None
         try:
             with self._workspace(workspace_id):
                 con = db.connect(workspace_id)
                 try:
                     proposal = None
-                    if all(v is None for v in answers.values()):
+                    fresh = all(v is None for v in answers.values())
+                    if fresh:
                         proposal, in_force = self._draft_in_force(con, dataset_name)
                     if proposal is None:
+                        record = db.get_dataset(con, dataset_name)
+                        loaded = getattr(record, "loaded_at", None) if record else None
+                        if fresh:
+                            # The model fills the form once per table; the data filters it
+                            # (decided with the user, 25/09/2026). A failure falls back to the
+                            # data's own suggestions, below.
+                            fill = autofill.fill(con, workspace_id, dataset_name,
+                                                 loaded_at=loaded)
+                            if fill.filled is not None:
+                                answers = self._answers_from_fill(fill.filled)
+                        elif autofill.kept(workspace_id, dataset_name):
+                            fill = autofill.fill(con, workspace_id, dataset_name,
+                                                 loaded_at=loaded, providers=[])
                         proposal = self._propose(con, dataset_name, **answers)
                 finally:
                     con.close()
@@ -446,10 +539,23 @@ class RealBackend:
             analysis_window_end=window.end.isoformat() if window else None,
             caveats=list(c.caveats), columns=columns, provisional=list(c.unresolved),
             questions=list(c.questions), evidence=list(proposal.notes),
+            suggestions={name: MeasureSuggestion(
+                agg=sg.agg, strength=sg.strength, reason=sg.reason, rule=sg.rule,
+                per=list(sg.per), question=sg.question(), ratio=sg.ratio)
+                for name, sg in proposal.suggestions.items()},
+            measure_per={m.name: list(m.per) for m in c.measures if m.per},
+            ratios={m.name: {"numerator": list(m.numerator), "denominator": list(m.denominator),
+                             "scale": m.scale} for m in c.measures if m.agg == "ratio"},
+            measured_caveats=list(c.measured_caveats),
+            measure_columns={m.name: m.column for m in c.measures
+                             if m.column and m.column != m.name},
+            sources=self._sources(fill.filled if fill else None, answers),
+            filled_by=fill.model if fill and fill.filled else "",
+            fill_note=fill.note if fill else "",
             message=("PROVISIONAL -- settle what is listed before confirming." if c.unresolved
                      else f"Contract v{in_force} is in force, as shown. Change a field and "
                           f"confirm to agree v{in_force + 1}." if in_force
-                     else "Ready to confirm: nothing in it is a guess."))
+                     else _ready(fill.filled if fill else None, answers)))
 
     def _draft_in_force(self, con, dataset_name: str):
         """The contract in force, drafted from its own fields: (proposal, version), or (None, None).
@@ -475,7 +581,13 @@ class RealBackend:
                 measure_definitions={m.name: m.definition for m in c.measures if m.definition},
                 analysis_window_start=window.start.isoformat() if window else None,
                 analysis_window_end=window.end.isoformat() if window else None,
-                caveats=list(c.caveats))
+                caveats=list(c.caveats),
+                measure_per={m.name: list(m.per) for m in c.measures if m.per},
+                ratios={m.name: {"numerator": list(m.numerator),
+                                 "denominator": list(m.denominator), "scale": m.scale}
+                        for m in c.measures if m.agg == "ratio"},
+                measure_columns={m.name: m.column for m in c.measures
+                                 if m.column and m.column != m.name})
         except (ContractRefused, ValueError):
             return None, None
         if proposal.contract.unresolved:
@@ -503,7 +615,9 @@ class RealBackend:
                         aggregations=draft.aggregations,
                         measure_definitions=draft.measure_definitions,
                         analysis_window_start=draft.analysis_window_start,
-                        analysis_window_end=draft.analysis_window_end, caveats=draft.caveats)
+                        analysis_window_end=draft.analysis_window_end, caveats=draft.caveats,
+                        measure_per=draft.measure_per, ratios=draft.ratios,
+                        measure_columns=draft.measure_columns)
                 except (ContractRefused, ValueError) as exc:
                     r = refusal_from_text(str(exc))
                     return ActionResult(ok=False, message=r.what, refusal=r)
@@ -517,6 +631,11 @@ class RealBackend:
                 # The export goes into the session's own workspace, not docs/contracts: that copy
                 # exists to version the canonical contract, and a browser session is not one --
                 # exporting there would dirty the repository with every visitor (P14-D19).
+                # Who decided each field travels with the contract: the model, the data, or the
+                # person -- how the model chose, countable later (scripts/autofill_report.py).
+                proposal.contract.provenance = {
+                    path: {**asdict(src), "model": draft.filled_by}
+                    for path, src in draft.sources.items()}
                 text = contract_tools.confirm(
                     con, proposal.contract.model_dump_json(),
                     export_root=workspace.workspace_dir(workspace_id) / "contracts",

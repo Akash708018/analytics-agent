@@ -453,3 +453,50 @@ def test_a_reload_shows_the_confirmed_contract_not_a_blank_form(monkeypatch):
         backend.get_backend.clear()
         workspace.reset(ws)
         workspace.workspace_dir(ws).rmdir()
+
+
+# --- the figure check under an answer (recheck, 25/09/2026) ---------------------------------------
+
+def _chat_turn(root: str, verified: bool) -> None:
+    import sys
+    sys.path.insert(0, root)
+    from analytics_agent.webapp.contract import ChatTurn
+    from ui.screens import chat
+    chat._turn(ChatTurn(reply="South margin 13.0%.", verification="1 of 1 figure(s) match"
+                        if verified else "Not in any tool reply this turn: 14.7%",
+                        verified=verified))
+
+
+def test_a_checked_answer_says_so_quietly_and_a_miss_is_a_warning():
+    ok = AppTest.from_function(_chat_turn, args=(str(ROOT), True), default_timeout=30).run()
+    assert not ok.exception and not ok.warning
+    assert any("1 of 1 figure(s) match" in c.value for c in ok.caption)
+    miss = AppTest.from_function(_chat_turn, args=(str(ROOT), False), default_timeout=30).run()
+    assert any("14.7%" in w.value for w in miss.warning)
+
+
+# --- the engine's suggestions on Contract (25/09/2026) -------------------------------------------
+
+def test_the_contract_screen_offers_strong_suggestions_and_fills_them_only_on_a_click():
+    at = screen("contract").run()
+    assert not at.exception, at.exception
+    lat = at.selectbox(key="c_agg_geolocation_geolocation_lat")
+    assert lat.value is None, "never filled by drafting"
+    assert any("a coordinate" in c.value for c in at.caption)
+    use = [b for b in at.button if b.label.startswith("Use the engine's")]
+    assert use and use[0].label == "Use the engine's 2 strong suggestion(s)"
+    use[0].click().run()
+    assert at.selectbox(key="c_agg_geolocation_geolocation_lat").value == "none"
+    assert at.selectbox(key="c_agg_geolocation_geolocation_lng").value == "none"
+
+
+def test_form_answers_carry_units_and_ratios():
+    from ui.screens.contract import form_answers
+    rows = [{"column": "fee", "role": "measure"}, {"column": "order_id", "role": "dimension"}]
+    got = form_answers(rows, "one line", None, None, "", {"fee": "sum"}, {"fee": "a fee"},
+                       per={"fee": ["order_id"]},
+                       ratios={"m_of_sums": {"numerator": ["a"], "denominator": ["b"],
+                                             "scale": 100.0, "definition": "a / b x 100"}})
+    assert got["measure_per"] == {"fee": ["order_id"]}
+    assert got["measures"] == ["fee", "m_of_sums"] and got["aggregations"]["m_of_sums"] == "ratio"
+    assert got["ratios"] == {"m_of_sums": {"numerator": ["a"], "denominator": ["b"], "scale": 100.0}}

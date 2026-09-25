@@ -315,7 +315,10 @@ def profile_column(
         dataset_name=dataset_name,
         column=col,
         top=top,
-        distinct_not_shown=max(0, col.evidence.distinct - len(top)),
+        # NULL is a row of the list and not a distinct value: rating's list read "7 of 6
+        # distinct" and hid one value too few (recheck, 25/09/2026).
+        distinct_not_shown=max(0, col.evidence.distinct
+                               - sum(1 for v in top if v.value is not None)),
         top_n=top_n,
     )
 
@@ -368,9 +371,10 @@ def render_column(detail: ColumnDetail) -> str:
             f"column has to say is below.",
         ]
     elif detail.top:
-        shown = len(detail.top)
+        shown = sum(1 for v in detail.top if v.value is not None)
+        nulls = " and (null)" if shown < len(detail.top) else ""
         out += ["", f"Most frequent value(s), {shown} of "
-                    f"{col.evidence.distinct:,} distinct:", ""]
+                    f"{col.evidence.distinct:,} distinct{nulls}:", ""]
         width = max(len(v.display()) for v in detail.top)
         for v in detail.top:
             out.append(

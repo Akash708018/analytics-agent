@@ -7,8 +7,13 @@ ANALYTICS_UI_BACKEND=fake (the default) runs every screen on in-memory data; =re
 
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
+
+# The web app is where a model fills a new dataset's contract form (webapp/autofill.py); tests
+# and scripts leave it off. ANALYTICS_AUTOFILL=off in the environment turns it off here too.
+os.environ.setdefault("ANALYTICS_AUTOFILL", "on")
 
 # `streamlit run ui/app.py` puts ui/ on the path, not the repository root; the ui package needs it.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))

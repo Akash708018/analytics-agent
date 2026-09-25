@@ -153,6 +153,39 @@ class ContractColumn:
 
 
 @dataclass(frozen=True)
+class MeasureSuggestion:
+    """How the engine reads one measure (contract/suggest.py): never applied by drafting.
+
+    `strength` is strong, likely or unsure. Only a strong one may be filled into the form, and
+    only by the person's click; a likely or unsure one comes with `question`. `ratio` is a ratio
+    of sums to ADD beside the column, as {name, numerator, denominator, scale, definition}.
+    """
+
+    agg: str | None
+    strength: str
+    reason: str
+    rule: str = ""
+    per: list[str] = field(default_factory=list)
+    question: str = ""
+    ratio: dict | None = None
+
+
+@dataclass(frozen=True)
+class FieldSource:
+    """Who decided one field of a drafted contract, and why (contract/llm_filter.py).
+
+    `status`: agree (the model and the data), llm_only (the data cannot check it), overruled (the
+    data replaced the model's choice, kept in `llm`), blocked, data (the data alone), or user.
+    """
+
+    status: str
+    reason: str = ""
+    llm: object = None
+    confidence: float | None = None
+    rule: str = ""
+
+
+@dataclass(frozen=True)
 class ContractDraft:
     """A Dataset Contract proposal, for the contract form. Nothing is stored by drafting.
 
@@ -178,6 +211,21 @@ class ContractDraft:
     evidence: list[str] = field(default_factory=list)  # "what the data showed"
     message: str = ""
     refusal: Refusal | None = None
+    #: One per measure the engine could read; see MeasureSuggestion (25/09/2026).
+    suggestions: dict[str, MeasureSuggestion] = field(default_factory=dict)
+    #: Measures counted once per unit ({"rep_monthly_salary": ["rep_id"]}) and ratios of sums
+    #: ({"margin_pct_of_sums": {"numerator": [...], "denominator": [...], "scale": 100}}).
+    measure_per: dict[str, list[str]] = field(default_factory=dict)
+    ratios: dict[str, dict] = field(default_factory=dict)
+    #: Caveats the engine counted from the table; every result carries them.
+    measured_caveats: list[str] = field(default_factory=list)
+    #: Helper measures reading another column ({"is_late_rate": "is_late"}).
+    measure_columns: dict[str, str] = field(default_factory=dict)
+    #: Field path -> who decided it, when a model filled the form ("measures[x].agg", "grain").
+    sources: dict[str, FieldSource] = field(default_factory=dict)
+    #: "gemini/gemini-2.5-flash" when a model filled it; `fill_note` says how it went or why not.
+    filled_by: str = ""
+    fill_note: str = ""
 
 
 @dataclass(frozen=True)
@@ -324,6 +372,10 @@ class ChatTurn:
     tool_calls: list[ToolCall] = field(default_factory=list)
     artifacts: list[Artifact] = field(default_factory=list)
     error: str | None = None
+    #: The reply's figures checked against the tool replies (webapp/verify.py): one line for the
+    #: person, and whether every figure was found. None where nothing was checked.
+    verification: str | None = None
+    verified: bool = True
 
 
 class Backend(Protocol):
@@ -372,8 +424,15 @@ class Backend(Protocol):
         analysis_window_start: str | None = None,
         analysis_window_end: str | None = None,
         caveats: list[str] | None = None,
+        measure_per: dict[str, list[str]] | None = None,
+        ratios: dict[str, dict] | None = None,
+        measure_columns: dict[str, str] | None = None,
     ) -> ContractDraft:
-        """Propose a contract, filling in what the data shows and what the person chose."""
+        """Propose a contract. With no answers and no contract in force, a model fills the form
+        and the data filters it; with answers, the person's are drafted and marked as theirs."""
+
+    def refill_contract(self, workspace_id: str, dataset_name: str) -> None:
+        """Forget the model's fill for this dataset, so the next draft asks it again."""
 
     def confirm_contract(self, workspace_id: str, draft: ContractDraft) -> ActionResult:
         """Store the contract. Refused while `draft.provisional` is non-empty."""
@@ -418,6 +477,8 @@ __all__ = [
     "ActionResult", "AnalysisMenu", "AnalysisParam", "AnalysisRun", "AnalysisSpec", "Artifact",
     "Backend", "ChatTurn", "CleaningProposal", "CleaningStep",
     "ColumnDraft", "ContractColumn",
-    "ContractDraft", "DatasetSummary", "GridPreview", "IngestDraft", "Limits", "Refusal",
+    "ContractDraft", "DatasetSummary", "FieldSource", "GridPreview", "IngestDraft", "Limits",
+    "MeasureSuggestion",
+    "Refusal",
     "ToolCall", "UploadResult",
 ]

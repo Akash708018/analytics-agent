@@ -53,6 +53,13 @@ from analytics_agent.profile import runs
 from analytics_agent.util import db
 
 
+#: The prefix on every caveat a person wrote into the contract, wherever a result prints it.
+#: webapp/verify.py reads it to tell a declared number from a measured one.
+DECLARED = "Declared in the contract, not measured: "
+#: The prefix on a caveat the engine counted when the contract was confirmed.
+MEASURED = "Measured when the contract was confirmed: "
+
+
 @dataclass
 class Gate:
     """A passed gate: the contract, and what has to be said about it."""
@@ -95,7 +102,10 @@ class Gate:
                 f'(propose_cleaning_plan(dataset_name="{name}")); a primary_key stated after '
                 f"that has every analysis check it."
             )
-        out.extend(self.contract.caveats)
+        # Marked as the person's statement: printed bare beside measured figures, a caveat's
+        # number was repeated as a finding (retail fixture, 25/09/2026).
+        out.extend(f"{MEASURED}{c}" for c in getattr(self.contract, "measured_caveats", []))
+        out.extend(f"{DECLARED}{c}" for c in self.contract.caveats)
         for e in self.contract.known_exclusions:
             count = f" ({e.row_count:,} rows)" if e.row_count is not None else ""
             out.append(f"Excluded: {e.rule}{count} -- {e.reason}.")

@@ -19,6 +19,7 @@ from analytics_agent.contract.refusals import reason_of
 
 from .contract import Artifact, ChatTurn, ToolCall
 from .llm import Call, Provider, ProviderError, ToolSpec, configured, convert_schema
+from .verify import Verification, verify
 
 #: Reading and analysis only. Excluded on purpose: tools taking a filesystem path (the server's
 #: disk, on a public host), SQL against configured databases, and every step a person must agree
@@ -56,6 +57,8 @@ only when the question asks about the data's quality or shape.
 - Charts appear to the person automatically under your answer. You cannot see them: describe a \
 chart only from the numbers its reply gives.
 - Carry every caveat a result prints -- a subset warning, a gap, excluded rows -- into your answer.
+- A caveat that begins "Declared in the contract, not measured" is the person's own note. Say \
+"the contract notes ..." when you repeat it; never list its numbers as something you found.
 - Add no unit or currency the contract does not state: a measure defined as "units x unit_price" \
 is a number, not dollars.
 - The app's screens are exactly: {screens}, and the sidebar's Reset. Name no other. \
@@ -211,7 +214,7 @@ def answer(workspace_id: str, history: list[dict], message: str, *,
             before = {a.path for a in list_artifacts()}
             calls = []
             try:
-                text = _turn(provider, workspace_id, history, message, lock, calls)
+                text, checked = _turn(provider, workspace_id, history, message, lock, calls)
             except ProviderError as exc:
                 failures.append(exc.summary)
                 more = getattr(provider, "has_another_model", lambda: False)()
@@ -223,7 +226,9 @@ def answer(workspace_id: str, history: list[dict], message: str, *,
                 return ChatTurn(reply="", tool_calls=calls,
                                 error=_failed(failures, _written(list_artifacts, at_start)))
             new = [a for a in list_artifacts() if a.path not in before]
-            return ChatTurn(reply=text, tool_calls=calls, artifacts=new)
+            return ChatTurn(reply=text, tool_calls=calls, artifacts=new,
+                            verification=checked.summary() if checked.checked else None,
+                            verified=checked.clean)
     return ChatTurn(reply="", tool_calls=calls,
                     error=_failed(failures, _written(list_artifacts, at_start)))
 
@@ -243,8 +248,11 @@ def _failed(failures: list[str], written: int = 0) -> str:
 
 
 def _turn(provider: Provider, workspace_id: str, history: list[dict], message: str,
-          lock: Callable[[], AbstractContextManager], calls: list[ToolCall]) -> str:
+          lock: Callable[[], AbstractContextManager], calls: list[ToolCall]
+          ) -> tuple[str, Verification]:
     session = provider.start(SYSTEM, history[-HISTORY_MESSAGES:], message, list(tool_specs()))
+    seen: list[str] = []  # the tool replies as the model read them, for the check
+    context = [message] + [m.get("content") or "" for m in history[-HISTORY_MESSAGES:]]
     for i in range(MAX_ROUNDS):
         # The last round offers no tools, so what was fetched is answered rather than dropped
         # (Cleanup Step 11: seven rounds held every figure, the eighth was a call, and the turn
@@ -252,7 +260,7 @@ def _turn(provider: Provider, workspace_id: str, history: list[dict], message: s
         final = i == MAX_ROUNDS - 1
         reply = session.step(final=final)
         if not reply.calls or (final and reply.text):
-            return reply.text
+            return _checked(session, reply.text, seen, context)
         if final:
             break
         results = []
@@ -262,11 +270,38 @@ def _turn(provider: Provider, workspace_id: str, history: list[dict], message: s
             calls.append(ToolCall(call.name, dict(call.args), result,
                                   refused=reason_of(result) is not None
                                   or result.lstrip().startswith("BLOCKED")))
-            results.append((call, _trim(_with_screen_notes(result))))
+            shown = _trim(_with_screen_notes(result))
+            seen.append(shown)
+            results.append((call, shown))
         session.add_results(results)
-    return (reply.text + "\n\n" if reply.text else "") + (
+    text = (reply.text + "\n\n" if reply.text else "") + (
         f"I stopped after {MAX_ROUNDS} rounds of tool calls without a final answer. What I ran is "
         f"listed below; ask again more narrowly.")
+    return text, verify(text, seen, context)
+
+
+def _checked(session, text: str, seen: list[str], context: list[str]) -> tuple[str, Verification]:
+    """The answer, its figures checked against the replies the model read (webapp/verify.py).
+
+    A figure no reply holds, or one only a declared caveat holds, is sent back once with the list,
+    and the rewrite is checked again; whichever is shown carries its own check. One round, never a
+    loop: a free-tier quota pays for it, and a second miss is shown to the person as it is.
+    """
+    checked = verify(text, seen, context)
+    add_user = getattr(session, "add_user", None)
+    if checked.clean or not seen or add_user is None:
+        return text, checked
+    try:
+        add_user(checked.correction())
+        again = session.step(final=True).text
+    except ProviderError:
+        return text, checked
+    if not again.strip():
+        return text, checked
+    rechecked = verify(again, seen, context)
+    worse = len(rechecked.unsupported) + len(rechecked.declared) > (
+        len(checked.unsupported) + len(checked.declared))
+    return (text, checked) if worse else (again, rechecked)
 
 
 __all__ = ["ALLOWED", "MAX_ROUNDS", "SCREENS", "SYSTEM", "answer", "run_tool", "tool_specs"]

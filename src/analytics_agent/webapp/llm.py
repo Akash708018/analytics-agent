@@ -83,6 +83,8 @@ LAST_ROUND = ("[system] This is your last round: no tool can be called. Answer t
 class Session(Protocol):
     def step(self, final: bool = False) -> Reply: ...
     def add_results(self, results: list[tuple[Call, str]]) -> None: ...
+    #: A message from the app, not the person: the figure check's correction (webapp/verify.py).
+    def add_user(self, text: str) -> None: ...
 
 
 class Provider(Protocol):
@@ -247,7 +249,8 @@ def _classify(provider: str, code: int, body: str) -> ProviderError:
                          summary=f"HTTP {code}: {first}")
 
 
-def _request(provider: str, url: str, headers: dict, body: dict | None = None) -> dict:
+def _request(provider: str, url: str, headers: dict, body: dict | None = None, *,
+             max_wait: float = MAX_WAIT_S) -> dict:
     data = None if body is None else json.dumps(body).encode("utf-8")
     for attempt in range(ATTEMPTS):
         req = urllib.request.Request(url, data=data, headers={
@@ -261,7 +264,7 @@ def _request(provider: str, url: str, headers: dict, body: dict | None = None) -
             busy = exc.code in (429, 500, 502, 503, 504) and error.kind != "daily_quota"
             if busy and attempt + 1 < ATTEMPTS:
                 wait = _wait_for(exc, detail, attempt)
-                if wait <= MAX_WAIT_S:
+                if wait <= max_wait:
                     _sleep(wait + 0.25)
                     continue
             raise error from None
@@ -334,6 +337,9 @@ class GeminiSession:
                 response["id"] = call.id
             parts.append({"functionResponse": response})
         self._body["contents"].append({"role": "user", "parts": parts})
+
+    def add_user(self, text: str) -> None:
+        self._body["contents"].append({"role": "user", "parts": [{"text": text}]})
 
 
 #: gemini-<major>[.<minor>]-flash exactly: no lite, image, tts, preview or other variant.
@@ -416,11 +422,11 @@ class Gemini:
     def has_another_model(self) -> bool:
         return any(self._spent.get(n) != self._today() for n in self.ladder())
 
-    def post(self, body: dict, model: str | None = None) -> dict:
+    def post(self, body: dict, model: str | None = None, *, max_wait: float = MAX_WAIT_S) -> dict:
         model = model or self.model()
         try:
             return _request("gemini", f"{GEMINI_URL}/models/{model}:generateContent",
-                            {"x-goog-api-key": self._key()}, body)
+                            {"x-goog-api-key": self._key()}, body, max_wait=max_wait)
         except ProviderError as exc:
             if exc.kind == "daily_quota":
                 # The alias has no quota of its own; the error names the model serving it, and
@@ -428,6 +434,17 @@ class Gemini:
                 for spent in {model, exc.model} - {None}:
                     self._spent[spent] = self._today()
             raise
+
+    def complete(self, system: str, prompt: str, *, max_wait: float) -> tuple[str, str]:
+        """One request, no tools, JSON out: (text, model)."""
+        model = self.model()
+        data = self.post({
+            "systemInstruction": {"parts": [{"text": system}]},
+            "contents": [{"role": "user", "parts": [{"text": prompt}]}],
+            "generationConfig": {"responseMimeType": "application/json", "temperature": 0},
+        }, model, max_wait=max_wait)
+        parts = ((data.get("candidates") or [{}])[0].get("content") or {}).get("parts") or []
+        return "".join(p.get("text", "") for p in parts if not p.get("thought")), model
 
     def start(self, system, history, message, tools) -> GeminiSession:
         return GeminiSession(self, system, history, message, tools)
@@ -494,6 +511,9 @@ class GroqSession:
         for call, text in results:
             self._messages.append({"role": "tool", "tool_call_id": call.id, "content": text})
 
+    def add_user(self, text: str) -> None:
+        self._messages.append({"role": "user", "content": text})
+
 
 class Groq:
     name = "groq"
@@ -524,16 +544,72 @@ class Groq:
         raise ProviderError("groq", f"none of {', '.join(self.PREFERENCE)} is offered; set "
                             "GROQ_MODEL to a tool-calling model", retryable=False)
 
-    def post(self, body: dict) -> dict:
+    def post(self, body: dict, *, max_wait: float = MAX_WAIT_S) -> dict:
         return _request("groq", f"{GROQ_URL}/chat/completions",
                         {"Authorization": f"Bearer {self._key()}"},
-                        {"model": self.model(), **body})
+                        {"model": self.model(), **body}, max_wait=max_wait)
+
+    def complete(self, system: str, prompt: str, *, max_wait: float) -> tuple[str, str]:
+        """One request, no tools, JSON out: (text, model)."""
+        data = self.post({"messages": [{"role": "system", "content": system},
+                                       {"role": "user", "content": prompt}],
+                          "response_format": {"type": "json_object"}, "temperature": 0},
+                         max_wait=max_wait)
+        try:
+            return data["choices"][0]["message"].get("content") or "", self.model()
+        except (KeyError, IndexError):
+            raise ProviderError("groq", "no message returned", retryable=False) from None
 
     def start(self, system, history, message, tools) -> GroqSession:
         return GroqSession(self, system, history, message, tools)
 
 
 PROVIDERS = {"gemini": Gemini, "groq": Groq}
+
+#: What a one-shot request waits on a rate limit before trying the next provider. The contract
+#: form waits on it; the Ask screen once sat seven minutes on 60-second waits (25/09/2026).
+QUICK_WAIT_S = 5.0
+
+
+def parse_json(text: str) -> dict:
+    """The JSON object in a model's reply: bare, fenced, or inside prose. ValueError if none."""
+    body = text.strip()
+    if body.startswith("```"):
+        body = body.split("\n", 1)[1] if "\n" in body else ""
+        body = body.rsplit("```", 1)[0]
+    try:
+        value = json.loads(body)
+    except json.JSONDecodeError:
+        start, end = body.find("{"), body.rfind("}")
+        if start < 0 or end <= start:
+            raise ValueError("no JSON object in the reply") from None
+        value = json.loads(body[start:end + 1])
+    if not isinstance(value, dict):
+        raise ValueError("the reply is JSON but not an object")
+    return value
+
+
+def complete_json(providers: list, system: str, prompt: str, *,
+                  max_wait: float = QUICK_WAIT_S) -> tuple[dict, str, list[str]]:
+    """One JSON answer from the first provider that gives one: (object, "provider/model",
+    the failures before it). ProviderError naming every failure when none does."""
+    failures: list[str] = []
+    for provider in providers:
+        for _attempt in range(6):
+            try:
+                text, model = provider.complete(system, prompt, max_wait=max_wait)
+                return parse_json(text), f"{provider.name}/{model}", failures
+            except ProviderError as exc:
+                failures.append(exc.summary)
+                more = getattr(provider, "has_another_model", lambda: False)()
+                if exc.kind == "daily_quota" and more:
+                    continue
+                break
+            except (ValueError, json.JSONDecodeError) as exc:
+                failures.append(f"{provider.name}: the reply was not a JSON object ({exc})")
+                break
+    raise ProviderError("every provider", "; ".join(failures) or "none is configured", True,
+                        summary="; ".join(failures) or "no model is configured")
 _INSTANCES: dict[str, Provider] = {}  # one each per process, so a model is discovered once
 
 
@@ -547,6 +623,6 @@ def configured() -> list[Provider]:
     return [_INSTANCES[n] for n in order if n in _INSTANCES and _INSTANCES[n].available()]
 
 
-__all__ = ["Call", "Gemini", "Groq", "Provider", "ProviderError", "Reply", "Session", "ToolSpec",
-           "choose_gemini_model", "configured", "gemini_ladder", "convert_schema",
-           "load_env", "to_json_schema"]
+__all__ = ["Call", "Gemini", "Groq", "Provider", "ProviderError", "QUICK_WAIT_S", "Reply",
+           "Session", "ToolSpec", "choose_gemini_model", "complete_json", "configured",
+           "gemini_ladder", "convert_schema", "load_env", "parse_json", "to_json_schema"]
