@@ -6647,3 +6647,13 @@ regression 45/45 defect cases, 0 controls changed. Digests:
   d7d05d0fefe2ec30848ab719c20601bc29fa38c18304d5d3cc31dbd755da0d49  tests/test_date_prescreen_facts.py
   35f9c464f7a988f8274c44f44ab932c8e3638ad829d746edf0305d7dd81b89f3  docs/benchmark/targeted_regression/before_after.json
   181bf90d3926014911d01a5dfad5bd328e14882ad12321c9263e168ff89eb67c  docs/benchmark/domain_benchmark/benchmark.json
+
+C112. A RUBRIC CHANGED AFTER RESULTS WERE SEEN, AND WHY. Gemini's 40 end-to-end answers scored a
+causal-overreach rate of 17.5% (7). Read one by one, all 7 were my detector: four decomposition
+sentences ("the increase was driven by groceries (+34.5% of the change)") that attribute a change
+arithmetically, two "unlikely to be due to sampling noise" (the statistical phrase, the reverse of
+a causal claim), one negated ("not possible to prove ... caused"). Decomposition and sampling
+phrases are exempted and "not possible" is a hedge; checked on eight written sentences, which
+found one more fault -- the hedge "may" matched the month "May" -- fixed (case-sensitive). 17.5% ->
+0.0%; end-to-end 92.45 -> 93.33. Scores are recomputed from stored answers for every provider, so
+Groq, when it runs, meets the same rubric.

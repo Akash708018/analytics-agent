@@ -534,6 +534,491 @@
      "result_head": "Under contract v1 for ecommerce: one row = one ecommerce record.\n\n5 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/llm_ecommerce/results/growth_decomposition_20260925-052116.csv\nfrom dataset   ecommerce\ncreated        2026-09-25 05:21:16\n\nWhat this shows:\n  - 9,825 of 10,000 row"
     }
    ]
+  },
+  {
+   "id": "ECO08",
+   "calls": [
+    {
+     "analysis": "growth_decomposition",
+     "params": {
+      "measure": "payment_value",
+      "dimension": "category",
+      "period": "2024-12",
+      "baseline": "2024-09",
+      "grain": "month"
+     },
+     "status": "OK",
+     "seconds": 0.131,
+     "result_head": "Under contract v1 for ecommerce: one row = one ecommerce record.\n\n9 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/llm_ecommerce/results/growth_decomposition_20260925-052136.csv\nfrom dataset   ecommerce\ncreated        2026-09-25 05:21:36\n\nWhat this shows:\n  - 9,825 of 10,000 row"
+    },
+    {
+     "analysis": "growth_decomposition",
+     "params": {
+      "measure": "payment_value",
+      "dimension": "category",
+      "period": "2024-Q4",
+      "baseline": "2024-Q3",
+      "grain": "quarter"
+     },
+     "status": "OK",
+     "seconds": 0.063,
+     "result_head": "Under contract v1 for ecommerce: one row = one ecommerce record.\n\n9 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/llm_ecommerce/results/growth_decomposition_20260925-052142.csv\nfrom dataset   ecommerce\ncreated        2026-09-25 05:21:42\n\nWhat this shows:\n  - 9,825 of 10,000 row"
+    },
+    {
+     "analysis": "mix_shift",
+     "params": {
+      "measure": "payment_value",
+      "dimension": "category",
+      "period": "2024-Q4",
+      "baseline": "2024-Q3",
+      "grain": "quarter"
+     },
+     "status": "OK",
+     "seconds": 0.066,
+     "result_head": "Under contract v1 for ecommerce: one row = one ecommerce record.\n\n9 rows x 9 columns, written to\n  /home/user/analytics-agent/workspace/llm_ecommerce/results/mix_shift_20260925-052148.csv\nfrom dataset   ecommerce\ncreated        2026-09-25 05:21:48\n\nWhat this shows:\n  - 9,825 of 10,000 row(s) analyse"
+    },
+    {
+     "analysis": "period_compare",
+     "params": {
+      "measure": "payment_value",
+      "period": "2024-Q4",
+      "baseline": "2024-Q3",
+      "grain": "quarter"
+     },
+     "status": "OK",
+     "seconds": 0.058,
+     "result_head": "Under contract v1 for ecommerce: one row = one ecommerce record.\n\n2 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/llm_ecommerce/results/period_compare_20260925-052155.csv\nfrom dataset   ecommerce\ncreated        2026-09-25 05:21:55\n\nWhat this shows:\n  - 9,825 of 10,000 row(s) an"
+    },
+    {
+     "analysis": "trend",
+     "params": {
+      "measure": "quantity",
+      "grain": "quarter"
+     },
+     "status": "OK",
+     "seconds": 0.068,
+     "result_head": "Under contract v1 for ecommerce: one row = one ecommerce record.\n\n8 rows x 3 columns, written to\n  /home/user/analytics-agent/workspace/llm_ecommerce/results/trend_20260925-052201.csv\nfrom dataset   ecommerce\ncreated        2026-09-25 05:22:01\n\nWhat this shows:\n  - 9,825 of 10,000 row(s) analysed. 1"
+    }
+   ]
+  },
+  {
+   "id": "ECO11",
+   "calls": []
+  },
+  {
+   "id": "LOG01",
+   "calls": [
+    {
+     "analysis": "trend",
+     "params": {
+      "measure": "attempts",
+      "grain": "month"
+     },
+     "status": "OK",
+     "seconds": 0.058,
+     "result_head": "Under contract v1 for logistics: one row = one logistics record.\n\n24 rows x 3 columns, written to\n  /home/user/analytics-agent/workspace/llm_logistics/results/trend_20260925-052232.csv\nfrom dataset   logistics\ncreated        2026-09-25 05:22:32\n\nWhat this shows:\n  - 9,838 of 10,000 row(s) analysed. "
+    },
+    {
+     "analysis": "cross_tab",
+     "params": {
+      "rows": "status",
+      "columns": "hub_id",
+      "measure": "attempts"
+     },
+     "status": "OK",
+     "seconds": 0.095,
+     "result_head": "Under contract v1 for logistics: one row = one logistics record.\n\n5 rows x 33 columns, written to\n  /home/user/analytics-agent/workspace/llm_logistics/results/cross_tab_20260925-052238.csv\nfrom dataset   logistics\ncreated        2026-09-25 05:22:38\n\nWhat this shows:\n  - 9,838 of 10,000 row(s) analys"
+    },
+    {
+     "analysis": "cross_tab",
+     "params": {
+      "rows": "status",
+      "columns": "sla_breach",
+      "measure": "attempts"
+     },
+     "status": "OK",
+     "seconds": 0.065,
+     "result_head": "Under contract v1 for logistics: one row = one logistics record.\n\n5 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/llm_logistics/results/cross_tab_20260925-052244.csv\nfrom dataset   logistics\ncreated        2026-09-25 05:22:44\n\nWhat this shows:\n  - 9,838 of 10,000 row(s) analyse"
+    },
+    {
+     "analysis": "group_compare",
+     "params": {
+      "dimension": "status",
+      "measure": "attempts"
+     },
+     "status": "OK",
+     "seconds": 0.063,
+     "result_head": "Under contract v1 for logistics: one row = one logistics record.\n\n5 rows x 10 columns, written to\n  /home/user/analytics-agent/workspace/llm_logistics/results/group_compare_20260925-052250.csv\nfrom dataset   logistics\ncreated        2026-09-25 05:22:50\n\nWhat this shows:\n  - 9,838 of 10,000 row(s) an"
+    }
+   ]
+  },
+  {
+   "id": "LOG04",
+   "calls": [
+    {
+     "analysis": "ranking_shift",
+     "params": {
+      "dimension": "hub_id",
+      "measure": "attempts",
+      "before_start": "2023-01-01",
+      "before_end": "2023-12-31",
+      "after_start": "2024-01-01",
+      "after_end": "2024-12-31"
+     },
+     "status": "OK",
+     "seconds": 0.065,
+     "result_head": "Under contract v1 for logistics: one row = one logistics record.\n\n31 rows x 6 columns, written to\n  /home/user/analytics-agent/workspace/llm_logistics/results/ranking_shift_20260925-052309.csv\nfrom dataset   logistics\ncreated        2026-09-25 05:23:09\n\nWhat this shows:\n  - 9,838 of 10,000 row(s) an"
+    }
+   ]
+  },
+  {
+   "id": "LOG08",
+   "calls": [
+    {
+     "analysis": "trend",
+     "params": {
+      "measure": "delivery_time_hours",
+      "grain": "month"
+     },
+     "status": "OK",
+     "seconds": 0.06,
+     "result_head": "Under contract v1 for logistics: one row = one logistics record.\n\n24 rows x 3 columns, written to\n  /home/user/analytics-agent/workspace/llm_logistics/results/trend_20260925-052328.csv\nfrom dataset   logistics\ncreated        2026-09-25 05:23:28\n\nWhat this shows:\n  - 9,838 of 10,000 row(s) analysed. "
+    },
+    {
+     "analysis": "changepoint",
+     "params": {
+      "measure": "delivery_time_hours",
+      "grain": "month"
+     },
+     "status": "OK",
+     "seconds": 0.062,
+     "result_head": "Under contract v1 for logistics: one row = one logistics record.\n\n19 rows x 6 columns, written to\n  /home/user/analytics-agent/workspace/llm_logistics/results/changepoint_20260925-052334.csv\nfrom dataset   logistics\ncreated        2026-09-25 05:23:34\n\nWhat this shows:\n  - 9,838 of 10,000 row(s) anal"
+    }
+   ]
+  },
+  {
+   "id": "LOG11",
+   "calls": []
+  },
+  {
+   "id": "HEA01",
+   "calls": [
+    {
+     "analysis": "top_n",
+     "params": {
+      "dimension": "hospital_id",
+      "measure": "treatment_cost"
+     },
+     "status": "OK",
+     "seconds": 0.048,
+     "result_head": "Under contract v1 for healthcare: one row = one healthcare record.\n\n10 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/llm_healthcare/results/top_n_20260925-052405.csv\nfrom dataset   healthcare\ncreated        2026-09-25 05:24:05\n\nWhat this shows:\n  - 9,844 of 10,000 row(s) analys"
+    }
+   ]
+  },
+  {
+   "id": "HEA04",
+   "calls": [
+    {
+     "analysis": "hypothesis_test",
+     "params": {
+      "dimension": "treatment_group",
+      "measure": "length_of_stay"
+     },
+     "status": "OK",
+     "seconds": 0.062,
+     "result_head": "Under contract v1 for healthcare: one row = one healthcare record.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/llm_healthcare/results/hypothesis_test_20260925-052423.csv\nfrom dataset   healthcare\ncreated        2026-09-25 05:24:23\n\nWhat this shows:\n  - 9,844 of 10,000 row("
+    },
+    {
+     "analysis": "effect_size",
+     "params": {
+      "dimension": "treatment_group",
+      "measure": "length_of_stay"
+     },
+     "status": "OK",
+     "seconds": 0.063,
+     "result_head": "Under contract v1 for healthcare: one row = one healthcare record.\n\n2 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/llm_healthcare/results/effect_size_20260925-052430.csv\nfrom dataset   healthcare\ncreated        2026-09-25 05:24:30\n\nWhat this shows:\n  - 9,844 of 10,000 row(s) a"
+    },
+    {
+     "analysis": "group_compare",
+     "params": {
+      "dimension": "treatment_group",
+      "measure": "length_of_stay"
+     },
+     "status": "OK",
+     "seconds": 0.063,
+     "result_head": "Under contract v1 for healthcare: one row = one healthcare record.\n\n3 rows x 9 columns, written to\n  /home/user/analytics-agent/workspace/llm_healthcare/results/group_compare_20260925-052435.csv\nfrom dataset   healthcare\ncreated        2026-09-25 05:24:35\n\nWhat this shows:\n  - 9,844 of 10,000 row(s)"
+    }
+   ]
+  },
+  {
+   "id": "HEA08",
+   "calls": [
+    {
+     "analysis": "growth_decomposition",
+     "params": {
+      "measure": "treatment_cost",
+      "dimension": "diagnosis_group",
+      "period": "2024",
+      "baseline": "2023",
+      "grain": "year"
+     },
+     "status": "OK",
+     "seconds": 0.07,
+     "result_head": "Under contract v1 for healthcare: one row = one healthcare record.\n\n15 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/llm_healthcare/results/growth_decomposition_20260925-052455.csv\nfrom dataset   healthcare\ncreated        2026-09-25 05:24:55\n\nWhat this shows:\n  - 9,844 of 10,00"
+    }
+   ]
+  },
+  {
+   "id": "HEA11",
+   "calls": []
+  },
+  {
+   "id": "MAN01",
+   "calls": [
+    {
+     "analysis": "top_n",
+     "params": {
+      "dimension": "plant_id",
+      "measure": "defective_units"
+     },
+     "status": "OK",
+     "seconds": 0.059,
+     "result_head": "Under contract v1 for manufacturing: one row = one manufacturing record.\n\n6 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/llm_manufacturing/results/top_n_20260925-052525.csv\nfrom dataset   manufacturing\ncreated        2026-09-25 05:25:25\n\nWhat this shows:\n  - 9,856 of 10,000 ro"
+    },
+    {
+     "analysis": "group_compare",
+     "params": {
+      "dimension": "plant_id",
+      "measure": "defective_units"
+     },
+     "status": "OK",
+     "seconds": 0.067,
+     "result_head": "Under contract v1 for manufacturing: one row = one manufacturing record.\n\n7 rows x 10 columns, written to\n  /home/user/analytics-agent/workspace/llm_manufacturing/results/group_compare_20260925-052531.csv\nfrom dataset   manufacturing\ncreated        2026-09-25 05:25:31\n\nWhat this shows:\n  - 9,856 of "
+    }
+   ]
+  },
+  {
+   "id": "MAN04",
+   "calls": [
+    {
+     "analysis": "hypothesis_test",
+     "params": {
+      "dimension": "maintenance_flag",
+      "measure": "defect_rate"
+     },
+     "status": "OK",
+     "seconds": 0.064,
+     "result_head": "Under contract v1 for manufacturing: one row = one manufacturing record.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/llm_manufacturing/results/hypothesis_test_20260925-052550.csv\nfrom dataset   manufacturing\ncreated        2026-09-25 05:25:50\n\nWhat this shows:\n  - 9,856 of"
+    },
+    {
+     "analysis": "effect_size",
+     "params": {
+      "dimension": "maintenance_flag",
+      "measure": "defect_rate"
+     },
+     "status": "OK",
+     "seconds": 0.064,
+     "result_head": "Under contract v1 for manufacturing: one row = one manufacturing record.\n\n2 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/llm_manufacturing/results/effect_size_20260925-052556.csv\nfrom dataset   manufacturing\ncreated        2026-09-25 05:25:56\n\nWhat this shows:\n  - 9,856 of 10,"
+    }
+   ]
+  },
+  {
+   "id": "MAN08",
+   "calls": [
+    {
+     "analysis": "changepoint",
+     "params": {
+      "measure": "defective_units"
+     },
+     "status": "OK",
+     "seconds": 0.06,
+     "result_head": "Under contract v1 for manufacturing: one row = one manufacturing record.\n\n19 rows x 6 columns, written to\n  /home/user/analytics-agent/workspace/llm_manufacturing/results/changepoint_20260925-052615.csv\nfrom dataset   manufacturing\ncreated        2026-09-25 05:26:15\n\nWhat this shows:\n  - 9,856 of 10"
+    },
+    {
+     "analysis": "growth_decomposition",
+     "params": {
+      "measure": "defective_units",
+      "dimension": "shift",
+      "period": "2024-07",
+      "baseline": "2024-06",
+      "grain": "month"
+     },
+     "status": "OK",
+     "seconds": 0.067,
+     "result_head": "Under contract v1 for manufacturing: one row = one manufacturing record.\n\n3 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/llm_manufacturing/results/growth_decomposition_20260925-052621.csv\nfrom dataset   manufacturing\ncreated        2026-09-25 05:26:21\n\nWhat this shows:\n  - 9,8"
+    },
+    {
+     "analysis": "growth_decomposition",
+     "params": {
+      "measure": "defective_units",
+      "dimension": "product_id",
+      "period": "2024-07",
+      "baseline": "2024-06",
+      "grain": "month"
+     },
+     "status": "OK",
+     "seconds": 0.06,
+     "result_head": "Under contract v1 for manufacturing: one row = one manufacturing record.\n\n30 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/llm_manufacturing/results/growth_decomposition_20260925-052630.csv\nfrom dataset   manufacturing\ncreated        2026-09-25 05:26:30\n\nWhat this shows:\n  - 9,"
+    },
+    {
+     "analysis": "trend",
+     "params": {
+      "measure": "defective_units",
+      "grain": "month"
+     },
+     "status": "OK",
+     "seconds": 0.065,
+     "result_head": "Under contract v1 for manufacturing: one row = one manufacturing record.\n\n24 rows x 3 columns, written to\n  /home/user/analytics-agent/workspace/llm_manufacturing/results/trend_20260925-052636.csv\nfrom dataset   manufacturing\ncreated        2026-09-25 05:26:36\n\nWhat this shows:\n  - 9,856 of 10,000 r"
+    }
+   ]
+  },
+  {
+   "id": "MAN11",
+   "calls": []
+  },
+  {
+   "id": "EDU01",
+   "calls": [
+    {
+     "analysis": "top_n",
+     "params": {
+      "dimension": "department",
+      "measure": "total_score",
+      "n": 5
+     },
+     "status": "OK",
+     "seconds": 0.054,
+     "result_head": "Under contract v1 for education: one row = one education record.\n\n5 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/llm_education/results/top_n_20260925-052709.csv\nfrom dataset   education\ncreated        2026-09-25 05:27:09\n\nWhat this shows:\n  - 9,847 of 10,000 row(s) analysed. 1"
+    },
+    {
+     "analysis": "group_compare",
+     "params": {
+      "dimension": "department",
+      "measure": "total_score"
+     },
+     "status": "OK",
+     "seconds": 0.072,
+     "result_head": "Under contract v1 for education: one row = one education record.\n\n9 rows x 9 columns, written to\n  /home/user/analytics-agent/workspace/llm_education/results/group_compare_20260925-052715.csv\nfrom dataset   education\ncreated        2026-09-25 05:27:15\n\nWhat this shows:\n  - 9,847 of 10,000 row(s) ana"
+    }
+   ]
+  },
+  {
+   "id": "EDU04",
+   "calls": [
+    {
+     "analysis": "hypothesis_test",
+     "params": {
+      "dimension": "scholarship_flag",
+      "measure": "total_score"
+     },
+     "status": "OK",
+     "seconds": 0.063,
+     "result_head": "Under contract v1 for education: one row = one education record.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/llm_education/results/hypothesis_test_20260925-052735.csv\nfrom dataset   education\ncreated        2026-09-25 05:27:35\n\nWhat this shows:\n  - 9,847 of 10,000 row(s) a"
+    },
+    {
+     "analysis": "hypothesis_test",
+     "params": {
+      "dimension": "scholarship_flag",
+      "measure": "final_score"
+     },
+     "status": "OK",
+     "seconds": 0.063,
+     "result_head": "Under contract v1 for education: one row = one education record.\n\n3 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/llm_education/results/hypothesis_test_20260925-052741.csv\nfrom dataset   education\ncreated        2026-09-25 05:27:41\n\nWhat this shows:\n  - 9,847 of 10,000 row(s) a"
+    },
+    {
+     "analysis": "hypothesis_test",
+     "params": {
+      "dimension": "scholarship_flag",
+      "measure": "current_gpa"
+     },
+     "status": "OK",
+     "seconds": 0.061,
+     "result_head": "Under contract v1 for education: one row = one education record.\n\n2 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/llm_education/results/hypothesis_test_20260925-052747.csv\nfrom dataset   education\ncreated        2026-09-25 05:27:47\n\nWhat this shows:\n  - 9,847 of 10,000 row(s) a"
+    }
+   ]
+  },
+  {
+   "id": "EDU08",
+   "calls": [
+    {
+     "analysis": "trend",
+     "params": {
+      "measure": "dropout_flag",
+      "grain": "quarter"
+     },
+     "status": "REFUSED",
+     "seconds": 0.041,
+     "result_head": "BLOCKED: trend cannot answer that under this contract.\nWHY: 'dropout_flag' is not a declared measure of education. Declared: attendance_rate, current_gpa, failed_subjects, final_score, midterm_score, previous_gpa, study_hours, total_score.\nCURRENT STATE: contract v1 for education\nNEXT STEP: call pro"
+    },
+    {
+     "analysis": "summary_stats",
+     "params": {},
+     "status": "OK",
+     "seconds": 0.077,
+     "result_head": "Under contract v1 for education: one row = one education record.\n\n8 rows x 11 columns, written to\n  /home/user/analytics-agent/workspace/llm_education/results/summary_stats_20260925-052828.csv\nfrom dataset   education\ncreated        2026-09-25 05:28:28\n\nWhat this shows:\n  - 9,847 of 10,000 row(s) an"
+    },
+    {
+     "analysis": "frequency",
+     "params": {
+      "column": "dropout_flag"
+     },
+     "status": "OK",
+     "seconds": 0.058,
+     "result_head": "Under contract v1 for education: one row = one education record.\n\n2 rows x 3 columns, written to\n  /home/user/analytics-agent/workspace/llm_education/results/frequency_20260925-052834.csv\nfrom dataset   education\ncreated        2026-09-25 05:28:34\n\nWhat this shows:\n  - 9,847 of 10,000 row(s) analyse"
+    },
+    {
+     "analysis": "group_compare",
+     "params": {
+      "dimension": "dropout_flag",
+      "measure": "failed_subjects"
+     },
+     "status": "OK",
+     "seconds": 0.062,
+     "result_head": "Under contract v1 for education: one row = one education record.\n\n3 rows x 10 columns, written to\n  /home/user/analytics-agent/workspace/llm_education/results/group_compare_20260925-052840.csv\nfrom dataset   education\ncreated        2026-09-25 05:28:40\n\nWhat this shows:\n  - 9,847 of 10,000 row(s) an"
+    },
+    {
+     "analysis": "cross_tab",
+     "params": {
+      "rows": "department",
+      "columns": "dropout_flag"
+     },
+     "status": "OK",
+     "seconds": 0.059,
+     "result_head": "Under contract v1 for education: one row = one education record.\n\n9 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/llm_education/results/cross_tab_20260925-052846.csv\nfrom dataset   education\ncreated        2026-09-25 05:28:46\n\nWhat this shows:\n  - 9,847 of 10,000 row(s) analyse"
+    },
+    {
+     "analysis": "cross_tab",
+     "params": {
+      "rows": "semester",
+      "columns": "dropout_flag"
+     },
+     "status": "OK",
+     "seconds": 0.059,
+     "result_head": "Under contract v1 for education: one row = one education record.\n\n9 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/llm_education/results/cross_tab_20260925-052852.csv\nfrom dataset   education\ncreated        2026-09-25 05:28:52\n\nWhat this shows:\n  - 9,847 of 10,000 row(s) analyse"
+    },
+    {
+     "analysis": "cross_tab",
+     "params": {},
+     "status": "REFUSED",
+     "seconds": 0.038,
+     "result_head": "BLOCKED: cross_tab was called without rows, columns.\nWHY: cross_tab needs rows, columns, and they were not given.\nCURRENT STATE: declared measures: study_hours, failed_subjects, total_score, final_score, attendance_rate, current_gpa, previous_gpa, midterm_score; declared dimensions: department, camp"
+    },
+    {
+     "analysis": "hypothesis_test",
+     "params": {
+      "dimension": "department",
+      "measure": "attendance_rate",
+      "method": "rank"
+     },
+     "status": "OK",
+     "seconds": 0.079,
+     "result_head": "Under contract v1 for education: one row = one education record.\n\n8 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/llm_education/results/hypothesis_test_20260925-052926.csv\nfrom dataset   education\ncreated        2026-09-25 05:29:26\n\nWhat this shows:\n  - 9,847 of 10,000 row(s) a"
+    }
+   ]
+  },
+  {
+   "id": "EDU11",
+   "calls": []
   }
  ],
  "groq": []

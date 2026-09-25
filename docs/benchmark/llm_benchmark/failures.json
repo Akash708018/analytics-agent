@@ -264,7 +264,6 @@
   "track": "e2e",
   "id": "FIN08",
   "failures": [
-   "CAUSAL_OVERREACH",
    "UNSUPPORTED_CLAIM"
   ]
  },
@@ -306,41 +305,9 @@
  {
   "provider": "gemini",
   "track": "e2e",
-  "id": "SAL08",
-  "failures": [
-   "CAUSAL_OVERREACH"
-  ]
- },
- {
-  "provider": "gemini",
-  "track": "e2e",
   "id": "MAR04",
   "failures": [
    "INTENT_ERROR"
-  ]
- },
- {
-  "provider": "gemini",
-  "track": "e2e",
-  "id": "MAR08",
-  "failures": [
-   "CAUSAL_OVERREACH"
-  ]
- },
- {
-  "provider": "gemini",
-  "track": "e2e",
-  "id": "MAR11",
-  "failures": [
-   "CAUSAL_OVERREACH"
-  ]
- },
- {
-  "provider": "gemini",
-  "track": "e2e",
-  "id": "CRM04",
-  "failures": [
-   "CAUSAL_OVERREACH"
   ]
  },
  {
@@ -360,6 +327,77 @@
   "id": "ECO04",
   "failures": [
    "TIME_RANGE_ERROR",
+   "UNSUPPORTED_CLAIM"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "e2e",
+  "id": "ECO08",
+  "failures": [
+   "INTENT_ERROR",
+   "UNSUPPORTED_CLAIM"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "e2e",
+  "id": "LOG04",
+  "failures": [
+   "INTENT_ERROR",
+   "WRONG_FINAL_ANSWER"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "e2e",
+  "id": "LOG08",
+  "failures": [
+   "INTENT_ERROR",
+   "WRONG_FINAL_ANSWER"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "e2e",
+  "id": "HEA08",
+  "failures": [
+   "INTENT_ERROR",
+   "WRONG_FINAL_ANSWER"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "e2e",
+  "id": "MAN04",
+  "failures": [
+   "INTENT_ERROR",
+   "METRIC_ERROR"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "e2e",
+  "id": "MAN08",
+  "failures": [
+   "UNSUPPORTED_CLAIM"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "e2e",
+  "id": "EDU04",
+  "failures": [
+   "BAD_TOOL_ORDER"
+  ]
+ },
+ {
+  "provider": "gemini",
+  "track": "e2e",
+  "id": "EDU08",
+  "failures": [
+   "INVALID_TOOL",
+   "METRIC_ERROR",
    "UNSUPPORTED_CLAIM"
   ]
  },

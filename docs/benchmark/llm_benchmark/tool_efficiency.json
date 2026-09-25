@@ -1,9 +1,9 @@
 {
  "gemini": {
-  "tool_efficiency": 0.9459,
-  "invalid_call_rate": 5.41,
+  "tool_efficiency": 0.9221,
+  "invalid_call_rate": 5.19,
   "redundant_call_rate": 0.0,
-  "premature_stop_rate": 4.76,
+  "premature_stop_rate": 2.5,
   "overanalysis_rate": 0.0
  },
  "groq": {

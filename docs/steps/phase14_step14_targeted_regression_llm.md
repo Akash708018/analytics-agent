@@ -115,3 +115,33 @@ free-tier LLMs as the planning layer over the deterministic engine.
   five sample queries (and the profile's cast examples) ended in LIMIT with no ORDER BY. D15,
   LOW. The patch is held back (/tmp/tr_data/d15.patch) until the timing cases finish, so that
   they measure the merged commit and nothing uncommitted.
+
+### 4. Final state of the targeted regression (tree f123362)
+
+- 4.1 H on the fixed code at a7573c6 still had one oracle error: a concurrent result file held
+  another dataset's rows. The name was chosen by `exists()` then `open("w")`: two threads took one
+  name. D16, CRITICAL, fixed for results, charts and reports by exclusive creation; its test fails
+  3 of 3 on the old code, passes 3 of 3 now. D15 (samples by LIMIT alone) fixed with it. Engine
+  suite 1996.
+- 4.2 The session paused mid-run; H had been cut off without a state file. Set aside, H and J
+  re-run: H 506 calls OK, concurrency 44/44, isolation 20/20 and 10/10 x3; J 6/6.
+- 4.3 Two judge faults fixed before the final judgement (C110): D4 counted distinct answers on
+  replies that rightly name distinct files; the cleaning comparison demanded randomly chosen
+  examples word for word. Final: 129 cases, 13 defects, 45/45 defect cases, 45 original failures
+  reproduced, 0 controls changed. profile_column 4.75 -> 0.18 s at 1M (27.1x), 45.27 -> 1.30 s at
+  10M (34.8x); cleaning at 1M 23.01 -> 14.51 s (dirty), 16.22 -> 7.76 s (clean); cohort reply at
+  100k 10,673 -> 3,738 characters (predicted under 3,000 -- wrong, still under 8,000).
+- 4.4 Suites on the final tree: docs/benchmark/targeted_regression/suites.json (engine 1996,
+  phases 8-12 as the baseline, eval 76/76, UI 50, scenario 30/30, stress 4,336 unchanged,
+  benchmark and defect tests 49).
+
+### 5. The LLM benchmark
+
+- 5.1 Gemini `gemini-3.5-flash-lite` (pinned, 0.2): 120/120 planner, 20/20 research, 40/40
+  end-to-end, 0 provider failures. Planner 96.17, end-to-end 93.33, research 83.42, marketing
+  96.03; intent 85.83%, valid tool selection 99.17%, invalid calls 5.19%, unsupported numeric
+  claims 2.55%, premature stops 2.5%, over-analysis 0%; median latency 1.17 s, p95 3.57 s.
+- 5.2 The causal-overreach detector read 17.5%; all 7 flags were its own faults (C112). 0.0% after.
+- 5.3 Groq: NOT_RUN_PROVIDER_UNAVAILABLE. api.groq.com is denied by the environment's network
+  policy; the key is in place. Once the host is allowed, `run.py planner|research|e2e groq` and
+  `run.py report` complete the comparison with nothing else changed.

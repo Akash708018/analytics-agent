@@ -391,9 +391,15 @@ def score_plan(qn: dict, plan: dict | None) -> dict:
 NUM = re.compile(r"(?<![\w.])-?\d[\d,]*(?:\.\d+)?%?")
 CAUSAL = re.compile(r"\b(caused|causes|because of|due to|led to|drove|driven by|resulted in|"
                     r"is the reason|was the reason)\b", re.I)
-HEDGE = re.compile(r"\b(may|might|could|possibly|suggest|consistent with|associated|correlat|"
+HEDGE = re.compile(r"\b((?-i:may)|might|could|possibly|suggest|consistent with|associated|correlat|"
                    r"not (?:establish|prove|show)|cannot|can't|no evidence|unclear|coincid|"
-                   r"plausibl|likely)\w*", re.I)
+                   r"plausibl|likely|not possible|impossible|no way to)\w*", re.I)
+# Not claims of cause (measured on Gemini's 40 answers after they were scored, C112): the
+# statistical phrase "due to sampling noise/chance", and an arithmetic decomposition saying which
+# members a change is made of ("driven by groceries (+34.5% of the change)").
+NOT_CAUSAL = re.compile(r"due to (?:sampling|chance|noise|random)|"
+                        r"(?:decompos|contribution|of the (?:net )?change|mix shift|rate effect|"
+                        r"mix effect|share of the change)", re.I)
 
 
 def _nums(text: str) -> list[float]:
@@ -430,7 +436,7 @@ def grounding(answer: str, evidence: list[str], question: str) -> dict:
 
 def overreach(answer: str) -> bool:
     for sent in re.split(r"(?<=[.!?])\s+", answer):
-        if CAUSAL.search(sent) and not HEDGE.search(sent):
+        if CAUSAL.search(sent) and not HEDGE.search(sent) and not NOT_CAUSAL.search(sent):
             return True
     return False
 

@@ -16,7 +16,7 @@ Three conclusions, kept apart on purpose: the engine's arithmetic is judged agai
 
 ## C2. LLM reasoning (Gemini vs Groq)
 
-- Gemini `gemini-3.5-flash-lite`: planner 96.17, end-to-end 92.54, research 83.42, marketing 95.71; valid tool selection 99.17%, invalid calls 5.41%, unsupported claims 1.89%, causal overreach 23.81%; median latency 1.197 s, provider failures 0.
+- Gemini `gemini-3.5-flash-lite`: planner 96.17, end-to-end 93.33, research 83.42, marketing 96.03; valid tool selection 99.17%, invalid calls 5.19%, unsupported claims 2.55%, causal overreach 0.0%; median latency 1.169 s, provider failures 0.
 - Groq: not run -- groq: no response (URLError).
 - The full table: docs/benchmark/llm_benchmark/comparison.md.
 
