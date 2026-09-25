@@ -209,7 +209,14 @@ def run(upload: Path) -> int:
             findings = c.findings + [f"console: {m[:300]}" for m in dict.fromkeys(c.console)]
     finally:
         server.terminate()
-        server.wait(timeout=10)
+        try:
+            server.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            # Streamlit can take longer than 10 s to stop on a terminate; the walk then raised
+            # here, left the server running, skipped the workspace cleanup and the report below
+            # (25/09/2026). Kill it: every screen was already checked.
+            server.kill()
+            server.wait(timeout=10)
         if ws:
             sys.path.insert(0, str(ROOT / "src"))
             from analytics_agent import workspace
