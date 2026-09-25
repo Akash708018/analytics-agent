@@ -72,3 +72,37 @@ TypeError: obs() got multiple values for argument 'tool'
 2026-09-24T23:09:27 PROFILE_PERF after: 16 observation(s) in 87s
 2026-09-24T23:11:17 phase H on the fixed code: exit 0 in 111s
 2026-09-24T23:13:05 phase J on the fixed code: exit 0 in 107s
+2026-09-24T23:18:57 D1 before: already measured, kept (D1_before.json)
+2026-09-24T23:19:09 D1 after: 10 observation(s) in 12s
+2026-09-24T23:19:09 D2 before: already measured, kept (D2_before.json)
+2026-09-24T23:19:14 D2 after: 21 observation(s) in 5s
+2026-09-24T23:19:14 D3 before: already measured, kept (D3_before.json)
+2026-09-24T23:19:19 D3 after: 10 observation(s) in 4s
+2026-09-24T23:19:19 D12 before: already measured, kept (D12_before.json)
+2026-09-24T23:19:23 D12 after: 1 observation(s) in 4s
+2026-09-24T23:19:29 D15 before: 1 observation(s) in 6s
+2026-09-24T23:19:35 D15 after: 1 observation(s) in 6s
+2026-09-24T23:19:38 D16 before: 1 observation(s) in 3s
+2026-09-24T23:19:41 D16 after: 1 observation(s) in 3s
+2026-09-24T23:19:41 RECS before: already measured, kept (RECS_before.json)
+2026-09-24T23:19:48 RECS after: 8 observation(s) in 7s
+2026-09-24T23:19:48 PAGING before: already measured, kept (PAGING_before.json)
+2026-09-24T23:19:51 PAGING after: 4 observation(s) in 3s
+2026-09-24T23:19:51 CHART_ISOLATION before: already measured, kept (CHART_ISOLATION_before.json)
+2026-09-24T23:19:55 CHART_ISOLATION after: 2 observation(s) in 4s
+2026-09-24T23:19:55 WELCH before: already measured, kept (WELCH_before.json)
+2026-09-24T23:20:02 WELCH after: 2 observation(s) in 7s
+2026-09-24T23:20:02 COHORT before: already measured, kept (COHORT_before.json)
+2026-09-24T23:20:11 COHORT after: 2 observation(s) in 9s
+2026-09-24T23:20:11 D4 before: already measured, kept (D4_before.json)
+2026-09-24T23:20:19 D4 after: 9 observation(s) in 8s
+2026-09-24T23:20:19 PRESCREEN before: already measured, kept (PRESCREEN_before.json)
+2026-09-24T23:20:35 PRESCREEN after: 1 observation(s) in 16s
+2026-09-24T23:20:35 D5 before: already measured, kept (D5_before.json)
+2026-09-24T23:20:54 D5 after: 8 observation(s) in 19s
+2026-09-24T23:21:29 PROFILE_CORRECTNESS before: 32 observation(s) in 34s
+2026-09-24T23:21:37 PROFILE_CORRECTNESS after: 32 observation(s) in 8s
+2026-09-24T23:21:37 CLEANING before: already measured, kept (CLEANING_before.json)
+2026-09-24T23:23:19 CLEANING after: 2 observation(s) in 102s
+2026-09-24T23:23:19 PROFILE_PERF before: already measured, kept (PROFILE_PERF_before.json)
+2026-09-24T23:24:45 PROFILE_PERF after: 16 observation(s) in 87s

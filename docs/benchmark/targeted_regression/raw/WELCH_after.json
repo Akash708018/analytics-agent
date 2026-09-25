@@ -1,11 +1,11 @@
 {
  "case": "WELCH",
  "src": "/home/user/analytics-agent/src",
- "commit": "916a5d2192e07e48864549b1af6aaea18124eae7",
+ "commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
  "src_dirty": [],
  "python": "3.12.3",
  "duckdb": "1.5.5",
- "seconds": 4.38,
+ "seconds": 4.05,
  "harness_error": null,
  "observations": [
   {
@@ -19,8 +19,8 @@
     "measure": "net_sales"
    },
    "status": "OK",
-   "wall_time_seconds": 0.097788,
-   "response": "Under contract v1 for sales: one row = one sales record.\n\n3 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_welch/results/hypothesis_test_20260924-224630.csv\nfrom dataset   sales\ncreated        2026-09-24 22:46:30\n\nWhat this shows:\n  - 98,487 of 100,000 row(s) analysed. 1,029 outside 2023-01-01 to 2024-12-31. 484 undated and so not placed in the window.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic -0.8901, df 5,061.8, p 0.373466.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g -0.0323. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 5,005 row(s), largest absolute skew 215.9537. At this many rows per group the test on means is robust to skew, so the skew column is context rather than a warning.\n  - At the conventional 5% threshold, this many rows cannot distinguish net_sales between the groups of returned_flag. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 207 analysed row(s) have no net_sales and are excluded from the test, 0 have no returned_flag. Both are rows in the table above, so the counts add back to the 98,487 in scope.\n\nFirst 3 of 3 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| False | 93,275 | 21,588.4504 | 4,630,522.311 | 215.9537 |\n| True | 5,005 | 199,937.6309 | 14,135,067.9134 | 70.746 |\n| (no net_sales) | 207 |  |  |  |",
+   "wall_time_seconds": 0.093487,
+   "response": "Under contract v1 for sales: one row = one sales record.\n\n3 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_welch/results/hypothesis_test_20260924-232002.csv\nfrom dataset   sales\ncreated        2026-09-24 23:20:02\n\nWhat this shows:\n  - 98,487 of 100,000 row(s) analysed. 1,029 outside 2023-01-01 to 2024-12-31. 484 undated and so not placed in the window.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic -0.8901, df 5,061.8, p 0.373466.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g -0.0323. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 5,005 row(s), largest absolute skew 215.9537. At this many rows per group the test on means is robust to skew, so the skew column is context rather than a warning.\n  - At the conventional 5% threshold, this many rows cannot distinguish net_sales between the groups of returned_flag. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 207 analysed row(s) have no net_sales and are excluded from the test, 0 have no returned_flag. Both are rows in the table above, so the counts add back to the 98,487 in scope.\n\nFirst 3 of 3 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| False | 93,275 | 21,588.4504 | 4,630,522.311 | 215.9537 |\n| True | 5,005 | 199,937.6309 | 14,135,067.9134 | 70.746 |\n| (no net_sales) | 207 |  |  |  |",
    "exception_type": null,
    "exception_message": null,
    "extra": {
@@ -40,8 +40,8 @@
     "measure": "net_sales"
    },
    "status": "OK",
-   "wall_time_seconds": 0.105536,
-   "response": "Under contract v1 for sales: one row = one sales record.\n\n3 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_welch/results/hypothesis_test_20260924-224630_2.csv\nfrom dataset   sales\ncreated        2026-09-24 22:46:30\n\nWhat this shows:\n  - 98,487 of 100,000 row(s) analysed. 1,029 outside 2023-01-01 to 2024-12-31. 484 undated and so not placed in the window.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic -0.8901, df 5,061.8, p 0.373466.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g -0.0323. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 5,005 row(s), largest absolute skew 215.9537. At this many rows per group the test on means is robust to skew, so the skew column is context rather than a warning.\n  - At the conventional 5% threshold, this many rows cannot distinguish net_sales between the groups of returned_flag. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 207 analysed row(s) have no net_sales and are excluded from the test, 0 have no returned_flag. Both are rows in the table above, so the counts add back to the 98,487 in scope.\n\nFirst 3 of 3 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| False | 93,275 | 21,588.4504 | 4,630,522.311 | 215.9537 |\n| True | 5,005 | 199,937.6309 | 14,135,067.9134 | 70.746 |\n| (no net_sales) | 207 |  |  |  |",
+   "wall_time_seconds": 0.097399,
+   "response": "Under contract v1 for sales: one row = one sales record.\n\n3 rows x 5 columns, written to\n  /home/user/analytics-agent/workspace/tr_welch/results/hypothesis_test_20260924-232002_2.csv\nfrom dataset   sales\ncreated        2026-09-24 23:20:02\n\nWhat this shows:\n  - 98,487 of 100,000 row(s) analysed. 1,029 outside 2023-01-01 to 2024-12-31. 484 undated and so not placed in the window.\n  - Test: Welch's unequal-variance t-test (two-sided). Statistic -0.8901, df 5,061.8, p 0.373466.\n  - Welch rather than Student: the groups are not assumed to share a variance.\n  - Effect size: Hedges' g -0.0323. A p-value says the difference is unlikely to be noise; this says how big it is.\n  - Assumption reported, not judged: smallest group 5,005 row(s), largest absolute skew 215.9537. At this many rows per group the test on means is robust to skew, so the skew column is context rather than a warning.\n  - At the conventional 5% threshold, this many rows cannot distinguish net_sales between the groups of returned_flag. That is not evidence they are the same -- sample_adequacy says how large a difference this scope could have detected.\n  - 207 analysed row(s) have no net_sales and are excluded from the test, 0 have no returned_flag. Both are rows in the table above, so the counts add back to the 98,487 in scope.\n\nFirst 3 of 3 rows:\n\n| group | n | mean | stddev | skew |\n|---|---|---|---|---|\n| False | 93,275 | 21,588.4504 | 4,630,522.311 | 215.9537 |\n| True | 5,005 | 199,937.6309 | 14,135,067.9134 | 70.746 |\n| (no net_sales) | 207 |  |  |  |",
    "exception_type": null,
    "exception_message": null,
    "extra": {

@@ -1,30 +1,29 @@
 {
- "case": "D12",
+ "case": "D16",
  "src": "/home/user/analytics-agent/src",
  "commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
  "src_dirty": [],
  "python": "3.12.3",
  "duckdb": "1.5.5",
- "seconds": 1.3,
+ "seconds": 0.04,
  "harness_error": null,
  "observations": [
   {
-   "sub": "parser_16_threads",
-   "tool": "sql_guard._ast",
+   "sub": "write_result_24_threads",
+   "tool": "write_result",
    "analysis": null,
    "dataset": null,
    "rows": null,
    "parameters": {},
    "status": "OK",
-   "wall_time_seconds": 1.294487,
+   "wall_time_seconds": 0.0366,
    "response": "",
    "exception_type": null,
    "exception_message": null,
    "extra": {
-    "threads": 16,
-    "parses": 3200,
-    "errors": 0,
-    "swapped_results": 0,
+    "threads": 24,
+    "distinct_paths": 24,
+    "files_with_another_writers_rows": 0,
     "role": "defect"
    }
   }

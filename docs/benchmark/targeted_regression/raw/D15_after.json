@@ -1,0 +1,29 @@
+{
+ "case": "D15",
+ "src": "/home/user/analytics-agent/src",
+ "commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
+ "src_dirty": [],
+ "python": "3.12.3",
+ "duckdb": "1.5.5",
+ "seconds": 2.74,
+ "harness_error": null,
+ "observations": [
+  {
+   "sub": "plan_twice_300k",
+   "tool": "propose_cleaning_plan",
+   "analysis": null,
+   "dataset": null,
+   "rows": 304000,
+   "parameters": {},
+   "status": "OK",
+   "wall_time_seconds": 0.544893,
+   "response": "2 change(s) proposed for P (304,000 row(s)). Nothing has been changed.\n\n  C001  DROP_DUPLICATE_ROWS: keep one of each of the 4,000 exactly duplicated row(s) (4,000 row(s)). 4,000 row(s) will be discarded and are not declared missing anywhere: '\"2024-01-05\"', '\"2024-01-05\"', '\"2024-01-05\"'. That is information, not absence -- approve this only if you mean to lose it.\n\n  C002  NORMALISE_CASE on pay: fold pay to one case, merging 3 distinct value(s) into others (243,200 row(s)). 3 distinct value(s) will be discarded and are not declared missing anywhere: 'CARD', 'Card', 'Wire'. That is information, not absence -- approve this only if you mean to lose it.\n\n2 of these discard something that is not declared missing anywhere (C001, C002). Read those lines before approving them.\n\nApprove by id, in the order you want them run. Anything you do not name is not run.\n\n",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "identical_text": true,
+    "role": "defect"
+   }
+  }
+ ]
+}

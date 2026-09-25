@@ -1,11 +1,11 @@
 {
  "case": "RECS",
  "src": "/home/user/analytics-agent/src",
- "commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+ "commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
  "src_dirty": [],
  "python": "3.12.3",
  "duckdb": "1.5.5",
- "seconds": 3.99,
+ "seconds": 3.96,
  "harness_error": null,
  "observations": [
   {
@@ -16,7 +16,7 @@
    "rows": 2000,
    "parameters": {},
    "status": "REFUSED",
-   "wall_time_seconds": 0.128767,
+   "wall_time_seconds": 0.12838,
    "response": "BLOCKED: the primary key stated for 'dupkey' (record_id) does not identify a row.\nWHY: the grain of every later number depends on this. If the key repeats, a join or a sum over it double-counts, and nothing downstream can tell that it did.\nDETAIL: record_id does not identify a row: 2,000 distinct value(s) across 2,007 keyed row(s), so 7 row(s) repeat a key that is meant to be unique. validate_dataset(dataset_name=\"dupkey\") reports this and everything else that disagrees with the contract, rather than stopping at the key.\nNEXT STEP: call propose_cleaning_plan(dataset_name=\"dupkey\") -- 7 row(s) repeat another row in every column, which is every repeat of record_id; dropping them makes the key hold\n\nreason: KEY_NOT_UNIQUE",
    "exception_type": null,
    "exception_message": null,
@@ -30,7 +30,7 @@
     "executable": true,
     "followed": {
      "status": "OK",
-     "head": "1 change(s) proposed for dupkey (2,007 row(s)). Nothing has been changed.\n\n  C001  DROP_DUPLICATE_ROWS: keep one of each of the 7 exactly duplicated row(s) (7 row(s)). 7 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"FIN000001774\",\"transaction_id\":\"T00001774\",\"account_id\":\"A0000002\",\"customer_id\":\"C0000308\",\"transaction_date\":\"2023-04-09\",\"posted_at\":\"2023-04-09 13:",
+     "head": "1 change(s) proposed for dupkey (2,007 row(s)). Nothing has been changed.\n\n  C001  DROP_DUPLICATE_ROWS: keep one of each of the 7 exactly duplicated row(s) (7 row(s)). 7 row(s) will be discarded and are not declared missing anywhere: '{\"record_id\":\"FIN000000002\",\"transaction_id\":\"T00000002\",\"account_id\":\"A0000004\",\"customer_id\":\"C0000161\",\"transaction_date\":\"2023-12-15\",\"posted_at\":\"2023-12-15 10:",
      "exception_type": null
     },
     "role": "defect"
@@ -46,7 +46,7 @@
     "measure": "v"
    },
    "status": "REFUSED",
-   "wall_time_seconds": 0.039736,
+   "wall_time_seconds": 0.041115,
    "response": "BLOCKED: correlation was called without against.\nWHY: correlation needs against, and it was not given.\nCURRENT STATE: declared measures: v; declared dimensions: g\nNEXT STEP: call propose_dataset_contract(dataset_name=\"one_measure\") -- correlation needs another declared measure for against\n\nreason: ANALYSIS_PARAMS_INVALID",
    "exception_type": null,
    "exception_message": null,
@@ -77,7 +77,7 @@
     "measure": "v"
    },
    "status": "REFUSED",
-   "wall_time_seconds": 0.061889,
+   "wall_time_seconds": 0.046111,
    "response": "BLOCKED: correlation was called without against.\nWHY: correlation needs against, and it was not given.\nCURRENT STATE: declared measures: v, w; declared dimensions: g\nNEXT STEP: call compute_analysis(dataset_name=\"two_measures\", analysis_type=\"correlation\", measure=\"v\", against=\"w\")\n\nreason: ANALYSIS_PARAMS_INVALID",
    "exception_type": null,
    "exception_message": null,
@@ -95,7 +95,7 @@
     "executable": true,
     "followed": {
      "status": "OK",
-     "head": "Under contract v1 for two_measures: row.\n\n1 rows x 6 columns, written to\n  /home/user/analytics-agent/workspace/tr_recs/results/correlation_20260924-224602.csv\nfrom dataset   two_measures\ncreated        2026-09-24 22:46:02\n\nWhat this shows:\n  - 120 of 120 row(s) analysed.\n  - 120 of 120 analysed row(s) hold both v and w; 0 hold one or neither and are in no coefficient above. A correlation is over ",
+     "head": "Under contract v1 for two_measures: row.\n\n1 rows x 6 columns, written to\n  /home/user/analytics-agent/workspace/tr_recs/results/correlation_20260924-231945.csv\nfrom dataset   two_measures\ncreated        2026-09-24 23:19:45\n\nWhat this shows:\n  - 120 of 120 row(s) analysed.\n  - 120 of 120 analysed row(s) hold both v and w; 0 hold one or neither and are in no coefficient above. A correlation is over ",
      "exception_type": null
     },
     "role": "defect"
@@ -109,7 +109,7 @@
    "rows": null,
    "parameters": {},
    "status": "REFUSED",
-   "wall_time_seconds": 0.015185,
+   "wall_time_seconds": 0.017227,
    "response": "BLOCKED: corrupt.xlsx is not a readable .xlsx workbook.\nWHY: BadZipFile: File is not a zip file. It may be another kind of file renamed, cut short, or protected with a password.\nNEXT STEP: open it in Excel or the program that made it and save it again as .xlsx, or export it as .csv, then call propose_ingest_spec(path=...) on the new file.",
    "exception_type": null,
    "exception_message": null,
@@ -129,7 +129,7 @@
    "rows": null,
    "parameters": {},
    "status": "REFUSED",
-   "wall_time_seconds": 0.000494,
+   "wall_time_seconds": 0.000443,
    "response": "BLOCKED: '/etc/passwd' is not a result file in this workspace.\nWHY: results are read from the workspace's own results directory and nowhere else. A path that resolves outside it is refused whether or not it exists, because a tool that reads any path on request is a tool that can be asked to read anything.\nCURRENT STATE: results directory: /home/user/analytics-agent/workspace/tr_recs_one/results\nNEXT STEP: call read_result_file(path=\"/home/user/analytics-agent/workspace/tr_recs_one/results/only.csv\")\n\nreason: RESULT_OUT_OF_SCOPE",
    "exception_type": null,
    "exception_message": null,
@@ -161,7 +161,7 @@
     "measure": "y"
    },
    "status": "REFUSED",
-   "wall_time_seconds": 0.022425,
+   "wall_time_seconds": 0.032007,
    "response": "BLOCKED: there is no dataset called 'nope' in this workspace.\nWHY: analysis runs on a loaded table, and nothing is read from disk here.\nCURRENT STATE: loaded: dupkey, fin, one_measure, two_measures\nNEXT STEP: call propose_ingest_spec(path=\"...\") then confirm_ingest_spec, or list_datasets() to see what is already here\n\nreason: DATASET_NOT_LOADED",
    "exception_type": null,
    "exception_message": null,
@@ -188,7 +188,7 @@
     "measure": "revenue"
    },
    "status": "REFUSED",
-   "wall_time_seconds": 0.493151,
+   "wall_time_seconds": 0.478048,
    "response": "BLOCKED: trend was computed and cannot be drawn as a 'pie' chart.\nWHY: there is no chart called 'pie'. Available: line, bar, grouped_bar, scatter, histogram, box, heatmap, waterfall.\nDETAIL: The numbers are not in question -- the analysis ran. This is about the shape a chart needs, which is not the shape this result has. Nothing was written.\nCURRENT STATE: contract v1 for fin\nNEXT STEP: call compute_analysis(dataset_name=\"fin\", analysis_type=\"trend\", measure=\"revenue\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
    "exception_type": null,
    "exception_message": null,
@@ -204,7 +204,7 @@
     "executable": true,
     "followed": {
      "status": "OK",
-     "head": "Under contract v1 for fin: one row = one financial record.\n\n24 rows x 3 columns, written to\n  /home/user/analytics-agent/workspace/tr_recs/results/trend_20260924-224604.csv\nfrom dataset   fin\ncreated        2026-09-24 22:46:04\n\nWhat this shows:\n  - 1,863 of 2,000 row(s) analysed. 108 excluded by the contract. 19 outside 2023-01-01 to 2024-12-31. 10 undated and so not placed in the window.\n  - Excl",
+     "head": "Under contract v1 for fin: one row = one financial record.\n\n24 rows x 3 columns, written to\n  /home/user/analytics-agent/workspace/tr_recs/results/trend_20260924-231947.csv\nfrom dataset   fin\ncreated        2026-09-24 23:19:47\n\nWhat this shows:\n  - 1,863 of 2,000 row(s) analysed. 108 excluded by the contract. 19 outside 2023-01-01 to 2024-12-31. 10 undated and so not placed in the window.\n  - Excl",
      "exception_type": null
     },
     "role": "control"
@@ -223,7 +223,7 @@
     "measure": "revenue"
    },
    "status": "REFUSED",
-   "wall_time_seconds": 0.048897,
+   "wall_time_seconds": 0.049171,
    "response": "BLOCKED: pareto cannot answer that under this contract.\nWHY: customer_id has 397 group(s), NULL counted as a group, against a cap of 49. top_n on customer_id says which of its groups matter.\nCURRENT STATE: contract v1 for fin\nNEXT STEP: call compute_analysis(dataset_name=\"fin\", analysis_type=\"top_n\", dimension=\"customer_id\", measure=\"revenue\")\n\nreason: ANALYSIS_NOT_POSSIBLE",
    "exception_type": null,
    "exception_message": null,
@@ -240,7 +240,7 @@
     "executable": true,
     "followed": {
      "status": "OK",
-     "head": "Under contract v1 for fin: one row = one financial record.\n\n10 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/tr_recs/results/top_n_20260924-224604.csv\nfrom dataset   fin\ncreated        2026-09-24 22:46:04\n\nWhat this shows:\n  - 1,863 of 2,000 row(s) analysed. 108 excluded by the contract. 19 outside 2023-01-01 to 2024-12-31. 10 undated and so not placed in the window.\n  - Excl",
+     "head": "Under contract v1 for fin: one row = one financial record.\n\n10 rows x 4 columns, written to\n  /home/user/analytics-agent/workspace/tr_recs/results/top_n_20260924-231947.csv\nfrom dataset   fin\ncreated        2026-09-24 23:19:47\n\nWhat this shows:\n  - 1,863 of 2,000 row(s) analysed. 108 excluded by the contract. 19 outside 2023-01-01 to 2024-12-31. 10 undated and so not placed in the window.\n  - Excl",
      "exception_type": null
     },
     "role": "control"

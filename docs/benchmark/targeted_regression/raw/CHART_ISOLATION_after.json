@@ -1,11 +1,11 @@
 {
  "case": "CHART_ISOLATION",
  "src": "/home/user/analytics-agent/src",
- "commit": "a7573c62b0f282ab9a35f48e12cf385887d80084",
+ "commit": "eb138e3b5cc16e5080737f24cdaada72f930f7c6",
  "src_dirty": [],
  "python": "3.12.3",
  "duckdb": "1.5.5",
- "seconds": 1.21,
+ "seconds": 1.18,
  "harness_error": null,
  "observations": [
   {
@@ -21,12 +21,12 @@
     "grain": "month"
    },
    "status": "OK",
-   "wall_time_seconds": 0.61973,
-   "response": "Under contract v1 for ds_a: row.\n\nChart written: /home/user/analytics-agent/workspace/tr_iso/charts/trend_20260924-224611.png\n\nA line chart of trend for ds_a. 3 of 12 point(s) drawn, period across the x axis, measure revenue (sum).\n\nYou cannot see this image. What it shows:\n  revenue (sum): lowest 101 at 2024-01, highest 103 at 2024-03, first 101, last 103, 3 point(s)\n\n  9 of 12 point(s) in revenue (sum) are empty and are not drawn; the table beside this chart still holds them.\n\nFrom the analysis it was drawn from:\n  3 of 3 row(s) analysed.\n  12 month(s) between 2024-01 and 2024-12, generated from the declared analysis window, 2024-01-01 to 2024-12-31 and truncated to the month.\n  9 month(s) hold no rows and are blank above, not zero: 2024-04, 2024-05, 2024-06, 2024-07, 2024-08, 2024-09, 2024-10, 2024-11, 2024-12.\n  The longest unbroken gap is 9 month(s). A line drawn through these points crosses those periods without stopping, and nothing here says whether the business paused or the feed did.\n  From 101 in 2024-01 to 103 in 2024-03. That is two endpoints and the periods between them, not a fitted line -- with 9 month(s) absent, a fit would be interpolating over them.",
+   "wall_time_seconds": 0.596635,
+   "response": "Under contract v1 for ds_a: row.\n\nChart written: /home/user/analytics-agent/workspace/tr_iso/charts/trend_20260924-231954.png\n\nA line chart of trend for ds_a. 3 of 12 point(s) drawn, period across the x axis, measure revenue (sum).\n\nYou cannot see this image. What it shows:\n  revenue (sum): lowest 101 at 2024-01, highest 103 at 2024-03, first 101, last 103, 3 point(s)\n\n  9 of 12 point(s) in revenue (sum) are empty and are not drawn; the table beside this chart still holds them.\n\nFrom the analysis it was drawn from:\n  3 of 3 row(s) analysed.\n  12 month(s) between 2024-01 and 2024-12, generated from the declared analysis window, 2024-01-01 to 2024-12-31 and truncated to the month.\n  9 month(s) hold no rows and are blank above, not zero: 2024-04, 2024-05, 2024-06, 2024-07, 2024-08, 2024-09, 2024-10, 2024-11, 2024-12.\n  The longest unbroken gap is 9 month(s). A line drawn through these points crosses those periods without stopping, and nothing here says whether the business paused or the feed did.\n  From 101 in 2024-01 to 103 in 2024-03. That is two endpoints and the periods between them, not a fitted line -- with 9 month(s) absent, a fit would be interpolating over them.",
    "exception_type": null,
    "exception_message": null,
    "extra": {
-    "chart_path": "/home/user/analytics-agent/workspace/tr_iso/charts/trend_20260924-224611.png",
+    "chart_path": "/home/user/analytics-agent/workspace/tr_iso/charts/trend_20260924-231954.png",
     "names_own_dataset": true,
     "names_other_dataset": false,
     "own_values_in_chart_text": [
@@ -56,12 +56,12 @@
     "grain": "month"
    },
    "status": "OK",
-   "wall_time_seconds": 0.164396,
-   "response": "Under contract v1 for ds_b: row.\n\nChart written: /home/user/analytics-agent/workspace/tr_iso/charts/trend_20260924-224611_2.png\n\nA line chart of trend for ds_b. 3 of 12 point(s) drawn, period across the x axis, measure revenue (sum).\n\nYou cannot see this image. What it shows:\n  revenue (sum): lowest 9,001 at 2024-01, highest 9,003 at 2024-03, first 9,001, last 9,003, 3 point(s)\n\n  9 of 12 point(s) in revenue (sum) are empty and are not drawn; the table beside this chart still holds them.\n\nFrom the analysis it was drawn from:\n  3 of 3 row(s) analysed.\n  12 month(s) between 2024-01 and 2024-12, generated from the declared analysis window, 2024-01-01 to 2024-12-31 and truncated to the month.\n  9 month(s) hold no rows and are blank above, not zero: 2024-04, 2024-05, 2024-06, 2024-07, 2024-08, 2024-09, 2024-10, 2024-11, 2024-12.\n  The longest unbroken gap is 9 month(s). A line drawn through these points crosses those periods without stopping, and nothing here says whether the business paused or the feed did.\n  From 9,001 in 2024-01 to 9,003 in 2024-03. That is two endpoints and the periods between them, not a fitted line -- with 9 month(s) absent, a fit would be interpolating over them.",
+   "wall_time_seconds": 0.163245,
+   "response": "Under contract v1 for ds_b: row.\n\nChart written: /home/user/analytics-agent/workspace/tr_iso/charts/trend_20260924-231954_2.png\n\nA line chart of trend for ds_b. 3 of 12 point(s) drawn, period across the x axis, measure revenue (sum).\n\nYou cannot see this image. What it shows:\n  revenue (sum): lowest 9,001 at 2024-01, highest 9,003 at 2024-03, first 9,001, last 9,003, 3 point(s)\n\n  9 of 12 point(s) in revenue (sum) are empty and are not drawn; the table beside this chart still holds them.\n\nFrom the analysis it was drawn from:\n  3 of 3 row(s) analysed.\n  12 month(s) between 2024-01 and 2024-12, generated from the declared analysis window, 2024-01-01 to 2024-12-31 and truncated to the month.\n  9 month(s) hold no rows and are blank above, not zero: 2024-04, 2024-05, 2024-06, 2024-07, 2024-08, 2024-09, 2024-10, 2024-11, 2024-12.\n  The longest unbroken gap is 9 month(s). A line drawn through these points crosses those periods without stopping, and nothing here says whether the business paused or the feed did.\n  From 9,001 in 2024-01 to 9,003 in 2024-03. That is two endpoints and the periods between them, not a fitted line -- with 9 month(s) absent, a fit would be interpolating over them.",
    "exception_type": null,
    "exception_message": null,
    "extra": {
-    "chart_path": "/home/user/analytics-agent/workspace/tr_iso/charts/trend_20260924-224611_2.png",
+    "chart_path": "/home/user/analytics-agent/workspace/tr_iso/charts/trend_20260924-231954_2.png",
     "names_own_dataset": true,
     "names_other_dataset": false,
     "own_values_in_chart_text": [

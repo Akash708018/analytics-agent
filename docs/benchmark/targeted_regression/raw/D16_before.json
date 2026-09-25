@@ -1,0 +1,31 @@
+{
+ "case": "D16",
+ "src": "/home/user/aa-orig/src",
+ "commit": "2d3d52f3667b3c920859f657addca7313f21bf3f",
+ "src_dirty": [],
+ "python": "3.12.3",
+ "duckdb": "1.5.5",
+ "seconds": 0.03,
+ "harness_error": null,
+ "observations": [
+  {
+   "sub": "write_result_24_threads",
+   "tool": "write_result",
+   "analysis": null,
+   "dataset": null,
+   "rows": null,
+   "parameters": {},
+   "status": "WRONG",
+   "wall_time_seconds": 0.0251,
+   "response": "",
+   "exception_type": null,
+   "exception_message": null,
+   "extra": {
+    "threads": 24,
+    "distinct_paths": 15,
+    "files_with_another_writers_rows": 12,
+    "role": "defect"
+   }
+  }
+ ]
+}
