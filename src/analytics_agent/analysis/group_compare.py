@@ -20,7 +20,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..util.sql_guard import quote_identifier
-from .base import LostRows, label, number, share_basis
+from .base import LostRows, TooManyGroups, label, number, share_basis, relation_types
 from .declared import AGG_SQL, agg_of, column_types, is_numeric
 from .declared import require_dimension, require_measure
 from .registry import Output, register
@@ -36,6 +36,7 @@ ALL = "(all)"
     summary="One declared measure summarised per group of a declared "
             "dimension, with an (all) row computed from the rows and a share "
             "column when the declared aggregate adds across groups.",
+    selects=True,
 )
 def group_compare(con, gate, scope, dimension: str, measure: str, **params) -> Output:
     if params:
@@ -56,10 +57,10 @@ def group_compare(con, gate, scope, dimension: str, measure: str, **params) -> O
             f"cannot compute. Known: {', '.join(sorted(AGG_SQL))}, none."
         )
 
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     dim = quote_identifier(dimension)
     col = quote_identifier(measure)
-    dtype = column_types(con, scope.dataset_name).get(measure, "")
+    dtype = relation_types(con, scope).get(measure, "")
     numeric = is_numeric(dtype)
     floating = can_be_non_finite(dtype)
 
@@ -85,11 +86,11 @@ def group_compare(con, gate, scope, dimension: str, measure: str, **params) -> O
         f"WHERE {scope.where})"
     ).fetchall()[0][0]
     if n_groups > MAX_GROUPS:
-        raise ValueError(
+        raise TooManyGroups(
             f"group_compare of {measure} by {dimension} would be {n_groups} "
             f"group(s), NULL counted as a group, against a cap of "
             f"{MAX_GROUPS} so that the {ALL} row fits the table limit. "
-            f"top_n on {dimension} says which of its groups matter."
+            f"top_n on {dimension} says which of its groups matter.", dimension, measure
         )
 
     exprs = stat_exprs(col, numeric, floating)

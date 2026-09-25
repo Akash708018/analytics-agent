@@ -177,6 +177,8 @@ def validate_dataset(
             ro, dataset_name, contract.foreign_keys
         )
         results += rules.domain_checks(ro, dataset_name, contract.domains)
+        results += rules.expectation_checks(
+            ro, dataset_name, contract.expectations, list(contract.primary_key))
         results.append(
             rules.row_count_check(
                 ro, dataset_name, stored.row_count,

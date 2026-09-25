@@ -31,10 +31,13 @@ from ..util.sql_guard import quote_identifier
 from .base import ParamsInvalid, label, number, share_basis
 from .declared import AGG_SQL, agg_of, require_dimension, require_measure
 from .registry import Output, register
-from .stats import MAX_GROUPS, ranked_totals
+from .stats import ranked_totals
 
 DEFAULT_THRESHOLD = 80.0
 CUTS = (1, 3, 5, 10, 20)
+# Cuts at a share of the groups, once there are enough groups for a percent to be a group or more.
+PERCENT_CUTS = (1, 5, 10)
+PERCENT_CUTS_FROM = 100
 
 
 def _ranked_with_shares(con, gate, scope, dimension: str, measure: str):
@@ -60,13 +63,10 @@ def _ranked_with_shares(con, gate, scope, dimension: str, measure: str):
 
     total_sql = AGG_SQL[agg].format(col=quote_identifier(measure))
     grouped = ranked_totals(con, scope, dimension, total_sql)
-
-    if len(grouped) > MAX_GROUPS:
-        raise ValueError(
-            f"{dimension} has {len(grouped)} group(s), NULL counted as a "
-            f"group, against a cap of {MAX_GROUPS}. top_n on {dimension} says "
-            f"which of its groups matter."
-        )
+    # No group cap here (Cleanup Step 14, RF-O8). MAX_GROUPS keeps a per-group TABLE inside the
+    # display limit; pareto's answer is a count to a threshold and concentration's is six cuts and
+    # an index. The retail run's 500 SKUs and 34,836 customers were refused for a table neither
+    # answer needs. pareto's full ranking goes to the result file, which pages.
 
     basis = share_basis(agg, [g[1] for g in grouped])
     if not basis.ok:
@@ -82,13 +82,14 @@ def _ranked_with_shares(con, gate, scope, dimension: str, measure: str):
     tier=2,
     summary="How few groups of a declared dimension carry most of a declared "
             "measure: each group's share, the running share, and the smallest "
-            "set reaching a threshold.",
+            "set reaching a threshold; with period, within one named period.",
+    narrows=True,
 )
 def pareto(con, gate, scope, dimension: str, measure: str,
            threshold: float = DEFAULT_THRESHOLD, **params) -> Output:
     if params:
         raise TypeError(
-            f"pareto takes dimension, measure and threshold; got "
+            f"pareto takes dimension, measure, threshold, period and grain; got "
             f"{', '.join(sorted(params))}."
         )
     if not 0 < threshold <= 100:
@@ -149,12 +150,14 @@ def pareto(con, gate, scope, dimension: str, measure: str,
     tier=2,
     summary="How much of a declared measure the largest groups of a declared "
             "dimension hold, at fixed cuts, with the Herfindahl-Hirschman "
-            "Index and the effective number of groups.",
+            "Index and the effective number of groups; with period, within one "
+            "named period.",
+    narrows=True,
 )
 def concentration(con, gate, scope, dimension: str, measure: str, **params) -> Output:
     if params:
         raise TypeError(
-            f"concentration takes dimension and measure; got "
+            f"concentration takes dimension, measure, period and grain; got "
             f"{', '.join(sorted(params))}."
         )
 
@@ -174,11 +177,14 @@ def concentration(con, gate, scope, dimension: str, measure: str, **params) -> O
     rows: list[list[Any]] = []
     running = Decimal(0) if isinstance(basis.denominator, Decimal) else 0
     cuts = [c for c in CUTS if c < n] + [n]
+    percent = ({max(1, n * p // 100): p for p in PERCENT_CUTS} if n >= PERCENT_CUTS_FROM else {})
     for i, share in enumerate(shares, start=1):
         running = running + share
         if i in cuts:
             rows.append([f"top {i}" if i < n else f"all {n}",
                          f"{running * 100:.1f}%"])
+        if i in percent:
+            rows.append([f"top {percent[i]}% ({i:,})", f"{running * 100:.2f}%"])
 
     hhi = sum(float(s) ** 2 for s in shares) * 10_000
     effective = 10_000 / hhi if hhi else float("inf")
@@ -186,9 +192,14 @@ def concentration(con, gate, scope, dimension: str, measure: str, **params) -> O
         f"Shares are of {number(basis.denominator)}, the {agg} of {measure} "
         f"across all {n:,} group(s)."
     )
+    # Two decimals below 100: the retail key's HHI of 1.35 printed as "1", and its floor over
+    # 34,836 customers as "0" (Cleanup Step 14).
+    def index(v: float) -> str:
+        return f"{v:,.2f}" if v < 100 else f"{v:,.0f}"
+
     summary.append(
-        f"HHI {hhi:,.0f} -- the sum of the squared percentage shares, between "
-        f"{10_000 / n:,.0f} (every group equal) and 10,000 (one group holds "
+        f"HHI {index(hhi)} -- the sum of the squared percentage shares, between "
+        f"{index(10_000 / n)} (every group equal) and 10,000 (one group holds "
         f"everything). It is reported as a number: the thresholds the index "
         f"carries in antitrust describe product markets, and {dimension} is "
         f"not necessarily one."

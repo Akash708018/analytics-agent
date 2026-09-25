@@ -23,7 +23,7 @@ from scipy.stats import t as t_dist
 from statsmodels.stats.proportion import proportion_confint
 
 from ..util.sql_guard import quote_identifier
-from .base import NO_MEMBER, LostRows, label, number
+from .base import NO_MEMBER, LostRows, label, number, relation_types
 from .declared import column_types, is_numeric, require_dimension, require_measure
 from .inferential import FINITE, group_stats
 from .registry import Output, register
@@ -59,6 +59,7 @@ def _shown(key: str, dimension: str, measure: str | None = None) -> str:
     summary="The range a mean or a share is consistent with, given how many rows produced it. "
             "The t interval for a measure, Wilson for a share, both named, with the width "
             "stated so a reader can see what the scope could and could not resolve.",
+    selects=True,
 )
 def confidence_interval(con, gate, scope, dimension: str | None = None,
                         measure: str | None = None, confidence: float = 0.95,
@@ -94,7 +95,7 @@ def _mean_intervals(con, gate, scope, dimension: str | None, measure: str,
     """The t interval around a mean, per group or over the whole scope."""
     m = require_measure(gate.contract, measure)
     unit = getattr(m, "unit", None) or ""
-    if not is_numeric(column_types(con, scope.dataset_name).get(measure, "")):
+    if not is_numeric(relation_types(con, scope).get(measure, "")):
         raise ValueError(f"confidence_interval bounds a numeric measure; {measure!r} is not one.")
 
     if dimension is None:
@@ -154,7 +155,7 @@ def _share_intervals(con, gate, scope, dimension: str, confidence: float,
                      summary: list[str]) -> Output:
     """The Wilson interval around each group's share of the scope's rows."""
     require_dimension(gate.contract, dimension)
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     dim = quote_identifier(dimension)
     rows_sql = con.execute(
         f"SELECT {dim}, count(*) FROM {table} WHERE {scope.where} AND {dim} IS NOT NULL "
@@ -204,7 +205,7 @@ def _whole_scope(con, scope, measure: str):
     """One pseudo-group covering every usable row, for an interval with no breakdown."""
     from .inferential import GroupStats
 
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     col = quote_identifier(measure)
     n, mean, var, skew, kurt = con.execute(
         f"SELECT count({col}), avg({col}), var_samp({col}), skewness({col}), kurtosis({col}) "
@@ -216,7 +217,7 @@ def _whole_scope(con, scope, measure: str):
 
 
 def _excluded(con, scope, dimension: str | None, measure: str) -> dict[str, int]:
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     col = quote_identifier(measure)
     dim = quote_identifier(dimension) if dimension else None
     no_group_expr = f"{dim} IS NULL" if dim else "FALSE"

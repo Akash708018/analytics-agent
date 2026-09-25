@@ -64,7 +64,7 @@ def cohort_retention(con, gate, scope, entity: str, period: str = "month",
         return Output(headers=["cohort", "size"], rows=[], label="cohort_retention",
                       summary=summary + ["No rows are in scope, so no cohort has formed."])
 
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     key = quote_identifier(entity)
     dt = quote_identifier(date_column)
     usable = f"{scope.where} AND {key} IS NOT NULL AND {dt} IS NOT NULL"
@@ -79,6 +79,21 @@ def cohort_retention(con, gate, scope, entity: str, period: str = "month",
             f"member and retention would be zero in every cell — a fact about the column, not "
             f"about anybody coming back. Name the column that identifies a person across their "
             f"events."
+        )
+
+
+    spans = con.execute(
+        f"SELECT count(*) FROM (SELECT {key} FROM {table} WHERE {usable} GROUP BY 1 "
+        f"HAVING count(DISTINCT {dt}) > 1)").fetchone()[0]
+    if events and not spans:
+        # Cleanup Step 16, 2.1: an order id repeats across its lines but every line carries the
+        # order's one timestamp, so it passes the one-per-row check and describes events anyway --
+        # the re-run reported 59,948 of 150,000 orders "came back".
+        raise ValueError(
+            f"cohort_retention cannot use {entity!r}: none of its {people:,} value(s) appears at more "
+            f"than one moment -- every row of a value shares one {date_column}, so it names an "
+            f"event (an order of several lines), not someone who came back. Name the column that "
+            f"identifies a person across their events."
         )
 
     no_entity, no_date = con.execute(
@@ -112,10 +127,8 @@ def cohort_retention(con, gate, scope, entity: str, period: str = "month",
             f"back to rows, but every person belongs to exactly one cohort."
         )
 
-    repeaters = con.execute(
-        f"SELECT count(*) FROM (SELECT {key} AS k, count(*) AS n FROM {table} "
-        f"WHERE {usable} GROUP BY 1) WHERE n > 1"
-    ).fetchall()[0][0]
+    # Coming back is a second moment, not a second row: two lines of one order share a timestamp.
+    repeaters = spans
     rate = repeaters / people if people else 0.0
 
     widest = max((o for _, o, _ in grid), default=0)

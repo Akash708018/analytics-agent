@@ -74,8 +74,14 @@ class Reply:
     calls: list[Call] = field(default_factory=list)
 
 
+#: Sent with a session's final step (Cleanup Step 11): the loop keeps its round limit, and the last
+#: round is an answer rather than one more call.
+LAST_ROUND = ("[system] This is your last round: no tool can be called. Answer the person now, in "
+              "words, from the tool replies above.")
+
+
 class Session(Protocol):
-    def step(self) -> Reply: ...
+    def step(self, final: bool = False) -> Reply: ...
     def add_results(self, results: list[tuple[Call, str]]) -> None: ...
 
 
@@ -222,6 +228,12 @@ def _classify(provider: str, code: int, body: str) -> ProviderError:
         return ProviderError(provider, f"HTTP 429: {body[:500]}", True, kind="daily_quota",
                              model=model, summary=f"the free daily quota"
                              f"{' for ' + model if model else ''} is used up")
+    if code == 400 and "failed_generation" in body:
+        # Groq could not parse the model's own output -- a malformed tool call. A fresh sample
+        # usually parses; the session retries (Cleanup Step 10, seen live).
+        return ProviderError(provider, f"HTTP 400: {body[:500]}", False,
+                             kind="generation_failed",
+                             summary="the model's reply could not be parsed")
     if code == 400 and "tool_use_failed" in body:
         return ProviderError(provider, f"HTTP 400: {body[:500]}", False, kind="tool_use_failed",
                              summary=f"refused the model's tool call ({first})")
@@ -288,7 +300,14 @@ class GeminiSession:
             "toolConfig": {"functionCallingConfig": {"mode": "AUTO"}},
         }
 
-    def step(self) -> Reply:
+    def step(self, final: bool = False) -> Reply:
+        if final:
+            self._body["toolConfig"] = {"functionCallingConfig": {"mode": "NONE"}}
+            last = self._body["contents"][-1]
+            if last.get("role") == "user":
+                last["parts"].append({"text": LAST_ROUND})
+            else:
+                self._body["contents"].append({"role": "user", "parts": [{"text": LAST_ROUND}]})
         data = self._p.post(self._body, self._model)
         candidates = data.get("candidates") or []
         if not candidates or "content" not in candidates[0]:
@@ -428,13 +447,20 @@ class GroqSession:
             "name": t.name, "description": t.description,
             "parameters": to_json_schema(t.parameters)}} for t in tools]
 
-    def step(self) -> Reply:
+    def step(self, final: bool = False) -> Reply:
+        if final:
+            self._messages.append({"role": "user", "content": LAST_ROUND})
         for _ in range(3):
             try:
                 data = self._p.post({"messages": self._messages, "tools": self._tools,
-                                     "tool_choice": "auto"})
+                                     "tool_choice": "none" if final else "auto"})
                 break
             except ProviderError as exc:
+                if exc.kind == "generation_failed":
+                    self._messages.append({"role": "user", "content": (
+                        "[system] Your last reply could not be parsed. Answer the person in "
+                        "plain words, or call one tool with valid JSON arguments.")})
+                    continue
                 if exc.kind != "tool_use_failed":
                     raise
                 # Groq refuses a call to a tool it was not given and returns no message; the
@@ -446,8 +472,9 @@ class GroqSession:
                     f"call it. Answer the person in words; if a step is theirs to do, say which "
                     f"screen does it.")})
         else:
-            raise ProviderError("groq", "the model kept calling tools it does not have", False,
-                                summary="the model kept calling tools it does not have")
+            raise ProviderError("groq", "three replies in a row were refused", False,
+                                summary="three replies in a row were refused (a tool it does "
+                                        "not have, or output that could not be parsed)")
         try:
             message = data["choices"][0]["message"]
         except (KeyError, IndexError):

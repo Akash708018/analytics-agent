@@ -445,3 +445,56 @@ def test_every_refusal_names_a_call_the_agent_can_make(con):
         text = run(con, **kwargs)
         line = next(l for l in text.splitlines() if l.startswith("NEXT STEP:"))
         assert "(" in line and ")" in line
+
+
+def test_a_trend_bar_draws_the_measure_it_was_given(con):
+    """Cleanup Step 8, from the bunty_babli run: this refused and spent the agent's last step."""
+    text = draw(con, "trend", "bar", measure="amount")
+    assert reason_of(text) is None, text.splitlines()[:3]
+    assert "measure amount (sum)" in text
+
+
+def test_a_period_reaches_the_analysis_through_the_tool_layer(con):
+    """Cleanup Step 9, 4.1: narrowed inside top_n, every result was refused as
+    ANALYSIS_RESULT_UNSOUND -- its method note described a scope _produce never built. The unit
+    tests went through registry.run and could not see it."""
+    text = run(con, "top_n", dimension="status", measure="amount", period="2024-06")
+    assert reason_of(text) is None, text.splitlines()[:3]
+    assert "outside the month 2024-06" in text
+    assert 'period="2024-06"' in text or "2024-06" in text
+
+
+# --- a group cap names the call its WHY names (Cleanup Step 11, CL10-O1) ----------------------
+
+WIDE = ("SELECT i AS id, 'shop' || lpad(i::VARCHAR, 2, '0') AS shop, "
+        "TIMESTAMP '2024-06-01' + INTERVAL (i % 28) DAY AS ts, (i + 1)::DECIMAL(18,2) AS amount "
+        "FROM range(60) t(i)")
+
+
+@pytest.fixture()
+def wide(con):
+    con.execute(f"CREATE TABLE wide AS {WIDE}")
+    GATES["wide"] = _gate(dataset_name="wide", dimensions=["shop"], known_exclusions=[])
+    return con
+
+
+def _next_call(text):
+    return next(ln for ln in text.splitlines()
+                if ln.startswith("NEXT STEP: call "))[len("NEXT STEP: call "):]
+
+
+def test_a_group_cap_names_top_n_not_a_new_contract(wide):
+    """Live, 15:03: WHY said 'top_n on order_id says which of its groups matter' and NEXT STEP
+    said propose_dataset_contract, and the assistant spent its last round on the refusal."""
+    # concentration until Cleanup Step 14 removed its cap; group_compare still has one.
+    text = run(wide, "group_compare", dataset_name="wide", dimension="shop", measure="amount")
+    assert reason_of(text) is Reason.ANALYSIS_NOT_POSSIBLE
+    assert _next_call(text) == ('compute_analysis(dataset_name="wide", analysis_type="top_n", '
+                                'dimension="shop", measure="amount")')
+
+
+def test_the_named_top_n_succeeds_verbatim(wide):
+    text = run(wide, "group_compare", dataset_name="wide", dimension="shop", measure="amount")
+    assert 'analysis_type="top_n"' in _next_call(text)
+    again = run(wide, "top_n", dataset_name="wide", dimension="shop", measure="amount")
+    assert reason_of(again) is None, again.splitlines()[:3]

@@ -50,6 +50,8 @@ from .temporal import (
     DEFAULT_GRAIN,
     calendar_for,
     edges,
+    empty_months,
+    months_sentence,
     per_period_sql,
     require_date_column,
 )
@@ -110,7 +112,7 @@ def growth_decomposition(con, gate, scope, measure: str, dimension: str,
     cal = calendar_for(gate, scope, date_column, grain)
     key = cal.key
 
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     col = quote_identifier(date_column)
     dim = quote_identifier(dimension)
     value = AGG_SQL[agg].format(col=quote_identifier(measure))
@@ -269,7 +271,11 @@ def growth_decomposition(con, gate, scope, measure: str, dimension: str,
             f"stand: {number(gross)} of movement cancelled out, which a "
             f"headline of nought is exactly what hides."
         )
-    elif gross > abs(change):
+    elif rose and fell:
+        # Directions, not magnitudes (Cleanup Step 16, 2.2): members moved against each other
+        # exactly when some rose and some fell. `gross > abs(change)` compared two float sums whose
+        # last bits depend on the order DuckDB's threads add them in, and the retail re-run said
+        # this on one run and not the next with all five categories rising.
         summary.append(
             "Gross movement exceeds the net change, so members moved against "
             "each other and a share above 100% or below zero is a member that "
@@ -291,10 +297,15 @@ def growth_decomposition(con, gate, scope, measure: str, dimension: str,
                 f"in a {key} the data covers actually is."
             )
 
+    for lab in (baseline, period):
+        said = months_sentence(lab, empty_months(con, cal, table, col, scope.where, lab),
+                               agg in ADDITIVE)
+        if said:
+            summary.append(said)
     if base_row[3] != per_row[3]:
         summary.append(
-            f"{baseline} covers {base_row[3]:,} days and {period} covers "
-            f"{per_row[3]:,}, so this {agg} sets {base_row[3]:,} days of data "
+            f"{baseline} covers {base_row[3]:,} calendar days and {period} covers "
+            f"{per_row[3]:,}, so this {agg} sets {base_row[3]:,} calendar days "
             f"against {per_row[3]:,}. Every contribution above carries that "
             f"same {(per_row[3] - base_row[3]) / base_row[3] * 100:+.1f}% of "
             f"length with it."

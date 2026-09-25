@@ -82,12 +82,13 @@ def test_b1_a_csv_without_a_footer_keeps_every_row(be, ws):
 
 # --- B2: leading zeros ---------------------------------------------------------------------------
 
-def test_b2_converting_leading_zero_ids_is_lossy_and_never_suggested(be, ws):
+def test_b2_leading_zero_ids_are_not_offered_as_numbers(be, ws):
+    """B2 first offered the conversion as lossy and never suggested (P14-O4). Main's Cleanup Step
+    12 (RF-O5) went further -- a zero-padded code is not offered as a number at all -- and the
+    merge of 25/09/2026 adopted it: the zeros cannot be lost by approving the wrong step."""
     _load(be, ws, "leading_zero_ids")
     steps = _steps(be, ws, "zips")
-    conv = steps.get(("CONVERT_TYPE", "zip"))
-    assert conv is not None and conv.lossy and not conv.suggested
-    assert any(v.startswith("00") for v in conv.sample), conv.sample
+    assert ("CONVERT_TYPE", "zip") not in steps, steps.get(("CONVERT_TYPE", "zip"))
 
 
 # --- B3: Excel formulas --------------------------------------------------------------------------

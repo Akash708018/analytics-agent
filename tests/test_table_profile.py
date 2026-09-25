@@ -685,3 +685,23 @@ def test_a_suppressed_count_leaves_the_table_blank_not_zero(con):
     row = dict(zip(TableProfile.HEADERS, profile_table(con, "t").to_rows()[0]))
     assert row["outliers_above"] is None
     assert row["fence_low"] is None
+
+
+# --- codes and currency, said (Cleanup Step 12) ---------------------------------------------------
+
+@pytest.fixture
+def coded(con):
+    con.execute("""CREATE TABLE coded AS SELECT * FROM (VALUES
+      ('000435', '₹1,234.00'), ('000021', '₹990.00'), ('001200', '₹10,846.50'),
+      ('000009', '₹58.00')) t(sku, list_price)""")
+    return con
+
+
+def test_a_code_that_parses_as_a_number_says_its_leading_zeros(coded):
+    s = profile_table(coded, "coded").column("sku").sentence()
+    assert "4 have leading zeros a number would drop" in s
+
+
+def test_numbers_behind_a_currency_sign_are_named(coded):
+    s = profile_table(coded, "coded").column("list_price").sentence()
+    assert "read as numbers once the currency sign and thousands separators are removed" in s

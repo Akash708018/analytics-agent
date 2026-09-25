@@ -78,7 +78,7 @@ def frequency(con, gate, scope, column: str, limit: int = DEFAULT_LIMIT, **param
     contract = gate.contract
     require_dimension(contract, column)
     col = quote_identifier(column)
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
 
     grouped = con.execute(
         f"SELECT {col}, count(*) FROM {table} WHERE {scope.where} "
@@ -123,14 +123,16 @@ def frequency(con, gate, scope, column: str, limit: int = DEFAULT_LIMIT, **param
     "top_n",
     tier=1,
     summary="The largest groups of a declared dimension by a declared measure, "
-            "with the number tied at the cut stated.",
+            "with the number tied at the cut stated; with period, within one named "
+            "period of the date column.",
+    narrows=True,
 )
 def top_n(con, gate, scope, dimension: str, measure: str,
           n: int = 10, **params) -> Output:
     """The `n` biggest values of `dimension`, ranked by `measure`."""
     if params:
         raise TypeError(
-            f"top_n takes dimension, measure and n; got "
+            f"top_n takes dimension, measure, n, period and grain; got "
             f"{', '.join(sorted(params))}."
         )
     if n < 1:
@@ -157,7 +159,7 @@ def top_n(con, gate, scope, dimension: str, measure: str,
 
     dim = quote_identifier(dimension)
     total_sql = AGG_SQL[agg].format(col=quote_identifier(measure))
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
 
     # P8-D4: the tiebreak is on the group name, so the same data gives the same
     # answer twice. It does not make the answer the only correct one, which is
@@ -198,6 +200,11 @@ def top_n(con, gate, scope, dimension: str, measure: str,
             f"Share is of {number(basis.denominator)}, the {agg} of {measure} "
             f"across all {len(grouped):,} group(s)."
         )
+        if shown < len(grouped):
+            # Stated, so no reader adds the column up themselves -- the live assistant of
+            # Cleanup Step 10 did, and reported 56% for five shares summing to 53.1%.
+            held = sum(g[1] for g in grouped[:shown] if g[1] is not None)
+            summary.append(f"The {shown} shown hold {basis.share(held)} of it together.")
         if agg == "count" and basis.denominator != scope.analysed:
             summary.append(
                 f"count({measure}) skips rows where {measure} is null, so that "

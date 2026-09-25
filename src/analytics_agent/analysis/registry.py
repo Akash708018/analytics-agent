@@ -66,18 +66,24 @@ class Analysis:
     tier: int
     run: Callable[..., Output]
     summary: str
+    #: Takes `period` (and `grain`), applied to the scope before the analysis runs, so the
+    #: analysis describes the rows it was handed (Cleanup Step 9).
+    narrows: bool = False
+    #: Takes `groups` -- members of its `dimension` to keep -- applied to the scope likewise.
+    selects: bool = False
 
 
 REGISTRY: dict[str, Analysis] = {}
 
 
-def register(name: str, tier: int, summary: str):
+def register(name: str, tier: int, summary: str, narrows: bool = False, selects: bool = False):
     """Decorator. The name is the `analysis_type` a caller asks for."""
 
     def wrap(fn: Callable[..., Output]) -> Callable[..., Output]:
         if name in REGISTRY:
             raise ValueError(f"{name!r} is registered twice.")
-        REGISTRY[name] = Analysis(name=name, tier=tier, run=fn, summary=summary)
+        REGISTRY[name] = Analysis(name=name, tier=tier, run=fn, summary=summary,
+                                  narrows=narrows, selects=selects)
         return fn
 
     return wrap
@@ -104,6 +110,67 @@ def get(analysis_type: str) -> Analysis:
         raise UnknownAnalysis(analysis_type, [a.name for a in REGISTRY.values()]) from None
 
 
+def narrowed(con, gate, scope, analysis: Analysis, params: dict):
+    """The scope and parameters an analysis actually runs with.
+
+    For an analysis registered with narrows=True, `period` and `grain` are taken off the
+    parameters and applied to the scope here, before it runs. They were first applied inside
+    each analysis, and the tool layer refused every such result as ANALYSIS_RESULT_UNSOUND: its
+    method note described a scope the tool layer had not built (Cleanup Step 9, 4.1). The
+    narrowing belongs where the scope is made, which is here and in tools._produce.
+    """
+    rest = dict(params)
+    if analysis.narrows:
+        from .temporal import period_narrowing  # temporal imports this module's neighbours
+
+        period, grain = rest.pop("period", None), rest.pop("grain", None)
+        scope = period_narrowing(con, gate, scope, analysis.name, period, grain)
+    if analysis.selects and rest.get("groups") is not None:
+        from .base import select_groups
+
+        scope = select_groups(con, gate, scope, rest.get("dimension"), rest.pop("groups"))
+    scope = _per_unit(con, gate, scope, analysis, rest)
+    return scope, rest
+
+
+#: Analyses that read a measure's value row by row, where a ratio of sums has no value.
+ROW_VALUE_ANALYSES = frozenset({
+    "distribution", "correlation", "bivariate", "outlier_detection", "hypothesis_test",
+    "effect_size", "confidence_interval", "sample_adequacy", "driver_analysis", "mix_shift",
+})
+#: Analyses that place rows on the contract's calendar.
+DATED_TIERS = (3, 5, 7)
+#: The parameters that name a column an analysis reads, beside its measures.
+COLUMN_PARAMS = ("dimension", "second_dimension", "rows", "columns", "column", "entity", "event")
+
+
+def _per_unit(con, gate, scope, analysis: Analysis, params: dict):
+    """A call on a per-unit measure runs over one row per unit; a ratio is refused where a row
+    value is needed (Cleanup Step 15). Both by name, before the analysis runs."""
+    declared = {m.name: m for m in getattr(gate.contract, "measures", None) or []}
+    named = [declared[params[k]] for k in ("measure", "against")
+             if isinstance(params.get(k), str) and params[k] in declared]
+    for m in named:
+        if getattr(m, "agg", None) == "ratio" and analysis.name in ROW_VALUE_ANALYSES:
+            raise ValueError(
+                f"{m.name} is a ratio of sums: it has a value for a set of rows and none for a "
+                f"row, and {analysis.name} reads row values. trend, group_compare, top_n and "
+                f"summary_stats compute it; the per-row ratio, if the table has one, is its own "
+                f"measure.")
+    if not any(getattr(m, "per", None) for m in named):
+        return scope
+    from .base import unit_scope
+
+    optional = []
+    if analysis.name == "driver_analysis":
+        optional = [d for d in getattr(gate.contract, "dimensions", [])]
+    return unit_scope(con, gate, scope, named,
+                      [params[k] for k in COLUMN_PARAMS if isinstance(params.get(k), str)],
+                      date=analysis.tier in DATED_TIERS, optional=optional)
+
+
 def run(con, gate, scope, analysis_type: str, **params) -> Output:
     """Look the analysis up and run it against a scope somebody else built."""
-    return get(analysis_type).run(con, gate, scope, **params)
+    analysis = get(analysis_type)
+    scope, params = narrowed(con, gate, scope, analysis, params)
+    return analysis.run(con, gate, scope, **params)

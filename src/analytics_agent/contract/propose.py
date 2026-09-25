@@ -50,13 +50,16 @@ of thing that gets confirmed without being read".
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from datetime import date, datetime
 
 from analytics_agent.contract import ContractRefused
+from analytics_agent.contract.refusals import Reason, Refusal
 from analytics_agent.contract.compatibility import (
     KeyVerdict,
     binding_for,
+    exact_copies,
     verify_key,
 )
 from analytics_agent.contract.dataset_contract import (
@@ -64,6 +67,7 @@ from analytics_agent.contract.dataset_contract import (
     AnalysisWindow,
     DatasetContract,
     Exclusion,
+    Expectation,
     ForeignKey,
     Measure,
 )
@@ -187,9 +191,12 @@ def _resolve_key(
     stated: list[str] | None,
     ev: DatasetEvidence,
     roles: dict[str, str],
-) -> tuple[list[str], KeyVerdict | None, list[str]]:
+) -> tuple[list[str], KeyVerdict | None, list[str], KeyVerdict | None]:
     """
     The primary key: verified when stated, taken from evidence when not.
+
+    The fourth element is the nearest identifier when no key was found, so the grain question
+    can name it rather than deny it exists (Cleanup Step 8).
 
     A stated key that does not hold is refused HERE, at proposal time, rather
     than being written into a contract that fails at the gate three steps
@@ -201,7 +208,7 @@ def _resolve_key(
         if not verdict.holds:
             raise ContractRefused(verdict.refusal().to_text())
         notes.append(f"Key as stated: {verdict.sentence()}")
-        return list(stated), verdict, notes
+        return list(stated), verdict, notes, None
 
     usable = ev.usable_keys()
     if not usable:
@@ -211,7 +218,8 @@ def _resolve_key(
             "key of three or more columns, which is not searched for. State "
             "it with primary_key=[...] and it will be checked."
         )
-        return [], None, notes
+        nearest, nearest_notes = _nearest_key_notes(con, dataset_name, ev, roles)
+        return [], None, notes + nearest_notes, nearest
 
     ranked = _rank_candidates(usable, roles)
     best = ranked[0]
@@ -223,7 +231,161 @@ def _resolve_key(
             f"the rows that happen to be here; state primary_key=[...] to use "
             f"one of them instead."
         )
-    return list(best.columns), None, notes
+    return list(best.columns), None, notes, None
+
+
+def _nearest_key_notes(con, dataset_name: str, ev: DatasetEvidence,
+                       roles: dict[str, str]) -> tuple[KeyVerdict | None, list[str]]:
+    """With no key found, how near the nearest identifier came, and whether copies explain it.
+
+    Phase 4: "400 duplicates across 20 values says the grain is wrong; two duplicates says the
+    data is dirty." That sentence was only ever produced for a key somebody STATED. With none
+    found, the proposal said nothing identifies a row, and the bunty_babli run confirmed a
+    keyless contract over 604 rows whose order_id held 600 values -- four rows copied whole.
+    Counts only: which column is meant to be the key is still the person's to say.
+    """
+    notes: list[str] = []
+    verdicts = [verify_key(con, dataset_name, [c.name]) for c in ev.columns
+                if roles.get(c.name) == "identifier"]
+    nearest = min(verdicts, key=lambda v: v.duplicate_rows + sum(v.null_counts.values()),
+                  default=None)
+    if nearest is not None:
+        notes.append(f"Nearest to a key: {nearest.sentence()}")
+
+    copies = exact_copies(con, dataset_name)
+    if not copies:
+        return nearest, notes
+    sentence = f"{copies:,} row(s) of {dataset_name} are exact copies of another row"
+    if nearest is not None:
+        col = nearest.columns[0]
+        rows, distinct, nulls = con.execute(
+            f'SELECT count(*), count(DISTINCT "{col}"), count(*) FILTER (WHERE "{col}" IS NULL) '
+            f'FROM (SELECT DISTINCT * FROM "{dataset_name}")'
+        ).fetchone()
+        if rows == distinct and not nulls:
+            sentence += (
+                f". Removing them would leave {col} unique: "
+                f'propose_cleaning_plan(dataset_name="{dataset_name}") offers that, and '
+                f'primary_key=["{col}"] afterwards has every analysis check it.'
+            )
+        else:
+            sentence += (
+                f"; removing them would still leave {col} repeating, so what is left is a "
+                f"question about the grain, not about copies."
+            )
+    else:
+        sentence += (
+            f'. propose_cleaning_plan(dataset_name="{dataset_name}") offers removing them.'
+        )
+    notes.append(sentence)
+    return nearest, notes
+
+
+_WORD_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
+
+
+def _grain_key_notes(con, dataset_name: str, grain: str, ev: DatasetEvidence) -> list[str]:
+    """A stated grain that names columns, under a contract that names no key.
+
+    The bunty_babli contract: grain "grain: [order_id]", primary_key []. The person meant a key
+    and put it where nothing reads it. The grain stays their sentence; the named columns are
+    checked as a key, which is arithmetic, and the note says how to make the check stick.
+    """
+    known = [c.name for c in ev.columns]
+    words = set(_WORD_RE.findall(grain))
+    named = [c for c in known if c in words]
+    if not named:
+        return []
+    verdict = verify_key(con, dataset_name, named)
+    listed = ", ".join(f'"{c}"' for c in named)
+    return [
+        f"The grain names {' and '.join(named)}, but no primary key is stated, so nothing "
+        f"checks it: {verdict.sentence()} primary_key=[{listed}] has every analysis check it."
+    ]
+
+
+def _refuse_measure(dataset_name: str, what: str, why: str) -> ContractRefused:
+    return ContractRefused(Refusal(
+        reason=Reason.CONTRACT_INVALID, what=what, why=why,
+        next_call=f'propose_dataset_contract(dataset_name="{dataset_name}", ...)',
+    ).to_text())
+
+
+def _measure(name, agg, definition, column, per, ratio) -> Measure:
+    """One measure from the answers about it (Cleanup Step 15): an alias, a unit, a ratio."""
+    extra: dict = {}
+    if column:
+        extra["column"] = column
+    if per:
+        extra["per"] = [per] if isinstance(per, str) else list(per)
+    if ratio:
+        agg = agg or "ratio"
+        extra.update(numerator=list(ratio.get("numerator") or []),
+                     denominator=list(ratio.get("denominator") or []),
+                     scale=float(ratio.get("scale", 1.0)))
+    try:
+        return Measure(name=name, agg=agg, definition=definition, **extra)
+    except ValueError as exc:
+        raise ContractRefused(Refusal(
+            reason=Reason.CONTRACT_INVALID, what=f"measure {name!r} is not usable as stated.",
+            why=str(exc).split("\n")[-1] if "\n" in str(exc) else str(exc),
+            next_call="propose_dataset_contract(dataset_name=..., ...)",
+        ).to_text()) from None
+
+
+def _verify_measure_columns(con, dataset_name: str, ev: DatasetEvidence, m: Measure) -> None:
+    """Every column the measure reads exists; a `per` measure is one value per unit.
+
+    The second is arithmetic, like a stated key's verification: a salary declared per rep_id that
+    varies within a rep is not rep-level, and every per-rep statistic over it would pick one value
+    of several without saying so. NULLs are not a second value -- a unit with a value and a blank
+    has one value.
+    """
+    known = {c.name for c in ev.columns}
+    missing = [c for c in m.columns_read() if c not in known]
+    if missing:
+        raise _refuse_measure(
+            dataset_name, f"measure {m.name!r} reads {', '.join(missing)}, which "
+            f"{dataset_name} does not have.",
+            f"columns present: {', '.join(sorted(known))}.")
+    if not m.per:
+        return
+    per = ", ".join(f'"{c}"' for c in m.per)
+    varying = con.execute(
+        f'SELECT count(*) FROM (SELECT {per} FROM "{dataset_name}" GROUP BY {per} '
+        f'HAVING count(DISTINCT "{m.source}") > 1)').fetchone()[0]
+    if varying:
+        units = " + ".join(m.per)
+        raise _refuse_measure(
+            dataset_name, f"{m.name} varies within {units}: {varying:,} {units} unit(s) hold more "
+            f"than one value of it.",
+            f"a measure declared per {units} is one value per {units}, and every statistic over it "
+            f"is taken over those units. Declare the unit it is constant within, or no unit.")
+
+
+def _bound_expectations(con, dataset_name: str, expectations) -> list[Expectation]:
+    """Each rule bound against the table as BOOLEAN, or the proposal refused naming it.
+
+    An exclusion rule is bound when an analysis first reads it; a rule meant to hold for every row
+    is bound here, so a column typo or a subquery is refused before it reaches a stored contract
+    that validation would then report as NOT RUN forever (Cleanup Step 13).
+    """
+    from analytics_agent.util.sql_guard import UnsafeSQL, bind_predicate
+
+    out = list(expectations or [])
+    for i, x in enumerate(out, 1):
+        try:
+            bind_predicate(con, dataset_name, x.rule)
+        except UnsafeSQL as exc:
+            raise ContractRefused(Refusal(
+                reason=Reason.CONTRACT_INVALID,
+                what=f"expectation {i} ({x.rule!r}) cannot be checked against {dataset_name}.",
+                why=str(exc),
+                detail="A rule is the text after WHERE, about this table's own columns.",
+                next_call=(f'propose_dataset_contract(dataset_name="{dataset_name}", '
+                           f'expectations=[...])'),
+            ).to_text()) from None
+    return out
 
 
 def _resolve_date_column(
@@ -333,6 +495,10 @@ def propose_contract(
     aggregations: dict[str, str] | None = None,
     analysis_window: tuple[date, date] | None = None,
     known_exclusions: list[Exclusion] | None = None,
+    expectations: list[Expectation] | None = None,
+    measure_columns: dict[str, str] | None = None,
+    measure_per: dict[str, list[str]] | None = None,
+    ratios: dict[str, dict] | None = None,
     caveats: list[str] | None = None,
     foreign_keys: list[ForeignKey] | None = None,
     domains: dict[str, list[str]] | None = None,
@@ -358,7 +524,7 @@ def propose_contract(
     unresolved: list[str] = []
     questions: list[str] = []
 
-    key, key_verdict, key_notes = _resolve_key(
+    key, key_verdict, key_notes, nearest = _resolve_key(
         con, dataset_name, primary_key, ev, roles
     )
     notes += key_notes
@@ -376,6 +542,8 @@ def propose_contract(
     # ---- grain: derived, and still unresolved
     if grain is not None and grain.strip():
         final_grain = grain.strip()
+        if not key:
+            notes += _grain_key_notes(con, dataset_name, final_grain, ev)
     else:
         final_grain = _grain_sentence(key)
         unresolved.append("grain")
@@ -384,6 +552,14 @@ def propose_contract(
                 f"Is '{final_grain}' what one row MEANS, in your words? The "
                 f"column names are all the data can offer; what the row "
                 f"represents is yours."
+            )
+        elif nearest is not None:
+            questions.append(
+                f"What is one row of this table? Nothing in the data identifies "
+                f"a row uniquely; the nearest is {nearest.label}, which repeats "
+                f"in {nearest.duplicate_rows:,} row(s) -- see what the data "
+                f"showed. If {nearest.label} is meant to be the key, state "
+                f"primary_key=[...] once the repeats are dealt with."
             )
         else:
             questions.append(
@@ -441,7 +617,9 @@ def propose_contract(
                     f"'count_distinct' counts a text column as it is.",
                 next_call=f'propose_cleaning_plan(dataset_name="{dataset_name}")',
             ).to_text())
-        m = Measure(name=name, agg=agg, definition=definition)
+        m = _measure(name, agg, definition, (measure_columns or {}).get(name),
+                     (measure_per or {}).get(name), (ratios or {}).get(name))
+        _verify_measure_columns(con, dataset_name, ev, m)
         built.append(m)
         if not definition:
             unresolved.append(m.definition_path)
@@ -497,6 +675,7 @@ def propose_contract(
         measures=built,
         dimensions=dimension_names,
         known_exclusions=list(known_exclusions or []),
+        expectations=_bound_expectations(con, dataset_name, expectations),
         caveats=list(caveats or []),
         # Neither is asked about and neither goes in `unresolved`. dbt does not
         # nag you for a relationships test; empty is a default, not a gap, and

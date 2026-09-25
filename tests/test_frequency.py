@@ -251,3 +251,67 @@ def test_a_mean_ranking_still_has_no_share(con):
     out = out_for(con, g, "top_n", dimension="region", measure="amount")
     assert all(r[3] == "" for r in out.rows)
     assert any("mean does not add up" in s for s in out.summary)
+
+
+# --- one named period (Cleanup Step 9) --------------------------------------------------------
+#
+# "Which single orders drive the 2025-11 total?" had no answer: top_n ranks the contract's whole
+# scope. One row a month here, February to September.
+
+def test_top_n_in_one_month_ranks_only_that_months_rows(con):
+    got = out_for(con, gate(), "top_n", dimension="region", measure="amount", period="2024-03")
+    assert [r[0] for r in got.rows] == ["North"] and got.rows[0][1] == "20.00"
+    note = got.summary[0]
+    assert "1 of 8 row(s) analysed" in note and "outside the month 2024-03" in note
+
+
+def test_a_quarter_is_a_period_too(con):
+    got = out_for(con, gate(), "top_n", dimension="region", measure="amount",
+                  period="2024-Q2", grain="quarter")
+    assert [r[0] for r in got.rows] == ["South", "North"]
+    assert got.rows[0][1] == "50.00"
+
+
+def test_a_period_outside_the_calendar_is_refused_naming_the_range(con):
+    from analytics_agent.analysis.base import ParamsInvalid
+    with pytest.raises(ParamsInvalid, match="2024-02 to 2024-09"):
+        out_for(con, gate(), "top_n", dimension="region", measure="amount", period="2024-10")
+
+
+def test_a_period_with_no_rows_narrows_to_none_and_says_so(con):
+    con.execute("DELETE FROM sales WHERE id = 4")
+    got = out_for(con, gate(), "top_n", dimension="region", measure="amount", period="2024-05")
+    assert got.rows == []
+    note = got.summary[0]
+    assert "0 of 7 row(s) analysed" in note and "outside the month 2024-05" in note
+
+
+def test_undated_rows_are_counted_out_of_a_period_not_lost(con):
+    con.execute("INSERT INTO sales VALUES (9, 'West', NULL, 5.00)")
+    note = out_for(con, gate(), "top_n", dimension="region", measure="amount",
+                   period="2024-03").summary[0]
+    assert "1 of 9 row(s) analysed" in note and "1 undated" in note
+
+
+def test_grain_without_a_period_is_refused(con):
+    from analytics_agent.analysis.base import ParamsInvalid
+    with pytest.raises(ParamsInvalid, match="period"):
+        out_for(con, gate(), "top_n", dimension="region", measure="amount", grain="quarter")
+
+
+def test_concentration_and_pareto_take_a_period(con):
+    for kind in ("concentration", "pareto"):
+        got = out_for(con, gate(), kind, dimension="region", measure="amount", period="2024-03")
+        assert "outside the month 2024-03" in got.summary[0], kind
+
+
+def test_top_n_states_what_the_rows_shown_hold_together(con):
+    """Cleanup Step 10, live: the assistant said the top five orders held '~56%' of November;
+    the five shares summed to 53.1%. A sum the reply states is a sum nobody has to do."""
+    got = out_for(con, gate(), "top_n", dimension="region", measure="amount", n=2)
+    assert "The 2 shown hold 67.7% of it together." in " ".join(got.summary), got.summary
+
+
+def test_top_n_showing_every_group_says_nothing_about_together(con):
+    got = out_for(con, gate(), "top_n", dimension="region", measure="amount", n=10)
+    assert "together" not in " ".join(got.summary)

@@ -175,3 +175,41 @@ def test_a_key_that_never_held_is_caught_the_first_time_the_gate_runs():
     state = state_of("sales")
     assert "BLOCKED" in state.stage
     assert state.next_call.startswith("validate_dataset")
+
+
+# --- a keyless contract over rows copied whole (Cleanup Step 8) -----------------------------
+
+COPIES = """SELECT * FROM (VALUES
+    ('A', TIMESTAMP '2024-03-01 09:00:00', 10),
+    ('A', TIMESTAMP '2024-03-01 09:00:00', 10),
+    ('B', TIMESTAMP '2024-04-01 09:00:00', 20)) v(k, ts, amount)"""
+
+
+def caveats_of(dataset_name: str) -> list[str]:
+    con = db.connect(WORKSPACE)
+    try:
+        return require_contract(con, dataset_name).caveats
+    finally:
+        con.close()
+
+
+def test_a_keyless_contract_over_exact_copies_carries_a_caveat():
+    """bunty_babli: no key, 4 rows copied whole, and every result said '604 of 604 row(s)
+    analysed' with nothing else. Not blocked -- a keyless contract is legal -- but said."""
+    build("sales", COPIES, [])
+    assert not gate_refuses("sales")
+    text = " ".join(caveats_of("sales"))
+    assert "1 of 3 row(s) in sales are exact copies of another row" in text
+    assert "propose_cleaning_plan" in text
+
+
+def test_a_keyless_contract_with_no_copies_says_nothing_about_them():
+    """A gate that fires when it need not teaches the reader to skim past it (Phase 4)."""
+    build("sales", DUPES, [])
+    assert not any("exact cop" in c for c in caveats_of("sales"))
+
+
+def test_a_keyed_contract_is_not_asked_about_copies():
+    """A key that holds already rules copies out; one that fails is refused by name."""
+    build("sales", GOOD, ["k"])
+    assert not any("exact cop" in c for c in caveats_of("sales"))

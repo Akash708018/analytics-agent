@@ -25,6 +25,9 @@ AGG_SQL: dict[str, str] = {
     "count": "count({col})",
     "count_distinct": "count(DISTINCT {col})",
     "median": "quantile_cont(CAST({col} AS DOUBLE), 0.5)",
+    # A ratio of sums (Cleanup Step 15): the measure is STRUCT(n, d) in the scope's relation,
+    # its parts summed apart and then divided -- never a mean of per-row ratios.
+    "ratio": "(sum({col}.n) / nullif(sum({col}.d), 0))",
 }
 
 

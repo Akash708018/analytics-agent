@@ -639,6 +639,10 @@ def propose_dataset_contract(
     caveats: list[str] | None = None,
     foreign_keys: list[dict] | None = None,
     domains: dict[str, list[str]] | None = None,
+    expectations: list[dict] | None = None,
+    measure_columns: dict[str, str] | None = None,
+    measure_per: dict[str, list[str]] | None = None,
+    ratios: dict[str, dict] | None = None,
     workspace_id: str | None = None,
 ) -> str:
     """Draft a Dataset Contract for a loaded dataset. Stores nothing.
@@ -668,6 +672,21 @@ def propose_dataset_contract(
       analysis_window_end="2024-09-30"            both ends or neither
       known_exclusions=[{"rule": "status = 'cancelled'",
                          "reason": "not real revenue"}]
+      expectations=[{"rule": "units > 0",
+                     "reason": "a line sells at least one item"}]
+                                                  every row must satisfy it;
+                                                  validate_dataset counts those
+                                                  that do not
+      measure_per={"order_shipping_fee": ["order_id"]}  a value repeated on every
+                                                  line of an order is one value
+                                                  per order; statistics over it
+                                                  are taken over orders
+      measure_columns={"returned_rate": "is_returned"}  a measure reading another
+                                                  column (a true/false column
+                                                  reads as 0/1, so mean = rate)
+      ratios={"gross_margin_pct": {"numerator": ["line_revenue", "-line_cost"],
+              "denominator": ["line_revenue"], "scale": 100}}  a ratio of sums,
+                                                  never a mean of ratios
 
     The contract that comes back with nothing unresolved is the one to confirm.
     Deleting an entry from `unresolved` does not work: the blank it was
@@ -683,7 +702,8 @@ def propose_dataset_contract(
             analysis_window_start=analysis_window_start,
             analysis_window_end=analysis_window_end,
             known_exclusions=known_exclusions, caveats=caveats,
-            foreign_keys=foreign_keys, domains=domains,
+            foreign_keys=foreign_keys, domains=domains, expectations=expectations,
+            measure_columns=measure_columns, measure_per=measure_per, ratios=ratios,
         )
     finally:
         con.close()
@@ -794,6 +814,8 @@ def compute_analysis(
     second_dimension: str | None = None,
     method: str | None = None,
     entity: str | None = None,
+    event: str | None = None,
+    groups: list[str] | None = None,
     confidence: float | None = None,
     alpha: float | None = None,
     power: float | None = None,
@@ -816,15 +838,21 @@ def compute_analysis(
       distribution    measure, bins
       frequency       column, limit
       cross_tab       rows, columns, and optionally measure
-      top_n           dimension, measure, n
-      group_compare   dimension, measure
-      pareto          dimension, measure, threshold
-      concentration   dimension, measure
+      top_n           dimension, measure, n; period and grain optional
+      group_compare   dimension, measure; groups optional
+      pareto          dimension, measure, threshold; period and grain optional
+      concentration   dimension, measure; period and grain optional. No group
+                      cap for these two: the answer is a count or a few cuts. With
+                      period ("2025-11", or "2025-Q4" with grain="quarter"),
+                      these three rank only that period's rows -- which
+                      orders drive a month.
       ranking_shift   dimension, measure, and four ISO dates:
                       before_start, before_end, after_start, after_end
-      trend           measure, and grain as below. One measure per
-                      period, with the periods holding no rows blank
-                      rather than zero and the gaps named.
+      trend           measure, and grain as below; dimension optional.
+                      One measure per period, with the periods holding
+                      no rows blank rather than zero and the gaps named.
+                      With dimension, one column per member of that
+                      declared dimension, then (all) and rows.
       seasonality     measure, and grain as below except year. One
                       measure folded onto the positions of its cycle,
                       each position's mean over the periods that hold
@@ -837,7 +865,8 @@ def compute_analysis(
                       level across the calendar, with every
                       admissible split reported and the splits a gap
                       could explain excluded rather than caveated.
-      outlier_detection  measure. Unusual values by three methods at
+      outlier_detection  measure; dimension optional, for fences within
+                      each group. Unusual values by three methods at
                       once -- Tukey's fence, the z-score and the
                       median absolute deviation -- with their bounds
                       and the masking that makes the z-score miss.
@@ -869,6 +898,9 @@ def compute_analysis(
                       which hold none -- a period with no rows cannot
                       appear in a GROUP BY, so a trend drawn over this
                       column crosses absent periods without saying so.
+      groups=[...]    on group_compare, hypothesis_test, effect_size,
+                      confidence_interval, sample_adequacy: keep only
+                      those members of dimension, e.g. Store and Online.
       hypothesis_test  dimension, and either measure or second_dimension,
                       plus method (auto, parametric or rank). Whether the
                       groups differ by more than sampling alone would
@@ -897,7 +929,8 @@ def compute_analysis(
                       cohort's size beside its label. Warns and points at
                       repeat_behaviour when too few return for the shape
                       to mean anything.
-      repeat_behaviour  entity. How many people appear once and how many
+      repeat_behaviour  entity; event optional (e.g. order_id, so a person's
+                      events are orders, not rows). How many people appear once and how many
                       come back, how often and how long they take. Both
                       refuse an entity that is distinct per row, which
                       describes events rather than people.
@@ -922,6 +955,7 @@ def compute_analysis(
             before_end=before_end, after_start=after_start,
             after_end=after_end, period=period, baseline=baseline, grain=grain,
             second_dimension=second_dimension, method=method, entity=entity,
+            event=event, groups=groups,
             confidence=confidence, alpha=alpha, power=power,
         )
     finally:
@@ -953,6 +987,8 @@ def render_chart(
     second_dimension: str | None = None,
     method: str | None = None,
     entity: str | None = None,
+    event: str | None = None,
+    groups: list[str] | None = None,
     confidence: float | None = None,
     alpha: float | None = None,
     power: float | None = None,
@@ -979,8 +1015,8 @@ def render_chart(
                     For calendar_coverage, trend, seasonality, period_compare.
       bar           one measure per group. For frequency, top_n, group_compare,
                     ranking_shift.
-      grouped_bar   two or more measures side by side per group. For cross_tab
-                    and period_compare.
+      grouped_bar   two or more measures side by side per group. For cross_tab,
+                    period_compare, and trend with a dimension.
       scatter       the first measure against the second, one point per row.
                     For correlation and bivariate.
       histogram     one measure binned by value. For distribution.
@@ -994,7 +1030,10 @@ def render_chart(
 
     line, bar, histogram and waterfall draw one measure. If the result holds
     more than one, name the one you want with y rather than letting the tool
-    pick -- it will refuse and list them instead of choosing.
+    pick -- it will refuse and list them instead of choosing. Two things you
+    already chose are honoured without y: the measure you passed is drawn
+    when one column is that measure (rows is then left beside the chart),
+    and a (all) or (total) column is not drawn beside the columns it totals.
 
     x names the column along the bottom and defaults to the result's first,
     which is the group. title defaults to the analysis and the chart kind.
@@ -1016,6 +1055,7 @@ def render_chart(
             before_end=before_end, after_start=after_start,
             after_end=after_end, period=period, baseline=baseline, grain=grain,
             second_dimension=second_dimension, method=method, entity=entity,
+            event=event, groups=groups,
             confidence=confidence, alpha=alpha, power=power,
         )
     finally:

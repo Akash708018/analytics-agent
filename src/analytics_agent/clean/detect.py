@@ -86,6 +86,10 @@ def proposed_type(con, table: str, column: str) -> str | None:
     total = _non_null(con, table, column)
     if total == 0:
         return None
+    # A value with a zero before another digit is a code: '000435' becomes 435, and SKUs that
+    # were six characters stop being what anybody wrote. Retail C003 offered exactly that as
+    # discarding nothing and recommended it (Cleanup Step 12, RF-O5).
+    padded = _scalar(con, f"SELECT count(*) FROM {t} WHERE regexp_matches({c}, '^[+-]?0[0-9]')")
 
     def reaches(to_type: str) -> bool:
         return _reaches(con, table, column, f"TRY_CAST({c} AS {to_type}) IS NOT NULL")
@@ -100,7 +104,9 @@ def proposed_type(con, table: str, column: str) -> str | None:
         if odd == 0:
             return "BOOLEAN"
 
-    if reaches("DOUBLE"):
+    # A padded code is not read as a number at all (Cleanup Step 12, RF-O5); the sampled test
+    # decides the rest (P14-O15).
+    if not padded and reaches("DOUBLE"):
         rounded = _scalar(
             con,
             f"SELECT count(*) FROM {t} WHERE TRY_CAST({c} AS DOUBLE) IS NOT NULL "
@@ -127,6 +133,29 @@ def proposed_type(con, table: str, column: str) -> str | None:
     return None
 
 
+def currency_type(con, table: str, column: str) -> str | None:
+    """The number type a column of currency text reads as, or None (Cleanup Step 12, A3).
+
+    Offered only where the plain cast fails and most values parse once the currency sign, the
+    thousands separators and spaces are removed -- and at least one value holds such a character,
+    so a column of plain numbers is never routed here.
+    """
+    t, c = sql.ident(table), sql.ident(column)
+    total = _non_null(con, table, column)
+    if total == 0:
+        return None
+    stripped = f"regexp_replace({c}, '{sql.CURRENCY_CHARS}', '', 'g')"
+    marked = _scalar(con, f"SELECT count(*) FROM {t} WHERE regexp_matches({c}, '[₹$€£¥,]')")
+    parsed = _scalar(con, f"SELECT count(*) FROM {t} WHERE {c} IS NOT NULL "
+                          f"AND TRY_CAST({stripped} AS DOUBLE) IS NOT NULL")
+    if not marked or parsed / total < CONVERT_MIN_SHARE:
+        return None
+    lost = _scalar(con, f"SELECT count(*) FROM {t} WHERE TRY_CAST({stripped} AS DOUBLE) IS NOT NULL "
+                        f"AND (TRY_CAST({stripped} AS DECIMAL(18,2)) IS NULL OR "
+                        f"TRY_CAST({stripped} AS DECIMAL(18,2)) <> TRY_CAST({stripped} AS DOUBLE))")
+    return "DECIMAL(18,2)" if lost == 0 else "DOUBLE"
+
+
 def _fits_two_places(con, table: str, column: str) -> bool:
     """DECIMAL(18,2) over DOUBLE where it fits.
 
@@ -148,10 +177,10 @@ NUMERIC_TYPES = ("BIGINT", "DOUBLE", "DECIMAL(18,2)")
 # Numbers written for people rather than parsers (P14-O10, B8/B9). RE2, full-match. A value like
 # '1,234' fits both conventions -- a thousand and twenty-four in one, one point two in the other --
 # so a convention is chosen only by values that fit it and not the other.
-_US_NUMBER = r"[-+]?[$€£¥]?\s?[-+]?(\d{1,3}(,\d{3})+|\d+)(\.\d+)?"
-_EU_NUMBER = r"[-+]?[$€£¥]?\s?[-+]?(\d{1,3}(\.\d{3})+|\d+)(,\d+)?"
+_US_NUMBER = r"[-+]?[₹$€£¥]?\s?[-+]?(\d{1,3}(,\d{3})+|\d+)(\.\d+)?"
+_EU_NUMBER = r"[-+]?[₹$€£¥]?\s?[-+]?(\d{1,3}(\.\d{3})+|\d+)(,\d+)?"
 _PERCENT = r"[-+]?\d+([.,]\d+)?\s?%"
-_CURRENCY_AND_SPACE = "[$€£¥\\s]"
+_CURRENCY_AND_SPACE = "[₹$€£¥\\s]"
 
 # Date formats tried in order for a text column no single cast reads (P14-O10, B12). The numeric
 # day/month orders are added only when a value settles which comes first (a part above 12).
@@ -241,6 +270,14 @@ def alternative_conversion(con, table: str, column: str) -> list[tuple[str, str,
 
     def full(pattern: str) -> str:
         return f"regexp_full_match({trimmed}, {sql.literal(pattern)})"
+
+    # A zero-padded code is not offered as a number by any reading (Cleanup Step 12, RF-O5):
+    # '000435' matched both separator conventions here and came back as two conversions at the
+    # merge of main (25/09/2026). Its dates are still looked for.
+    if _scalar(con, f"SELECT count(*) FROM {sql.ident(table)} "
+                    f"WHERE regexp_matches({c}, '^[+-]?0[0-9]')"):
+        date = _date_conversion(con, table, column)
+        return [date] if date else []
 
     if _reaches(con, table, column, full(_PERCENT)):
         text = f"replace(rtrim({trimmed}, '%'), ',', '.')"
@@ -423,7 +460,12 @@ def detect(
                 column,
             )
         else:
-            for alt_type, expression, how in alternative_conversion(con, source, column):
+            # The readings a plain cast misses -- separators of either convention, currency and
+            # percent signs, mixed date formats (P14-O10) -- first: they tell a decimal comma
+            # from a thousands separator. Main's currency reading (Cleanup Step 12) stands behind
+            # them; ahead of them it read '12,5' as 125 (found at the merge, 25/09/2026).
+            alternatives = alternative_conversion(con, source, column)
+            for alt_type, expression, how in alternatives:
                 add(
                     ActionKind.CONVERT_TYPE,
                     sql.convert_type(source=source, target=target, column=column,
@@ -431,6 +473,17 @@ def detect(
                                      expression=expression,
                                      numeric=alt_type in NUMERIC_TYPES),
                     f"read {column} as {alt_type}, {how}",
+                    column,
+                )
+            money = None if alternatives else currency_type(con, source, column)
+            if money:
+                add(
+                    ActionKind.CONVERT_TYPE,
+                    sql.convert_type(source=source, target=target, column=column,
+                                     to_type=money, missing_tokens=missing_tokens,
+                                     strip_currency=True),
+                    f"read {column} as {money}, removing the currency sign and thousands "
+                    f"separators first (currency text)",
                     column,
                 )
 

@@ -32,7 +32,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..util.sql_guard import quote_identifier
-from .base import LostRows, number
+from .base import LostRows, number, relation_types
 from .declared import column_types
 from .registry import Output, register
 from .temporal import (
@@ -69,12 +69,12 @@ def calendar_coverage(con, gate, scope, grain: str = DEFAULT_GRAIN, **params) ->
     cal = calendar_for(gate, scope, date_column, grain)
     key = cal.key
 
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     col = quote_identifier(date_column)
     # The column's type is the contract's check, not this one's (P9-D10):
     # dataset_contract refuses a text date at confirm time. It is read here
     # only to decide whether the session zone is worth stating (P9-D7).
-    dtype = column_types(con, scope.dataset_name).get(date_column, "")
+    dtype = relation_types(con, scope).get(date_column, "")
     tz_aware = "TIME ZONE" in dtype.upper()
 
     window = getattr(contract, "analysis_window", None)

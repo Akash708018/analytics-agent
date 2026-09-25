@@ -842,6 +842,54 @@ def domain_checks(con, dataset_name: str, domains) -> list[CheckResult]:
         ))
     return out
 
+def expectation_checks(con, dataset_name: str, expectations, primary_key) -> list[CheckResult]:
+    """One check per declared rule every row must satisfy (Cleanup Step 13, RF-O7).
+
+    failed where the rule is false; not_checked where it is NULL -- a rule over a blank column
+    judged nothing about that row, and P7-D4 is that a predicate does not see NULLs, so they are
+    counted rather than folded into passed. Evidence is the failing rows' primary-key values, the
+    handle a person looks a row up by; without a key, the failing rows are counted and not named.
+    The rule was bound at proposal; it is bound again here, because the table can have changed.
+    """
+    from ..util.sql_guard import UnsafeSQL, bind_predicate
+
+    out: list[CheckResult] = []
+    table = _q(dataset_name)
+    for x in expectations or []:
+        check_id, title = f"rule[{x.rule}]", "Rows satisfy a rule"
+        try:
+            bind_predicate(con, dataset_name, x.rule)
+        except UnsafeSQL as exc:
+            out.append(CheckResult.not_run(check_id, title, x.rule, str(exc)))
+            continue
+        rows, failed, unknown = con.execute(
+            f"SELECT count(*), count(*) FILTER (WHERE ({x.rule}) = false), "
+            f"count(*) FILTER (WHERE ({x.rule}) IS NULL) FROM {table}"
+        ).fetchone()
+        shown: list[str] = []
+        if failed and primary_key:
+            key = " || ' + ' || ".join(f"CAST({_q(c)} AS VARCHAR)" for c in primary_key)
+            shown = [r[0] for r in con.execute(
+                f"SELECT {key} FROM {table} WHERE ({x.rule}) = false "
+                f"ORDER BY 1 LIMIT {EVIDENCE_LIMIT}").fetchall()]
+        out.append(CheckResult(
+            check_id=check_id,
+            title=title,
+            subject=x.rule,
+            rows=rows,
+            passed=rows - failed - unknown,
+            failed=failed,
+            not_checked=unknown,
+            detail=(f"{failed:,} row(s) break it -- {x.reason}" if failed
+                    else f"every row it can judge keeps it -- {x.reason}")
+            + (f"; {unknown:,} row(s) have a NULL where it looks, so it judged nothing about them"
+               if unknown else ""),
+            evidence=tuple(shown),
+            evidence_total=failed if shown else 0,
+        ))
+    return out
+
+
 __all__ = [
     "EVIDENCE_LIMIT",
     "CheckResult",
@@ -849,6 +897,7 @@ __all__ = [
     "Scope",
     "date_checks",
     "domain_checks",
+    "expectation_checks",
     "key_checks",
     "reference_checks",
     "row_count_check",

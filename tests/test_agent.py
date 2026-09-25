@@ -44,8 +44,11 @@ class Scripted:
         self.tools = tools
         outer = self
 
+        outer.finals = []
+
         class S:
-            def step(self_inner):
+            def step(self_inner, final=False):
+                outer.finals.append(final)
                 if outer.fail:
                     raise outer.fail
                 return outer.replies.pop(0)
@@ -168,7 +171,9 @@ def test_the_loop_stops_after_the_round_limit(contracted):
     p = Scripted([Reply(calls=[Call(str(i), "list_datasets", {})])
                   for i in range(agent.MAX_ROUNDS + 2)])
     turn = _answer(be, ws, p)
-    assert len(turn.tool_calls) == agent.MAX_ROUNDS
+    # Cleanup Step 11: the last round offers no tools, so at most MAX_ROUNDS - 1 run; a model
+    # that still answers with calls and no text gets the stop message.
+    assert len(turn.tool_calls) == agent.MAX_ROUNDS - 1
     assert f"stopped after {agent.MAX_ROUNDS} rounds" in turn.reply
 
 
@@ -396,15 +401,17 @@ def test_a_503_is_retried_with_backoff_then_reported(monkeypatch):
 
 
 def test_groq_gets_json_schema_nullables_and_gemini_keeps_openapi():
-    """P14-D27: Groq refused gpt-oss's `question: null` because `nullable` is not JSON Schema."""
-    ra = next(s for s in agent.tool_specs() if s.name == "run_analysis")
-    assert ra.parameters["properties"]["question"] == {"type": "string", "nullable": True}
-    js = llm.to_json_schema(ra.parameters)
-    assert js["properties"]["question"] == {"type": ["string", "null"]}
+    """P14-D27: Groq refused gpt-oss's `question: null` because `nullable` is not JSON Schema.
+    run_analysis carried that argument and left the allowlist in Cleanup Step 10; compute_analysis's
+    `dimension` is the same shape, a string that may be null."""
+    ca = next(s for s in agent.tool_specs() if s.name == "compute_analysis")
+    assert ca.parameters["properties"]["dimension"] == {"type": "string", "nullable": True}
+    js = llm.to_json_schema(ca.parameters)
+    assert js["properties"]["dimension"] == {"type": ["string", "null"]}
     assert js["properties"]["dataset_name"] == {"type": "string"}
     q = llm.Groq()
-    session = q.start("s", [], "m", [ra])
-    sent = session._tools[0]["function"]["parameters"]["properties"]["question"]
+    session = q.start("s", [], "m", [ca])
+    sent = session._tools[0]["function"]["parameters"]["properties"]["dimension"]
     assert sent == {"type": ["string", "null"]}
 
 
@@ -418,10 +425,10 @@ def test_only_the_successful_attempts_artifacts_come_back(contracted):
             session = super().start(system, history, message, tools)
             outer, step = self, session.step
 
-            def failing_step():
+            def failing_step(final=False):
                 if not outer.replies:
                     raise ProviderError("gemini", "HTTP 429", retryable=True)
-                return step()
+                return step(final)
             session.step = failing_step
             return session
     first = DrawsThenFails([Reply(calls=[Call("1", "render_chart", {
@@ -553,3 +560,154 @@ def test_the_screen_note_reaches_the_model_through_the_loop(contracted):
     _answer(be, ws, p)
     to_model = p.seen[0][1]
     assert "[Note for the assistant]" in to_model and "Upload & read screen" in to_model
+
+
+# --- the rules the graded answer of 22/09/2026 12:21 broke (Cleanup Step 9) -------------------
+
+def test_the_screens_the_rules_name_are_the_screens_the_app_has():
+    """It sent the person to a Cleaning screen that does not exist."""
+    import re
+    from pathlib import Path
+    app = (Path(__file__).resolve().parents[1] / "ui" / "app.py").read_text()
+    assert list(agent.SCREENS) == re.findall(r'st\.Page\([^)]*title="([^"]+)"', app)
+    assert all(name in agent.SYSTEM for name in agent.SCREENS)
+
+
+def test_the_rules_forbid_handing_the_person_a_tool_call():
+    assert "never give the person a tool call" in agent.SYSTEM.lower()
+
+
+def test_the_rules_say_to_run_what_the_question_needs_rather_than_suggest_it():
+    text = agent.SYSTEM.lower()
+    assert "run it yourself" in text and "render_chart" in text and "period=" in text
+
+
+def test_the_rules_forbid_a_cause_no_result_states():
+    assert "cause" in agent.SYSTEM.lower()
+
+
+def test_cleaning_is_sent_to_a_screen_that_exists():
+    """Main's Cleanup Step 9 forbade 'approve cleaning' because cleaning had no screen and the rule
+    named one anyway. Phase 14 Step 5 built the Clean screen; at the merge of 25/09/2026 the rule
+    stands only because that screen is in the app -- and no rule may say cleaning has none."""
+    assert "Clean" in agent.SCREENS
+    assert "approve cleaning" in agent.SYSTEM and "the Clean screen" in agent.SYSTEM
+    assert "cleaning and databases have no screen" not in agent.SYSTEM.lower()
+
+
+# --- the request fits the providers (Cleanup Step 10, CL9-O1) ---------------------------------
+#
+# Groq refused every graded question with 413: 8,000 tokens a minute, and the twelve tool specs
+# alone were 19,616 characters (~4,900 tokens) before a word of the conversation.
+
+SPEC_BUDGET = 8_000
+
+
+def _spec_chars() -> int:
+    import json
+    return sum(len(s.description) + len(json.dumps(s.parameters)) for s in agent.tool_specs())
+
+
+def test_the_tool_specs_fit_their_budget():
+    assert _spec_chars() <= SPEC_BUDGET, _spec_chars()
+
+
+def test_the_analysis_roster_is_derived_from_the_registry():
+    from analytics_agent.analysis.registry import REGISTRY
+    desc = next(s.description for s in agent.tool_specs() if s.name == "compute_analysis")
+    for name in REGISTRY:
+        assert f"{name}(" in desc, name
+    assert "top_n(dimension, measure, n, period, grain)" in desc
+
+
+def test_run_analysis_is_not_offered_to_the_model():
+    """compute_analysis passes the same gate; run_analysis's reply was 7,431 characters of a
+    catalogue the roster above already carries."""
+    assert "run_analysis" not in agent.ALLOWED
+
+
+def test_a_reply_naming_run_analysis_says_compute_analysis_does_the_same():
+    text = agent._with_screen_notes('NEXT STEP: call run_analysis(dataset_name="x", ...)')
+    assert "run_analysis: not one of your tools" in text and "compute_analysis" in text
+
+
+# --- the live run of Cleanup Step 10: a malformed generation, and a false "nothing changed" ---
+
+PARSE_FAILED = ('{"error":{"message":"Parsing failed. The model generated output that could not be '
+                'parsed. Please adjust your prompt. See \'failed_generation\' for more details.",'
+                '"type":"invalid_request_error","failed_generation":"{\\"name\\": ..."}}')
+
+
+def test_a_generation_groq_could_not_parse_is_classified():
+    assert llm._classify("groq", 400, PARSE_FAILED).kind == "generation_failed"
+
+
+def test_groq_retries_a_generation_it_could_not_parse(monkeypatch):
+    """Seen live: six tool calls made, a chart drawn, then 400 'Parsing failed' ended the turn."""
+    q = llm.Groq()
+    monkeypatch.setattr(q, "model", lambda: "m")
+    replies = iter([llm._classify("groq", 400, PARSE_FAILED),
+                    {"choices": [{"message": {"role": "assistant", "content": "November."}}]}])
+
+    def post(body):
+        r = next(replies)
+        if isinstance(r, Exception):
+            raise r
+        return r
+    monkeypatch.setattr(q, "post", post)
+    assert q.start("sys", [], "q", []).step().text == "November."
+
+
+def test_a_failed_turn_does_not_say_nothing_changed_when_a_file_was_written():
+    """The same run wrote a chart before failing; the message said nothing had changed."""
+    text = agent._failed(["groq: could not parse"], written=1)
+    assert "Nothing in your workspace changed" not in text and "Files" in text
+    assert "Nothing in your workspace changed" in agent._failed(["x"], written=0)
+
+
+# --- the last round answers (Cleanup Step 11) ---------------------------------------------------
+#
+# Live, 15:03: seven rounds fetched every figure the answer needed, the eighth was spent on a
+# refusal, and the turn returned "I stopped after 8 rounds" with none of it.
+
+def test_the_last_round_is_asked_for_an_answer_and_its_text_is_kept(contracted):
+    be, ws = contracted
+    rounds = [Reply(calls=[Call(str(i), "list_datasets", {})]) for i in range(agent.MAX_ROUNDS - 1)]
+    rounds.append(Reply(text="November, driven by one order.",
+                        calls=[Call("x", "list_datasets", {})]))
+    p = Scripted(rounds)
+    turn = _answer(be, ws, p)
+    assert p.finals == [False] * (agent.MAX_ROUNDS - 1) + [True]
+    assert turn.reply == "November, driven by one order."
+    assert len(turn.tool_calls) == agent.MAX_ROUNDS - 1, "the final round's calls are not run"
+
+
+def test_gemini_is_told_to_call_nothing_on_the_final_round(monkeypatch):
+    g = llm.Gemini()
+    monkeypatch.setattr(g, "model", lambda: "m")
+    bodies = []
+    monkeypatch.setattr(g, "post", lambda body, model: bodies.append(
+        __import__("copy").deepcopy(body)) or {"candidates": [{"content": {
+            "role": "model", "parts": [{"text": "done"}]}}]})
+    s = g.start("sys", [], "q", list(agent.tool_specs())[:1])
+    s.step()
+    s.step(final=True)
+    assert bodies[0]["toolConfig"]["functionCallingConfig"]["mode"] == "AUTO"
+    assert bodies[1]["toolConfig"]["functionCallingConfig"]["mode"] == "NONE"
+    assert "last round" in str(bodies[1]["contents"][-1])
+
+
+def test_groq_is_told_to_call_nothing_on_the_final_round(monkeypatch):
+    q = llm.Groq()
+    monkeypatch.setattr(q, "model", lambda: "m")
+    bodies = []
+    monkeypatch.setattr(q, "post", lambda body: bodies.append(
+        __import__("copy").deepcopy(body)) or {
+        "choices": [{"message": {"role": "assistant", "content": "done"}}]})
+    q.start("sys", [], "q", list(agent.tool_specs())[:1]).step(final=True)
+    assert bodies[0]["tool_choice"] == "none"
+    assert "last round" in bodies[0]["messages"][-1]["content"]
+
+
+def test_the_rules_say_not_to_re_check_a_ready_dataset():
+    assert "profile, describe or validate only when" in agent.SYSTEM

@@ -111,6 +111,7 @@ _TRACKED = (
     "analysis_window",
     "dimensions",
     "known_exclusions",
+    "expectations",
     "caveats",
     "bound_to",
     "missing_values",

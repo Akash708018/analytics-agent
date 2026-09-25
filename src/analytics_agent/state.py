@@ -43,6 +43,7 @@ from analytics_agent.contract.compatibility import (
     KeyVerdict,
     binding_for,
     classify_drift,
+    exact_copies,
     verify_key,
 )
 from analytics_agent.contract.dataset_contract import DatasetContract
@@ -61,6 +62,10 @@ class Gate:
     drift: DriftVerdict
     key: KeyVerdict | None = None
     narrowed: str | None = None
+    #: Rows that are exact copies of another row, counted only when the contract states no key
+    #: (a key that holds rules copies out; one that fails is refused). Cleanup Step 8.
+    copies: int = 0
+    rows: int | None = None
 
     @property
     def caveats(self) -> list[str]:
@@ -80,6 +85,16 @@ class Gate:
         drift_caveat = self.drift.caveat()
         if drift_caveat:
             out.append(drift_caveat)
+        if self.copies:
+            of = f" of {self.rows:,}" if self.rows is not None else ""
+            name = self.contract.dataset_name
+            out.append(
+                f"{self.copies:,}{of} row(s) in {name} are exact copies of another row, and "
+                f"this contract states no primary key, so every count and total here includes "
+                f"them. Removing them is a cleaning step "
+                f'(propose_cleaning_plan(dataset_name="{name}")); a primary_key stated after '
+                f"that has every analysis check it."
+            )
         out.extend(self.contract.caveats)
         for e in self.contract.known_exclusions:
             count = f" ({e.row_count:,} rows)" if e.row_count is not None else ""
@@ -186,6 +201,8 @@ def require_contract(con, dataset_name: str) -> Gate:
         drift=drift,
         key=key_verdict,
         narrowed=record.narrowing() if record else None,
+        copies=0 if live.contract.primary_key else exact_copies(con, dataset_name),
+        rows=db.table_shape(con, dataset_name)[0],
     )
 
 

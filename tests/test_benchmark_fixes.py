@@ -133,7 +133,9 @@ def test_n4_a_wrong_argument_repeats_the_same_analysis(ws, kw, analysis):
 
 
 def test_n5_a_group_cap_points_at_top_n_as_its_why_says(ws):
-    out = server.compute_analysis(dataset_name="sales", analysis_type="concentration",
+    # concentration lost its cap in main's Cleanup Step 14 ("no needless cap"); group_compare
+    # keeps one -- the (all) row must fit -- so it carries the check since the merge of 25/09.
+    out = server.compute_analysis(dataset_name="sales", analysis_type="group_compare",
                                   dimension="customer_id", measure="revenue", workspace_id=ws)
     assert "top_n on customer_id" in out
     assert _next(out) == ('NEXT STEP: call compute_analysis(dataset_name="sales", '

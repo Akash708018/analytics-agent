@@ -113,11 +113,15 @@ def _replace_one(target: str, source: str, column: str, expression: str) -> str:
 # part of a zip code or an account number, are gone (P14-O4, B2).
 LEADING_ZERO = "regexp_matches(trim({col}), '^[+-]?0[0-9]')"
 ZERO_DATE = r"0000-00-00([ T]00:00:00)?"
+#: What a number written for people carries that a number does not: currency signs, thousands
+#: separators, spaces. Removed before the cast when a conversion is offered as currency text.
+CURRENCY_CHARS = "[₹$€£¥,\\s]"
 
 
 def convert_type(
     *, source: str, target: str, column: str, to_type: str,
     missing_tokens: list[str], expression: str | None = None, numeric: bool = False,
+    strip_currency: bool = False,
 ) -> Rendering:
     """Read a text column as `to_type`.
 
@@ -128,10 +132,14 @@ def convert_type(
     destroys the only record that a price was withheld rather than missing.
     """
     col = ident(column)
+    # Currency text (Cleanup Step 12, A3): '₹10,846.00' is a number once the sign and the
+    # separator are gone, and the statement shown for approval says so in its own SQL.
+    source_value = (f"regexp_replace({col}, '{CURRENCY_CHARS}', '', 'g')"
+                    if strip_currency else col)
     # `expression` is the conversion when TRY_CAST alone cannot read the text: a decimal comma,
     # a currency sign, a percent sign, several date formats (P14-O10). The loss is counted from
     # it exactly as from a plain cast. `numeric` counts a value with leading zeros as lost too.
-    expression = expression or f"TRY_CAST({col} AS {to_type})"
+    expression = expression or f"TRY_CAST({source_value} AS {to_type})"
     fails = f"{expression} IS NULL"
     if numeric:
         fails = f"({fails} OR {LEADING_ZERO.format(col=col)})"
@@ -272,9 +280,11 @@ def drop_duplicate_rows(*, source: str, target: str) -> Rendering:
         affected_sql=f"SELECT count(*) - (SELECT count(*) FROM {grouped}) FROM {src}",
         lost_sql=f"SELECT count(*) - (SELECT count(*) FROM {grouped}) FROM {src}",
         sample_sql=(
-            f"SELECT to_json(d)::VARCHAR FROM (SELECT *, count(*) AS "
+            # Ordered, so a proposal reads the same twice (Cleanup Step 16: the re-run's two
+            # plans showed different sample rows for one table).
+            f"SELECT to_json(d)::VARCHAR AS j FROM (SELECT *, count(*) AS "
             f"duplicate_count FROM {src} GROUP BY ALL HAVING count(*) > 1) d "
-            f"ORDER BY 1 LIMIT {SAMPLE_LIMIT}"
+            f"ORDER BY j LIMIT {SAMPLE_LIMIT}"
         ),
     )
 

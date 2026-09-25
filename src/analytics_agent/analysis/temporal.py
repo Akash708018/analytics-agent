@@ -28,7 +28,7 @@ The rulings carried here, all measured in Step 1 and listed in decisions.md:
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import NamedTuple
 
 from ..util.sql_guard import quote_identifier
@@ -42,6 +42,9 @@ __all__ = [
     "calendar_for",
     "edges",
     "longest_run",
+    "empty_months",
+    "months_sentence",
+    "narrow_to_period",
     "per_period_sql",
     "require_date_column",
 ]
@@ -103,7 +106,7 @@ def calendar_for(gate, scope, date_column: str, grain: str) -> Calendar:
         )
     step, label_sql = GRAINS[key]
 
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     col = quote_identifier(date_column)
     window = getattr(gate.contract, "analysis_window", None)
     if window is not None:
@@ -219,3 +222,117 @@ def edges(con, cal: Calendar, table: str, col: str, where: str) -> Edges:
         f"{tests} FROM e"
     ).fetchall()[0]
     return Edges(*row)
+
+
+# Labels shown when a period outside the calendar is refused.
+NAMED_RANGE = 12
+
+
+def narrow_to_period(con, gate, scope, period: str, grain: str = DEFAULT_GRAIN):
+    """The same scope, holding only the rows of one named period.
+
+    Cleanup Step 9: "which orders drive the 2025-11 total?" had no answer, because top_n,
+    concentration and pareto rank over the contract's whole scope and the scope is the
+    contract's. The period is looked up in the generated calendar, as period_compare looks its
+    periods up (P9-D12): a label the calendar lacks is refused naming the range, and a label it
+    has with no rows narrows to nothing, which the caller reports.
+
+    The four buckets still sum to the table (Scope.__post_init__): dated rows of other periods
+    move to outside_window, and undated analysed rows -- which no period can hold -- to no_date.
+    method_note then says "outside the month 2025-11".
+    """
+    date_column = require_date_column(gate.contract)
+    cal = calendar_for(gate, scope, date_column, grain)
+    table = scope.source
+    col = quote_identifier(date_column)
+    periods = con.execute(per_period_sql(
+        cal, table, col, scope.where, inner=["count(*) AS n"],
+        outer=["strftime(s.period, '%Y-%m-%d %H:%M:%S')", "coalesce(d.n, 0)"],
+    )).fetchall()
+    found = next((r for r in periods if r[0] == period), None)
+    if found is None:
+        labels = [r[0] for r in periods]
+        span = f"{labels[0]} to {labels[-1]}" if labels else "none -- no row in scope is dated"
+        raise ParamsInvalid(
+            f"period {period!r} is not a {cal.key} of this calendar, which runs {span}"
+            + (f" ({len(labels):,} {cal.key}s)" if len(labels) > NAMED_RANGE else "")
+            + f". A {cal.key} is labelled as trend labels it; grain sets which labels exist."
+        )
+    in_period = (
+        f"({scope.where}) AND date_trunc('{cal.key}', {col}) = TIMESTAMP '{found[1]}'"
+    )
+    undated = con.execute(
+        f"SELECT count(*) FROM {table} WHERE ({scope.where}) AND {col} IS NULL"
+    ).fetchone()[0]
+    held = found[2]
+    where_text = f"the {cal.key} {period}"
+    if scope.window_text:
+        where_text += f" (within {scope.window_text})"
+    return replace(
+        scope,
+        where=in_period,
+        outside_window=scope.outside_window + scope.analysed - held - undated,
+        no_date=scope.no_date + undated,
+        analysed=held,
+        window_text=where_text,
+    )
+
+
+def period_narrowing(con, gate, scope, name: str, period, grain):
+    """The scope an analysis registered with narrows=True runs over.
+
+    One place for the parameter rule three analyses share: grain names which labels a period
+    may take, so a grain with no period is a call that asks for nothing.
+    """
+    if period is None:
+        if grain is not None:
+            raise ParamsInvalid(
+                f"{name} got grain={grain!r} and no period. grain says what a period label "
+                f"means; name one with period=, e.g. period=\"2025-11\"."
+            )
+        return scope
+    return narrow_to_period(con, gate, scope, str(period), grain or DEFAULT_GRAIN)
+
+
+def empty_months(con, cal, table: str, col: str, where: str, label: str):
+    """The months inside one quarter or year of the calendar that hold no rows, and how many
+    months it has -- or None at a grain with no months inside it.
+
+    Cleanup Step 12, RF-O3: period_compare set retail's 2024 against 2025 and said "366 days of
+    data" for a year whose September held nothing. A day inside a month holding no sale is normal
+    and is not named; a month inside a year holding none is how a feed outage shows. Months outside
+    the declared window are not counted as empty.
+    """
+    if cal.key not in ("quarter", "year"):
+        return None
+    starts = con.execute(per_period_sql(
+        cal, table, col, where, inner=["count(*) AS n"],
+        outer=["strftime(s.period, '%Y-%m-%d %H:%M:%S')"],
+    )).fetchall()
+    start = next((r[1] for r in starts if r[0] == label), None)
+    if start is None:
+        return None
+    lo, hi = f"TIMESTAMP '{start}'", f"(TIMESTAMP '{start}' + {cal.step})"
+    if cal.windowed:
+        lo = f"greatest({lo}, CAST(DATE '{cal.start}' AS TIMESTAMP))"
+        hi = f"least({hi}, CAST(DATE '{cal.end}' AS TIMESTAMP) + INTERVAL 1 DAY)"
+    months = con.execute(
+        f"SELECT strftime(x.g, '%Y-%m'), EXISTS (SELECT 1 FROM {table} WHERE {where} "
+        f"AND {col} >= x.g AND {col} < x.g + INTERVAL 1 MONTH) "
+        f"FROM generate_series(date_trunc('month', {lo}), {hi} - INTERVAL 1 DAY, "
+        f"INTERVAL 1 MONTH) x(g) ORDER BY x.g"
+    ).fetchall()
+    return [m for m, held in months if not held], len(months)
+
+
+def months_sentence(label: str, found, additive: bool) -> str:
+    """One sentence naming a compared period's empty months, or ''."""
+    if not found or not found[0]:
+        return ""
+    missing, total = found
+    named = ", ".join(missing[:12]) + (f", and {len(missing) - 12:,} more" if len(missing) > 12 else "")
+    return (
+        f"{label} holds no rows in {named} ({total - len(missing)} of its {total} months hold "
+        f"rows)" + (", so its total reads low for the missing months alone and the change "
+                    "mixes the business with the gap." if additive else ".")
+    )

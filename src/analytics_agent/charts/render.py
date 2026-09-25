@@ -50,6 +50,11 @@ KINDS = ("line", "bar", "grouped_bar", "scatter", "histogram", "box", "heatmap",
 _SINGLE = ("line", "bar", "histogram", "waterfall")
 #: The label group_compare and confidence_interval give the row computed over all the others.
 ROLLUP_LABEL = "(all)"
+#: Columns that total the columns beside them: trend's split and cross_tab's margin.
+ROLLUP_COLUMNS = ("(all)", "(total)")
+#: The row count most results carry beside their measure. It is the measure only when no
+#: measure was asked for -- frequency and calendar_coverage chart exactly this.
+SUPPORT_COLUMN = "rows"
 
 _STAMP_FORMAT = "%Y%m%d-%H%M%S"
 _LABEL_RE = re.compile(r"^[A-Za-z][A-Za-z0-9_]*$")
@@ -154,13 +159,21 @@ class Extract:
     dropped: list[str] = field(default_factory=list)
 
 
-def series_from_output(output, x: str | None = None, y: Sequence[str] | None = None) -> Extract:
+def series_from_output(output, x: str | None = None, y: Sequence[str] | None = None,
+                       measure: str | None = None) -> Extract:
     """The plottable parts of an analysis result.
 
     `x` names the label column and defaults to the first, which is where every analysis in this
     engine puts its group. `y` names the measures and defaults to every remaining column that is
     numeric all the way down -- a column holding one label is not a measure with a bad cell, it
     is a different kind of column.
+
+    With y unset, two narrowings the caller has already made (Cleanup Step 8). A roll-up column
+    is left out beside the columns it totals, as C98 leaves out the roll-up row. And `measure`,
+    the analysis's own argument: the one column that IS it (`revenue`, or `revenue (sum)`) is
+    drawn; with none, `rows` is left out, because the caller asked about a measure and a row
+    count is not one. P11-D13 stands -- nothing is picked that nobody named, and a result still
+    offering several refuses as before.
     """
     headers = [str(h) for h in output.headers]
     if not headers:
@@ -201,6 +214,22 @@ def series_from_output(output, x: str | None = None, y: Sequence[str] | None = N
             h for i, h in enumerate(headers)
             if i != x_at and is_numeric_column([r[i] for r in rows])
         ]
+        members = [h for h in wanted if h not in ROLLUP_COLUMNS]
+        if len(members) < len(wanted) and [h for h in members if h != SUPPORT_COLUMN]:
+            left = [h for h in wanted if h in ROLLUP_COLUMNS]
+            wanted = members
+            rollup_note.append(
+                f"{', '.join(left)} totals the columns shown and is not drawn beside them; the "
+                f"table beside this chart still holds it.")
+        if measure:
+            named = [h for h in wanted if h == measure or h.startswith(f"{measure} (")]
+            others = named or [h for h in wanted if h != SUPPORT_COLUMN]
+            if others and len(others) < len(wanted):
+                left = [h for h in wanted if h not in others]
+                wanted = others
+                rollup_note.append(
+                    f"Drawn: {', '.join(wanted)}, for measure {measure}; "
+                    f"{', '.join(left)} is in the table beside this chart.")
     if not wanted:
         raise ChartRefused(
             f"no column of this result holds numbers to plot. Columns: {', '.join(headers)}."
@@ -370,21 +399,40 @@ def _draw(ax, kind: str, extract: Extract) -> int:
 
     # The remaining kinds share an x of category positions, because P11-D5 measured matplotlib
     # keeping the order it is given and ranked_totals hands groups back biggest first.
-    kept = [(i, lab) for i, lab in enumerate(extract.x)
-            if all(s.values[i] is not None for s in series)]
-    if not kept:
+    #
+    # Every label keeps its slot (Cleanup Step 9). Positions used to be only the x where every
+    # series had a value, so an absent month vanished from the axis and a chart of a gapped
+    # calendar showed June beside August -- the evenly spaced line the trend analysis exists to
+    # warn against. Now a slot with no value is drawn empty. Waterfall alone keeps the filter: a
+    # running total cannot step over a missing part and still mean what it says.
+    if kind == "waterfall":
+        kept = [(i, lab) for i, lab in enumerate(extract.x)
+                if all(s.values[i] is not None for s in series)]
+    else:
+        kept = list(enumerate(extract.x))
+    if not any(s.values[i] is not None for s in series for i, _ in kept):
         raise ChartRefused(
-            "no row holds a value for every measure drawn, so there is nothing to place."
+            "no row holds a value for the measures drawn, so there is nothing to place."
         )
     at = _positions(len(kept))
     labels = [lab for _, lab in kept]
 
+    def present(s: Series) -> tuple[list[float], list[float]]:
+        pairs = [(p, s.values[i]) for p, (i, _) in zip(at, kept) if s.values[i] is not None]
+        return [a for a, _ in pairs], [v for _, v in pairs]
+
+    drawn = 0
     if kind == "line":
+        # P11-D4: a None in plot() is a gap, so the line stops at the empty slot rather than
+        # bridging it.
         ax.plot(at, [series[0].values[i] for i, _ in kept], marker="o")
         ax.set_ylabel(series[0].name)
+        drawn = len(series[0].present)
     elif kind == "bar":
-        ax.bar(at, [series[0].values[i] for i, _ in kept])
+        xs, ys = present(series[0])
+        ax.bar(xs, ys)
         ax.set_ylabel(series[0].name)
+        drawn = len(ys)
     elif kind == "waterfall":
         values = [series[0].values[i] for i, _ in kept]
         bottoms: list[float] = []
@@ -394,6 +442,7 @@ def _draw(ax, kind: str, extract: Extract) -> int:
             running += v
         ax.bar(at, values, bottom=bottoms)
         ax.set_ylabel(f"{series[0].name} (cumulative)")
+        drawn = len(kept)
     elif kind == "grouped_bar":
         if len(series) < 2:
             raise ChartRefused(
@@ -403,8 +452,9 @@ def _draw(ax, kind: str, extract: Extract) -> int:
         width = 0.8 / len(series)
         start = -0.4 + width / 2
         for j, s in enumerate(series):
-            ax.bar([p + start + j * width for p in at],
-                   [s.values[i] for i, _ in kept], width=width, label=s.name)
+            xs, ys = present(s)
+            ax.bar([p + start + j * width for p in xs], ys, width=width, label=s.name)
+            drawn += len(ys)
         ax.legend()
     else:  # pragma: no cover -- render() checks the name before this is reached
         raise ChartRefused(f"{kind!r} is not a chart this engine draws.")
@@ -412,7 +462,13 @@ def _draw(ax, kind: str, extract: Extract) -> int:
     ax.set_xticks(at)
     ax.set_xticklabels(labels, rotation=45 if any(len(s) > 4 for s in labels) else 0,
                        ha="right" if any(len(s) > 4 for s in labels) else "center")
-    return len(kept) * len(series)
+    return drawn
+
+
+def empty_slots(extract: Extract) -> list[str]:
+    """Labels where no series drawn has a value: slots a line, bar or grouped bar keeps empty."""
+    return [lab for i, lab in enumerate(extract.x)
+            if all(s.values[i] is None for s in extract.series)]
 
 
 def render(
@@ -426,6 +482,7 @@ def render(
     y: Sequence[str] | None = None,
     title: str | None = None,
     now: datetime | None = None,
+    measure: str | None = None,
 ) -> Chart:
     """Draw one analysis result and describe what was drawn.
 
@@ -442,7 +499,7 @@ def render(
             f"and underscores -- it becomes a filename."
         )
 
-    extract = series_from_output(output, x=x, y=y)
+    extract = series_from_output(output, x=x, y=y, measure=measure)
     x_name = x if x is not None else str(output.headers[0])
 
     stamp = (now or datetime.now()).strftime(_STAMP_FORMAT)
@@ -473,7 +530,10 @@ def render(
         key_values=_key_values(extract),
         dataset_name=dataset_name,
         summary=list(getattr(output, "summary", []) or []),
-        notes=extract.dropped,
+        notes=extract.dropped + (
+            [f"{', '.join(empty_slots(extract))} hold(s) no value in any series and "
+             f"stay on the axis as an empty slot, not a zero."]
+            if kind in ("line", "bar", "grouped_bar") and empty_slots(extract) else []),
     )
 
 

@@ -75,7 +75,7 @@ def cross_tab(con, gate, scope, rows: str, columns: str,
         if agg not in AGG_SQL:
             raise ValueError(f"cannot fill a cell with agg={agg!r}.")
 
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     r = quote_identifier(rows)
     c = quote_identifier(columns)
 

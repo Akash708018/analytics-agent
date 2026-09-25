@@ -133,7 +133,7 @@ def test_d5_the_tie_term_does_not_overflow_at_millions_of_ties():
     con.execute("CREATE TABLE t AS SELECT CASE WHEN i % 2 = 0 THEN 'a' ELSE 'b' END AS g, "
                 "CASE WHEN i < 2200000 THEN 0.0 ELSE i::DOUBLE END AS v "
                 "FROM range(2300000) r(i)")
-    scope = SimpleNamespace(dataset_name="t", where="TRUE")
+    scope = SimpleNamespace(dataset_name="t", where="TRUE", source='"t"')
     result = inferential.mann_whitney(con, scope, "g", "v", "a", "b")
     assert 0.0 <= result.p <= 1.0
 

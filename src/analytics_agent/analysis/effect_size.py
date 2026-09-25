@@ -19,7 +19,7 @@ import math
 from typing import Any
 
 from ..util.sql_guard import quote_identifier
-from .base import NO_MEMBER, LostRows, label, number
+from .base import NO_MEMBER, LostRows, label, number, relation_types
 from .declared import column_types, is_numeric, require_dimension, require_measure
 from .inferential import FINITE, chi_square, eta_squared, group_stats, hedges_g
 from .registry import Output, register
@@ -73,6 +73,7 @@ def _shown_pair(dimension: str, second: str) -> str:
             "between two groups, eta squared across more, Cramer's V between two dimensions. "
             "Named, banded by Cohen's conventions, and stated as a convention rather than a "
             "verdict.",
+    selects=True,
 )
 def effect_size(con, gate, scope, dimension: str, measure: str | None = None,
                 second_dimension: str | None = None, **params) -> Output:
@@ -112,7 +113,7 @@ def band(value: float, bands) -> str:
 def _difference(con, gate, scope, dimension: str, measure: str, summary: list[str]) -> Output:
     m = require_measure(gate.contract, measure)
     unit = getattr(m, "unit", None) or ""
-    if not is_numeric(column_types(con, scope.dataset_name).get(measure, "")):
+    if not is_numeric(relation_types(con, scope).get(measure, "")):
         raise ValueError(f"effect_size sizes a numeric measure; {measure!r} is not one.")
 
     groups = group_stats(con, scope, dimension, measure)
@@ -205,7 +206,7 @@ def _association(con, gate, scope, dimension: str, second: str, summary: list[st
     if dimension == second:
         raise ValueError(f"effect_size cannot size {dimension!r} against itself.")
 
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     a, b = quote_identifier(dimension), quote_identifier(second)
     cells = con.execute(
         f"SELECT {a}, {b}, count(*) FROM {table} WHERE {scope.where} "
@@ -269,7 +270,7 @@ def _association(con, gate, scope, dimension: str, second: str, summary: list[st
 
 
 def _excluded(con, scope, dimension: str, measure: str) -> dict[str, int]:
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     dim, col = quote_identifier(dimension), quote_identifier(measure)
     no_group, no_value, not_finite = con.execute(
         f"SELECT count(*) FILTER (WHERE {dim} IS NULL), "

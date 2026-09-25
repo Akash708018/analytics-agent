@@ -97,7 +97,7 @@ def correlation(con, gate, scope, measure: str, against: str, **params) -> Outpu
             f"arithmetic and not about {contract.dataset_name}."
         )
 
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     x = quote_identifier(measure)
     y = quote_identifier(against)
     headers = [measure, against, "pairs", "pearson r", "spearman rho",

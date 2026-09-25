@@ -120,7 +120,7 @@ def seasonality(con, gate, scope, measure: str, grain: str = DEFAULT_GRAIN,
         )
     cycle, length, pos_sql, name_of = CYCLES[key]
 
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     col = quote_identifier(date_column)
     value = AGG_SQL[agg].format(col=quote_identifier(measure))
 

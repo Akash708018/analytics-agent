@@ -267,3 +267,32 @@ def test_switching_the_vocabulary_off_turns_a_token_into_a_loss(con):
     assert not any(a.kind is ActionKind.NORMALISE_MISSING for a in actions)
     price = by_column(actions, "unit_price", ActionKind.CONVERT_TYPE)
     assert price.values_lost == 1
+
+
+# --- codes and currency (Cleanup Step 12, RF-O5 and A3) ------------------------------------------
+
+@pytest.fixture()
+def coded():
+    c = duckdb.connect(":memory:")
+    c.execute("""CREATE TABLE coded AS SELECT * FROM (VALUES
+      ('000435', '₹1,234.00', '12'), ('000021', '₹990.00', '7'), ('001200', '₹10,846.50', '3'),
+      ('000009', '₹58.00', '41')) t(sku, list_price, qty)""")
+    yield c
+    c.close()
+
+
+def test_a_zero_padded_code_is_not_offered_as_a_number(coded):
+    """Retail C003: sku '000435' offered as BIGINT, 'discards nothing', and recommended."""
+    acts = detect.detect(coded, source="coded", target="coded", missing_tokens=[])
+    assert (ActionKind.CONVERT_TYPE, "sku") not in kinds(acts)
+    assert (ActionKind.CONVERT_TYPE, "qty") in kinds(acts), "a plain integer column still is"
+
+
+def test_a_currency_column_is_offered_with_the_symbols_removed(coded):
+    acts = detect.detect(coded, source="coded", target="coded", missing_tokens=[])
+    price = next(a for a in acts if a.kind is ActionKind.CONVERT_TYPE and a.column == "list_price")
+    assert "currency" in price.intent and "regexp_replace" in price.sql
+    assert price.values_lost == 0
+    coded.execute(price.sql)   # the statement a person approves, run as they would approve it
+    got = [float(r[0]) for r in coded.execute("SELECT list_price FROM coded").fetchall()]
+    assert got == [1234.0, 990.0, 10846.5, 58.0]

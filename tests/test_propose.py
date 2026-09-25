@@ -462,3 +462,69 @@ def test_deleting_the_declaration_from_the_rendered_json_fails(items):
     with pytest.raises(ValueError) as exc:
         contract_from_json(json.dumps(payload))
     assert reason_of(str(exc.value)) is Reason.CONTRACT_INVALID
+
+
+# --------------------------------------------------------------------------
+# no key found: say how close the nearest one is (Cleanup Step 8)
+
+@pytest.fixture
+def copied(con):
+    """clean_sales with three of its rows copied whole: 503 rows, 500 order_ids. The bunty_babli
+    run's shape -- a key that fails only because some rows are exact copies."""
+    from pathlib import Path
+    csv = Path(__file__).resolve().parent / "fixtures" / "clean_sales.csv"
+    con.execute(f"CREATE TABLE orders AS SELECT * FROM read_csv('{csv}')")
+    con.execute("INSERT INTO orders SELECT * FROM orders ORDER BY order_id LIMIT 3")
+    return con
+
+
+def test_with_no_key_the_nearest_identifier_is_reported_with_its_repeats(copied):
+    """Phase 4: 'two duplicates says the data is dirty'. With no key found, that sentence was
+    never produced, and the proposal said only that nothing identifies a row."""
+    p = propose_contract(copied, "orders")
+    assert p.contract.primary_key == []
+    notes = " ".join(p.notes)
+    assert "order_id does not identify a row: 500 distinct value(s) across 503" in notes
+
+
+def test_with_no_key_exact_copies_are_counted_and_the_cleaning_step_named(copied):
+    notes = " ".join(propose_contract(copied, "orders").notes)
+    assert "3 row(s) of orders are exact copies of another row" in notes
+    assert "would leave order_id unique" in notes
+    assert 'propose_cleaning_plan(dataset_name="orders")' in notes
+
+
+def test_repeats_that_are_not_copies_are_not_blamed_on_copies(con):
+    """broken_sales: 186 rows, 181 order_ids, no row an exact copy (P7-D12). Removing copies
+    fixes nothing there, and the note must not say it would."""
+    from pathlib import Path
+    csv = Path(__file__).resolve().parent / "fixtures" / "broken_sales.csv"
+    con.execute(f"CREATE TABLE broken AS SELECT * FROM read_csv('{csv}')")
+    notes = " ".join(propose_contract(con, "broken").notes)
+    assert "order_id does not identify a row" in notes
+    assert "exact copies" not in notes
+
+
+def test_a_grain_that_names_a_column_is_checked_when_no_key_is_stated(copied):
+    """The bunty_babli contract: grain 'grain: [order_id]', primary_key []. The person meant a
+    key and nothing checked it."""
+    p = propose_contract(copied, "orders", grain="grain: [order_id]")
+    notes = " ".join(p.notes)
+    assert "The grain names order_id, but no primary key is stated" in notes
+    assert 'primary_key=["order_id"]' in notes
+    assert "500 distinct value(s) across 503" in notes
+
+
+def test_a_grain_naming_no_column_adds_nothing(copied):
+    notes = " ".join(propose_contract(copied, "orders", grain="one row = one sale").notes)
+    assert "The grain names" not in notes
+
+
+def test_the_grain_question_does_not_deny_the_candidate_the_notes_name(copied):
+    """Found by the live replay: 'Nearest to a key: order_id ...' in the notes, and beneath it
+    'there is not even a candidate to correct'. A claim and the thing it describes, edited
+    separately."""
+    p = propose_contract(copied, "orders")
+    asked = " ".join(p.contract.questions)
+    assert "not even a candidate" not in asked
+    assert "order_id" in asked

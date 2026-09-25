@@ -27,6 +27,12 @@ SERVER_VERSION = "0.2.0"
 
 _GIB = 1024 ** 3
 _MIB = 1024 ** 2
+# File sizes are decimal, as macOS Finder and `ls -l` report them (Cleanup Step 12, RF-O2): the
+# retail run's 2,595,199,347-byte file is 2.6 GB on the machine it sat on and was called "2.4 GB"
+# here, under a refuse limit printed as "2.5 GB" that was 2.5 GiB. RAM stays in GiB above --
+# memory is sold and reported in binary units.
+_MB = 1000 ** 2
+_GB = 1000 ** 3
 
 
 # ---------------------------------------------------------------------------
@@ -145,31 +151,32 @@ class SizeGates:
 
 
 SIZE_GATES = SizeGates(
-    csv_warn_bytes=_scaled(500 * _MIB),
-    csv_refuse_bytes=_scaled(5 * _GIB),
-    excel_warn_bytes=_scaled(40 * _MIB),
-    excel_refuse_bytes=_scaled(200 * _MIB),
+    csv_warn_bytes=_scaled(500 * _MB),
+    csv_refuse_bytes=_scaled(5 * _GB),
+    excel_warn_bytes=_scaled(40 * _MB),
+    excel_refuse_bytes=_scaled(200 * _MB),
     excel_warn_rows=_scaled(250_000),
     excel_refuse_rows=_scaled(1_500_000),
     # DuckDB spills intermediates to disk; require room for the load plus
     # working space before starting one.
     disk_headroom_multiplier=3.0,
-    disk_min_free_bytes=2 * _GIB,
+    disk_min_free_bytes=2 * _GB,
 )
 
 # Backward compatibility with the Phase 1 config.py. server.py imports these
 # two names for its ping() output. They are now derived from SIZE_GATES rather
 # than hand-set, so there is one source of truth.
-MAX_EXCEL_MB: int = SIZE_GATES.excel_refuse_bytes // _MIB
-WARN_CSV_MB: int = SIZE_GATES.csv_warn_bytes // _MIB
+MAX_EXCEL_MB: int = SIZE_GATES.excel_refuse_bytes // _MB
+WARN_CSV_MB: int = SIZE_GATES.csv_warn_bytes // _MB
 
 
 def human_bytes(n: float) -> str:
-    """Format a byte count for a gate message. Not for analysis output."""
+    """Format a byte count for a gate message, in decimal units (KB = 1,000 bytes), as the
+    operating system's own file listings report it. Not for analysis output."""
     for unit in ("B", "KB", "MB", "GB", "TB"):
-        if abs(n) < 1024 or unit == "TB":
+        if abs(n) < 1000 or unit == "TB":
             return f"{n:.0f} {unit}" if unit == "B" else f"{n:.1f} {unit}"
-        n /= 1024
+        n /= 1000
     return f"{n:.1f} TB"
 
 

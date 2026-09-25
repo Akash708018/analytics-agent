@@ -422,7 +422,7 @@ def case_d5() -> list[dict]:
                     f"CASE WHEN i % 3 = 0 THEN 'x' WHEN i % 3 = 1 THEN 'y' ELSE 'z' END AS h, "
                     f"CASE WHEN i < {tied} THEN 0.0 ELSE i::DOUBLE END AS v "
                     f"FROM range({n}) r(i)")
-        scope = SimpleNamespace(dataset_name="t", where="TRUE")
+        scope = SimpleNamespace(dataset_name="t", where="TRUE", source='"t"')
         rows = con.execute("SELECT g, h, v FROM t").fetchall()
         a = [v for g, _, v in rows if g == "a"]
         b = [v for g, _, v in rows if g == "b"]

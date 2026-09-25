@@ -6137,6 +6137,520 @@ confirmed draft is now kept. Falsified: dropping it fails the one-click test.
 
 MEASURED VALIDATION, 22/09/2026. UI tests 35 -> 37; engine 1839.
 
+## Cleanup Step 8 - what the bunty_babli run found, 22/09/2026
+
+Step document: docs/steps/cleanup_step8_run_findings.md. Found by the user's graded Ask-screen
+run: every figure matched SQL over the RAW table, the question asked for the deduplicated one,
+there was no month x channel, and the chart spent the agent's last step. Three predictions were
+wrong and are recorded there (the cost of the copy count, every new test failing, and a question
+the replay found contradicting its own notes).
+
+CL8-D1. A KEYLESS CONTRACT STAYS LEGAL, AND ITS EXACT COPIES ARE SAID ON EVERY RESULT. Keyless is
+by design ("a coarser grain than one row", Phase 4), so the gate does not refuse it; with nothing
+to verify it had nothing to say, and bunty_babli's 604 rows -- 4 of them copies of another --
+went through as "604 of 604 row(s) analysed". state.Gate now carries `copies` and the live row
+count, counted only when the contract states no key (a key that holds rules copies out; one that
+fails is refused by name), and caveats() says how many, that every count and total includes
+them, and names propose_cleaning_plan. Silent at zero. contract/compatibility.exact_copies is the
+one count, used by the gate and the proposal both (P7-D6's reason: two copies of one decision
+eventually disagree).
+
+CL8-D2. THE COPY COUNT IS A HASH SCREEN, THEN AN EXACT COUNT ONLY WHEN THE SCREEN FINDS ANY.
+Measured on 5M x 8, best of three: SELECT DISTINCT * 0.213s, count(DISTINCT hash(cols)) 0.119s,
+against summary_stats shape 0.162s, trend shape 0.058s, verify_key 0.084s. The plan's fallback --
+proposal time only, if slower than the analysis it gates -- tripped at 0.213s. 0.119s is inside
+the 0.077-0.179s Phase 7 accepted for verify_key, which the gate already pays for every keyed
+contract. A hash collision can only overstate the screen, never hide a copy; the exact count
+settles it, and the caveat quotes the exact count. DISTINCT and hash() both treat NULLs as equal
+(tests/test_duplicate_facts.py), so rows matching through a NULL are copies.
+
+CL8-D3. WITH NO KEY FOUND, THE PROPOSAL SAYS HOW NEAR THE NEAREST CAME. Phase 4's "two duplicates
+says the data is dirty" was only ever produced for a key somebody stated. Now the nearest
+identifier-shaped column's KeyVerdict sentence is a note, then the exact copies, then whether
+removing them would leave that column unique -- if so naming the cleaning step and
+primary_key=[...], if not saying what is left is a grain question. broken_sales, whose repeats
+are not copies (P7-D12), is told nothing about copies. The grain question names the nearest
+column rather than saying there is no candidate. Counts only: which column is the key stays the
+person's.
+
+CL8-D4. A STATED GRAIN THAT NAMES COLUMNS IS CHECKED WHEN NO KEY IS STATED. The v1 contract read
+grain "grain: [order_id]", primary_key []: a key put where nothing reads it. Whole words of the
+grain that are column names are verified together as one key and the verdict becomes a note with
+the primary_key=[...] that makes the check stick. A note, not a refusal: the sentence is the
+person's, and a grain mentioning a column is not always claiming a key.
+
+CL8-D5. TREND TAKES A DIMENSION; IT IS STILL 27 ANALYSES. The run asked for order_value by month
+split by channel and nothing took a period and a dimension together (cross_tab's are both
+declared dimensions; growth_decomposition and mix_shift split two named periods; scope is the
+contract's). trend(dimension=...) returns period, one column per member of a declared dimension
+(from dated rows -- an undated row lands in no period), (all) computed from rows and not from
+cells (a mean is not the mean of its members), rows. A member with no rows in a period is blank,
+never zero. Capped at MAX_COLS - 3 members, with label collisions refused, as cross_tab does.
+Cells use FILTER (WHERE d IS NOT DISTINCT FROM ?), cross_tab's bound-value selector, inside
+per_period_sql's calendar. Each member's two endpoints are stated; no fit.
+
+CL8-D6. A CHART HONOURS WHAT THE CALLER ALREADY CHOSE; P11-D13 STANDS. With y unset: a roll-up
+COLUMN, (all) or (total), is not drawn beside the columns it totals (C98, for columns), unless it
+is the only series; and when the analysis was given `measure`, the one column that IS it
+(`measure` or `measure (...)`, whole name, not substring -- units is not units_returned) is drawn,
+and with none, `rows` is left out, because a row count is not the measure asked about. Each is
+said in the chart's notes. Nothing nobody named is drawn, and a result still offering several
+refuses as before -- B11 (summary_stats, no measure) is unchanged. render_chart(trend, bar,
+measure="order_value") now draws order_value (sum).
+
+C100. I WROTE A NOTE AND LEFT A QUESTION DENYING IT. CL8-D3's first version added "Nearest to a
+key: order_id ..." to the notes and left the grain question reading "there is not even a
+candidate to correct", three lines below. No unit test read both; the live replay, printing both,
+showed it. The claim-and-the-thing-it-describes pattern of C61-C76, inside one proposal. The
+question now names the nearest column; a test asserts the two cannot disagree.
+
+NOT CHANGED, AND STILL OPEN: P14-O2. The web assistant still cannot clean, so "deduplicated" is
+unanswerable from the browser. What changed is that it can no longer be unanswerable silently:
+the copies caveat is on every result it reads, and SCREEN_FOR already tells it cleaning has no
+screen. Also observed, not caused here: workspace ws_f1704c182539, the run's own, was emptied at
+11:59 by workspace.reset during this step; the suite's tests use fresh random ids, the UI's Reset
+needs a checkbox and a click, and who reset it was not established. The table was recovered from
+a copy taken at the start of the session.
+
+MEASURED VALIDATION, 22/09/2026. `uv run pytest -q`: 1839 -> 1867 passed (4 in
+tests/test_duplicate_facts.py, 24 across test_propose, test_state_gate, test_trend,
+test_charts_render, test_analysis_tools). Acceptance unchanged: 99/0/2, 19/0/0, 35/0/1, 26/0/0,
+36/0/0. `uv run python eval/run_eval.py`: SCORE 76/76 (100%). `uv run --group ui pytest ui/tests`:
+37 passed. Live replay through server.py on the run's own rows: v1 raw 2025-11 254,506.43 with the
+copies caveat, split Online 180,180.82 / Store 74,325.61; cleaned 604 -> 600; v2 key holds;
+2025-11 246,412.22, July blank, Online 332 / Store 268 -- the user's key. Max line in src/ 105.
+Digests, final tree (sha256, lines):
+  246a197767690e6eca2d0c6b7444dd373ae41b1ddc65e4d116f233bfc79d6e77  550  src/analytics_agent/contract/compatibility.py
+  097b85d027c09ce14f0d1130176364f86482c47cd81748a6203edf5b2f4f2a1c  586  src/analytics_agent/contract/propose.py
+  566cc0a3ac79bde82fe8a754b226c8b524aa8e2667681e58ae4fd981c5b36f96  413  src/analytics_agent/state.py
+  0f18fdee9548990b0cf4e04b671691f48f3d59bb773604a4a1e483035405a26f  283  src/analytics_agent/analysis/trend.py
+  e90184af3b3da02df30b1e8b6cda857500364021c5506155bda972931c4b457e  495  src/analytics_agent/charts/render.py
+  5ddbeb4061c26cc81a4e4221f56e6231e626c7d4b25b027fbb20bec1db06c197  342  src/analytics_agent/analysis/tools.py
+  e99c11add4e9320534dfbc70617cfd3c91fdb3703df57da17df9d9833b1b7771  1210  src/analytics_agent/server.py
+  003ade48054722ae104dceac2326a71d7d6b94fc4aa52dd3846ca232baa028de  69  tests/test_duplicate_facts.py
+
+## Cleanup Step 9 - which orders drive a month; a chart that keeps its gap; the assistant's rules, 22/09/2026
+
+Step document: docs/steps/cleanup_step9_period_charts_prompt.md. Found by grading the Ask screen's
+12:21 answer on ws_0b4a3e60bfd6: it failed deduplication (and invented a Cleaning screen), the
+chart (none drawn; JSON handed over instead) and the peak (deferred to a whole-year call). One
+prediction failed (4.1, C101); the live assistant check could not be measured (CL9-O1).
+
+CL9-D1. THREE ANALYSES TAKE ONE NAMED PERIOD, APPLIED WHERE THE SCOPE IS BUILT. top_n,
+concentration and pareto register with narrows=True, and registry.narrowed() -- called from
+registry.run and tools._produce, the two places a scope is handed to an analysis -- takes period
+and grain off the parameters and narrows the scope first. temporal.narrow_to_period looks the
+label up in the generated calendar (P9-D12): a label outside it is refused naming the range, one
+inside it with no rows narrows to 0 rows. The four buckets still sum to the table: dated rows of
+other periods move to outside_window, undated analysed rows to no_date, and the method note reads
+"outside the month 2025-11 (within 2025-01-01 to 2025-12-30)". grain without period is refused.
+Measured on the run's rows: November 56 of 604 rows; ORD-00551 96,049, 37.7% of the raw
+254,506.43 (39.0% of the deduplicated 246,412.22, by SQL). Still 27 analyses.
+
+CL9-D2. A LINE, BAR OR GROUPED BAR KEEPS EVERY X SLOT. _draw placed only the x where every series
+had a value, so the 12:17 chart of a gapped calendar put June beside August -- the evenly spaced
+picture trend exists to warn against, and the assistant promised the person the opposite. Every
+label is now on the axis; values are drawn where present (a line breaks at None, P11-D4); a slot
+empty in every series is named in the notes as "an empty slot, not a zero". A grouped bar now
+draws a member's bar even where another member has none, and drawn counts the values drawn.
+Waterfall keeps the old filter: a running total cannot step over a missing part.
+
+CL9-D3. THE ASSISTANT'S RULES NAME ONLY REAL SCREENS AND FORBID HANDING OVER CALLS. agent.SCREENS
+holds the web app's screens and a test holds it equal to ui/app.py's st.Page titles; SYSTEM names
+exactly those and says cleaning and databases have none. New rules: never give the person a tool
+call, JSON or parameters; run what the question needs while rounds remain (render_chart for a
+chart, top_n with period= for "what drives this month"); give a cause for a gap, peak or change
+only if a tool reply states it; when copies are reported and cleaning was asked for, answer on the
+data as it is, labelled, and say cleaning is not in the web app. Rules are text a model may
+ignore -- the 12:21 answer ignored an explicit engine note -- so what these tests pin is that the
+rules exist and agree with the app, not that a model obeys them.
+
+C101. I NARROWED THE SCOPE INSIDE THE ANALYSIS, AND THE TOOL LAYER REFUSED EVERY RESULT. First
+version: top_n, concentration and pareto each called the narrowing on the scope they were given.
+All seven unit tests passed, through registry.run. Through server.compute_analysis every call was
+ANALYSIS_RESULT_UNSOUND: _produce checks the first summary line against the method note of the
+scope it built, and the analysis had described a different one. The check was right and my
+layering wrong -- a scope is made in one place and an analysis describes what it is handed. The
+same lesson as C83: a test that does not go through the tool layer does not test the tool.
+
+C102. A RULE I DID NOT WRITE CONTRADICTED ONE I DID, AND ONLY PRINTING THE PROMPT SHOWED IT. The
+Phase 14 rule listed "approve cleaning" among what the person does on a screen, naming the Upload
+& read and Contract screens, while P14-O2 records that cleaning has none. Present since Step 4 and
+a plausible source of the invented "Cleaning screen". Removed; a test pins its absence.
+
+CL9-O1 IS OPEN. THE WEB ASSISTANT'S CONVERSATION OUTGROWS GROQ'S LIMIT, AND THIS STEP'S LIVE CHECK
+IS UNMEASURED. Two live runs of the graded question: Gemini 503 ("high demand") both times; Groq
+413, tokens per minute 8,000, requested 8,003 then 8,451. This step's rules added ~260 tokens
+(SYSTEM 1,090 -> 2,118 characters); run_analysis's catalogue reply is 7,431 characters (~1,850
+tokens) and four tool replies at up to RESULT_CHARS=8,000 characters each put Groq out of reach on
+its own. Closing it means a shorter catalogue for the model or a per-provider budget, measured
+against a real run -- and then the rule checks of CL9-D3 run against a real answer.
+
+MEASURED VALIDATION, 22/09/2026. `uv run pytest -q`: 1867 -> 1884 passed (7 test_frequency, 4
+test_charts_render, 5 test_agent, 1 test_analysis_tools). Acceptance unchanged: 99/0/2, 19/0/0,
+35/0/1, 26/0/0, 36/0/0. `uv run python eval/run_eval.py`: SCORE 76/76 (100%). `uv run --group ui
+pytest ui/tests`: 37 passed. Max line in src/ 105.
+Digests, final tree (sha256, lines):
+  8974102ef15e925fdec9a317594c412bddaadfb3b27cdc804db6415bc7b9c8ce  292  src/analytics_agent/analysis/temporal.py
+  5cbc398e9a2c8d3765d64970264d114b8c7f051eb5782563dd45497c3ce024d4  133  src/analytics_agent/analysis/registry.py
+  32c6dd497ec121dba46b6121ffd0bb0041aa841e95828961321d0222d93a1c39  342  src/analytics_agent/analysis/tools.py
+  685fb01dd957265ca7754916805db76ffa11a947331faa22414e2828dcb37b0a  209  src/analytics_agent/analysis/frequency.py
+  83e745e54285450396a770c4dea5ae67eb1a78723900a6390adb87fb2a854a34  204  src/analytics_agent/analysis/pareto.py
+  adc462ce5a8a3ebd4ad2aa5680d61a6f92581bb51a756f4d93082e11779b09af  525  src/analytics_agent/charts/render.py
+  c0a5723639e28fd47a1b42edf69eba188e0fda9717ea8a8d595111cc55cf0111  197  src/analytics_agent/webapp/agent.py
+  9fefccd63f2b219e68f30a347beb81dc428a683cb99d1fb9ab94029cd7bca027  1213  src/analytics_agent/server.py
+
+## Cleanup Step 10 - the web assistant's request fits the providers, 22/09/2026
+
+Step document: docs/steps/cleanup_step10_request_size.md. Reported by the user: every Ask-screen
+question failed, Groq with 413 (8,039 of 8,000 tokens a minute), Gemini with a timeout.
+
+CL10-D1. THE MODEL READS COMPACT TOOL DESCRIPTIONS; CLAUDE DESKTOP KEEPS THE FULL ONES. The twelve
+allowlisted tools' docstrings and schemas were 19,616 characters (~4,900 tokens) on every request.
+webapp/agent.tool_specs now sends each docstring's first paragraph; compute_analysis and
+render_chart add a roster read from the registry -- each analysis_type with the parameters its
+function takes, period and grain added where narrows=True -- so it cannot drift from the code as
+the hand-written 7,051-character table could, plus one line on grains or on chart kinds and y.
+6,229 characters. The MCP tools are unchanged.
+
+CL10-D2. RUN_ANALYSIS LEAVES THE WEB ALLOWLIST. Its reply was 7,431 characters, almost all the
+catalogue the roster now carries, and compute_analysis passes the same gate with the same
+caveats. A reply naming run_analysis( -- get_workflow_state's NEXT STEP does -- gains a note that
+compute_analysis does the same check (agent.INSTEAD, beside SCREEN_FOR). The graded question's
+four-call conversation measured 15,165 characters (~3,800 tokens), from ~33,000. CL9-O1's size
+half is closed: no 413 in either live run after the change.
+
+CL10-D3. GROQ'S FAILED_GENERATION IS RETRIED, AND A FAILED TURN SAYS WHAT IT WROTE. Seen live: six
+tool calls, a chart drawn, then 400 "Parsing failed ... failed_generation" ended the turn, and the
+message said nothing had changed. It is now kind="generation_failed", retried inside the same
+three attempts as tool_use_failed with a note asking for words or valid JSON; and the failure
+counts files written since the turn began and says they are in Files.
+
+CL10-D4. TOP_N STATES WHAT ITS ROWS HOLD TOGETHER. The live answer said the top five November
+orders held "~56%"; the five shares sum to 53.1%. Rule one already forbids stating a number no
+reply gave, and the model broke it anyway, so the reply now gives the number: "The 5 shown hold
+53.1% of it together." -- only when fewer than all groups are shown.
+
+CL10-O1 IS OPEN. A REFUSAL WHOSE WHY AND NEXT STEP DISAGREE. concentration over more than 49
+groups: WHY "top_n on order_id says which of its groups matter", NEXT STEP
+propose_dataset_contract, because tools._produce maps every ValueError to that call. The model
+read the WHY this time. The fix is a refusal kind for "too many groups" whose NEXT STEP is the
+top_n call -- a tools.py change with eval consequences (B-questions execute NEXT STEPs).
+
+CL10-O2 IS OPEN. GEMINI TIMES OUT AT 60 SECONDS AND WHY IS UNMEASURED. Three TimeoutErrors today,
+one before and two after the request shrank; the other Gemini failures were a 503 and a spent
+daily quota. Whether it is the model's latency, the ladder's lower rungs or the network was not
+measured, so TIMEOUT_S was not changed.
+
+The live answer of 5.2 met the graded question's checks except the invented share: chart drawn
+with July an empty slot, November 254,506.43 (raw, labelled), ORD-00551 96,049 at 37.7%, the
+copies stated and cleaning said to be unavailable, no screen invented, no call handed over. One
+sample of a nondeterministic model.
+
+MEASURED VALIDATION, 22/09/2026. `uv run pytest -q`: 1884 -> 1893 passed (7 in test_agent, 2 in
+test_frequency). Acceptance unchanged: 99/0/2, 19/0/0, 35/0/1, 26/0/0, 36/0/0. `uv run python
+eval/run_eval.py`: SCORE 76/76 (100%). `uv run --group ui pytest ui/tests`: 37 passed.
+Digests, final tree (sha256, lines):
+  3648dfc1eb82dac1ff80574b410d10fc39dde5dd027095ca7209b891026a52a3  261  src/analytics_agent/webapp/agent.py
+  c6d5b1dc37b1ce97f57acddca6db6be31ed11d1fd6055e99319b7f0eded2fccf  537  src/analytics_agent/webapp/llm.py
+  b17b9044e3364e28d2fdff33d909dd063720ae3233dad83c3b30be66024fa9b2  214  src/analytics_agent/analysis/frequency.py
+
+## Cleanup Step 11 - a turn that runs out of rounds still answers, 22/09/2026
+
+Step document: docs/steps/cleanup_step11_final_round.md. Reported by the user at 15:03: "I stopped
+after 8 rounds of tool calls without a final answer", with every figure the answer needed already
+fetched by round seven.
+
+CL11-D1. THE LAST ROUND OFFERS NO TOOLS. Session.step(final=True) on round MAX_ROUNDS: Gemini's
+functionCallingConfig mode NONE, Groq's tool_choice "none", and llm.LAST_ROUND telling the model
+to answer from the replies above. A final reply's text is the answer even if it still carries
+calls, which are not run. The stop message remains for a final reply with no text. So at most
+MAX_ROUNDS - 1 tools run, and a turn that fetched its figures cannot end with none of them.
+
+CL11-D2. A GROUP CAP NAMES TOP_N, AS ITS WHY ALWAYS DID. CLOSES CL10-O1. base.TooManyGroups
+carries the dimension and measure from the six cap sites (pareto/concentration, group_compare,
+ranking_shift, hypothesis_test, sample_adequacy); tools._produce names compute_analysis(top_n,
+same dimension and measure, and period and grain if given), or frequency(column) when there is no
+measure. Measured live: the assistant took that call on the next round. The recovery executes
+verbatim (tested), per P13-D3.
+
+CL11-D3. A READY DATASET IS NOT RE-CHECKED UNASKED. The 15:03 turn spent three of eight rounds on
+describe, validate and profile under a contract the state called ready. SYSTEM now says to go
+straight to the analyses the question needs, and to profile, describe or validate only when the
+question asks about the data's quality or shape. The live run after it called none of the three.
+
+STILL OPEN: CL10-O2 (Gemini timeouts, cause unmeasured), P14-O1, P14-O2. The live answer's one
+lapse -- a correct subtraction no reply stated -- is the same failure CL10-D4 answered for one
+case; rule one is the only guard on the rest.
+
+MEASURED VALIDATION, 22/09/2026. `uv run pytest -q`: 1893 -> 1899 passed (4 in test_agent, 2 in
+test_analysis_tools; one test_agent test updated to MAX_ROUNDS - 1). Acceptance unchanged:
+99/0/2, 19/0/0, 35/0/1, 26/0/0, 36/0/0. `uv run python eval/run_eval.py`: SCORE 76/76 (100%). `uv
+run --group ui pytest ui/tests`: 37 passed.
+Digests, final tree (sha256, lines):
+  60fc34bb9879f7bfb9e95ff3c9fe2b3657b5016913491fadea05ad67b645d474  269  src/analytics_agent/webapp/agent.py
+  e9dae56bafb36b346331eace40168ce50d2a0b4c6c56737256b1f8bfb7c68738  552  src/analytics_agent/webapp/llm.py
+  6309072b73a345fcec23f70a7306b2c5b7cefe50fa3a7b424e540abd9ef38437  353  src/analytics_agent/analysis/base.py
+  e968316b4b7cf70c7554448e90b532d686bdb9b9c08c6e8afc7fa7b685fef6ff  359  src/analytics_agent/analysis/tools.py
+
+## Phase 15 planned - cleaning in the web app, and helper columns, 22/09/2026
+
+The user's decision, after the bunty_babli runs of Cleanup Steps 8-11: the web app gets cleaning,
+and analysis gets helper columns. Written into the build guide as Phase 15, section 11, with a ledger
+row (Not started) and changelog entry 8. Nothing in src/ changed.
+
+P15-D1. THE CLEAN SCREEN IS A FRONT DOOR ON PHASE 6, AND THE ASSISTANT STAYS READ-ONLY. Proposal,
+approval by id, all-or-nothing apply, before-tables, ledger and staleness refusal already exist and
+are tested. The screen adds propose/apply to the web backend, marks lossy actions, states a required
+order before the click, and after an apply sends the person to confirm a new contract version. The
+assistant learns the screen exists and may name an action id; it never applies one, and no subset is
+auto-approved. Closes P14-O2 when built.
+
+P15-D2. A HELPER COLUMN IS AN APPROVED DERIVATION, FROM A FIXED MENU. DERIVE_COLUMN is a cleaning
+action a person proposes -- never detected, like EXCLUDE_COLUMN -- applied through the same gate and
+ledgered with its SQL. Menu: a date part; bands of a measure at stated edges; product, ratio or
+difference of two numeric columns; a flag against a stated value; a combination of two dimensions.
+Not free SQL: P8-D7 measured caller text reading /etc/passwd through read_csv, and sql_guard checks
+boolean predicates only. Free expressions are a later phase, Claude Desktop only, after sql_guard can
+check a value expression. A new column is ADDITIVE drift; it is usable only once declared in the
+contract with a definition.
+
+P15-D3. OPTIONAL EXTRAS BECOME PHASE 16. Forecasting (Tier 8), multi-dataset joins and scheduled
+runs were Phase 15, out of scope until the build was done; the decided work goes before them. The
+guide's two mentions (Tier 8's heading, the section) were renumbered in the same edit.
+
+Build guide after the edit: 1,163 lines (from 1,104), sha256
+532433bcc96cdec8dd2c98fa85e1ef7f54a3f9bcbd4c6d3b6613d13092f2df47.
+
+## Retail fixture run - 53 graded cases against the engine, 22/09/2026
+
+Step document: docs/steps/retail_fixture_run.md. The user's fixture (224,955 lines x 42 columns,
+seed 20260922) and answer key, run through server.py after the key's own cleaning convention (dedup
+224,955 -> 224,835; rating nulls '', NA, n/a, -). The key was spot-checked by SQL first and held on
+six figures. Nothing in src/ changed; this records a measurement.
+
+RF-D1. RESULT: PASS 25, PARTIAL 9, FAIL 8, GAP 11. Every figure the engine is built to compute --
+sums, shares, trends, seasonality, decompositions, rankings, correlations, eta squared, mix shift,
+changepoint, chi-square, cohort grids -- matched the key, most to the paisa. The failures are not
+arithmetic: they are units the contract cannot state.
+
+RF-D2. THE FAILURES HAVE ONE MAIN CAUSE. `none` was designed to stop a meaningless total, and it
+does (C1, C3). It does not stop a mean, and for an order-level, rep-level or ratio column the mean is
+the wrong answer the key names (C2 71,692.20, C5 25.79%, J2, J3), and line-level tests repeat an
+order's rating (H1-H5). The fix is a measure grain -- aggregate per distinct order_id or rep_id
+before anything else -- and a ratio declaration, not another refusal.
+
+RF-O1 IS OPEN. Measure grain and ratio declarations (RF-1; C2, C5, J2, J3, H1-H5).
+RF-O2 IS OPEN. Size gates are 2.5 GiB and say "2.5 GB"; the key's 2.60 GB file is allowed (L2); the
+warning names no threshold (L1).
+RF-O3 IS OPEN. period_compare and growth_decomposition report calendar days as "days of data" and do
+not name empty months inside a compared period (E3).
+RF-O4 IS OPEN. The loader's default NA tokens null `-` and `NA` without a count in the reply (A5).
+RF-O5 IS OPEN. Cleaning recommends converting a zero-padded fixed-width code to BIGINT as lossless
+(A2).
+RF-O6 IS OPEN. repeat_behaviour counts rows as events; no event key (I2).
+RF-O7 IS OPEN. No range or cross-column validation rules (B1-B3).
+RF-O8 IS OPEN. pareto and concentration refuse above 49 groups though their answer is a few numbers
+(D3, D4).
+Smaller, recorded in the step document: one aggregate per measure (G3), no two-of-three group
+selection (H1, H6), no within-group outliers (G1), no currency-number detection (A3), no boolean rate
+column (C6), no attrition or tenure (J1, J4).
+
+MEASURED VALIDATION, 22/09/2026. Baseline `uv run pytest -q` 1899 passed before the run; src/
+unchanged. Six key figures equal by SQL. Size-gate files built per the key (308,952,771 and
+2,595,199,347 bytes) and deleted after; SIZE_GATES.csv_refuse_bytes 2,684,354,560.
+
+## Cleanup Step 12 - the retail run's quick fixes, 22/09/2026
+
+Step document: docs/steps/cleanup_step12_retail_quick_fixes.md. Closes RF-O2, RF-O3, RF-O4, RF-O5 and
+the A3 finding.
+
+CL12-D1. FILE SIZES ARE DECIMAL, AS THE MACHINE REPORTS THEM. CLOSES RF-O2. SIZE_GATES from 10^6 and
+10^9 bytes (halving on small machines kept) and human_bytes in 1,000s, because macOS Finder and ls
+report decimal: the retail file of 2,595,199,347 bytes is 2.6 GB there and was called "2.4 GB" here.
+RAM stays GiB. A warning names the threshold it crossed and the refuse limit.
+
+CL12-D2. THE LOAD REPLY NAMES WHAT IT READ AS NULL. CLOSES RF-O4. Per column and token, counted in
+one extra pass over the file read as text with nothing nulled -- after the load a nulled 'NA' and an
+empty field are the same NULL, so only the file can say. Blank is not listed. The defaults are
+unchanged; they are said. Retail: rating ('NA' 8,069, '-' 5,353).
+
+CL12-D3. A ZERO-PADDED CODE IS NOT OFFERED AS A NUMBER. CLOSES RF-O5. proposed_type proposes no
+numeric type where a value has a zero before another digit; the profile says "N have leading zeros
+a number would drop -- a code, not a quantity" and marks the column "zero-padded: a code".
+
+CL12-D4. CURRENCY TEXT IS READ, BY APPROVAL. A3. A text column that parses as a number once
+[₹$€£¥,] and spaces are removed (90%, and at least one value carrying such a character) is named by
+the profile and offered as CONVERT_TYPE whose SQL does the removal (regexp_replace inside TRY_CAST),
+DECIMAL(18,2) where it fits.
+
+CL12-D5. EMPTY MONTHS INSIDE A COMPARED QUARTER OR YEAR ARE NAMED; DAYS ARE CALENDAR DAYS. CLOSES
+RF-O3. temporal.empty_months, used by period_compare and growth_decomposition. Only months inside a
+quarter or a year: a day with no sale inside a month is normal and naming it would be noise. Months
+outside the declared window are not called empty. "days of data" was never a count of data.
+
+MEASURED VALIDATION, 22/09/2026. `uv run pytest -q`: 1899 -> 1912 passed (4 test_sizegate_units, 2
+test_loaders_step5, 2 test_cleaning_detect, 2 test_table_profile, 2 test_period_compare, 1
+test_growth_decomposition). Acceptance unchanged: 99/0/2, 19/0/0, 35/0/1, 26/0/0, 36/0/0. Eval 76/76.
+UI 37. Live on the retail fixture: L2 refused at 2.6 GB, A5 named, A2 not offered, A3 offered, E3
+names 2024-09.
+Digests (sha256, lines):
+  194ee1c095f14504419cdb4b037c2993d634c89401d70bdbc672cc1061e8db7a  349  src/analytics_agent/config.py
+  1a5fa92bf917f2879db20c881a74d5970be0cc77b58da914ecc9d26260c5420b  289  src/analytics_agent/ingest/sizegate.py
+  08927c4daa9b6b8a5f1bc9c973843e848991729e2294bb67c38d0d1d7acdcc27  504  src/analytics_agent/ingest/csv_loader.py
+  e517482cfd96b9b9ce8178a4484fb8e130a1e7a531f7173475def804fc08ee44  309  src/analytics_agent/clean/detect.py
+  51a3dce8a9d253b82f8f4c47611ef041e820314114e3bd3e3e0a3cc2f1902871  327  src/analytics_agent/clean/sql.py
+  f6cbe8760a2d68498f89cb19277f1d0e108101f090ccfdb9d1298ab3046a5218  893  src/analytics_agent/profile/table_profile.py
+  979f05f2573f1ffc015b02f29d7843e361fe8ced5321e677b28d732e1dc0d648  338  src/analytics_agent/analysis/temporal.py
+  7df7ec9c2af3022947359d35f0c7bc1d898e8116bf09a852910d6d552cd41b6b  230  src/analytics_agent/analysis/period_compare.py
+  5f32174de660bc352e25f14454829ca5f9e09e6607617b7a538301f7d9859860  321  src/analytics_agent/analysis/growth_decomposition.py
+  e1a1d36b5e4d57e3b648155f62f88c7b00adec434a7629215f84ebc813281080  44  tests/test_sizegate_units.py
+
+## Cleanup Step 13 - rules every row must satisfy, 22/09/2026
+
+Step document: docs/steps/cleanup_step13_validation_rules.md. Closes RF-O7.
+
+CL13-D1. A CONTRACT DECLARES EXPECTATIONS; VALIDATION COUNTS THEM. DatasetContract.expectations:
+[{rule, reason}], proposed with expectations=[...]. The rule is caller SQL, so it goes through
+util/sql_guard -- one statement, no subquery, bound as BOOLEAN -- at PROPOSAL, so a typo or a
+subquery is refused before a contract is stored (an exclusion is bound only when an analysis reads
+it). validate_dataset adds one check per rule after the domains: failed where false, not_checked
+where NULL (P7-D4), evidence the failing rows' primary-key values. Nothing is blocked: a finding is
+settled by a person (P7-D12). Retail: B1 8, B2 13 (with the mixed delivery_date parsed in the rule),
+B3 37 across 23 reps, B4 0 -- the key's four.
+
+Found and flagged, not changed: validate/rules.py defines reference_checks and domain_checks twice.
+
+MEASURED VALIDATION, 22/09/2026. `uv run pytest -q`: 1912 -> 1917 passed (5 in
+tests/test_validate_expectations.py; test_validate_tools.py's stand-in gained expectations).
+Acceptance unchanged: 99/0/2, 19/0/0, 35/0/1, 26/0/0, 36/0/0. Eval 76/76. UI 37.
+Digests (sha256, lines):
+  2d6824469e3a965b0553bb2c2d6f1d76c374e1c15ce684624b1cbcc49a641d65  706  src/analytics_agent/contract/dataset_contract.py
+  40d83d174972e8a185d36b32ea9a9419a84e4fb64a14c6fe23de4b024378980a  615  src/analytics_agent/contract/propose.py
+  cd56e307b58701f13efce70cdcbe8903c764c1b139be9ec61380f2600f957785  377  src/analytics_agent/contract/tools.py
+  07da3b20356d2f0d4d560ffff15c3d5af59737041f99f0b72794e0dc06df341c  422  src/analytics_agent/contract/store.py
+  2860121294fde6d3125853fcaad5c4bf060d5826adbea87704d0eeeb41b7b772  904  src/analytics_agent/validate/rules.py
+  8eb76eeb2bff9c7cee00ff99b7a98526a23427ee04eab496112495c2ef508c97  220  src/analytics_agent/validate/tools.py
+  24a32eba7b0a54cd1acf5c37726ee6e7d4239e3a44c600035c0db34c94e400ed  1219  src/analytics_agent/server.py
+  12664311b3f3dbb228a902de936540109da922b3764058bf6b40163925790f2f  88  tests/test_validate_expectations.py
+
+## Cleanup Step 14 - an event key, no needless cap, fences within groups, chosen groups, 22/09/2026
+
+Step document: docs/steps/cleanup_step14_analysis_options.md. Closes RF-O6, RF-O8, and the G1 and
+H1/H6 findings.
+
+CL14-D1. REPEAT_BEHAVIOUR TAKES AN EVENT KEY. CLOSES RF-O6. event=order_id: a person's events are
+distinct orders, dated by their earliest row; rows with no event counted apart. The median gap
+between consecutive events is reported beside the first-to-second one. Retail: 82.096%, busiest 633.
+
+CL14-D2. PARETO AND CONCENTRATION HAVE NO GROUP CAP. CLOSES RF-O8. The cap keeps a per-group table
+inside the display limit; these answers are a count to a threshold and a few cuts. concentration
+adds cuts at 1/5/10% of the groups from 100 groups, and prints an index below 100 with two decimals.
+Retail: 180 of 500 SKUs; top 1% (348) 12.56%, HHI 1.35.
+
+CL14-D3. OUTLIER_DETECTION TAKES A DIMENSION. G1. The three methods' bounds within each group, one
+pass, capped by TooManyGroups; the reply sets the within-group count beside the global Tukey count
+and names the difference as between-group spread.
+
+CL14-D4. GROUPS=[...] CHOOSES MEMBERS OF A DIMENSION. H1, H6. On group_compare, hypothesis_test,
+effect_size, confidence_interval and sample_adequacy (registered selects=True); applied to the scope
+in registry.narrowed as period is, counted by a new Scope.unselected (the four-bucket invariant is
+now five). A member with no rows is refused naming those that exist.
+
+MEASURED VALIDATION, 22/09/2026. `uv run pytest -q`: 1917 -> 1925 passed (8 in
+tests/test_analysis_options.py; one test_pareto test inverted, two test_analysis_tools tests
+repointed). Acceptance unchanged: 99/0/2, 19/0/0, 35/0/1, 26/0/0, 36/0/0. Eval 76/76. UI 37.
+Digests (sha256, lines):
+  a4c0e10790b3bdaa1eae8746da688a68f6729dbcf658d59a05497ee67498d6e7  228  src/analytics_agent/analysis/repeat_behaviour.py
+  41e3e90774a6c6de153fd0e10033b050a3f1f649d8e60ec714c45b980464dfe9  212  src/analytics_agent/analysis/pareto.py
+  754d935f70f8a80134c7683003402fd7df51af51bb3c98730e52947169ed3514  309  src/analytics_agent/analysis/outlier_detection.py
+  2e5cc8c51b4c6718e913d54280579d9575032e5b42eb16a112df51fdc0b6ccc2  393  src/analytics_agent/analysis/base.py
+  ffbe4a21721cd72bcfea6600c507554cea8a1f36f1314b7c47ada5341492dabd  139  src/analytics_agent/analysis/registry.py
+  878ee9fa5043d03bbb44669fcfe98f838b22cd9375b260cde6d039b97933852c  359  src/analytics_agent/analysis/tools.py
+  d341c69a9ea1e3be03d9d4d7a15efbc83289c7a3e43f2f9fb824420db19dc088  1231  src/analytics_agent/server.py
+  378c52433ec5bd2c9df116064ef21db9b66ecc8094abe0a878833a4f56cc844e  271  src/analytics_agent/webapp/agent.py
+  02fdccd82ae226611d1c6d6f2b592dff018d04b7ce411512db4c0c6c71e1b978  131  tests/test_analysis_options.py
+
+## Cleanup Step 15 - the measure model: per a unit, a ratio of sums, a measure over another column, 22/09/2026
+
+Step document: docs/steps/cleanup_step15_measure_model.md. Closes RF-O1 and the G3, C6 and J1
+findings.
+
+CL15-D1. A MEASURE CAN BELONG TO A COARSER UNIT. CLOSES RF-O1. Measure.per names the columns whose
+value it is; every statistic over it is taken over the units, one row each (base.unit_scope, applied
+in registry.narrowed beside period and groups, and by summary_stats per measure). A column the call
+needs that varies within the unit is refused by name -- counting one rep in several categories is
+the trap in another form. At proposal a per measure is verified constant within its unit, as a
+stated key is verified. Retail: C1 6,271,191; C2 72,026.67; H1 t 177.48; H2 F 1,515.59; H5 3.8283;
+J2 and J3 at rep level -- the key's figures.
+
+CL15-D2. A RATIO OF SUMS IS A MEASURE. agg 'ratio' with signed numerator and denominator column lists
+and a scale. The scope's relation exposes it as STRUCT(n, d); AGG_SQL['ratio'] sums the parts apart
+and divides, so a ratio works wherever an aggregate does -- totals, groups, trends -- and analyses
+that read row values refuse it by name (registry.ROW_VALUE_ANALYSES). Retail C5: 18.3983%.
+
+CL15-D3. THE SCOPE READS A RELATION. base.measure_relation turns declarations into columns once: a
+BOOLEAN measure CAST to INTEGER (DuckDB has no avg over BOOLEAN), an aliased measure (Measure.column)
+under its own name, a ratio's parts. Scope.source replaces quote_identifier(scope.dataset_name) at 46
+sites; relation_types replaces column_types for what an analysis sees. So one column can be two
+measures -- units summed, units_per_line averaged (G3) -- and a flag can be a rate (C6).
+
+CL15-D4. A NAME THAT IS NOT A COLUMN MAY NOT LOOK LIKE ONE. An aliased or ratio measure named like a
+table column is refused at confirmation; every column a measure reads must exist.
+
+MEASURED VALIDATION, 22/09/2026. `uv run pytest -q`: 1925 -> 1943 passed (7 in
+tests/test_measure_model_facts.py, 11 in tests/test_measure_model.py). Acceptance unchanged: 99/0/2,
+19/0/0, 35/0/1, 26/0/0, 36/0/0. Eval 76/76. UI 37. Live figures in the step document.
+Digests (sha256, lines):
+  16ddf48e786520f2857fd63c0e58479e0824e990d7d65c64247421b0a8d82e47  762  src/analytics_agent/contract/dataset_contract.py
+  a369e67f3384db20a99b4c19e2da9901705763945a7386447d4f0ad056921c19  679  src/analytics_agent/contract/propose.py
+  ff126ea6893b573749b0a30ec3ab7ac51469fa328a0bc482bfe411c5477774aa  516  src/analytics_agent/analysis/base.py
+  ab78bc5c1177840456cbd8ee36427ca60107df37c548857e2c4f51bbbd1a62be  176  src/analytics_agent/analysis/registry.py
+  c613e420d5182331523fb8d3c15cd39af17466edcc17337bdb7cfabb7be2e343  174  src/analytics_agent/analysis/declared.py
+  46a78b85ae6935fa79b34bd45b54b6804677febb0a5c769bec5f0efd80b7eaf0  175  src/analytics_agent/analysis/summary_stats.py
+  ed981c7e4159a9af0725575fdcad66304bcecdbbad4620d58cd52d2f5642e75c  199  src/analytics_agent/analysis/driver_analysis.py
+  1b8e3dd9040a6ecb2d3e7fa42b947bc393b8c08029c75ac31a4ab107afa93374  126  tests/test_measure_model.py
+  4165dff360dab39bf13d9385ca71c975d22ff0e6b7ab56e145adc1a4a2895217  55  tests/test_measure_model_facts.py
+
+## Cleanup Step 16 - the retail fixture's 53 cases, re-run, 22/09/2026
+
+Step document: docs/steps/cleanup_step16_retail_rerun.md. PASS 46, PARTIAL 3, FAIL 0, GAP 4, from
+PASS 25, PARTIAL 9, FAIL 8, GAP 11 before Steps 12-15. RF-O1 to RF-O8 are closed.
+
+CL16-D1. COMING BACK IS A SECOND MOMENT, NOT A SECOND ROW. The re-run's first pass accepted
+cohort_retention keyed on order_id and reported 59,948 of 150,000 orders "came back": the lines of
+one order share its timestamp, and the refusal only caught a key distinct per row. cohort_retention's
+repeat rate counts a person with rows at two distinct moments, and both it and repeat_behaviour
+refuse a key none of whose values spans two moments -- it names an event. Retail: order_id refused;
+the customer rate 82.096%, the key's.
+
+CL16-D2. "MEMBERS MOVED AGAINST EACH OTHER" IS A STATEMENT ABOUT DIRECTIONS. growth_decomposition
+printed it when gross movement exceeded the net change -- two float sums compared exactly, whose last
+bits follow the order DuckDB's threads add in -- and the retail re-run said it on one run and not
+the next with every category rising. It is now said when some member rose and some fell. A fixed
+three-row fixture could not reproduce the flip; its test guards the rule rather than falsifying it.
+
+Also: the duplicate-row sample in a cleaning proposal is ordered, so a proposal reads the same twice.
+
+RF-O9 IS OPEN. A unit-level value derived from its rows -- "the order had any return" is max(is_returned)
+per order, which varies across the order's lines and so cannot be declared per order (H5's share).
+Belongs with Phase 15's derived columns.
+RF-O10 IS OPEN. The profile does not say that blanks in several columns coincide with one value of
+another (courier, delivery_date and web_session_seconds are blank exactly on the 67,417 Store rows,
+A5).
+Not open, out of scope by the build guide: regression and forecasting (J3's within-department
+slope, K1-K3), Phase 16; a date difference as a measure (J4), Phase 15.
+
+MEASURED VALIDATION, 22/09/2026. `uv run pytest -q`: 1943 -> 1947 passed (4 in
+tests/test_analysis_options.py). Acceptance unchanged: 99/0/2, 19/0/0, 35/0/1, 26/0/0, 36/0/0. Eval
+76/76. UI 37. Three runs of all 53 cases; the third on this tree, graded in the step document.
+Digests (sha256, lines):
+  e277288e525dd261b384684fc9b816afc53d78e25011302b38634e7bf2b13402  184  src/analytics_agent/analysis/cohort_retention.py
+  41bfb74b1865aceaaf7cf82752f76658a391c52c044f17d1ccd8b69673159e6e  244  src/analytics_agent/analysis/repeat_behaviour.py
+  ec936b9ded4ef2c2d964693668790ffe85457e901941caa62a3b081fac267a62  325  src/analytics_agent/analysis/growth_decomposition.py
+  53971418b29d2726113cf175cbbf5fbbb51bb90003b1fa9102f72724f0f85454  329  src/analytics_agent/clean/sql.py
+  eae0c5fff7d88605d747a4e7e521b909bc8c978706a6db6a01245e5fb5941fa9  174  tests/test_analysis_options.py
+
 ## Phase 14, Step 5 - the open items closed, 24/09/2026
 
 Step document: docs/steps/phase14_step5_open_items.md. Run in a cloud container with no Postgres.

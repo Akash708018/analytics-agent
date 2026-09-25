@@ -58,11 +58,11 @@ _TEMPORAL_PREFIXES = ("DATE", "TIMESTAMP", "DATETIME")
 # is meaningful per row and meaningless summed -- a unit price, a rate, a
 # balance. There is deliberately no default; see Measure.agg.
 Aggregation = Literal[
-    "sum", "mean", "median", "min", "max", "count", "count_distinct", "none"
+    "sum", "mean", "median", "min", "max", "count", "count_distinct", "none", "ratio"
 ]
 
 AGGREGATIONS = (
-    "sum", "mean", "median", "min", "max", "count", "count_distinct", "none"
+    "sum", "mean", "median", "min", "max", "count", "count_distinct", "none", "ratio"
 )
 
 
@@ -97,6 +97,16 @@ class Measure(BaseModel):
         "contract lists it as unresolved.",
     )
     unit: str | None = None
+    # Cleanup Step 15 (RF-O1). `column`: the table column this measure reads, when that is not its
+    # own name -- units_per_line reads units with agg mean while units sums. `per`: the columns
+    # whose value this is -- a fee repeated on every line of an order is one value per order_id,
+    # and every statistic over it is taken over orders. `numerator`/`denominator`/`scale`: a ratio
+    # of sums, agg 'ratio' -- signed column lists ("-line_cost"), summed apart, then divided.
+    column: str | None = None
+    per: list[str] = Field(default_factory=list)
+    numerator: list[str] = Field(default_factory=list)
+    denominator: list[str] = Field(default_factory=list)
+    scale: float = 1.0
 
     @field_validator("name")
     @classmethod
@@ -104,6 +114,42 @@ class Measure(BaseModel):
         if not _IDENT_RE.match(v):
             raise ValueError(f"measure name {v!r} is not a valid column name.")
         return v
+
+    @model_validator(mode="after")
+    def _ratio_is_whole(self) -> "Measure":
+        is_ratio = self.agg == "ratio"
+        if is_ratio and not (self.numerator and self.denominator):
+            raise ValueError(
+                f"measure {self.name!r} is a ratio and needs both a numerator and a denominator: "
+                f"lists of columns, each summed, e.g. numerator=['line_revenue', '-line_cost'].")
+        if not is_ratio and (self.numerator or self.denominator):
+            raise ValueError(
+                f"measure {self.name!r} names a numerator or denominator but its agg is "
+                f"{self.agg!r}; only agg 'ratio' divides one sum by another.")
+        if is_ratio and (self.column or self.per):
+            raise ValueError(
+                f"measure {self.name!r} is a ratio of sums over rows; it reads its numerator and "
+                f"denominator columns, not a column of its own or a coarser unit.")
+        for c in [*self.per, *(t.lstrip("-") for t in self.numerator + self.denominator),
+                  *([self.column] if self.column else [])]:
+            if not _IDENT_RE.match(c):
+                raise ValueError(f"measure {self.name!r} names {c!r}, not a valid column name.")
+        return self
+
+    @property
+    def source(self) -> str:
+        """The table column read, for a measure that reads one."""
+        return self.column or self.name
+
+    @property
+    def is_virtual(self) -> bool:
+        """A name that is not a table column: an alias or a ratio."""
+        return self.agg == "ratio" or bool(self.column and self.column != self.name)
+
+    def columns_read(self) -> list[str]:
+        if self.agg == "ratio":
+            return [t.lstrip("-") for t in self.numerator + self.denominator]
+        return [self.source, *self.per]
 
     @property
     def definition_path(self) -> str:
@@ -138,6 +184,29 @@ class Exclusion(BaseModel):
     def _not_negative(cls, v: int | None) -> int | None:
         if v is not None and v < 0:
             raise ValueError(f"row_count cannot be negative; got {v}.")
+        return v
+
+
+class Expectation(BaseModel):
+    """A statement every row must make true -- Great Expectations' word for it.
+
+    Cleanup Step 13 (RF-O7): the retail run's negative quantities, deliveries before the order and
+    sales after a rep's exit passed validation, because no check could state them. The rule is SQL
+    text a person wrote, so it goes through util/sql_guard like an exclusion rule; validation
+    counts the rows where it is false, and leaves apart the rows where it is NULL.
+    """
+
+    rule: str
+    reason: str
+
+    @field_validator("rule", "reason")
+    @classmethod
+    def _not_blank(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError(
+                "an expectation needs both a rule and a reason. A rule with no reason is a "
+                "failure count nobody can act on."
+            )
         return v
 
 
@@ -285,6 +354,7 @@ class DatasetContract(BaseModel):
     measures: list[Measure] = Field(default_factory=list)
     dimensions: list[str] = Field(default_factory=list)
     known_exclusions: list[Exclusion] = Field(default_factory=list)
+    expectations: list[Expectation] = Field(default_factory=list)
     caveats: list[str] = Field(default_factory=list)
 
     missing_values: list[str] | None = Field(
@@ -410,11 +480,17 @@ class DatasetContract(BaseModel):
         referenced: list[tuple[str, str]] = []
         referenced += [("primary_key", c) for c in self.primary_key]
         referenced += [("dimensions", c) for c in self.dimensions]
-        referenced += [("measures", m.name) for m in self.measures]
+        referenced += [("measures", c) for m in self.measures for c in m.columns_read()]
         if self.date_column:
             referenced.append(("date_column", self.date_column))
 
         missing = sorted({f"{c} ({where})" for where, c in referenced if c not in known})
+        clash = sorted(m.name for m in self.measures if m.is_virtual and m.name in known)
+        if clash:
+            raise ValueError(
+                f"measure(s) {', '.join(clash)} read another column or divide two sums, but are "
+                f"named like a column of the table; name them apart so no reader takes one for "
+                f"the other.")
         if missing:
             raise ValueError(
                 f"these columns are named by the contract but are not in the "
@@ -546,6 +622,9 @@ class DatasetContract(BaseModel):
             for e in self.known_exclusions:
                 count = f" ({e.row_count:,} rows)" if e.row_count is not None else ""
                 lines.append(f"  - {e.rule}{count} -- {e.reason}")
+        if self.expectations:
+            lines += ["", "Rules every row must satisfy:"]
+            lines += [f"  - {x.rule} -- {x.reason}" for x in self.expectations]
         if self.caveats:
             lines += ["", "Caveats:"] + [f"  - {c}" for c in self.caveats]
         return "\n".join(lines)
@@ -611,6 +690,10 @@ class DatasetContract(BaseModel):
                     "agg": m.agg,
                     "unit": m.unit,
                     "definition": m.definition,
+                    **({"column": m.column} if m.column else {}),
+                    **({"per": list(m.per)} if m.per else {}),
+                    **({"numerator": list(m.numerator), "denominator": list(m.denominator),
+                        "scale": m.scale} if m.agg == "ratio" else {}),
                 }
                 for m in self.measures
             ],
@@ -619,6 +702,7 @@ class DatasetContract(BaseModel):
                 {"rule": e.rule, "reason": e.reason, "row_count": e.row_count}
                 for e in self.known_exclusions
             ],
+            "expectations": [{"rule": x.rule, "reason": x.reason} for x in self.expectations],
             "caveats": list(self.caveats),
             "foreign_keys": [
                 {

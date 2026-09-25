@@ -111,7 +111,7 @@ def test_the_percentage_is_taken_off_the_baseline(con):
 
 def test_the_difference_in_length_is_named_for_an_additive_aggregate(con):
     text = " ".join(compared(con).summary)
-    assert "28 days of data against 31" in text
+    assert "28 calendar days against 31" in text
     assert "+10.7%" in text
 
 
@@ -121,7 +121,7 @@ def test_the_length_is_not_raised_for_an_aggregate_that_does_not_add(con):
         f"{out.headers[1]!r}. The aggregate is the contract's word for it, and "
         "the contract's word is mean -- AGG_SQL has no avg."
     )
-    assert "days of data against" not in " ".join(out.summary), (
+    assert "calendar days against" not in " ".join(out.summary), (
         "A mean over 28 days and a mean over 31 are the same kind of number; "
         "only a sum or a count is longer for being longer."
     )
@@ -189,3 +189,22 @@ def test_the_method_note_is_the_first_summary_line(con):
 def test_the_catalogue_reports_name_tier_and_a_sentence(con):
     entry = next(c for c in catalogue() if c[0] == "period_compare")
     assert entry[1] == 3 and "no rows" in entry[2]
+
+
+# --- empty months inside a compared year (Cleanup Step 12, RF-O3) --------------------------------
+# Retail: "2024 covers 366 days ... sets 366 days of data against 365" with 2024-09 empty.
+
+YEARS = ("SELECT i AS id, TIMESTAMP '2023-01-15' + INTERVAL (i) MONTH AS ts, 'north' AS region, "
+         "10.00 AS amount, 1.00 AS ticket, 1.00 AS unit_price FROM range(24) t(i) "
+         "WHERE i <> 20")   # 2024-09 is month 20 from 2023-01
+
+
+def test_an_empty_month_inside_a_compared_year_is_named(con):
+    con.execute(f"CREATE OR REPLACE TABLE sales AS {YEARS}")
+    text = " ".join(compared(con, baseline="2023", period="2024", grain="year").summary)
+    assert "2024 holds no rows in 2024-09" in text
+    assert "11 of its 12 months" in text
+
+
+def test_a_day_count_is_called_calendar_days(con):
+    assert "28 calendar days against 31" in " ".join(compared(con).summary)

@@ -15,6 +15,14 @@ across the gap this analysis exists to report would be the gap warning's own
 counter-example, and `growth_decomposition` is where the arithmetic of change
 belongs.
 
+**A split is columns, not rows.** With `dimension`, each member of a declared dimension is a
+column beside the periods, then `(all)` -- the unsplit trend, computed from rows rather than
+added from the cells, because a mean is not the mean of its members -- then `rows`. Added in
+Cleanup Step 8: the bunty_babli run asked for order_value by month split by channel, and no
+analysis took a period and a dimension together. A member with no rows in a period is blank,
+never zero, for the reason an absent period is. Members are read from dated rows, because an
+undated row lands in no period and the undated sentence already says where it went.
+
 **The aggregate is the contract's.** `AGG_SQL[agg]` and nothing else. A measure
 declared `agg='none'` is refused rather than averaged: a unit price summed or
 averaged per month produces a number nothing downstream can detect as wrong,
@@ -25,9 +33,10 @@ from __future__ import annotations
 
 from typing import Any
 
+from ..util.formatting import MAX_COLS
 from ..util.sql_guard import quote_identifier
-from .base import LostRows, number
-from .declared import AGG_SQL, agg_of, require_measure
+from .base import LostRows, label, number
+from .declared import AGG_SQL, agg_of, require_dimension, require_measure
 from .registry import Output, register
 from .temporal import (
     DEFAULT_GRAIN,
@@ -43,6 +52,9 @@ __all__ = ["trend"]
 # Absent periods named before the list becomes a count, as calendar_coverage
 # names them. A reader needs enough to go and look, not a second table.
 NAMED_MISSING = 12
+ALL = "(all)"
+# The period, (all) and rows columns, then the members, inside the table limit.
+MAX_MEMBERS = MAX_COLS - 3
 
 
 @register(
@@ -50,13 +62,15 @@ NAMED_MISSING = 12
     tier=3,
     summary="One declared measure per period, over a calendar that includes "
             "the periods holding no rows, with the gaps named and the "
-            "direction read from the first and last periods that do.",
+            "direction read from the first and last periods that do; with "
+            "dimension, one column per member of a declared dimension.",
 )
 def trend(con, gate, scope, measure: str, grain: str = DEFAULT_GRAIN,
-          **params) -> Output:
+          dimension: str | None = None, **params) -> Output:
     if params:
         raise TypeError(
-            f"trend takes measure and grain; got {', '.join(sorted(params))}."
+            f"trend takes measure, grain and dimension; got "
+            f"{', '.join(sorted(params))}."
         )
 
     contract = gate.contract
@@ -78,11 +92,14 @@ def trend(con, gate, scope, measure: str, grain: str = DEFAULT_GRAIN,
             f"cannot compute. Known: {', '.join(sorted(AGG_SQL))}, none."
         )
 
+    if dimension is not None:
+        require_dimension(contract, dimension)
+
     date_column = require_date_column(contract)
     cal = calendar_for(gate, scope, date_column, grain)
     key = cal.key
 
-    table = quote_identifier(scope.dataset_name)
+    table = scope.source
     col = quote_identifier(date_column)
     value = AGG_SQL[agg].format(col=quote_identifier(measure))
 
@@ -99,6 +116,10 @@ def trend(con, gate, scope, measure: str, grain: str = DEFAULT_GRAIN,
             else "No rows are in scope, so there are no periods to trend over."
         )
         return Output(headers=headers, rows=[], summary=summary, label="trend")
+
+    if dimension is not None:
+        return _split(con, gate, scope, cal, e, table, col, value, measure, agg,
+                      unit, date_column, dimension)
 
     fetched = con.execute(per_period_sql(
         cal, table, col, scope.where,
@@ -172,5 +193,91 @@ def trend(con, gate, scope, measure: str, grain: str = DEFAULT_GRAIN,
         summary.append(
             f"{e.undated:,} analysed row(s) have no {date_column} and are in "
             f"no {key} above."
+        )
+    return Output(headers=headers, rows=rows, summary=summary, label="trend")
+
+
+def _split(con, gate, scope, cal, e, table, col, value, measure, agg, unit,
+           date_column, dimension) -> Output:
+    """trend with one column per member of `dimension`. See the module docstring."""
+    key = cal.key
+    d = quote_identifier(dimension)
+    members = [r[0] for r in con.execute(
+        f"SELECT DISTINCT {d} FROM {table} WHERE {scope.where} AND {col} IS NOT NULL "
+        f"ORDER BY 1 NULLS LAST"
+    ).fetchall()]
+    if len(members) > MAX_MEMBERS:
+        raise ValueError(
+            f"trend of {measure} split by {dimension} would have {len(members)} member "
+            f"column(s), NULL counted as one. It is capped at {MAX_MEMBERS}, so that with "
+            f"period, {ALL} and rows it fits the {MAX_COLS}-column table limit. top_n on "
+            f"{dimension} says which members matter; a coarser declared dimension is the "
+            f"other way."
+        )
+    names = [label(m) for m in members]
+    clash = sorted({n for n in names if names.count(n) > 1 or n in ("period", ALL, "rows")})
+    if clash:
+        raise ValueError(
+            f"trend cannot label its columns: {clash} would collide with each other or with "
+            f"the period, {ALL} and rows columns."
+        )
+
+    inner = [f"{value} FILTER (WHERE {d} IS NOT DISTINCT FROM ?) AS v{i}"
+             for i in range(len(members))]
+    inner += [f"{value} AS v", "count(*) AS n"]
+    outer = [f"d.v{i}" for i in range(len(members))] + ["d.v", "coalesce(d.n, 0)"]
+    fetched = con.execute(
+        per_period_sql(cal, table, col, scope.where, inner=inner, outer=outer),
+        list(members),
+    ).fetchall()
+
+    held = sum(r[-1] for r in fetched)
+    if held + e.undated != scope.analysed:
+        raise LostRows(
+            f"trend lost rows: its {len(fetched)} {key}(s) hold {held:,} row(s) and "
+            f"{e.undated:,} are undated, against {scope.analysed:,} analysed."
+        )
+
+    rows: list[list[Any]] = [
+        [r[0]] + [number(v) if v is not None else "" for v in r[1:-1]] + [number(r[-1])]
+        for r in fetched
+    ]
+    headers = ["period", *names, ALL, "rows"]
+    summary = [scope.method_note(), *gate.caveats]
+    summary.append(
+        f"{len(fetched):,} {key}(s) between {fetched[0][0]} and {fetched[-1][0]}, generated "
+        f"from {cal.bounds_text} and truncated to the {key}. Each member of {dimension} is a "
+        f"column of {agg} of {measure}{f' ({unit})' if unit else ''}; {ALL} is {agg} over "
+        f"every row in the {key}, not a combination of the cells."
+    )
+    summary.append(
+        f"A blank cell is not zero: no analysed row of that member, with a value of "
+        f"{measure}, falls in that {key}."
+    )
+    missing = [r[0] for r in fetched if not r[-1]]
+    if missing:
+        named = ", ".join(missing[:NAMED_MISSING])
+        rest = len(missing) - NAMED_MISSING
+        summary.append(
+            f"{len(missing):,} {key}(s) hold no rows for any member and are blank across the "
+            f"row: {named}" + (f", and {rest:,} more." if rest > 0 else ".")
+        )
+    for i, name in enumerate(names):
+        present = [(r[0], r[1 + i]) for r in fetched if r[1 + i] is not None]
+        if len(present) >= 2:
+            summary.append(
+                f"{name}: from {number(present[0][1])} in {present[0][0]} to "
+                f"{number(present[-1][1])} in {present[-1][0]}, two endpoints and not a fit."
+            )
+        elif present:
+            summary.append(f"{name}: only {present[0][0]} holds a value.")
+    if cal.windowed and e.opens_mid_period:
+        summary.append(
+            f"The window opens on {cal.start}, inside the {key} beginning {fetched[0][0]}, so "
+            f"that {key} covers part of its period and can read low for that reason alone."
+        )
+    if e.undated:
+        summary.append(
+            f"{e.undated:,} analysed row(s) have no {date_column} and are in no {key} above."
         )
     return Output(headers=headers, rows=rows, summary=summary, label="trend")
