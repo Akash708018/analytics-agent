@@ -427,7 +427,9 @@ class FakeBackend:
                                  f"{dataset_name} report", body, "9 sections")
         return AnalysisRun(f"Report written: {art.path}", [art])
 
-    def chat(self, workspace_id: str, history: list[dict], message: str) -> ChatTurn:
+    def chat(self, workspace_id: str, history: list[dict], message: str,
+             progress=None) -> ChatTurn:
+        # progress: the protocol's optional listener (step 2); the fake has nothing to wait on.
         text = message.lower()
         with self._lock:
             space = self._ws(workspace_id)

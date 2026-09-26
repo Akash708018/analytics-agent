@@ -1,13 +1,18 @@
 """Ask: the conversation. The assistant runs the analyses; this screen shows what it said, what
-it drew, and -- one click away -- every tool it called, refusals included."""
+it drew, and -- one click away -- every tool it called, refusals included.
+
+While a turn runs, the status box says what it is waiting on -- a provider's rate-limit pause
+names the provider and the seconds (step 2: the screen once said "Reading the data..." through
+seven minutes of waits). What is still worth reading afterwards is kept on the turn as notes."""
 
 from __future__ import annotations
 
+import inspect
 import json
 
 import streamlit as st
 
-from analytics_agent.webapp.contract import Artifact, ChatTurn
+from analytics_agent.webapp.contract import Artifact, Backend, ChatEvent, ChatTurn
 from ui import components as ui
 from ui import theme
 
@@ -38,6 +43,8 @@ def _turn(turn: ChatTurn) -> None:
             st.caption(f":material/check_circle: {turn.verification}")
         else:
             st.warning(turn.verification, icon=":material/rule:")
+    for note in getattr(turn, "notes", None) or []:
+        st.caption(f":material/schedule: {note}")
     for art in turn.artifacts:
         _artifact(art)
     if turn.tool_calls:
@@ -48,6 +55,32 @@ def _turn(turn: ChatTurn) -> None:
                 st.markdown(f"`{call.name}`{mark}")
                 st.code(json.dumps(call.arguments, indent=2), language="json")
                 st.code(call.result, language=None)
+
+
+def _takes_progress(backend: Backend) -> bool:
+    """Whether this backend's chat hears progress: one written before step 2 (the fake) takes
+    three arguments and is called with three."""
+    try:
+        return "progress" in inspect.signature(backend.chat).parameters
+    except (TypeError, ValueError):
+        return False
+
+
+def _ask(backend: Backend, workspace_id: str, history: list[dict], message: str) -> ChatTurn:
+    """One turn, with a status box that says what the turn is waiting on while it runs."""
+    with st.status("Reading the data…", expanded=False) as box:
+        def progress(event: ChatEvent) -> None:
+            box.update(label=event.text)
+            if event.kind != "step":  # a wait, a failover, a shortened reply: kept in the box
+                box.write(event.text)
+
+        if _takes_progress(backend):
+            turn = backend.chat(workspace_id, history, message, progress=progress)
+        else:
+            turn = backend.chat(workspace_id, history, message)
+        box.update(label="Could not answer" if turn.error else "Answered",
+                   state="error" if turn.error else "complete", expanded=False)
+    return turn
 
 
 def render() -> None:
@@ -71,8 +104,7 @@ def render() -> None:
         with st.chat_message("user", avatar=":material/person:"):
             st.markdown(message)
         with st.chat_message("assistant", avatar=AVATAR):
-            with st.spinner("Reading the data…"):
-                turn = ui.backend().chat(ui.workspace_id(), history, message)
+            turn = _ask(ui.backend(), ui.workspace_id(), history, message)
             _turn(turn)
         log.append({"role": "assistant", "content": turn.reply or (turn.error or ""),
                     "turn": turn})

@@ -3,22 +3,33 @@
 A model reads the question, calls the engine's tools, reads their replies, and answers. The tools
 are server.py's own functions -- what Claude Desktop calls -- restricted to an allowlist, with the
 workspace injected by this module and never chosen by the model.
+
+Step 2 (26/09/2026), so a multi-step answer finishes on free-tier models: a caveat block repeated
+within a turn is sent to the model once (the tools' own text is unchanged -- Claude Desktop reads
+it); the tool replies a turn gathers outlive the provider that asked for them, so a failover
+answers from them instead of running every tool again; and what the person is waiting on is
+reported as it happens (`progress`) and kept on the turn (`ChatTurn.notes`).
 """
 
 from __future__ import annotations
 
 import asyncio
+import dataclasses
 import functools
 import inspect
 import re
 from collections.abc import Callable
 from contextlib import AbstractContextManager
+from dataclasses import dataclass, field
 
 from analytics_agent import server
 from analytics_agent.contract.refusals import reason_of
+from analytics_agent.state import DECLARED, MEASURED
 
-from .contract import Artifact, ChatTurn, ToolCall
-from .llm import Call, Provider, ProviderError, ToolSpec, configured, convert_schema
+from .budget import SAME_CAVEATS
+from .contract import Artifact, ChatEvent, ChatTurn, ToolCall
+from .llm import (Call, Event, Provider, ProviderError, ToolSpec, configured, convert_schema,
+                  gathered_text, listening, notify)
 from .verify import Verification, verify
 
 #: Reading and analysis only. Excluded on purpose: tools taking a filesystem path (the server's
@@ -192,44 +203,133 @@ def _trim(text: str) -> str:
                                   f"Page a written result with read_result_file.]")
 
 
+def _is_caveat(line: str) -> bool:
+    return MEASURED in line or DECLARED in line
+
+
+@dataclass
+class Gathered:
+    """What this turn's tools replied, kept across providers (step 2).
+
+    `calls` is the person's record (What I did); `replies` the texts as the model was sent them;
+    `seen` the same texts with any caveat block restored, which the figure check reads -- a
+    declared number is recognised as declared wherever it repeats. `blocks` holds the caveat
+    blocks already sent in full this turn.
+    """
+
+    calls: list[ToolCall] = field(default_factory=list)
+    replies: list[tuple[Call, str]] = field(default_factory=list)
+    seen: list[str] = field(default_factory=list)
+    blocks: set[tuple[str, ...]] = field(default_factory=set)
+
+    def compact(self, text: str) -> tuple[str, str, str]:
+        """`text` with a caveat block already sent this turn replaced by one line: (the text, the
+        line, the block it stands for) -- the last two empty when nothing was replaced.
+
+        Every analysis prints its table's caveats; on the retail table that is 30 lines, 4,077
+        characters, in every reply (step 2, command 3). The first reply carrying a block keeps
+        it; a later one whose block is identical, line for line, gets the line instead. A block
+        that differs (another table, a caveat added) is sent whole."""
+        lines = text.split("\n")
+        at = [i for i, line in enumerate(lines) if _is_caveat(line)]
+        if not at:
+            return text, "", ""
+        block = tuple(lines[i].strip() for i in at)
+        if block not in self.blocks:
+            self.blocks.add(block)
+            return text, "", ""
+        first = lines[at[0]]
+        lead = first[:len(first) - len(first.lstrip())] + (
+            "- " if first.lstrip().startswith("- ") else "")
+        line = f"{lead}{SAME_CAVEATS}{len(at)} as in an earlier reply this turn."
+        skip = set(at[1:])
+        kept = [line if i == at[0] else x for i, x in enumerate(lines) if i not in skip]
+        return "\n".join(kept), line, "\n".join(lines[i] for i in at)
+
+    def add(self, call: Call, result: str) -> str:
+        """Record one tool reply; returns the text the model is sent."""
+        compacted, line, block = self.compact(_with_screen_notes(result))
+        shown = _trim(compacted)
+        self.replies.append((call, shown))
+        self.seen.append(shown.replace(line, block, 1) if line else shown)
+        return shown
+
+
+#: The note before replies another provider gathered (step 2).
+HANDOVER = ("[system] Another model began answering this question, ran the tools whose replies "
+            "follow, and could not finish. No tool can be called now. Answer the person from "
+            "these {n} replies alone, as the rules above say; they are this turn's tool replies "
+            "in the order they ran.")
+
+
 def answer(workspace_id: str, history: list[dict], message: str, *,
            lock: Callable[[], AbstractContextManager],
            list_artifacts: Callable[[], list[Artifact]],
-           providers: list[Provider] | None = None) -> ChatTurn:
-    """One turn: the providers in order, failing over on a retryable error."""
+           providers: list[Provider] | None = None,
+           progress: Callable[[ChatEvent], None] | None = None) -> ChatTurn:
+    """One turn: the providers in order, failing over on a retryable error. `progress` hears
+    every ChatEvent while it runs; the ones worth reading afterwards are kept on the turn."""
+    notes: list[str] = []
+
+    def hear(event: ChatEvent) -> None:
+        if event.kind != "step" and event.text not in notes:
+            notes.append(event.text)
+        if progress is not None:
+            progress(event)
+
+    with listening(hear):
+        turn = _answer(workspace_id, history, message, lock, list_artifacts, providers)
+    return dataclasses.replace(turn, notes=notes) if notes else turn
+
+
+def _answer(workspace_id: str, history: list[dict], message: str,
+            lock: Callable[[], AbstractContextManager],
+            list_artifacts: Callable[[], list[Artifact]],
+            providers: list[Provider] | None) -> ChatTurn:
     providers = configured() if providers is None else providers
     if not providers:
         return ChatTurn(reply="", error=(
-            "No model is configured. Add GEMINI_API_KEY (or GROQ_API_KEY) to the .env file at "
-            "the repository root and restart the app."))
+            "No model is configured. Add GEMINI_API_KEY (or GROQ_API_KEY, or "
+            "OPENROUTER_API_KEY) to the .env file at the repository root and restart the app."))
     failures: list[str] = []
-    calls: list[ToolCall] = []
+    got = Gathered()
     at_start = {a.path for a in list_artifacts()}
+    failed: Provider | None = None
     for provider in providers:
         # A spent daily quota is per model: Gemini tries its next model before the next
         # provider (P14-D32). Bounded by the ladder's length.
         for _attempt in range(6):
-            # Per attempt: an abandoned attempt may have drawn a chart the final answer never
-            # mentions. It stays in Files, not under this answer (P14-D28).
-            before = {a.path for a in list_artifacts()}
-            calls = []
+            if failures:
+                who = f"{provider.name}'s next model" if failed is provider else provider.name
+                notify(Event("failover", f"{failures[-1]} -- {who} takes over" + (
+                    f", answering from the {len(got.replies)} tool repl"
+                    f"{'y' if len(got.replies) == 1 else 'ies'} already gathered"
+                    if got.replies else ""), provider.name))
             try:
-                text, checked = _turn(provider, workspace_id, history, message, lock, calls)
+                # Tools already ran: the next provider answers from their replies and runs
+                # none again (step 2; the retail turn ran six, then failed over, then 413).
+                if got.replies:
+                    text, checked = _synthesize(provider, history, message, got)
+                else:
+                    text, checked = _turn(provider, workspace_id, history, message, lock, got)
             except ProviderError as exc:
                 failures.append(exc.summary)
+                failed = provider
                 more = getattr(provider, "has_another_model", lambda: False)()
                 if exc.kind == "daily_quota" and more:
                     continue
                 if exc.retryable:
                     break
                 # Every failure, not the last (P14-D25), each as one readable sentence.
-                return ChatTurn(reply="", tool_calls=calls,
+                return ChatTurn(reply="", tool_calls=got.calls,
                                 error=_failed(failures, _written(list_artifacts, at_start)))
-            new = [a for a in list_artifacts() if a.path not in before]
-            return ChatTurn(reply=text, tool_calls=calls, artifacts=new,
+            # Every file this turn wrote: since step 2 no attempt's replies are abandoned, so a
+            # chart drawn before a failover is one the answer was written from (was P14-D28).
+            new = [a for a in list_artifacts() if a.path not in at_start]
+            return ChatTurn(reply=text, tool_calls=got.calls, artifacts=new,
                             verification=checked.summary() if checked.checked else None,
                             verified=checked.clean)
-    return ChatTurn(reply="", tool_calls=calls,
+    return ChatTurn(reply="", tool_calls=got.calls,
                     error=_failed(failures, _written(list_artifacts, at_start)))
 
 
@@ -247,17 +347,23 @@ def _failed(failures: list[str], written: int = 0) -> str:
             + f"\n\n{after} Try again shortly.")
 
 
+def _context(history: list[dict], message: str) -> list[str]:
+    return [message] + [m.get("content") or "" for m in history[-HISTORY_MESSAGES:]]
+
+
 def _turn(provider: Provider, workspace_id: str, history: list[dict], message: str,
-          lock: Callable[[], AbstractContextManager], calls: list[ToolCall]
+          lock: Callable[[], AbstractContextManager], got: Gathered
           ) -> tuple[str, Verification]:
     session = provider.start(SYSTEM, history[-HISTORY_MESSAGES:], message, list(tool_specs()))
-    seen: list[str] = []  # the tool replies as the model read them, for the check
-    context = [message] + [m.get("content") or "" for m in history[-HISTORY_MESSAGES:]]
+    seen = got.seen  # the tool replies as the model read them, for the check
+    context = _context(history, message)
     for i in range(MAX_ROUNDS):
         # The last round offers no tools, so what was fetched is answered rather than dropped
         # (Cleanup Step 11: seven rounds held every figure, the eighth was a call, and the turn
         # returned only the stop message).
         final = i == MAX_ROUNDS - 1
+        notify(Event("step", f"Waiting for {provider.name} (round {i + 1} of {MAX_ROUNDS})...",
+                     provider.name))
         reply = session.step(final=final)
         if not reply.calls or (final and reply.text):
             return _checked(session, reply.text, seen, context)
@@ -265,19 +371,41 @@ def _turn(provider: Provider, workspace_id: str, history: list[dict], message: s
             break
         results = []
         for call in reply.calls:
+            notify(Event("step", f"Running {call.name}...", provider.name))
             with lock():  # one tool at a time holds the workspace; the model's thinking does not
                 result = run_tool(call, workspace_id)
-            calls.append(ToolCall(call.name, dict(call.args), result,
-                                  refused=reason_of(result) is not None
-                                  or result.lstrip().startswith("BLOCKED")))
-            shown = _trim(_with_screen_notes(result))
-            seen.append(shown)
-            results.append((call, shown))
+            got.calls.append(ToolCall(call.name, dict(call.args), result,
+                                      refused=reason_of(result) is not None
+                                      or result.lstrip().startswith("BLOCKED")))
+            results.append((call, got.add(call, result)))
         session.add_results(results)
     text = (reply.text + "\n\n" if reply.text else "") + (
         f"I stopped after {MAX_ROUNDS} rounds of tool calls without a final answer. What I ran is "
         f"listed below; ask again more narrowly.")
     return text, verify(text, seen, context)
+
+
+def _synthesize(provider: Provider, history: list[dict], message: str, got: Gathered
+                ) -> tuple[str, Verification]:
+    """The answer from replies another provider's model gathered: no tools offered, one final
+    round, the same figure check against the same replies (step 2)."""
+    session = provider.start(SYSTEM, history[-HISTORY_MESSAGES:], message, [])
+    note = HANDOVER.format(n=len(got.replies))
+    add = getattr(session, "add_gathered", None)
+    if add is not None:
+        add(note, got.replies)
+    else:  # a session written before step 2: the same text, as one message
+        n = len(got.replies)
+        session.add_user("\n\n".join([note] + [gathered_text(i, n, call, text) for i, (call, text)
+                                                in enumerate(got.replies, 1)]))
+    notify(Event("step", f"Waiting for {provider.name} to answer from "
+                         f"{len(got.replies)} gathered repl"
+                         f"{'y' if len(got.replies) == 1 else 'ies'}...", provider.name))
+    text = session.step(final=True).text
+    if not text.strip():
+        raise ProviderError(provider.name, "no answer from the gathered replies", True,
+                            summary="answered nothing from the replies already gathered")
+    return _checked(session, text, got.seen, _context(history, message))
 
 
 def _checked(session, text: str, seen: list[str], context: list[str]) -> tuple[str, Verification]:
@@ -304,4 +432,5 @@ def _checked(session, text: str, seen: list[str], context: list[str]) -> tuple[s
     return (text, checked) if worse else (again, rechecked)
 
 
-__all__ = ["ALLOWED", "MAX_ROUNDS", "SCREENS", "SYSTEM", "answer", "run_tool", "tool_specs"]
+__all__ = ["ALLOWED", "HANDOVER", "MAX_ROUNDS", "SCREENS", "SYSTEM", "Gathered", "answer",
+           "run_tool", "tool_specs"]

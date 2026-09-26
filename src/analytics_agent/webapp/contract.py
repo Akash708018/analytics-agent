@@ -22,6 +22,7 @@ Standard library only, so importing this file costs the UI nothing.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Literal, Protocol
 
@@ -376,6 +377,27 @@ class ChatTurn:
     #: person, and whether every figure was found. None where nothing was checked.
     verification: str | None = None
     verified: bool = True
+    #: What the person should still read after the answer about how it was reached (step 2): a
+    #: wait on a busy provider, a move to another provider, earlier replies shortened to fit a
+    #: model's request limit. Empty when nothing of the kind happened.
+    notes: list[str] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
+class ChatEvent:
+    """Something the person waiting on an answer should see while it is worked out (step 2).
+
+    `kind` is "wait" (a busy provider asked for a pause of `seconds`), "shortened" (earlier tool
+    replies cut to fit a model's request limit), "failover" (another provider or model takes over
+    the turn), or "step" (a round or a tool starting -- shown while it happens, not kept on the
+    turn). `who` is "provider (model)" where one is involved. Measured 25/09/2026: the screen said
+    "Reading the data..." for seven minutes of waits nobody could see.
+    """
+
+    kind: str
+    text: str
+    who: str = ""
+    seconds: float = 0.0
 
 
 class Backend(Protocol):
@@ -457,9 +479,12 @@ class Backend(Protocol):
     def build_report(self, workspace_id: str, dataset_name: str, question: str) -> AnalysisRun:
         """The full report for a dataset: every section, every number traced to its call."""
 
-    def chat(self, workspace_id: str, history: list[dict], message: str) -> ChatTurn:
+    def chat(self, workspace_id: str, history: list[dict], message: str,
+             progress: Callable[[ChatEvent], None] | None = None) -> ChatTurn:
         """Answer one message. history is [{"role": "user"|"assistant", "content": str}, ...],
-        oldest first, not including `message`."""
+        oldest first, not including `message`. `progress`, where given, hears each ChatEvent
+        while the turn runs (step 2). Optional: a backend written before it (ui/fake_backend.py)
+        takes three arguments, and the Ask screen calls it with three."""
 
     def list_artifacts(self, workspace_id: str) -> list[Artifact]:
         """Charts, reports and result tables in the workspace, newest first."""
@@ -475,7 +500,7 @@ class Backend(Protocol):
 __all__ = [
     "AGGREGATIONS", "DTYPES", "HEADER_JOINS", "ROLES",
     "ActionResult", "AnalysisMenu", "AnalysisParam", "AnalysisRun", "AnalysisSpec", "Artifact",
-    "Backend", "ChatTurn", "CleaningProposal", "CleaningStep",
+    "Backend", "ChatEvent", "ChatTurn", "CleaningProposal", "CleaningStep",
     "ColumnDraft", "ContractColumn",
     "ContractDraft", "DatasetSummary", "FieldSource", "GridPreview", "IngestDraft", "Limits",
     "MeasureSuggestion",

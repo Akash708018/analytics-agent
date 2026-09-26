@@ -500,3 +500,44 @@ def test_form_answers_carry_units_and_ratios():
     assert got["measure_per"] == {"fee": ["order_id"]}
     assert got["measures"] == ["fee", "m_of_sums"] and got["aggregations"]["m_of_sums"] == "ratio"
     assert got["ratios"] == {"m_of_sums": {"numerator": ["a"], "denominator": ["b"], "scale": 100.0}}
+
+
+# --- provider waits on the Ask screen (step 2) ------------------------------------------------------
+
+WAIT = ("groq (openai/gpt-oss-120b): rate limit reached -- waiting 40 s, then trying "
+        "again (attempt 2 of 3)")
+
+
+def _ask_with_a_wait(root: str) -> None:
+    import sys
+    sys.path.insert(0, root)
+    from analytics_agent.webapp.contract import ChatEvent, ChatTurn
+    from ui.screens import chat
+
+    WAIT = ("groq (openai/gpt-oss-120b): rate limit reached -- waiting 40 s, then trying "
+            "again (attempt 2 of 3)")
+
+    class Waits:
+        def chat(self, workspace_id, history, message, progress=None):
+            progress(ChatEvent("step", "Running compute_analysis...", "groq"))
+            progress(ChatEvent("wait", WAIT, "groq (openai/gpt-oss-120b)", 40.25))
+            return ChatTurn(reply="North leads.", notes=[WAIT])
+    chat._turn(chat._ask(Waits(), "ws_000000000abc", [], "q"))
+
+
+def test_the_ask_screen_names_the_provider_and_the_wait():
+    at = AppTest.from_function(_ask_with_a_wait, args=(str(ROOT),), default_timeout=30).run()
+    assert not at.exception, at.exception
+    assert any(WAIT in m.value for m in at.markdown), "written in the status box as it happens"
+    assert any(WAIT in c.value for c in at.caption), "kept under the answer"
+
+
+def test_a_backend_without_progress_is_called_as_before():
+    from analytics_agent.webapp.real_backend import RealBackend
+    from ui.screens import chat
+    class Before:  # a backend written before step 2
+        def chat(self, workspace_id, history, message):
+            from analytics_agent.webapp.contract import ChatTurn
+            return ChatTurn(reply="as before")
+    assert not chat._takes_progress(Before()) and chat._takes_progress(RealBackend())
+    assert chat._takes_progress(FakeBackend())
