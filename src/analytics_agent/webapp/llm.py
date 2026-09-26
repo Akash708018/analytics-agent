@@ -311,6 +311,12 @@ def _classify(provider: str, code: int, body: str) -> ProviderError:
         return ProviderError(provider, f"HTTP 429: {body[:500]}", True, kind="daily_quota",
                              model=model, summary=f"the free daily quota"
                              f"{' for ' + model if model else ''} is used up")
+    if code == 404 and provider == "gemini":
+        # "This model models/gemini-2.5-flash is no longer available to new users" -- seen live
+        # 26/09/2026 with GEMINI_MODEL pinned to it. Not the turn's fault: the next model, or
+        # the next provider, can answer (step 2).
+        return ProviderError(provider, f"HTTP 404: {body[:500]}", True, kind="model_gone",
+                             summary=f"the model is not available ({first})")
     if code == 400 and "failed_generation" in body:
         # Groq could not parse the model's own output -- a malformed tool call. A fresh sample
         # usually parses; the session retries (Cleanup Step 10, seen live).
@@ -585,7 +591,7 @@ class Gemini:
             return _request("gemini", f"{GEMINI_URL}/models/{model}:generateContent",
                             {"x-goog-api-key": self._key()}, body, max_wait=max_wait)
         except ProviderError as exc:
-            if exc.kind == "daily_quota":
+            if exc.kind in ("daily_quota", "model_gone"):
                 # The alias has no quota of its own; the error names the model serving it, and
                 # both are spent for today.
                 for spent in {model, exc.model} - {None}:
@@ -865,7 +871,7 @@ def complete_json(providers: list, system: str, prompt: str, *,
             except ProviderError as exc:
                 failures.append(exc.summary)
                 more = getattr(provider, "has_another_model", lambda: False)()
-                if exc.kind == "daily_quota" and more:
+                if exc.kind in ("daily_quota", "model_gone") and more:
                     continue
                 break
             except (ValueError, json.JSONDecodeError) as exc:

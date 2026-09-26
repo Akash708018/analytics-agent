@@ -316,7 +316,7 @@ def _answer(workspace_id: str, history: list[dict], message: str,
                 failures.append(exc.summary)
                 failed = provider
                 more = getattr(provider, "has_another_model", lambda: False)()
-                if exc.kind == "daily_quota" and more:
+                if exc.kind in ("daily_quota", "model_gone") and more:
                     continue
                 if exc.retryable:
                     break

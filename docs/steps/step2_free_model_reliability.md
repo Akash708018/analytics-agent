@@ -253,3 +253,28 @@ MEASURED VALIDATION, 26/09/2026: engine 2194/0 skipped; UI 55; phases 55/0/3, 0/
   ac63fcc842e9a5f9f1e45c99309359a53bca9f0520e7759a87872b3f645d4478  ui/screens/chat.py
   072c7842a00523b8e0e9cf9e82ba43b66b08d29fc1a8cdbbb55d740bd57d3dba  scripts/request_size.py
   ac6a9f4b767ae928698b9624084191e19b5c6ad355cad740db4c5336984d3aff  tests/test_budget.py
+
+## 7. After the step: a retired Gemini model, and the first live runs (26/09/2026)
+
+7.1 Seen live on the user's machine: with `GEMINI_MODEL=gemini-2.5-flash`, Gemini answered 404 "no
+longer available to new users" and the turn ended, because a 404 was classified as permanent.
+It is now `kind="model_gone"` and retryable. Gemini marks the model unusable and moves to its
+next model, and with none left the turn fails over. New test:
+`test_a_retired_pinned_gemini_model_fails_over_to_groq`. Checks after the fix: pytest 2195 passed;
+UI 55; phases 55/0/3, 0/0/1, 0/0/1, 26/0/0, 36/0/0; eval 76/76; scenario matrix 30/30.
+
+7.2 `uv run python scripts/agent_live.py` with the user's keys in the gitignored .env: Gemini
+(gemini-flash-latest) answered "South, 378,416.78" with a chart, which is correct. Groq could not
+be tried from this container: its network policy denies api.groq.com ("no response (URLError)").
+GROQ IS STILL NOT VERIFIED LIVE.
+
+7.3 The retail question, live, on the retail-like table (Gemini only). 76 s. Rounds ran
+get_workflow_state, validate_dataset, describe_dataset and profile_dataset. Then there was a
+40 s rate-limit wait, shown. After that gemini-3.8-flash's daily quota ran out, and
+gemini-3.7-flash took over "answering from the 4 tool replies already gathered": no tool ran
+twice. It answered through two 503 waits, both shown. Verification: 28 of 28 figures match. Not
+as hoped: the first model spent its rounds on quality tools before any revenue analysis, so the
+answer lists the data-quality issues correctly but says the 2025 revenue/cost/margin by region
+was not computed. Resumable synthesis answers from what was gathered, never more. Model
+behaviour, not budget: a follow-up could steer the first rounds to the analyses the question
+names.

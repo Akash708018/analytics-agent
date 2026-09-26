@@ -39,7 +39,7 @@
   "family": "L",
   "check": "the report before any analysis still has nine sections",
   "outcome": "OK",
-  "detail": "# clean_sales\n\nWritten 2026-09-24 14:27.\n\n## Contents\n\n1. [The question asked](#the-question-asked)\n2. [Dataset and grain](#dataset-and-grain)\n3. [Data quality](#data-quality)\n4. [Cleaning ledger](#cl"
+  "detail": "# clean_sales\n\nWritten 2026-09-26 13:41.\n\n## Contents\n\n1. [The question asked](#the-question-asked)\n2. [Dataset and grain](#dataset-and-grain)\n3. [Data quality](#data-quality)\n4. [Cleaning ledger](#cl"
  },
  {
   "family": "H",

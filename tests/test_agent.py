@@ -1046,3 +1046,23 @@ def test_the_real_backend_passes_progress_through(monkeypatch):
     finally:
         with contextlib.suppress(FileNotFoundError):
             workspace.workspace_dir(ws).rmdir()
+
+
+GONE = ('{"error":{"code":404,"message":"This model models/gemini-2.5-flash is no longer available '
+        'to new users. Please update your code to use models/gemini-3.8-flash.",'
+        '"status":"NOT_FOUND"}}')
+
+
+def test_a_retired_pinned_gemini_model_fails_over_to_groq(monkeypatch):
+    """Seen live 26/09/2026: GEMINI_MODEL=gemini-2.5-flash gave 404 and the turn ended there."""
+    err = llm._classify("gemini", 404, GONE)
+    assert err.kind == "model_gone" and err.retryable
+    g = llm.Gemini()
+    monkeypatch.setattr(g, "_ladder", ["gemini-2.5-flash"])
+    monkeypatch.setattr(llm, "_request", lambda *a, **k: (_ for _ in ()).throw(
+        llm._classify("gemini", 404, GONE)))
+    groq = Scripted([Reply(text="from groq")])
+    turn = agent.answer("ws_000000000abc", [], "hi", lock=contextlib.nullcontext,
+                        list_artifacts=list, providers=[g, groq])
+    assert turn.reply == "from groq" and turn.error is None
+    assert not g.has_another_model()
