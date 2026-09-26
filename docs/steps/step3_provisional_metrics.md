@@ -104,3 +104,16 @@ ranking exactly and each figure to +-1 order and +-1 point.
    network policy). NOT COMPLETED: gemini-3.8-flash's free daily quota was spent by earlier runs
    today, gemini-3.7-flash answered 503 "high demand" three times. The model had called
    get_workflow_state and summary_stats before the failover. To be re-run.
+
+   5.1 Re-run, 26/09/2026, Gemini only (gemini-3.8-flash's day spent; gemini-3.7-flash through
+   seven 503/429 waits, each shown). Turn 1, 132 s: get_workflow_state, describe_dataset,
+   validate_dataset, summary_stats, frequency of delivery_status, get_cleaning_ledger, then
+   propose_metric(sla_compliance = recorded_delivery_minutes <= promised_minutes, mean): the
+   refusal of 26/09 is gone -- the model proposed the metric, gave its coverage (366 of 492 rows
+   judged, 47.5% true), asked for approval, and computed nothing (check: 5 of 5 figures match).
+   Approved as the button would. Turn 2, 27 s: gemini-3.7-flash's free day ran out after one
+   call; the takeover model answered from that one reply that the ranking was not run. NOT YET
+   SEEN LIVE: the ranking and the drill-down with the approved metric. Two things the run shows:
+   the model spent six calls on data-quality tools before proposing (the rules say to go
+   straight to the analyses the question needs), and a free Gemini day holds roughly two such
+   questions. The engine side of the answer is proven by the bench (19/19).
