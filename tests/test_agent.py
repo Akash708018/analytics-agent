@@ -8,6 +8,7 @@ formats are tested by translating canned responses in the shapes their APIs docu
 from __future__ import annotations
 
 import contextlib
+import json
 import sys
 from pathlib import Path
 
@@ -45,6 +46,7 @@ class Scripted:
         outer = self
 
         outer.finals = []
+        outer.gathered = []
 
         class S:
             def step(self_inner, final=False):
@@ -55,6 +57,12 @@ class Scripted:
 
             def add_results(self_inner, results):
                 outer.seen.extend(results)
+
+            def add_user(self_inner, text):
+                outer.seen.append((None, text))
+
+            def add_gathered(self_inner, note, results):
+                outer.gathered.append((note, list(results)))
         return S()
 
 
@@ -415,9 +423,11 @@ def test_groq_gets_json_schema_nullables_and_gemini_keeps_openapi():
     assert sent == {"type": ["string", "null"]}
 
 
-def test_only_the_successful_attempts_artifacts_come_back(contracted):
-    """P14-D28: an attempt that drew a chart and then failed over leaves the chart in Files, not
-    under an answer that never mentions it."""
+def test_a_chart_drawn_before_a_failover_stays_with_the_answer(contracted):
+    """P14-D28 kept a chart drawn by an attempt that then failed over out of the answer: that
+    attempt's replies were thrown away and every tool ran again. Since step 2 the next provider
+    answers from those replies, so the chart is one the answer was written from -- and the chart
+    is drawn once, not twice."""
     be, ws = contracted
 
     class DrawsThenFails(Scripted):
@@ -434,11 +444,14 @@ def test_only_the_successful_attempts_artifacts_come_back(contracted):
     first = DrawsThenFails([Reply(calls=[Call("1", "render_chart", {
         "dataset_name": "clean_sales", "analysis_type": "frequency", "chart": "bar",
         "column": "region", "y": "rows"})])])
-    second = Scripted([Reply(text="answered without a chart")])
+    second = Scripted([Reply(text="answered from the chart's reply")])
     turn = agent.answer(ws, [], "q", lock=lambda: be._workspace(ws),
                         list_artifacts=lambda: be.list_artifacts(ws), providers=[first, second])
-    assert turn.reply == "answered without a chart" and turn.artifacts == []
-    assert any(a.kind == "chart" for a in be.list_artifacts(ws))  # still in Files
+    assert turn.reply == "answered from the chart's reply"
+    assert [a.kind for a in turn.artifacts] == ["chart"]
+    assert [a.kind for a in be.list_artifacts(ws)].count("chart") == 1, "drawn once"
+    assert [c.name for c in turn.tool_calls] == ["render_chart"]
+    assert second.tools == [] and len(second.gathered[0][1]) == 1
 
 
 def test_the_rules_forbid_inventing_units():
@@ -711,3 +724,345 @@ def test_groq_is_told_to_call_nothing_on_the_final_round(monkeypatch):
 
 def test_the_rules_say_not_to_re_check_a_ready_dataset():
     assert "profile, describe or validate only when" in agent.SYSTEM
+
+
+# --- step 2: free-tier models finish multi-step answers (26/09/2026) ---------------------------
+
+DECLARED_CAVEATS = ["120 exact duplicate rows; remove before summing",
+                    "8 lines have units = -1 and negative revenue/cost",
+                    "customer_state blank in 3,470 rows"]
+
+
+@pytest.fixture()
+def caveated():
+    be = RealBackend()
+    ws = be.new_workspace_id()
+    path = be.save_upload(ws, "clean_sales.csv", (FIXTURES / "clean_sales.csv").read_bytes()).path
+    assert be.confirm_ingest(ws, be.draft_ingest(ws, path).spec).ok
+    assert be.confirm_contract(ws, be.draft_contract(ws, "clean_sales", caveats=DECLARED_CAVEATS,
+                                                     **ANSWERS)).ok
+    yield be, ws
+    workspace.reset(ws)
+    workspace.workspace_dir(ws).rmdir()
+
+
+def _caveat_lines(text):
+    from analytics_agent.state import DECLARED, MEASURED
+    return [line for line in text.splitlines() if DECLARED in line or MEASURED in line]
+
+
+def test_a_repeated_caveat_block_is_sent_once_per_turn(caveated):
+    """Every analysis prints its table's caveats; the model reads them once a turn. The tools'
+    own text -- what Claude Desktop reads, and the person's record -- is unchanged."""
+    be, ws = caveated
+    freq = {"dataset_name": "clean_sales", "analysis_type": "frequency", "column": "region"}
+    top = {"dataset_name": "clean_sales", "analysis_type": "top_n", "dimension": "region",
+           "measure": "revenue", "n": 3}
+    p = Scripted([Reply(calls=[Call("1", "compute_analysis", freq)]),
+                  Reply(calls=[Call("2", "compute_analysis", top)]),
+                  Reply(text="Done.")])
+    turn = _answer(be, ws, p)
+    first, second = (text for _, text in p.seen)
+    block = _caveat_lines(first)
+    assert len(block) >= len(DECLARED_CAVEATS) + 1       # the measured blank region, the declared
+    assert _caveat_lines(second) == []
+    assert f"Caveats: the same {len(block)} as in an earlier reply this turn." in second
+    assert [len(_caveat_lines(c.result)) for c in turn.tool_calls] == [len(block)] * 2
+
+
+def test_only_an_identical_block_is_replaced():
+    from analytics_agent.state import DECLARED
+    got = agent.Gathered()
+    a = f"head\n  - {DECLARED}one\n  - {DECLARED}two\n| t | 1 |"
+    b = f"other\n  - {DECLARED}one\n  - {DECLARED}three\n| t | 2 |"
+    assert got.add(Call("1", "x", {}), a) == a
+    assert got.add(Call("2", "x", {}), b) == b, "a different block is sent whole"
+    again = got.add(Call("3", "x", {}), a.replace("| t | 1 |", "| t | 9 |"))
+    assert again == "head\n  - Caveats: the same 2 as in an earlier reply this turn.\n| t | 9 |"
+    assert got.seen[-1] == a.replace("| t | 1 |", "| t | 9 |"), "the check reads the block"
+    assert got.add(Call("4", "x", {}), "no caveats here") == "no caveats here"
+
+
+FUNCTION_CALLS = {"role": "model", "parts": [
+    {"functionCall": {"name": "compute_analysis", "args": {
+        "dataset_name": "clean_sales", "analysis_type": "frequency", "column": "region"}},
+     "thoughtSignature": "sig=="},
+    {"functionCall": {"name": "list_datasets", "args": {}}}]}
+HIGH_DEMAND = ('{"error":{"code":503,"message":"The model is overloaded due to high demand. '
+               'Please try again later.","status":"UNAVAILABLE"}}')
+
+
+def test_a_failover_after_tools_ran_answers_without_running_them_again(caveated, monkeypatch):
+    """The failure's shape (25/09/2026): Gemini ran tools, then answered 503 "high demand", and
+    the next provider ran every tool again. Now Groq is handed the replies already gathered, is
+    offered no tool, and answers in one round."""
+    be, ws = caveated
+    ran = []
+    real_run = agent.run_tool
+    monkeypatch.setattr(agent, "run_tool", lambda call, w: (
+        ran.append((call.name, json.dumps(call.args, sort_keys=True))), real_run(call, w))[1])
+    gemini = llm.Gemini()
+    monkeypatch.setattr(gemini, "model", lambda: "gemini-3.8-flash")
+    monkeypatch.setattr(gemini, "_ladder", ["gemini-3.8-flash"])
+    replies = iter([{"candidates": [{"content": FUNCTION_CALLS}]},
+                    llm._classify("gemini", 503, HIGH_DEMAND)])
+
+    def gemini_post(body, model=None):
+        r = next(replies)
+        if isinstance(r, Exception):
+            raise r
+        return r
+    monkeypatch.setattr(gemini, "post", gemini_post)
+    groq = llm.Groq()
+    monkeypatch.setattr(groq, "model", lambda: "openai/gpt-oss-120b")
+    sent = []
+
+    def groq_post(body):
+        sent.append(json.loads(json.dumps(body)))
+        return {"choices": [{"message": {"role": "assistant", "content": "North leads."}}]}
+    monkeypatch.setattr(groq, "post", groq_post)
+    turn = agent.answer(ws, [], "how many orders by region?", lock=lambda: be._workspace(ws),
+                        list_artifacts=lambda: be.list_artifacts(ws), providers=[gemini, groq])
+    assert turn.error is None and turn.reply == "North leads."
+    assert len(ran) == 2 and len(set(ran)) == 2, "each tool ran once"
+    assert [c.name for c in turn.tool_calls] == ["compute_analysis", "list_datasets"]
+    [body] = sent
+    assert "tools" not in body and "tool_choice" not in body
+    texts = [m["content"] for m in body["messages"]]
+    assert texts[0] == agent.SYSTEM and texts[1] == "how many orders by region?"
+    assert texts[2] == agent.HANDOVER.format(n=2)
+    assert texts[3].startswith("[Tool reply 1 of 2, already run: compute_analysis(")
+    assert texts[3].endswith(turn.tool_calls[0].result) and "last round" in texts[-1]
+    assert any("high demand" in n and "groq takes over, answering from the 2 tool replies "
+               "already gathered" in n for n in turn.notes), turn.notes
+
+
+def test_a_gemini_session_answering_gathered_replies_is_offered_no_tools(monkeypatch):
+    g = llm.Gemini()
+    monkeypatch.setattr(g, "model", lambda: "m")
+    bodies = []
+    monkeypatch.setattr(g, "post", lambda body, model: bodies.append(
+        __import__("copy").deepcopy(body)) or {"candidates": [{"content": {
+            "role": "model", "parts": [{"text": "answered"}]}}]})
+    s = g.start("sys", [], "the question", [])
+    s.add_gathered("note", [(Call("c1", "list_datasets", {}), "reply one")])
+    assert s.step(final=True).text == "answered"
+    [body] = bodies
+    assert "tools" not in body and "toolConfig" not in body
+    texts = [p["text"] for p in body["contents"][-1]["parts"]]
+    assert texts[0] == "the question" and texts[1] == "note"
+    assert texts[2] == "[Tool reply 1 of 1, already run: list_datasets()]\nreply one"
+    assert "last round" in texts[-1]
+
+
+def test_a_failed_synthesis_moves_on_and_a_turn_with_none_left_reports_every_failure(
+        caveated, monkeypatch):
+    be, ws = caveated
+    first = Scripted([Reply(calls=[Call("1", "list_datasets", {})])])
+    step = first.start
+
+    def start(*a):
+        s = step(*a)
+        inner = s.step
+
+        def failing(final=False):
+            if not first.replies:
+                raise ProviderError("gemini", "HTTP 503", retryable=True)
+            return inner(final)
+        s.step = failing
+        return s
+    first.start = start
+    down = Scripted([], fail=ProviderError("groq", "HTTP 413", retryable=True))
+    turn = agent.answer(ws, [], "q", lock=lambda: be._workspace(ws),
+                        list_artifacts=lambda: be.list_artifacts(ws), providers=[first, down])
+    assert "gemini: HTTP 503" in turn.error and "groq: HTTP 413" in turn.error
+    assert [c.name for c in turn.tool_calls] == ["list_datasets"], "the record is kept"
+
+
+# --- OpenRouter, the third provider (scripted HTTP only: not verified live) ---------------------
+
+def _private_env(monkeypatch, **keys):
+    import os
+    private = {k: v for k, v in os.environ.items()
+               if not k.endswith("_API_KEY") and k not in ("ANALYTICS_LLM", "OPENROUTER_MODEL")}
+    private.update(keys)
+    monkeypatch.setattr(os, "environ", private)
+    monkeypatch.setattr(llm, "load_env", lambda path=None: [])  # never the developer's .env
+    monkeypatch.setattr(llm, "_INSTANCES", {})
+    return private
+
+
+def test_openrouter_is_third_in_the_default_order(monkeypatch):
+    assert llm.DEFAULT_ORDER == "gemini,groq,openrouter"
+    _private_env(monkeypatch, OPENROUTER_API_KEY="k")
+    assert [p.name for p in llm.configured()] == ["openrouter"]
+    _private_env(monkeypatch, OPENROUTER_API_KEY="k", GROQ_API_KEY="k", GEMINI_API_KEY="k")
+    assert [p.name for p in llm.configured()] == ["gemini", "groq", "openrouter"]
+
+
+def test_openrouter_chooses_a_free_model_that_calls_tools(monkeypatch):
+    _private_env(monkeypatch, OPENROUTER_API_KEY="k")
+    listed = {"data": [
+        {"id": "anthropic/claude-x", "supported_parameters": ["tools"], "context_length": 9},
+        {"id": "some/small:free", "supported_parameters": ["tools"], "context_length": 8_192},
+        {"id": "some/long:free", "supported_parameters": ["tools"], "context_length": 131_072},
+        {"id": "some/notools:free", "supported_parameters": [], "context_length": 10**6}]}
+    asked = []
+    monkeypatch.setattr(llm, "_request", lambda provider, url, headers, body=None, **_: (
+        asked.append(url), listed)[1])
+    assert llm.OpenRouter().model() == "some/long:free"
+    assert asked == [f"{llm.OPENROUTER_URL}/models"]
+    listed["data"].append({"id": "openai/gpt-oss-120b:free", "supported_parameters": ["tools"]})
+    assert llm.OpenRouter().model() == "openai/gpt-oss-120b:free"      # the preference first
+    listed["data"] = listed["data"][:1]
+    with pytest.raises(ProviderError) as exc:
+        llm.OpenRouter().model()
+    assert not exc.value.retryable and "OPENROUTER_MODEL" in str(exc.value)
+    _private_env(monkeypatch, OPENROUTER_API_KEY="k", OPENROUTER_MODEL="pinned/model")
+    assert llm.OpenRouter().model() == "pinned/model"
+
+
+class _Resp:
+    def __init__(self, payload):
+        self.payload = payload
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *a):
+        return False
+
+    def read(self):
+        return json.dumps(self.payload).encode()
+
+
+def test_openrouter_speaks_the_openai_shape_with_tools(monkeypatch):
+    _private_env(monkeypatch, OPENROUTER_API_KEY="SECRET-OR-KEY", OPENROUTER_MODEL="m:free")
+    seen = []
+    answers = iter([
+        {"choices": [{"message": {"role": "assistant", "content": None, "tool_calls": [
+            {"id": "c1", "type": "function",
+             "function": {"name": "list_datasets", "arguments": "{}"}}]}}]},
+        {"choices": [{"message": {"role": "assistant", "content": "two datasets"}}]}])
+
+    def urlopen(req, timeout):
+        seen.append((req.full_url, dict(req.header_items()), json.loads(req.data)))
+        return _Resp(next(answers))
+    monkeypatch.setattr(llm.urllib.request, "urlopen", urlopen)
+    spec = next(s for s in agent.tool_specs() if s.name == "list_datasets")
+    s = llm.OpenRouter().start("sys", [], "what is loaded?", [spec])
+    reply = s.step()
+    assert reply.calls == [Call("c1", "list_datasets", {})]
+    s.add_results([(reply.calls[0], "clean_sales")])
+    assert s.step().text == "two datasets"
+    url, headers, body = seen[-1]
+    assert url == "https://openrouter.ai/api/v1/chat/completions"
+    assert headers["Authorization"] == "Bearer SECRET-OR-KEY" and body["model"] == "m:free"
+    assert body["tools"][0]["function"]["name"] == "list_datasets"
+    assert body["messages"][-1] == {"role": "tool", "tool_call_id": "c1", "content": "clean_sales"}
+
+
+def test_openrouter_errors_are_classified_and_never_carry_the_key(monkeypatch):
+    _private_env(monkeypatch, OPENROUTER_API_KEY="SECRET-OR-KEY", OPENROUTER_MODEL="m:free")
+    monkeypatch.setattr(llm, "_sleep", lambda s: None)
+    daily = {"error": {"code": 429, "message": "Rate limit exceeded: free-models-per-day. Add 10 "
+                                              "credits to unlock 1000 free model requests per day"}}
+    monkeypatch.setattr(llm.urllib.request, "urlopen", lambda req, timeout: _Resp(daily))
+    with pytest.raises(ProviderError) as exc:
+        llm.OpenRouter().post({"messages": []})        # an error in a 200 body
+    assert exc.value.kind == "daily_quota" and "SECRET-OR-KEY" not in str(exc.value)
+    upstream = {"error": {"code": 502, "message": "Provider returned error"}}
+    monkeypatch.setattr(llm.urllib.request, "urlopen", lambda req, timeout: _Resp(upstream))
+    with pytest.raises(ProviderError) as exc:
+        llm.OpenRouter().post({"messages": []})
+    assert exc.value.retryable and exc.value.kind == ""
+    monkeypatch.setattr(llm.urllib.request, "urlopen",
+                        lambda req, timeout: (_ for _ in ()).throw(_http_error(401, b'{"error":'
+                                                                   b'{"message":"No auth"}}')))
+    with pytest.raises(ProviderError) as exc:
+        llm.OpenRouter().post({"messages": []})
+    assert not exc.value.retryable and "SECRET-OR-KEY" not in str(exc.value)
+
+
+def test_openrouter_answers_a_one_shot_json_request(monkeypatch):
+    _private_env(monkeypatch, OPENROUTER_API_KEY="k", OPENROUTER_MODEL="m:free")
+    sent = []
+
+    def urlopen(req, timeout):
+        sent.append(json.loads(req.data))
+        return _Resp({"choices": [{"message": {"content": '{"a": 1}'}}]})
+    monkeypatch.setattr(llm.urllib.request, "urlopen", urlopen)
+    value, who, failures = llm.complete_json([llm.OpenRouter()], "sys", "prompt")
+    assert value == {"a": 1} and who == "openrouter/m:free" and failures == []
+    assert sent[0]["response_format"] == {"type": "json_object"}
+
+
+# --- the person sees what the turn waits on -------------------------------------------------------
+
+def test_a_wait_is_heard_while_it_happens_and_kept_on_the_turn(monkeypatch):
+    """25/09/2026: the Ask screen said "Reading the data..." through seven minutes of 60 s
+    waits. Now each wait names the provider, the model and the seconds before the sleep."""
+    events, slept = [], []
+    answers = iter([_http_error(429, b'{"error":{"message":"Please try again in 3.9675s."}}'),
+                    _Resp({"choices": [{"message": {"role": "assistant", "content": "done"}}]})])
+
+    def urlopen(req, timeout):
+        r = next(answers)
+        if isinstance(r, Exception):
+            raise r
+        return r
+    monkeypatch.setattr(llm.urllib.request, "urlopen", urlopen)
+    monkeypatch.setattr(llm, "_sleep", lambda s: slept.append((s, len(events))))
+    groq = llm.Groq()
+    monkeypatch.setattr(groq, "model", lambda: "openai/gpt-oss-120b")
+    turn = agent.answer("ws_000000000abc", [], "hi", lock=contextlib.nullcontext,
+                        list_artifacts=list, providers=[groq], progress=events.append)
+    assert turn.reply == "done"
+    [wait] = [e for e in events if e.kind == "wait"]
+    assert wait.who == "groq (openai/gpt-oss-120b)" and abs(wait.seconds - 4.2175) < 1e-6
+    assert "rate limit reached -- waiting 4 s" in wait.text
+    assert slept[0][1] == events.index(wait) + 1, "heard before the sleep, not after"
+    assert turn.notes == [wait.text], "a step is shown while it happens, not kept"
+    assert any(e.kind == "step" for e in events)
+
+
+def test_a_listener_that_fails_never_fails_the_turn(monkeypatch):
+    def broken(event):
+        raise RuntimeError("the screen went away")
+    turn = agent.answer("ws_000000000abc", [], "hi", lock=contextlib.nullcontext,
+                        list_artifacts=list, providers=[Scripted([Reply(text="fine")])],
+                        progress=broken)
+    assert turn.reply == "fine" and turn.error is None
+
+
+def test_the_real_backend_passes_progress_through(monkeypatch):
+    got = {}
+    monkeypatch.setattr(agent, "answer", lambda *a, **kw: got.update(kw) or "turn")
+    be = RealBackend()
+    ws = be.new_workspace_id()
+    try:
+        assert be.chat(ws, [], "q", progress=print) == "turn" and got["progress"] is print
+        assert be.chat(ws, [], "q") == "turn" and got["progress"] is None
+    finally:
+        with contextlib.suppress(FileNotFoundError):
+            workspace.workspace_dir(ws).rmdir()
+
+
+GONE = ('{"error":{"code":404,"message":"This model models/gemini-2.5-flash is no longer available '
+        'to new users. Please update your code to use models/gemini-3.8-flash.",'
+        '"status":"NOT_FOUND"}}')
+
+
+def test_a_retired_pinned_gemini_model_fails_over_to_groq(monkeypatch):
+    """Seen live 26/09/2026: GEMINI_MODEL=gemini-2.5-flash gave 404 and the turn ended there."""
+    err = llm._classify("gemini", 404, GONE)
+    assert err.kind == "model_gone" and err.retryable
+    g = llm.Gemini()
+    monkeypatch.setattr(g, "_ladder", ["gemini-2.5-flash"])
+    monkeypatch.setattr(llm, "_request", lambda *a, **k: (_ for _ in ()).throw(
+        llm._classify("gemini", 404, GONE)))
+    groq = Scripted([Reply(text="from groq")])
+    turn = agent.answer("ws_000000000abc", [], "hi", lock=contextlib.nullcontext,
+                        list_artifacts=list, providers=[g, groq])
+    assert turn.reply == "from groq" and turn.error is None
+    assert not g.has_another_model()

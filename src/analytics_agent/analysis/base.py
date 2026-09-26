@@ -229,6 +229,9 @@ class Scope:
     #: Rows of groups the caller did not choose (groups=[...], Cleanup Step 14), and which ones.
     unselected: int = 0
     selection_text: str = ""
+    #: Rows a caller's filter left out (where=, step 3), and the filter as written.
+    filtered: int = 0
+    filter_text: str = ""
     #: The relation analyses read, when it is not the table itself (Cleanup Step 15): the table
     #: with its derived measures -- a true/false read as 0/1, an alias, a ratio's parts -- or,
     #: for a measure declared per a unit, one row per unit. "" means the table.
@@ -251,12 +254,13 @@ class Scope:
         error.
         """
         total = (self.excluded + self.outside_window + self.no_date + self.unselected
-                 + self.analysed)
+                 + self.filtered + self.analysed)
         if total != self.rows:
             raise ScopeError(
                 f"the scope of {self.dataset_name} loses rows: "
                 f"{self.excluded} excluded + {self.outside_window} outside the "
                 f"window + {self.no_date} undated + {self.unselected} unselected + "
+                f"{self.filtered} filtered + "
                 f"{self.analysed} analysed = "
                 f"{total}, against {self.rows} row(s) in the table."
             )
@@ -291,6 +295,8 @@ class Scope:
             )
         if self.unselected:
             parts.append(f"{self.unselected:,} outside the groups {self.selection_text}.")
+        if self.filtered:
+            parts.append(f"{self.filtered:,} left out by the filter {self.filter_text}.")
         if self.rule_unknown:
             parts.append(
                 f"{self.rule_unknown:,} kept although an exclusion rule could "
@@ -372,6 +378,43 @@ def scope_for(con, gate) -> Scope:
     )
 
 
+def _kind(dtype: str) -> str:
+    from .declared import is_numeric
+
+    base = dtype.upper().split("(")[0].strip()
+    if is_numeric(dtype):
+        return "number"
+    if base in ("DATE", "TIMESTAMP", "DATETIME") or base.startswith("TIMESTAMP"):
+        return "date"
+    return base.lower() or "missing"
+
+
+def compare_sql(measure, types: dict[str, str]) -> str:
+    """A comparison measure as SQL (step 3): 1 where it holds, 0 where not, NULL where a side is.
+
+    Built here from validated names and an operator from a fixed list, never from caller text.
+    Both sides must be numbers, or both dates: '9' > '10' as text is true, and a comparison of
+    unlike things is refused rather than cast.
+    """
+    left, op, right = measure.compare
+    kinds = [_kind(types.get(left, ""))]
+    if right:
+        kinds.append(_kind(types.get(right, "")))
+    else:
+        kinds.append("number")
+    missing = [c for c in (left, right) if c and c not in types]
+    if missing:
+        raise ValueError(f"measure {measure.name} compares {', '.join(missing)}, which "
+                         f"{'is' if len(missing) == 1 else 'are'} not a column of the table.")
+    if kinds[0] != kinds[1] or kinds[0] not in ("number", "date"):
+        raise ValueError(
+            f"measure {measure.name} compares {left} ({types[left]}) with "
+            f"{right + ' (' + types[right] + ')' if right else 'a number'}: both sides must be "
+            f"numbers, or both dates.")
+    rhs = quote_identifier(right) if right else repr(float(measure.value))
+    return f"CAST(({quote_identifier(left)} {op} {rhs}) AS INTEGER)"
+
+
 def measure_relation(con, contract) -> str:
     """The table with its derived measures as columns, or "" when it has none (Cleanup Step 15).
 
@@ -391,7 +434,9 @@ def measure_relation(con, contract) -> str:
     for m in getattr(contract, "measures", None) or []:
         agg = getattr(m, "agg", None)
         column = getattr(m, "column", None)
-        if agg == "ratio":
+        if getattr(m, "compare", None):
+            extras.append(f"{compare_sql(m, types)} AS {quote_identifier(m.name)}")
+        elif agg == "ratio":
             def summed(terms):
                 return " + ".join(
                     ("-" if t.startswith("-") else "") + quote_identifier(t.lstrip("-"))
@@ -455,6 +500,28 @@ def select_groups(con, gate, scope: Scope, dimension: str | None, groups) -> Sco
     return replace(scope, where=where, analysed=kept,
                    unselected=scope.unselected + scope.analysed - kept,
                    selection_text=f"{', '.join(wanted)} of {dimension}")
+
+
+def filter_rows(con, scope: Scope, rule: str) -> Scope:
+    """The scope holding only the rows `rule` is true for (where=, step 3).
+
+    The rule is the text after WHERE and passes the same guard as a contract's exclusion: one
+    statement, no subquery, binds against the table as BOOLEAN (util/sql_guard.py; P8-D7 read a
+    file through a rule that passed everything else). A row the rule is NULL for is left out, and
+    counted with the rest. A filter that keeps nothing is refused, not answered with an empty
+    table that reads as "none".
+    """
+    from analytics_agent.util.sql_guard import bind_predicate
+
+    bind_predicate(con, scope.dataset_name, rule)
+    where = f"({scope.where}) AND coalesce(({rule}), false)"
+    kept = con.execute(f"SELECT count(*) FROM {scope.source} WHERE {where}").fetchone()[0]
+    if not kept:
+        raise ParamsInvalid(
+            f"the filter {rule!r} keeps none of the {scope.analysed:,} row(s) in scope. Check "
+            f"the values it compares with, as the table writes them (frequency lists them).")
+    return replace(scope, where=where, analysed=kept,
+                   filtered=scope.filtered + scope.analysed - kept, filter_text=repr(rule))
 
 
 def unit_scope(con, gate, scope: Scope, measures, columns, *, date: bool = False,

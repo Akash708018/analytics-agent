@@ -5,7 +5,7 @@ to Claude Desktop. Phases 1-13 done, then Cleanup Steps 4-16; Phase 14
 (Track B) in progress, Steps 1-14 done; Phase 15 (web cleaning + helper columns) planned, not
 started (UI in ui/, on the fake backend or the engine with
 ANALYTICS_UI_BACKEND=real;
-`uv run --group ui streamlit run ui/app.py`; its 53 tests: `uv run --group ui pytest ui/tests`;
+`uv run --group ui streamlit run ui/app.py`; its 56 tests: `uv run --group ui pytest ui/tests`;
 the behaviour matrix: `uv run python scripts/scenario_matrix.py` (30 checks);
 the contract-suggestion bench: `uv run python scripts/suggest_bench.py` (docs/steps/engine_suggested_contract.md;
 `--llm` fills with the live model, `--replay` re-grades a saved run); the model-filled contract (web
@@ -28,7 +28,12 @@ anomalies to a round with no new bug. `docs/stress/REPORT.md`; re-run with
 `uv run python scripts/stress_matrix.py --round all` (4 rounds, 95 datasets, 0 crashes; its
 load-time "wrong" lines are text the suggested cleaning converts). Open: CL10-O2 (Gemini timeouts,
 cause unmeasured), RF-O9 (unit-level values derived from rows), RF-O10 (coinciding blanks not
-named) -- from the Cleanup Steps merged in from main on 25/09/2026. The agent's live check:
+named) -- from the Cleanup Steps merged in from main on 25/09/2026. Step 2 (26/09/2026,
+docs/steps/step2_free_model_reliability.md): caveats once a turn, a token budget, failover without
+re-running tools, OpenRouter third (not verified live), provider waits on Ask; measure with
+`uv run python scripts/request_size.py`. Step 3 (docs/steps/step3_provisional_metrics.md): the assistant proposes a
+yes/no metric (`propose_metric`), a person approves it on Ask, results say PROVISIONAL; `where=`
+on every analysis; the SLA bench on the user's file: `uv run python scripts/sla_bench.py` (19 checks). The agent's live check:
 `uv run python scripts/agent_live.py` (needs keys in the gitignored .env). Otherwise nothing: P9-O4's feature half was closed by the user's
 decision on 21/09/2026 (copy-first; in-place analysis is a later scaling item).
 
@@ -47,7 +52,8 @@ Steps 8-16 into Phase 14 Step 14; phases 8-10 at Step 4 (21/09) -- they need the
 `olist` source, and without it their Olist clauses skip (55/0/3, 0/0/1, 0/0/1 in a container
 lacking it):
 
-    uv run pytest -q                      # 2168 passed, 1 skipped (25/09/2026)
+    uv run pytest -q                      # 2212 passed, 1 skipped (26/09/2026, step 3; measured
+                                          # 2213/0 in a cloud box where N13's skip cannot fire)
     uv run python tests/test_phase8.py    # 99 passed, 0 failed, 2 skipped
     uv run python tests/test_phase9.py    # 19 passed, 0 failed, 0 skipped
     uv run python tests/test_phase10.py   # 35 passed, 0 failed, 1 skipped

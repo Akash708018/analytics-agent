@@ -66,6 +66,10 @@ AGGREGATIONS = (
 )
 
 
+#: The comparisons a measure may make (step 3). Nothing else reaches SQL from `compare`.
+COMPARE_OPS = (">", ">=", "<", "<=", "=", "<>")
+
+
 class Measure(BaseModel):
     """A column to aggregate, and the sentences that say what it means.
 
@@ -107,6 +111,14 @@ class Measure(BaseModel):
     numerator: list[str] = Field(default_factory=list)
     denominator: list[str] = Field(default_factory=list)
     scale: float = 1.0
+    # Step 3 (26/09/2026). A comparison of two columns, 1 where it holds, 0 where it does not,
+    # NULL where either side is: `recorded_delivery_minutes > promised_minutes` is an SLA breach,
+    # and its mean is the breach rate. Columns only, never SQL text; `right` may instead be a
+    # number (`value`). `provisional` names the approval that made it, for one the assistant
+    # proposed and a person approved outside the contract.
+    compare: list[str] = Field(default_factory=list)
+    value: float | None = None
+    provisional: str = ""
 
     @field_validator("name")
     @classmethod
@@ -126,12 +138,30 @@ class Measure(BaseModel):
             raise ValueError(
                 f"measure {self.name!r} names a numerator or denominator but its agg is "
                 f"{self.agg!r}; only agg 'ratio' divides one sum by another.")
+        if self.compare:
+            if len(self.compare) != 3 or self.compare[1] not in COMPARE_OPS:
+                raise ValueError(
+                    f"measure {self.name!r} compares two columns: compare=[left, op, right] with "
+                    f"op one of {', '.join(COMPARE_OPS)}, e.g. ['delivery_minutes', '>', "
+                    f"'promised_minutes']; right may be '' with value= a number.")
+            if self.agg not in ("mean", "sum"):
+                raise ValueError(
+                    f"measure {self.name!r} is a comparison, 1 or 0 a row: its mean is a rate "
+                    f"and its sum a count, so agg is 'mean' or 'sum', not {self.agg!r}.")
+            if bool(self.compare[2]) == (self.value is not None):
+                raise ValueError(
+                    f"measure {self.name!r} compares with a column or with a value, not both "
+                    f"or neither.")
+            if self.column or self.per or is_ratio:
+                raise ValueError(f"measure {self.name!r} is a comparison; it reads the two "
+                                 f"columns it compares and nothing else.")
         if is_ratio and (self.column or self.per):
             raise ValueError(
                 f"measure {self.name!r} is a ratio of sums over rows; it reads its numerator and "
                 f"denominator columns, not a column of its own or a coarser unit.")
         for c in [*self.per, *(t.lstrip("-") for t in self.numerator + self.denominator),
-                  *([self.column] if self.column else [])]:
+                  *([self.column] if self.column else []),
+                  *[x for i, x in enumerate(self.compare) if i != 1 and x]]:
             if not _IDENT_RE.match(c):
                 raise ValueError(f"measure {self.name!r} names {c!r}, not a valid column name.")
         return self
@@ -143,10 +173,18 @@ class Measure(BaseModel):
 
     @property
     def is_virtual(self) -> bool:
-        """A name that is not a table column: an alias or a ratio."""
-        return self.agg == "ratio" or bool(self.column and self.column != self.name)
+        """A name that is not a table column: an alias, a ratio or a comparison."""
+        return (self.agg == "ratio" or bool(self.compare)
+                or bool(self.column and self.column != self.name))
+
+    def formula(self) -> str:
+        """A comparison in words a person can check: `a > b`, or `a > 90`."""
+        left, op, right = self.compare
+        return f"{left} {op} {right or format(self.value, 'g')}"
 
     def columns_read(self) -> list[str]:
+        if self.compare:
+            return [c for i, c in enumerate(self.compare) if i != 1 and c]
         if self.agg == "ratio":
             return [t.lstrip("-") for t in self.numerator + self.denominator]
         return [self.source, *self.per]

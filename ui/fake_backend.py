@@ -19,8 +19,8 @@ from dataclasses import dataclass, field, replace
 from analytics_agent.webapp.contract import (
     ActionResult, AnalysisMenu, AnalysisParam, AnalysisRun, AnalysisSpec, Artifact, ChatTurn,
     CleaningProposal, CleaningStep, ColumnDraft, ContractColumn, ContractDraft,
-    DatasetSummary, GridPreview, IngestDraft, Limits, MeasureSuggestion, Refusal, ToolCall,
-    UploadResult,
+    DatasetSummary, GridPreview, IngestDraft, Limits, MeasureSuggestion, MetricProposal, Refusal,
+    ToolCall, UploadResult,
 )
 
 _MIB = 1024 * 1024
@@ -101,6 +101,7 @@ class _Workspace:
     columns: dict[str, list[ContractColumn]] = field(default_factory=dict)
     artifacts: list[tuple[Artifact, bytes]] = field(default_factory=list)
     cleaned: dict[str, list[str]] = field(default_factory=dict)  # dataset -> applied step ids
+    metrics: dict[str, tuple[MetricProposal, str]] = field(default_factory=dict)  # id -> status
 
 
 class FakeBackend:
@@ -427,7 +428,9 @@ class FakeBackend:
                                  f"{dataset_name} report", body, "9 sections")
         return AnalysisRun(f"Report written: {art.path}", [art])
 
-    def chat(self, workspace_id: str, history: list[dict], message: str) -> ChatTurn:
+    def chat(self, workspace_id: str, history: list[dict], message: str,
+             progress=None) -> ChatTurn:
+        # progress: the protocol's optional listener (step 2); the fake has nothing to wait on.
         text = message.lower()
         with self._lock:
             space = self._ws(workspace_id)
@@ -449,6 +452,14 @@ class FakeBackend:
                                          "chart": "bar", "dimension": "region",
                                          "measure": "revenue", "y": "total"}, art.description)],
                     artifacts=[art])
+            if "late" in text or "sla" in text:
+                p = MetricProposal("m1", "sales", "late", "delivery_days > promised_days",
+                                   "delivered after the promised day",
+                                   "Judged on 480 of 500 row(s); true for 96 (20.0%).")
+                space.metrics.setdefault(p.id, (p, "pending"))
+                return ChatTurn(reply="The contract has no lateness measure, so I proposed one: "
+                                      "**late** = delivery_days > promised_days. Approve it "
+                                      "below and ask again.")
             if "trend" in text:
                 return ChatTurn(
                     reply="Revenue rose from 21,815 in January to 26,873 in March. **One month "
@@ -485,6 +496,21 @@ class FakeBackend:
                 if art.path == path:
                     return data
         raise ValueError(f"{path} is not an artifact of this workspace")
+
+    def pending_metrics(self, workspace_id: str) -> list[MetricProposal]:
+        with self._lock:
+            return [p for p, status in self._ws(workspace_id).metrics.values()
+                    if status == "pending"]
+
+    def decide_metric(self, workspace_id: str, proposal_id: str, approve: bool) -> ActionResult:
+        with self._lock:
+            metrics = self._ws(workspace_id).metrics
+            if proposal_id not in metrics or metrics[proposal_id][1] != "pending":
+                return ActionResult(ok=False, message="No such proposed metric is waiting.")
+            p = metrics[proposal_id][0]
+            metrics[proposal_id] = (p, "approved" if approve else "rejected")
+        return ActionResult(ok=True, message=f"**{p.name}** is "
+                            f"{'approved' if approve else 'rejected'}.")
 
     def reset_workspace(self, workspace_id: str) -> ActionResult:
         with self._lock:

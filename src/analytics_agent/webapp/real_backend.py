@@ -54,7 +54,8 @@ from . import autofill
 from .contract import (
     ActionResult, AnalysisMenu, AnalysisParam, AnalysisRun, AnalysisSpec, Artifact, ChatTurn,
     CleaningProposal, CleaningStep, ColumnDraft, ContractColumn, ContractDraft, DatasetSummary,
-    FieldSource, GridPreview, IngestDraft, Limits, MeasureSuggestion, Refusal, UploadResult,
+    FieldSource, GridPreview, IngestDraft, Limits, MeasureSuggestion, MetricProposal, Refusal,
+    UploadResult,
 )
 
 UPLOADS_DIRNAME = "uploads"
@@ -844,14 +845,17 @@ class RealBackend:
 
     # --- chat, files, reset --------------------------------------------------------------
 
-    def chat(self, workspace_id: str, history: list[dict], message: str) -> ChatTurn:
+    def chat(self, workspace_id: str, history: list[dict], message: str,
+             progress=None) -> ChatTurn:
         """One turn of the agent loop (webapp/agent.py). The workspace lock is taken per tool
-        call, not for the turn, so the model's thinking time never blocks the sidebar."""
+        call, not for the turn, so the model's thinking time never blocks the sidebar.
+        `progress` hears what the turn is waiting on as it happens (step 2)."""
         validate_workspace_id(workspace_id)
         from . import agent
         return agent.answer(workspace_id, history, message,
                             lock=lambda: self._workspace(workspace_id),
-                            list_artifacts=lambda: self.list_artifacts(workspace_id))
+                            list_artifacts=lambda: self.list_artifacts(workspace_id),
+                            progress=progress)
 
     def list_artifacts(self, workspace_id: str) -> list[Artifact]:
         with self._workspace(workspace_id):
@@ -892,6 +896,31 @@ class RealBackend:
                     or not target.is_file()):
                 raise ValueError(f"{path} is not an artifact of this workspace")
             return target.read_bytes()
+
+    def pending_metrics(self, workspace_id: str) -> list[MetricProposal]:
+        from analytics_agent.contract import provisional
+
+        validate_workspace_id(workspace_id)
+        with self._workspace(workspace_id):
+            if not self._exists(workspace_id):
+                return []
+            return [MetricProposal(p.id, p.dataset_name, p.name, p.formula(), p.definition,
+                                   provisional.describe(p)) for p in provisional.pending(workspace_id)]
+
+    def decide_metric(self, workspace_id: str, proposal_id: str, approve: bool) -> ActionResult:
+        from analytics_agent.contract import provisional
+
+        validate_workspace_id(workspace_id)
+        with self._workspace(workspace_id):
+            try:
+                p = provisional.decide(workspace_id, proposal_id, approve)
+            except provisional.ProposalError as exc:
+                return ActionResult(ok=False, message=str(exc))
+        if not approve:
+            return ActionResult(ok=True, message=f"**{p.name}** was rejected; nothing uses it.")
+        return ActionResult(ok=True, message=(
+            f"**{p.name}** is approved: {p.formula()}. Ask again and the assistant computes with "
+            f"it; every result says it is provisional, not in the contract."))
 
     def reset_workspace(self, workspace_id: str) -> ActionResult:
         with self._workspace(workspace_id):

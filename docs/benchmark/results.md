@@ -41,189 +41,188 @@ Sizes: 1,000, 100,000, 1,000,000 rows. Tools: 29 of 29 called.
 
 | tool | call | s @ 1,000 | s @ 100,000 | s @ 1,000,000 | chars (largest) |
 |---|---|---|---|---|---|
-| confirm_ingest_spec | confirm_ingest_spec (dirty) | 0.095 | - | - | 161 |
-| propose_cleaning_plan | propose_cleaning_plan (dirty) | 0.183 | - | - | 589 |
-| apply_cleaning_plan | apply_cleaning_plan (every id) | 0.090 | - | - | 310 |
-| get_cleaning_ledger | get_cleaning_ledger (dirty) | 0.038 | - | - | 455 |
+| confirm_ingest_spec | confirm_ingest_spec (dirty) | 0.081 | - | - | 385 |
+| propose_cleaning_plan | propose_cleaning_plan (dirty) | 0.146 | - | - | 589 |
+| apply_cleaning_plan | apply_cleaning_plan (every id) | 0.051 | - | - | 310 |
+| get_cleaning_ledger | get_cleaning_ledger (dirty) | 0.018 | - | - | 455 |
 | check_file | check_file | 0.000 | 0.000 | 0.000 | 47 |
 | preview_file | preview_file | 0.000 | 0.000 | 0.000 | 1,078 |
-| propose_ingest_spec | propose_ingest_spec | 0.005 | 0.198 | 0.165 | 2,457 |
-| confirm_ingest_spec | confirm_ingest_spec | 0.214 | 0.554 | 1.979 | 296 |
-| compute_analysis | compute_analysis (no contract) | 0.037 | 0.041 | 0.042 | 508 |
-| propose_dataset_contract | propose_dataset_contract | 0.069 | 0.176 | 0.441 | 3,645 |
-| confirm_dataset_contract | confirm_dataset_contract | 0.032 | 0.030 | 0.035 | 791 |
-| compute_analysis | summary_stats | 0.057 | 0.111 | 0.297 | 934 |
-| compute_analysis | summary_stats (again) | 0.068 | 0.119 | 0.298 | 934 |
-| render_chart | render_chart summary_stats (no y) | 0.191 | 0.241 | 0.413 | 1,274 |
-| compute_analysis | frequency | 0.066 | 0.099 | 0.128 | 584 |
-| compute_analysis | frequency (again) | 0.067 | 0.084 | 0.138 | 586 |
-| render_chart | render_chart frequency (no y) | 0.142 | 0.188 | 0.373 | 603 |
-| compute_analysis | top_n | 0.061 | 0.074 | 0.134 | 722 |
-| compute_analysis | top_n (again) | 0.060 | 0.082 | 0.121 | 722 |
-| render_chart | render_chart top_n (no y) | 0.166 | 0.175 | 0.239 | 663 |
-| compute_analysis | group_compare | 0.067 | 0.101 | 0.232 | 1,098 |
-| compute_analysis | group_compare (again) | 0.072 | 0.103 | 0.248 | 1,098 |
-| render_chart | render_chart group_compare (no y) | 0.072 | 0.099 | 0.232 | 685 |
-| render_chart | render_chart group_compare | 0.159 | 0.190 | 0.337 | 844 |
-| compute_analysis | cross_tab | 0.074 | 0.105 | 0.172 | 848 |
-| compute_analysis | cross_tab (again) | 0.072 | 0.106 | 0.160 | 850 |
-| render_chart | render_chart cross_tab (no y) | 0.203 | 0.237 | 0.315 | 1,150 |
-| compute_analysis | pareto | 0.062 | 0.077 | 0.143 | 913 |
-| compute_analysis | pareto (again) | 0.060 | 0.076 | 0.134 | 915 |
-| render_chart | render_chart pareto (no y) | 0.157 | 0.180 | 0.518 | 741 |
-| compute_analysis | concentration | 0.090 | 0.082 | 0.123 | 939 |
-| compute_analysis | concentration (again) | 0.087 | 0.087 | 0.124 | 941 |
-| compute_analysis | distribution | 0.075 | 0.113 | 0.327 | 1,314 |
-| compute_analysis | distribution (again) | 0.069 | 0.120 | 0.314 | 1,316 |
-| render_chart | render_chart distribution (no y) | 0.066 | 0.105 | 0.299 | 593 |
-| render_chart | render_chart distribution | 0.204 | 0.225 | 0.410 | 1,075 |
-| compute_analysis | ranking_shift | 0.064 | 0.091 | 0.145 | 835 |
-| compute_analysis | ranking_shift (again) | 0.074 | 0.090 | 0.168 | 837 |
-| render_chart | render_chart ranking_shift (no y) | 0.072 | 0.079 | 0.159 | 839 |
-| render_chart | render_chart ranking_shift | 0.157 | 0.200 | 0.271 | 653 |
-| compute_analysis | calendar_coverage | 0.081 | 0.100 | 0.160 | 1,501 |
-| compute_analysis | calendar_coverage (again) | 0.087 | 0.091 | 0.197 | 1,505 |
-| render_chart | render_chart calendar_coverage (no y) | 0.262 | 0.252 | 0.351 | 997 |
-| compute_analysis | trend | 0.071 | 0.091 | 0.170 | 1,926 |
-| compute_analysis | trend (again) | 0.071 | 0.108 | 0.147 | 1,930 |
-| render_chart | render_chart trend (no y) | 0.398 | 0.264 | 0.345 | 1,237 |
-| compute_analysis | seasonality | 0.070 | 0.097 | 0.155 | 1,718 |
-| compute_analysis | seasonality (again) | 0.073 | 0.114 | 0.171 | 1,718 |
-| render_chart | render_chart seasonality (no y) | 0.213 | 0.210 | 0.293 | 1,222 |
-| compute_analysis | period_compare | 0.070 | 0.096 | 0.146 | 1,001 |
-| compute_analysis | period_compare (again) | 0.076 | 0.109 | 0.179 | 1,003 |
-| render_chart | render_chart period_compare (no y) | 0.173 | 0.194 | 0.227 | 1,051 |
-| compute_analysis | growth_decomposition | 0.076 | 0.143 | 0.219 | 1,600 |
-| compute_analysis | growth_decomposition (again) | 0.082 | 0.129 | 0.220 | 1,602 |
-| render_chart | render_chart growth_decomposition (no y) | 0.077 | 0.114 | 0.204 | 794 |
-| render_chart | render_chart growth_decomposition | 0.194 | 0.221 | 0.372 | 1,427 |
-| compute_analysis | correlation | 0.079 | 0.126 | 0.343 | 1,273 |
-| compute_analysis | correlation (again) | 0.076 | 0.132 | 0.373 | 1,273 |
-| render_chart | render_chart correlation (no y) | 0.173 | 0.258 | 0.488 | 1,631 |
-| compute_analysis | bivariate | 0.070 | 0.088 | 0.150 | 1,979 |
-| compute_analysis | bivariate (again) | 0.070 | 0.093 | 0.151 | 1,981 |
-| render_chart | render_chart bivariate (no y) | 0.181 | 0.210 | 0.257 | 1,967 |
-| compute_analysis | driver_analysis | 0.078 | 0.154 | 0.283 | 1,853 |
-| compute_analysis | driver_analysis (again) | 0.082 | 0.129 | 0.296 | 1,855 |
-| compute_analysis | mix_shift | 0.077 | 0.126 | 0.271 | 1,335 |
-| compute_analysis | mix_shift (again) | 0.074 | 0.123 | 0.230 | 1,337 |
-| render_chart | render_chart mix_shift (no y) | 0.067 | 0.116 | 0.243 | 896 |
-| render_chart | render_chart mix_shift | 0.176 | 0.215 | 0.309 | 994 |
-| compute_analysis | outlier_detection | 0.078 | 0.141 | 0.339 | 1,959 |
-| compute_analysis | outlier_detection (again) | 0.078 | 0.152 | 0.382 | 1,961 |
-| render_chart | render_chart outlier_detection (no y) | 0.173 | 0.229 | 0.485 | 2,152 |
-| compute_analysis | changepoint | 0.071 | 0.096 | 0.174 | 3,189 |
-| compute_analysis | changepoint (again) | 0.074 | 0.103 | 0.188 | 3,191 |
-| compute_analysis | correlated_shift | 0.069 | 0.102 | 0.200 | 1,757 |
-| compute_analysis | correlated_shift (again) | 0.067 | 0.099 | 0.158 | 1,759 |
-| compute_analysis | hypothesis_test | 0.071 | 0.111 | 0.161 | 1,457 |
-| compute_analysis | hypothesis_test (again) | 0.071 | 0.115 | 0.159 | 1,459 |
-| compute_analysis | confidence_interval | 0.070 | 0.136 | 0.178 | 1,052 |
-| compute_analysis | confidence_interval (again) | 0.072 | 0.120 | 0.185 | 1,054 |
-| compute_analysis | effect_size | 0.080 | 0.120 | 0.186 | 1,144 |
-| compute_analysis | effect_size (again) | 0.078 | 0.119 | 0.160 | 1,146 |
-| compute_analysis | sample_adequacy | 0.080 | 0.125 | 0.204 | 1,292 |
-| compute_analysis | sample_adequacy (again) | 0.075 | 0.114 | 0.175 | 1,294 |
-| compute_analysis | repeat_behaviour | 0.070 | 0.132 | 0.317 | 1,307 |
-| compute_analysis | repeat_behaviour (again) | 0.072 | 0.164 | 0.327 | 1,309 |
-| compute_analysis | cohort_retention | 0.075 | 0.162 | 0.419 | 3,425 |
-| compute_analysis | cohort_retention (again) | 0.077 | 0.158 | 0.406 | 3,425 |
-| render_chart | render_chart cohort_retention (no y) | 0.329 | 0.487 | 0.675 | 6,082 |
-| compute_analysis | top_n region | 0.071 | 0.092 | 0.130 | 722 |
-| compute_analysis | top_n channel | 0.078 | 0.085 | 0.123 | 680 |
+| propose_ingest_spec | propose_ingest_spec | 0.004 | 0.015 | 0.139 | 2,457 |
+| confirm_ingest_spec | confirm_ingest_spec | 0.232 | 0.484 | 1.428 | 296 |
+| compute_analysis | compute_analysis (no contract) | 0.028 | 0.039 | 0.038 | 508 |
+| propose_dataset_contract | propose_dataset_contract | 0.077 | 0.281 | 0.674 | 4,479 |
+| confirm_dataset_contract | confirm_dataset_contract | 0.065 | 0.205 | 0.467 | 1,022 |
+| compute_analysis | summary_stats | 0.058 | 0.102 | 0.236 | 1,224 |
+| compute_analysis | summary_stats (again) | 0.056 | 0.108 | 0.258 | 1,226 |
+| render_chart | render_chart summary_stats (no y) | 0.184 | 0.387 | 0.465 | 1,560 |
+| compute_analysis | frequency | 0.051 | 0.086 | 0.104 | 874 |
+| compute_analysis | frequency (again) | 0.048 | 0.083 | 0.103 | 876 |
+| render_chart | render_chart frequency (no y) | 0.114 | 0.137 | 0.167 | 889 |
+| compute_analysis | top_n | 0.052 | 0.082 | 0.104 | 1,012 |
+| compute_analysis | top_n (again) | 0.055 | 0.072 | 0.102 | 1,014 |
+| render_chart | render_chart top_n (no y) | 0.119 | 0.164 | 0.177 | 1,035 |
+| compute_analysis | group_compare | 0.055 | 0.099 | 0.177 | 1,388 |
+| compute_analysis | group_compare (again) | 0.064 | 0.102 | 0.182 | 1,390 |
+| render_chart | render_chart group_compare (no y) | 0.049 | 0.088 | 0.190 | 685 |
+| render_chart | render_chart group_compare | 0.123 | 0.178 | 0.246 | 1,130 |
+| compute_analysis | cross_tab | 0.064 | 0.085 | 0.148 | 1,138 |
+| compute_analysis | cross_tab (again) | 0.065 | 0.096 | 0.163 | 1,138 |
+| render_chart | render_chart cross_tab (no y) | 0.182 | 0.208 | 0.258 | 1,426 |
+| compute_analysis | pareto | 0.067 | 0.078 | 0.104 | 1,203 |
+| compute_analysis | pareto (again) | 0.051 | 0.074 | 0.107 | 1,205 |
+| render_chart | render_chart pareto (no y) | 0.126 | 0.175 | 0.193 | 1,027 |
+| compute_analysis | concentration | 0.056 | 0.070 | 0.119 | 1,229 |
+| compute_analysis | concentration (again) | 0.068 | 0.089 | 0.118 | 1,231 |
+| compute_analysis | distribution | 0.056 | 0.130 | 0.248 | 1,728 |
+| compute_analysis | distribution (again) | 0.057 | 0.112 | 0.251 | 1,728 |
+| render_chart | render_chart distribution (no y) | 0.124 | 0.236 | 0.362 | 1,529 |
+| compute_analysis | ranking_shift | 0.058 | 0.094 | 0.124 | 1,125 |
+| compute_analysis | ranking_shift (again) | 0.058 | 0.081 | 0.123 | 1,127 |
+| render_chart | render_chart ranking_shift (no y) | 0.045 | 0.068 | 0.119 | 839 |
+| render_chart | render_chart ranking_shift | 0.120 | 0.191 | 0.222 | 939 |
+| compute_analysis | calendar_coverage | 0.069 | 0.094 | 0.158 | 1,791 |
+| compute_analysis | calendar_coverage (again) | 0.066 | 0.101 | 0.155 | 1,795 |
+| render_chart | render_chart calendar_coverage (no y) | 0.325 | 0.226 | 0.274 | 1,283 |
+| compute_analysis | trend | 0.067 | 0.084 | 0.148 | 2,216 |
+| compute_analysis | trend (again) | 0.077 | 0.079 | 0.153 | 2,220 |
+| render_chart | render_chart trend (no y) | 0.168 | 0.207 | 0.265 | 1,700 |
+| compute_analysis | seasonality | 0.059 | 0.078 | 0.134 | 2,008 |
+| compute_analysis | seasonality (again) | 0.059 | 0.082 | 0.153 | 2,010 |
+| render_chart | render_chart seasonality (no y) | 0.162 | 0.203 | 0.257 | 1,508 |
+| compute_analysis | period_compare | 0.057 | 0.091 | 0.136 | 1,301 |
+| compute_analysis | period_compare (again) | 0.065 | 0.088 | 0.143 | 1,303 |
+| render_chart | render_chart period_compare (no y) | 0.161 | 0.157 | 0.189 | 1,439 |
+| compute_analysis | growth_decomposition | 0.071 | 0.108 | 0.201 | 1,873 |
+| compute_analysis | growth_decomposition (again) | 0.082 | 0.120 | 0.224 | 1,875 |
+| render_chart | render_chart growth_decomposition (no y) | 0.050 | 0.132 | 0.220 | 794 |
+| render_chart | render_chart growth_decomposition | 0.123 | 0.196 | 0.287 | 1,708 |
+| compute_analysis | correlation | 0.061 | 0.124 | 0.324 | 1,563 |
+| compute_analysis | correlation (again) | 0.064 | 0.126 | 0.344 | 1,565 |
+| render_chart | render_chart correlation (no y) | 0.156 | 0.240 | 0.412 | 1,917 |
+| compute_analysis | bivariate | 0.057 | 0.087 | 0.148 | 2,265 |
+| compute_analysis | bivariate (again) | 0.058 | 0.080 | 0.149 | 2,267 |
+| render_chart | render_chart bivariate (no y) | 0.122 | 0.175 | 0.214 | 2,290 |
+| compute_analysis | driver_analysis | 0.070 | 0.120 | 0.252 | 2,143 |
+| compute_analysis | driver_analysis (again) | 0.074 | 0.121 | 0.231 | 2,145 |
+| compute_analysis | mix_shift | 0.062 | 0.120 | 0.219 | 1,625 |
+| compute_analysis | mix_shift (again) | 0.062 | 0.114 | 0.193 | 1,625 |
+| render_chart | render_chart mix_shift (no y) | 0.045 | 0.109 | 0.213 | 896 |
+| render_chart | render_chart mix_shift | 0.145 | 0.200 | 0.291 | 1,280 |
+| compute_analysis | outlier_detection | 0.078 | 0.131 | 0.311 | 2,249 |
+| compute_analysis | outlier_detection (again) | 0.068 | 0.123 | 0.336 | 2,251 |
+| render_chart | render_chart outlier_detection (no y) | 0.132 | 0.203 | 0.397 | 2,438 |
+| compute_analysis | changepoint | 0.063 | 0.095 | 0.130 | 3,479 |
+| compute_analysis | changepoint (again) | 0.059 | 0.102 | 0.136 | 3,481 |
+| compute_analysis | correlated_shift | 0.061 | 0.105 | 0.154 | 2,047 |
+| compute_analysis | correlated_shift (again) | 0.057 | 0.093 | 0.156 | 2,049 |
+| compute_analysis | hypothesis_test | 0.071 | 0.093 | 0.126 | 1,747 |
+| compute_analysis | hypothesis_test (again) | 0.066 | 0.083 | 0.141 | 1,749 |
+| compute_analysis | confidence_interval | 0.070 | 0.140 | 0.139 | 1,342 |
+| compute_analysis | confidence_interval (again) | 0.061 | 0.107 | 0.136 | 1,342 |
+| compute_analysis | effect_size | 0.055 | 0.095 | 0.128 | 1,434 |
+| compute_analysis | effect_size (again) | 0.057 | 0.093 | 0.123 | 1,436 |
+| compute_analysis | sample_adequacy | 0.059 | 0.087 | 0.183 | 1,582 |
+| compute_analysis | sample_adequacy (again) | 0.062 | 0.091 | 0.155 | 1,582 |
+| compute_analysis | repeat_behaviour | 0.070 | 0.132 | 0.475 | 1,702 |
+| compute_analysis | repeat_behaviour (again) | 0.070 | 0.139 | 0.476 | 1,702 |
+| compute_analysis | cohort_retention | 0.064 | 0.136 | 0.357 | 3,715 |
+| compute_analysis | cohort_retention (again) | 0.070 | 0.130 | 0.379 | 3,715 |
+| render_chart | render_chart cohort_retention (no y) | 0.262 | 0.341 | 0.591 | 4,058 |
+| compute_analysis | top_n region | 0.059 | 0.087 | 0.127 | 1,012 |
+| compute_analysis | top_n channel | 0.060 | 0.086 | 0.118 | 968 |
 | ping | ping | 0.000 | 0.000 | 0.000 | 203 |
 | show_limits | show_limits | 0.000 | 0.000 | 0.000 | 261 |
-| list_datasets | list_datasets | 0.027 | 0.022 | 0.022 | 172 |
-| describe_dataset | describe_dataset | 0.057 | 0.094 | 0.204 | 1,141 |
-| get_workflow_state | get_workflow_state | 0.055 | 0.067 | 0.095 | 586 |
-| run_analysis | run_analysis | 0.046 | 0.090 | 0.086 | 6,551 |
-| profile_dataset | profile_dataset | 0.095 | 0.438 | 2.237 | 2,108 |
-| profile_column | profile_column | 0.092 | 0.481 | 2.221 | 547 |
-| validate_dataset | validate_dataset | 0.098 | 0.147 | 0.236 | 1,958 |
-| propose_cleaning_plan | propose_cleaning_plan | 0.219 | 1.195 | 5.337 | 267 |
-| get_cleaning_ledger | get_cleaning_ledger | 0.023 | 0.024 | 0.022 | 159 |
-| compute_analysis | top_n for read_result_file | 0.068 | 0.341 | 0.996 | 1,507 |
-| read_result_file | read_result_file | 0.001 | 0.001 | 0.001 | 643 |
-| build_report | build_report | 0.048 | 0.041 | 0.040 | 2,291 |
-| web | upload+ingest+contract | 0.383 | 0.963 | - | 0 |
-| web | Explore cross_tab | 0.326 | 0.438 | - | 680 |
-| web | Explore distribution | 0.300 | 0.396 | - | 1,246 |
-| web | Explore frequency | 0.260 | 0.292 | - | 480 |
-| web | Explore top_n | 0.264 | 0.333 | - | 558 |
-| web | Explore summary_stats | 0.291 | 0.414 | - | 874 |
-| web | Explore group_compare | 0.328 | 0.356 | - | 877 |
-| web | Explore pareto | 0.301 | 0.297 | - | 679 |
-| web | Explore concentration | 0.109 | 0.134 | - | 839 |
-| web | Explore ranking_shift | 0.288 | 0.313 | - | 640 |
-| web | Explore calendar_coverage | 0.374 | 0.388 | - | 1,379 |
-| web | Explore trend | 0.398 | 0.437 | - | 1,661 |
-| web | Explore seasonality | 0.373 | 0.382 | - | 1,570 |
-| web | Explore period_compare | 0.290 | 0.336 | - | 907 |
-| web | Explore growth_decomposition | 0.302 | 0.444 | - | 1,175 |
-| web | Explore correlation | 0.326 | 0.438 | - | 1,212 |
-| web | Explore bivariate | 0.320 | 0.323 | - | 1,932 |
-| web | Explore driver_analysis | 0.160 | 0.185 | - | 1,785 |
-| web | Explore mix_shift | 0.298 | 0.463 | - | 1,092 |
-| web | Explore outlier_detection | 0.281 | 0.432 | - | 1,105 |
-| web | Explore changepoint | 0.124 | 0.166 | - | 2,845 |
-| web | Explore correlated_shift | 0.128 | 0.179 | - | 1,703 |
-| web | Explore hypothesis_test | 0.135 | 0.157 | - | 1,346 |
-| web | Explore confidence_interval | 0.158 | 0.187 | - | 993 |
-| web | Explore effect_size | 0.140 | 0.165 | - | 1,176 |
-| web | Explore sample_adequacy | 0.153 | 0.180 | - | 1,229 |
-| web | Explore repeat_behaviour | 0.152 | 0.215 | - | 1,238 |
-| web | Explore cohort_retention | 0.543 | 0.635 | - | 3,018 |
-| web | build_report | 0.102 | 0.103 | - | 2,407 |
+| list_datasets | list_datasets | 0.016 | 0.016 | 0.018 | 167 |
+| describe_dataset | describe_dataset | 0.038 | 0.078 | 0.188 | 1,136 |
+| get_workflow_state | get_workflow_state | 0.043 | 0.062 | 0.085 | 581 |
+| run_analysis | run_analysis | 0.036 | 0.051 | 0.077 | 7,129 |
+| profile_dataset | profile_dataset | 0.077 | 0.392 | 2.048 | 2,108 |
+| profile_column | profile_column | 0.031 | 0.042 | 0.048 | 547 |
+| validate_dataset | validate_dataset | 0.069 | 0.119 | 0.168 | 1,958 |
+| propose_cleaning_plan | propose_cleaning_plan | 0.188 | 0.870 | 2.951 | 267 |
+| get_cleaning_ledger | get_cleaning_ledger | 0.018 | 0.024 | 0.020 | 159 |
+| compute_analysis | top_n for read_result_file | 0.058 | 0.268 | 0.852 | 1,841 |
+| read_result_file | read_result_file | 0.001 | 0.000 | 0.001 | 643 |
+| build_report | build_report | 0.031 | 0.039 | 0.038 | 2,942 |
+| web | upload+ingest+contract | 0.455 | 1.396 | - | 0 |
+| web | Explore cross_tab | 0.278 | 0.343 | - | 968 |
+| web | Explore distribution | 0.257 | 0.313 | - | 1,658 |
+| web | Explore frequency | 0.221 | 0.292 | - | 768 |
+| web | Explore top_n | 0.215 | 0.254 | - | 846 |
+| web | Explore summary_stats | 0.243 | 0.332 | - | 1,162 |
+| web | Explore group_compare | 0.230 | 0.328 | - | 1,165 |
+| web | Explore pareto | 0.198 | 0.293 | - | 967 |
+| web | Explore concentration | 0.104 | 0.126 | - | 1,127 |
+| web | Explore ranking_shift | 0.227 | 0.297 | - | 928 |
+| web | Explore calendar_coverage | 0.303 | 0.362 | - | 1,667 |
+| web | Explore trend | 0.309 | 0.338 | - | 1,949 |
+| web | Explore seasonality | 0.287 | 0.313 | - | 1,858 |
+| web | Explore period_compare | 0.228 | 0.299 | - | 1,205 |
+| web | Explore growth_decomposition | 0.234 | 0.343 | - | 1,473 |
+| web | Explore correlation | 0.261 | 0.359 | - | 1,500 |
+| web | Explore bivariate | 0.239 | 0.282 | - | 2,218 |
+| web | Explore driver_analysis | 0.113 | 0.150 | - | 2,073 |
+| web | Explore mix_shift | 0.232 | 0.300 | - | 1,380 |
+| web | Explore outlier_detection | 0.262 | 0.365 | - | 1,393 |
+| web | Explore changepoint | 0.096 | 0.130 | - | 3,133 |
+| web | Explore correlated_shift | 0.142 | 0.117 | - | 1,991 |
+| web | Explore hypothesis_test | 0.107 | 0.130 | - | 1,633 |
+| web | Explore confidence_interval | 0.093 | 0.128 | - | 1,281 |
+| web | Explore effect_size | 0.093 | 0.120 | - | 1,464 |
+| web | Explore sample_adequacy | 0.100 | 0.118 | - | 1,517 |
+| web | Explore repeat_behaviour | 0.118 | 0.174 | - | 1,631 |
+| web | Explore cohort_retention | 0.366 | 0.469 | - | 3,306 |
+| web | build_report | 0.069 | 0.076 | - | 2,960 |
 
 ## Refusals
 
 | tool | case | s | refused | NEXT STEP |
 |---|---|---|---|---|
 | compute_analysis | before any contract | 0.0 | yes | NEXT STEP: call propose_dataset_contract(dataset_name="sales") |
-| compute_analysis | an analysis nobody registered | 0.058 | yes | NEXT STEP: call run_analysis(dataset_name="sales") |
-| compute_analysis | a measure that is not a column | 0.047 | yes | NEXT STEP: call describe_dataset(dataset_name="sales") |
-| compute_analysis | summing an agg=none measure | 0.047 | yes | NEXT STEP: call propose_dataset_contract(dataset_name="sales") |
-| compute_analysis | concentration over a 1,000-group dimension | 0.047 | yes | NEXT STEP: call compute_analysis(dataset_name="sales", analysis_type="top_n", dimension="customer_id", measure |
-| compute_analysis | period_compare against the empty month | 0.063 | no | (none) |
-| compute_analysis | a period outside the window | 0.049 | yes | NEXT STEP: call compute_analysis(dataset_name="sales", analysis_type="period_compare", measure="units", period |
+| compute_analysis | an analysis nobody registered | 0.033 | yes | NEXT STEP: call run_analysis(dataset_name="sales") |
+| compute_analysis | a measure that is not a column | 0.038 | yes | NEXT STEP: call describe_dataset(dataset_name="sales") |
+| compute_analysis | summing an agg=none measure | 0.034 | yes | NEXT STEP: call propose_dataset_contract(dataset_name="sales") |
+| compute_analysis | concentration over a 1,000-group dimension | 0.051 | no | (none) |
+| compute_analysis | period_compare against the empty month | 0.053 | no | (none) |
+| compute_analysis | a period outside the window | 0.048 | yes | NEXT STEP: call compute_analysis(dataset_name="sales", analysis_type="period_compare", measure="units", period |
 | compute_analysis | a wrong argument for the analysis | 0.042 | yes | NEXT STEP: call compute_analysis(dataset_name="sales", analysis_type="trend", measure="units") |
-| compute_analysis | an unknown grain | 0.058 | yes | NEXT STEP: call compute_analysis(dataset_name="sales", analysis_type="trend", measure="units") |
-| compute_analysis | hypothesis_test with a key as the dimension | 0.051 | yes | NEXT STEP: call propose_dataset_contract(dataset_name="sales") |
-| compute_analysis | no such dataset | 0.022 | yes | NEXT STEP: call propose_ingest_spec(path="...") then confirm_ingest_spec, or list_datasets() to see what is al |
+| compute_analysis | an unknown grain | 0.05 | yes | NEXT STEP: call compute_analysis(dataset_name="sales", analysis_type="trend", measure="units") |
+| compute_analysis | hypothesis_test with a key as the dimension | 0.043 | yes | NEXT STEP: call propose_dataset_contract(dataset_name="sales") |
+| compute_analysis | no such dataset | 0.019 | yes | NEXT STEP: call propose_ingest_spec(path="...") then confirm_ingest_spec, or list_datasets() to see what is al |
 | render_chart | a chart kind that does not exist | 0.048 | yes | NEXT STEP: call compute_analysis(dataset_name="sales", analysis_type="trend", grain="month", measure="revenue" |
-| render_chart | a heatmap of a trend | 0.052 | yes | NEXT STEP: call render_chart(dataset_name="sales", analysis_type="trend", chart="line", grain="month", measure |
-| describe_dataset | no such dataset | 0.022 | yes | NEXT STEP: call list_datasets to see what is available. |
-| profile_column | no such column | 0.089 | yes | NEXT STEP: call profile_dataset(dataset_name="sales") |
-| profile_dataset | no such dataset | 0.034 | yes | NEXT STEP: call list_datasets() |
-| run_analysis | no such dataset | 0.023 | yes | NEXT STEP: call propose_ingest_spec(path="...") then confirm_ingest_spec, or list_datasets() to see what is al |
-| validate_dataset | no such dataset | 0.027 | yes | NEXT STEP: call list_datasets() |
-| apply_cleaning_plan | an id from no plan | 0.032 | yes | NEXT STEP: call propose_cleaning_plan(dataset_name="sales") |
-| confirm_dataset_contract | JSON that does not parse | 0.019 | yes | NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to cha |
+| render_chart | a heatmap of a trend | 0.039 | yes | NEXT STEP: call render_chart(dataset_name="sales", analysis_type="trend", chart="line", grain="month", measure |
+| describe_dataset | no such dataset | 0.018 | yes | NEXT STEP: call list_datasets to see what is available. |
+| profile_column | no such column | 0.072 | yes | NEXT STEP: call profile_dataset(dataset_name="sales") |
+| profile_dataset | no such dataset | 0.021 | yes | NEXT STEP: call list_datasets() |
+| run_analysis | no such dataset | 0.017 | yes | NEXT STEP: call propose_ingest_spec(path="...") then confirm_ingest_spec, or list_datasets() to see what is al |
+| validate_dataset | no such dataset | 0.015 | yes | NEXT STEP: call list_datasets() |
+| apply_cleaning_plan | an id from no plan | 0.019 | yes | NEXT STEP: call propose_cleaning_plan(dataset_name="sales") |
+| confirm_dataset_contract | JSON that does not parse | 0.011 | yes | NEXT STEP: call propose_dataset_contract(dataset_name=...) to get a valid one, edit the fields you want to cha |
 | confirm_ingest_spec | an empty spec | 0.0 | yes | NEXT STEP: call propose_ingest_spec to get a valid one, edit the fields you want to change, and pass the whole |
-| propose_dataset_contract | a key that is not unique | 0.08 | yes | NEXT STEP: call propose_dataset_contract(dataset_name="sales", primary_key=[...]) with a key that holds, or st |
+| propose_dataset_contract | a key that is not unique | 0.05 | yes | NEXT STEP: call propose_dataset_contract(dataset_name="sales", primary_key=[...]) with a key that holds, or st |
 | read_result_file | a path outside the workspace | 0.001 | yes | NEXT STEP: call read_result_file(path="/home/user/analytics-agent/workspace/benchref/results/<one of: top_n_20 |
 | read_result_file | start past the end | 0.0 | no | (none) |
-| load_csv | a file that is not there | 0.015 | yes | NEXT STEP: check the path. If it contains spaces, quote it. |
-| load_excel | a CSV passed as Excel | 0.015 | yes | NEXT STEP: call propose_ingest_spec(path="/tmp/bench_itpkfqg9/ref_sales.csv") -- it reads CSV and Excel alike  |
+| load_csv | a file that is not there | 0.013 | yes | NEXT STEP: check the path. If it contains spaces, quote it. |
+| load_excel | a CSV passed as Excel | 0.012 | yes | NEXT STEP: open it in Excel or the program that made it and save it again as .xlsx, or export it as .csv, then |
 | preview_file | a file that is not there | 0.0 | yes | NEXT STEP: check the path. |
 | check_file | a file that is not there | 0.0 | no | NEXT STEP: check the path. If it contains spaces, quote it. |
 | reset_workspace | without confirm | 0.0 | yes | NEXT STEP: ask the user to confirm, then call reset_workspace(confirm=True). |
-| build_report | no such dataset | 0.021 | yes | NEXT STEP: call list_datasets() |
-| get_cleaning_ledger | no such dataset | 0.028 | yes | NEXT STEP: call list_datasets() and use one of those names. |
+| build_report | no such dataset | 0.017 | yes | NEXT STEP: call list_datasets() |
+| get_cleaning_ledger | no such dataset | 0.026 | yes | NEXT STEP: call list_datasets() and use one of those names. |
 | list_sources | no Postgres running | 0.0 | no | (none) |
-| describe_source | no Postgres running | 0.016 | yes | NEXT STEP: add it to /root/.analytics-agent/sources.yaml under 'sources:', then call list_sources() to confirm |
-| query_source | no Postgres running | 0.016 | yes | NEXT STEP: add it to /root/.analytics-agent/sources.yaml under 'sources:', then call list_sources() to confirm |
-| load_postgres_table | no Postgres running | 0.016 | yes | NEXT STEP: add it to /root/.analytics-agent/sources.yaml under 'sources:', then call list_sources() to confirm |
-| describe_source | an alias nobody configured | 0.025 | yes | NEXT STEP: add it to /root/.analytics-agent/sources.yaml under 'sources:', then call list_sources() to confirm |
+| describe_source | no Postgres running | 0.018 | yes | NEXT STEP: add it to /root/.analytics-agent/sources.yaml under 'sources:', then call list_sources() to confirm |
+| query_source | no Postgres running | 0.013 | yes | NEXT STEP: add it to /root/.analytics-agent/sources.yaml under 'sources:', then call list_sources() to confirm |
+| load_postgres_table | no Postgres running | 0.013 | yes | NEXT STEP: add it to /root/.analytics-agent/sources.yaml under 'sources:', then call list_sources() to confirm |
+| describe_source | an alias nobody configured | 0.012 | yes | NEXT STEP: add it to /root/.analytics-agent/sources.yaml under 'sources:', then call list_sources() to confirm |
 
 ## Memory and disk
 
-- 1,000 rows: CSV 65,937 bytes; workspace 3,129,211 bytes in 78 files after the run; peak RSS 354 MiB
-- 100,000 rows: CSV 6,581,805 bytes; workspace 4,709,827 bytes in 78 files after the run; peak RSS 422 MiB
-- 1,000,000 rows: CSV 65,827,258 bytes; workspace 19,393,168 bytes in 78 files after the run; peak RSS 1,028 MiB
+- 1,000 rows: CSV 65,937 bytes; workspace 3,150,023 bytes in 78 files after the run; peak RSS 365 MiB
+- 100,000 rows: CSV 6,581,805 bytes; workspace 4,731,913 bytes in 78 files after the run; peak RSS 426 MiB
+- 1,000,000 rows: CSV 65,827,258 bytes; workspace 19,414,563 bytes in 78 files after the run; peak RSS 1,052 MiB
 
-## Flags (15)
+## Flags (12)
 
-FRICTION 15
+FRICTION 12
 
-- **FRICTION** `render_chart` the chart kind the analysis names is refused until y is given (at 1,000, 1,000, 1,000, 1,000, 1,000, 100,000, 100,000, 100,000, 100,000, 100,000, 1,000,000, 1,000,000, 1,000,000, 1,000,000, 1,000,000): mix_shift as waterfall: WHY: a waterfall chart draws one measure and this result offers 8: mean in 2024-11, mean in 2024-12, share in 2024-11, share in 2024-12, rate, mix, interaction, contribution. Name one with y.
+- **FRICTION** `render_chart` the chart kind the analysis names is refused until y is given (at 1,000, 1,000, 1,000, 1,000, 100,000, 100,000, 100,000, 100,000, 1,000,000, 1,000,000, 1,000,000, 1,000,000): mix_shift as waterfall: WHY: a waterfall chart draws one measure and this result offers 8: mean in 2024-11, mean in 2024-12, share in 2024-11, share in 2024-12, rate, mix, interaction, contribution. Name one with y.

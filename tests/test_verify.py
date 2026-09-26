@@ -96,3 +96,16 @@ def test_a_rewrite_that_is_worse_is_not_shown():
     s = Session(["Margins average 14.7% and 15.2%, 3,470 unknown."])
     text, v = agent._checked(s, "Margins average 14.7%.", [REPLY], [])
     assert text == "Margins average 14.7%." and v.unsupported == ["14.7%"]
+
+
+def test_a_declared_figure_is_still_declared_when_its_block_was_sent_once():
+    """Step 2: a repeated caveat block reaches the model as one line; the check reads the block."""
+    from analytics_agent.webapp.agent import Gathered
+    from analytics_agent.webapp.llm import Call
+    got = Gathered()
+    block = f"  - {DECLARED}customer_state blank in 3,470 rows\n"
+    got.add(Call("1", "x", {}), f"first\n{block}| North | 1,234.50 |")
+    shown = got.add(Call("2", "x", {}), f"second\n{block}| South | 987.25 |")
+    assert DECLARED not in shown
+    checked = verify("South had 987.25; 3,470 rows lack a state.", got.seen[1:])
+    assert checked.declared == ["3,470"] and not checked.unsupported

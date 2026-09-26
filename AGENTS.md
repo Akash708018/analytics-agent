@@ -39,7 +39,7 @@ that changes behaviour, you stop and ask.
    instructions.
 
 ## Context hygiene
-- Never read these whole: `uv.lock`, `docs/decisions.md`, `phase6_recon.txt`, the
+- Never read these whole: `uv.lock`, `docs/decisions.md`, the
   build guide, `tests/fixtures/*`. Use `grep -n` or `sed -n 'A,Bp'` for the lines you need.
 - Read only the files in the spec's FILES and read-only references, plus files
   those import directly. Do not survey the repo.

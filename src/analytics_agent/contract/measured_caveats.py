@@ -415,7 +415,7 @@ def _future(con, t: str, ev: DatasetEvidence) -> list[str]:
     """M11: dates after today."""
     out = []
     for c in ev.columns:
-        if not _is_temporal(c.dtype):
+        if not _is_date(c.dtype):
             continue
         q = sql.ident(c.name)
         n, top = con.execute(f"SELECT count(*), max({q}) FROM {t} WHERE CAST({q} AS DATE) > "
@@ -446,10 +446,19 @@ def _currencies(con, t: str, ev: DatasetEvidence, table: str) -> list[str]:
     return out
 
 
+def _is_date(dtype: str) -> bool:
+    """A calendar date or timestamp, not a time of day: a TIME column neither casts to DATE nor
+    compares with one (stress round 4, time_only_column, 26/09/2026: M11 and M13 raised)."""
+    base = dtype.upper().split("(")[0].strip()
+    return _is_temporal(dtype) and base not in ("TIME", "TIME WITH TIME ZONE", "TIMETZ")
+
+
 def _date_order(con, t: str, ev: DatasetEvidence) -> list[str]:
     """M13: of two dates, the one that follows the other in 99% of rows where both exist, and
     the few rows where it comes first."""
-    dates = [c.name for c in ev.columns if _is_temporal(c.dtype)]
+    # A time of day is not a date: DATE < TIME is a binder error (stress round 4, time_only_column,
+    # 26/09/2026), and "before" means nothing between them.
+    dates = [c.name for c in ev.columns if _is_date(c.dtype)]
     out = []
     for k, a in enumerate(dates):
         for b in dates[k + 1:]:

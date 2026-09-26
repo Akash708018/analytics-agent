@@ -1,9 +1,15 @@
-"""Model providers for the Track B agent loop: Gemini, with Groq as failover (guide Phase 14 item 3).
+"""Model providers for the Track B agent loop: Gemini, then Groq, then OpenRouter as failover
+(guide Phase 14 item 3; OpenRouter added in step 2, 26/09/2026).
 
 No SDKs. Each provider is one JSON POST over urllib, translated to and from one small internal
 shape: a `Reply` holding text and/or tool calls. A `Session` keeps the provider's own message list,
 so each wire format is spoken exactly -- Gemini's model content is echoed back verbatim, whatever
-parts it holds, rather than rebuilt from what this module understood of it.
+parts it holds, rather than rebuilt from what this module understood of it. Groq and OpenRouter
+speak the same OpenAI chat-completions shape and share `OpenAISession`.
+
+Every session keeps its request within the model's token budget (webapp/budget.py) before each
+call, and a wait on a busy provider is reported to whoever listens (`listening`) -- the Ask screen
+shows it rather than only "Reading the data...".
 
 Keys come from the environment or a gitignored .env at the repository root (`load_env`), are sent
 in headers, and never appear in an error message or a log line.
@@ -11,17 +17,23 @@ in headers, and never appear in an error message or a log line.
 
 from __future__ import annotations
 
+import contextvars
 import json
 import os
 import re
 import time
 import urllib.error
 import urllib.request
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Protocol
 
 from analytics_agent.config import PROJECT_ROOT
+
+from . import budget
+from .contract import ChatEvent
 
 TIMEOUT_S = 60
 #: Sent on every request. Python's default "Python-urllib/3.x" is refused by Groq's edge with
@@ -29,6 +41,7 @@ TIMEOUT_S = 60
 USER_AGENT = "analytics-agent/0.1 (+https://github.com/Akash708018/analytics-agent)"
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta"
 GROQ_URL = "https://api.groq.com/openai/v1"
+OPENROUTER_URL = "https://openrouter.ai/api/v1"
 
 #: Schema keys a function declaration keeps. Gemini accepts an OpenAPI subset and rejects the rest
 #: (measured on the engine's own tools: anyOf x105, default x122, additionalProperties x36).
@@ -41,17 +54,51 @@ class ProviderError(Exception):
 
     `kind` names the cases the loop treats specially: "daily_quota" (never waited on; Gemini
     moves to its next model), "tool_use_failed" (the provider refused the model's own tool call;
-    the session tells the model and retries). `summary` is the one sentence a person reads.
+    the session tells the model and retries), "too_large" (HTTP 413: the session shrinks the
+    request and sends it once more; `limit` and `requested` are the tokens the provider named).
+    `summary` is the one sentence a person reads.
     """
 
     def __init__(self, provider: str, message: str, retryable: bool, *, kind: str = "",
-                 summary: str = "", model: str | None = None) -> None:
+                 summary: str = "", model: str | None = None, limit: int | None = None,
+                 requested: int | None = None) -> None:
         super().__init__(f"{provider}: {message}")
         self.provider = provider
         self.retryable = retryable
         self.kind = kind
         self.model = model
+        self.limit = limit
+        self.requested = requested
         self.summary = f"{provider}: {summary or message}"
+
+
+#: What a person waiting on an answer should see (step 2). Defined with the UI's contract, which
+#: is standard library only, so the screen can read it without importing this module.
+Event = ChatEvent
+
+_listener: contextvars.ContextVar[Callable[[Event], None] | None] = contextvars.ContextVar(
+    "analytics_llm_listener", default=None)
+
+
+def notify(event: Event) -> None:
+    """Tell the listener, if any. A listener that fails never fails the request it reports on."""
+    listener = _listener.get()
+    if listener is None:
+        return
+    try:
+        listener(event)
+    except Exception:  # noqa: BLE001 -- a screen that cannot show a line is not a provider error
+        pass
+
+
+@contextmanager
+def listening(listener: Callable[[Event], None]) -> Iterator[None]:
+    """Report every Event raised in this context (this thread) to `listener`."""
+    token = _listener.set(listener)
+    try:
+        yield
+    finally:
+        _listener.reset(token)
 
 
 @dataclass(frozen=True)
@@ -85,6 +132,15 @@ class Session(Protocol):
     def add_results(self, results: list[tuple[Call, str]]) -> None: ...
     #: A message from the app, not the person: the figure check's correction (webapp/verify.py).
     def add_user(self, text: str) -> None: ...
+    #: Tool replies another provider's model gathered this turn, as text after the question, each
+    #: shortenable to the budget like a tool reply (step 2: a failover does not re-run tools).
+    def add_gathered(self, note: str, results: list[tuple[Call, str]]) -> None: ...
+
+
+def gathered_text(i: int, n: int, call: Call, text: str) -> str:
+    """One gathered reply as the next provider reads it."""
+    args = ", ".join(f"{k}={v!r}" for k, v in call.args.items() if v is not None)
+    return f"[Tool reply {i} of {n}, already run: {call.name}({args})]\n{text}"
 
 
 class Provider(Protocol):
@@ -189,7 +245,20 @@ MAX_WAIT_S = 60.0
 BACKOFF_S = (2.0, 5.0)
 _WAIT_HINT = re.compile(r"(?:try again in|retry in)\s+([0-9.]+)\s*(ms|s)\b", re.I)
 _RETRY_DELAY = re.compile(r'"retryDelay"\s*:\s*"([0-9.]+)s"')
+_TOO_LARGE = re.compile(r"Limit\s+(\d+),\s*Requested\s+(\d+)", re.I)
+_PER_DAY = re.compile(r"PerDay|per[- ]day", re.I)
+_URL_MODEL = re.compile(r"/models/([^/:?]+):")
 _sleep = time.sleep  # a test replaces it
+
+
+def _who(provider: str, url: str, body: dict | None) -> str:
+    """"provider (model)" for a person: the model from the body (OpenAI shape) or the URL
+    (Gemini's)."""
+    model = (body or {}).get("model")
+    if not model:
+        m = _URL_MODEL.search(url)
+        model = m.group(1) if m else None
+    return f"{provider} ({model})" if model else provider
 
 
 def _wait_for(exc: urllib.error.HTTPError, detail: str, attempt: int) -> float:
@@ -222,7 +291,19 @@ def _classify(provider: str, code: int, body: str) -> ProviderError:
     except (json.JSONDecodeError, AttributeError):
         pass
     first = message.strip().split("\n")[0][:240]
-    if code == 429 and "PerDay" in body:
+    if code == 413:
+        # Groq, 25/09/2026: "Request too large for model `openai/gpt-oss-120b` ... tokens per
+        # minute (TPM): Limit 8000, Requested 8917". Retryable: the session shrinks and sends it
+        # once more, and a second 413 fails over (step 2).
+        m = _TOO_LARGE.search(message)
+        lim, asked = (int(m.group(1)), int(m.group(2))) if m else (None, None)
+        return ProviderError(provider, f"HTTP 413: {body[:500]}", True, kind="too_large",
+                             limit=lim, requested=asked,
+                             summary="the request was larger than the model accepts" + (
+                                 f" ({asked:,} tokens against a limit of {lim:,})" if m else ""))
+    # Gemini's quota id says PerDay; OpenRouter's "free-models-per-day"; Groq's "tokens per day
+    # (TPD)" -- a wait of minutes to hours, never worth sleeping on.
+    if code == 429 and _PER_DAY.search(body):
         m = re.search(r"model:\s*([\w.\-]+)", message)
         # A model name can hold dots (3.8) but not end in one: "model: gemini-3.8-flash." in a
         # sentence must not name a model that does not exist.
@@ -230,6 +311,12 @@ def _classify(provider: str, code: int, body: str) -> ProviderError:
         return ProviderError(provider, f"HTTP 429: {body[:500]}", True, kind="daily_quota",
                              model=model, summary=f"the free daily quota"
                              f"{' for ' + model if model else ''} is used up")
+    if code == 404 and provider == "gemini":
+        # "This model models/gemini-2.5-flash is no longer available to new users" -- seen live
+        # 26/09/2026 with GEMINI_MODEL pinned to it. Not the turn's fault: the next model, or
+        # the next provider, can answer (step 2).
+        return ProviderError(provider, f"HTTP 404: {body[:500]}", True, kind="model_gone",
+                             summary=f"the model is not available ({first})")
     if code == 400 and "failed_generation" in body:
         # Groq could not parse the model's own output -- a malformed tool call. A fresh sample
         # usually parses; the session retries (Cleanup Step 10, seen live).
@@ -249,6 +336,14 @@ def _classify(provider: str, code: int, body: str) -> ProviderError:
                          summary=f"HTTP {code}: {first}")
 
 
+def _wait(who: str, why: str, seconds: float, attempt: int) -> None:
+    """Sleep on a busy provider, having said so: the Ask screen once showed "Reading the data..."
+    for seven minutes of these (25/09/2026)."""
+    notify(Event("wait", f"{who}: {why} -- waiting {max(1, round(seconds))} s, then trying again "
+                         f"(attempt {attempt + 2} of {ATTEMPTS})", who, seconds=seconds))
+    _sleep(seconds)
+
+
 def _request(provider: str, url: str, headers: dict, body: dict | None = None, *,
              max_wait: float = MAX_WAIT_S) -> dict:
     data = None if body is None else json.dumps(body).encode("utf-8")
@@ -265,15 +360,63 @@ def _request(provider: str, url: str, headers: dict, body: dict | None = None, *
             if busy and attempt + 1 < ATTEMPTS:
                 wait = _wait_for(exc, detail, attempt)
                 if wait <= max_wait:
-                    _sleep(wait + 0.25)
+                    why = ("rate limit reached" if exc.code == 429
+                           else f"busy (HTTP {exc.code})")
+                    _wait(_who(provider, url, body), why, wait + 0.25, attempt)
                     continue
             raise error from None
         except (urllib.error.URLError, TimeoutError, OSError) as exc:
             if attempt + 1 < ATTEMPTS:
-                _sleep(BACKOFF_S[min(attempt, len(BACKOFF_S) - 1)])
+                _wait(_who(provider, url, body), "no response",
+                      BACKOFF_S[min(attempt, len(BACKOFF_S) - 1)], attempt)
                 continue
             raise ProviderError(provider, f"no response ({type(exc).__name__})", True) from None
     raise AssertionError("unreachable")
+
+
+# --- the budget, shared by every session (step 2) ----------------------------------------------
+
+class _Budgeted:
+    """A session whose every request is kept to its model's token budget (webapp/budget.py).
+
+    `_slots` lists where the shortenable texts sit, oldest first: the earlier messages, then each
+    tool reply as it arrives. A 413 is answered once: the limit and count the provider named are
+    learnt, the request shrunk again, and sent again; a second 413 goes to the loop, which fails
+    over.
+    """
+
+    _slots: list[budget.Slot]
+
+    def _names(self) -> tuple[str, str]:
+        raise NotImplementedError
+
+    def _fit(self, body: dict) -> int:
+        provider, model = self._names()
+        allowed = budget.allowance(provider, model)
+        if allowed is None:
+            return 0
+        cut = budget.fit(self._slots, lambda: budget.estimate(body), allowed)
+        if cut:
+            notify(Event("shortened", (
+                f"{provider} ({model}): {cut} earlier tool repl{'y' if cut == 1 else 'ies'} "
+                f"shortened for the model to fit its request limit of "
+                f"{budget.limit(provider, model):,} tokens; every reply is whole under What I "
+                f"did"), f"{provider} ({model})"))
+        return cut
+
+    def _send(self, body: dict, post: Callable[[], dict]) -> dict:
+        self._fit(body)
+        try:
+            return post()
+        except ProviderError as exc:
+            if exc.kind != "too_large":
+                raise
+            provider, model = self._names()
+            budget.learn(provider, model, limit_tokens=exc.limit, requested=exc.requested,
+                         estimated=budget.estimate(body))
+            if not self._fit(body):
+                raise
+            return post()
 
 
 # --- Gemini ------------------------------------------------------------------------------------
@@ -288,30 +431,37 @@ def _declaration(t: ToolSpec) -> dict:
     return out
 
 
-class GeminiSession:
+class GeminiSession(_Budgeted):
     def __init__(self, provider: "Gemini", system: str, history: list[dict], message: str,
                  tools: list[ToolSpec]) -> None:
         self._p = provider
         self._model = provider.model()  # pinned: signature parts belong to the model that wrote them
+        earlier = [{"role": "model" if m["role"] == "assistant" else "user",
+                    "parts": [{"text": m["content"]}]} for m in history if m.get("content")]
+        self._slots = [budget.Slot(c["parts"][0], "text", "history") for c in earlier]
         self._body: dict = {
             "systemInstruction": {"parts": [{"text": system}]},
-            "contents": [{"role": "model" if m["role"] == "assistant" else "user",
-                          "parts": [{"text": m["content"]}]}
-                         for m in history if m.get("content")]
-            + [{"role": "user", "parts": [{"text": message}]}],
-            "tools": [{"functionDeclarations": [_declaration(t) for t in tools]}],
-            "toolConfig": {"functionCallingConfig": {"mode": "AUTO"}},
+            "contents": earlier + [{"role": "user", "parts": [{"text": message}]}],
         }
+        # No tools (step 2: answering from replies another provider gathered) sends no
+        # declarations -- an empty list is not a shape to test Gemini with.
+        if tools:
+            self._body["tools"] = [{"functionDeclarations": [_declaration(t) for t in tools]}]
+            self._body["toolConfig"] = {"functionCallingConfig": {"mode": "AUTO"}}
+
+    def _names(self) -> tuple[str, str]:
+        return "gemini", self._model
 
     def step(self, final: bool = False) -> Reply:
         if final:
-            self._body["toolConfig"] = {"functionCallingConfig": {"mode": "NONE"}}
+            if "tools" in self._body:
+                self._body["toolConfig"] = {"functionCallingConfig": {"mode": "NONE"}}
             last = self._body["contents"][-1]
             if last.get("role") == "user":
                 last["parts"].append({"text": LAST_ROUND})
             else:
                 self._body["contents"].append({"role": "user", "parts": [{"text": LAST_ROUND}]})
-        data = self._p.post(self._body, self._model)
+        data = self._send(self._body, lambda: self._p.post(self._body, self._model))
         candidates = data.get("candidates") or []
         if not candidates or "content" not in candidates[0]:
             reason = (candidates[0].get("finishReason") if candidates
@@ -336,10 +486,23 @@ class GeminiSession:
             if not call.id.startswith("call_"):
                 response["id"] = call.id
             parts.append({"functionResponse": response})
+            self._slots.append(budget.Slot(response["response"], "result", "reply"))
         self._body["contents"].append({"role": "user", "parts": parts})
 
     def add_user(self, text: str) -> None:
         self._body["contents"].append({"role": "user", "parts": [{"text": text}]})
+
+    def add_gathered(self, note: str, results: list[tuple[Call, str]]) -> None:
+        """Text parts on the question's own content: no function call is replayed, so no thought
+        signature is needed for one this model did not write."""
+        parts = [{"text": gathered_text(i, len(results), call, text)}
+                 for i, (call, text) in enumerate(results, 1)]
+        last = self._body["contents"][-1]
+        if last.get("role") != "user":
+            last = {"role": "user", "parts": []}
+            self._body["contents"].append(last)
+        last["parts"].extend([{"text": note}] + parts)
+        self._slots.extend(budget.Slot(p, "text", "reply") for p in parts)
 
 
 #: gemini-<major>[.<minor>]-flash exactly: no lite, image, tts, preview or other variant.
@@ -428,7 +591,7 @@ class Gemini:
             return _request("gemini", f"{GEMINI_URL}/models/{model}:generateContent",
                             {"x-goog-api-key": self._key()}, body, max_wait=max_wait)
         except ProviderError as exc:
-            if exc.kind == "daily_quota":
+            if exc.kind in ("daily_quota", "model_gone"):
                 # The alias has no quota of its own; the error names the model serving it, and
                 # both are spent for today.
                 for spent in {model, exc.model} - {None}:
@@ -450,27 +613,45 @@ class Gemini:
         return GeminiSession(self, system, history, message, tools)
 
 
-# --- Groq (OpenAI-compatible) ---------------------------------------------------------------------
+# --- Groq and OpenRouter (OpenAI-compatible) --------------------------------------------------------
 
-class GroqSession:
-    def __init__(self, provider: "Groq", system: str, history: list[dict], message: str,
-                 tools: list[ToolSpec]) -> None:
+class OpenAISession(_Budgeted):
+    """One conversation in the OpenAI chat-completions shape, which Groq and OpenRouter share.
+    Each message is a slot for the budget: the earlier conversation as history, every tool reply
+    (or reply gathered by another provider) as a reply."""
+
+    def __init__(self, provider: "Groq | OpenRouter", system: str, history: list[dict],
+                 message: str, tools: list[ToolSpec]) -> None:
         self._p = provider
+        earlier = [{"role": m["role"], "content": m["content"]} for m in history
+                   if m.get("content")]
         self._messages: list[dict] = (
-            [{"role": "system", "content": system}]
-            + [{"role": m["role"], "content": m["content"]} for m in history if m.get("content")]
+            [{"role": "system", "content": system}] + earlier
             + [{"role": "user", "content": message}])
+        self._slots = [budget.Slot(m, "content", "history") for m in earlier]
         self._tools = [{"type": "function", "function": {
             "name": t.name, "description": t.description,
             "parameters": to_json_schema(t.parameters)}} for t in tools]
+
+    def _names(self) -> tuple[str, str]:
+        return self._p.name, self._p.model()
+
+    def _body(self, final: bool) -> dict:
+        body: dict = {"messages": self._messages}
+        # No tools (step 2: answering from replies another provider gathered) sends neither key:
+        # tool_choice without tools is not a request the API defines.
+        if self._tools:
+            body["tools"] = self._tools
+            body["tool_choice"] = "none" if final else "auto"
+        return body
 
     def step(self, final: bool = False) -> Reply:
         if final:
             self._messages.append({"role": "user", "content": LAST_ROUND})
         for _ in range(3):
             try:
-                data = self._p.post({"messages": self._messages, "tools": self._tools,
-                                     "tool_choice": "none" if final else "auto"})
+                body = self._body(final)
+                data = self._send(body, lambda: self._p.post(body))
                 break
             except ProviderError as exc:
                 if exc.kind == "generation_failed":
@@ -489,13 +670,13 @@ class GroqSession:
                     f"call it. Answer the person in words; if a step is theirs to do, say which "
                     f"screen does it.")})
         else:
-            raise ProviderError("groq", "three replies in a row were refused", False,
+            raise ProviderError(self._p.name, "three replies in a row were refused", False,
                                 summary="three replies in a row were refused (a tool it does "
                                         "not have, or output that could not be parsed)")
         try:
             message = data["choices"][0]["message"]
-        except (KeyError, IndexError):
-            raise ProviderError("groq", "no message returned", retryable=False) from None
+        except (KeyError, IndexError, TypeError):
+            raise ProviderError(self._p.name, "no message returned", retryable=False) from None
         self._messages.append({k: v for k, v in message.items()
                                if k in ("role", "content", "tool_calls")})
         reply = Reply(text=message.get("content") or "")
@@ -509,10 +690,25 @@ class GroqSession:
 
     def add_results(self, results: list[tuple[Call, str]]) -> None:
         for call, text in results:
-            self._messages.append({"role": "tool", "tool_call_id": call.id, "content": text})
+            message = {"role": "tool", "tool_call_id": call.id, "content": text}
+            self._messages.append(message)
+            self._slots.append(budget.Slot(message, "content", "reply"))
 
     def add_user(self, text: str) -> None:
         self._messages.append({"role": "user", "content": text})
+
+    def add_gathered(self, note: str, results: list[tuple[Call, str]]) -> None:
+        """The note, then each gathered reply as its own user message: no tool call is replayed,
+        and each reply is a slot the budget can shorten apart from the others."""
+        self._messages.append({"role": "user", "content": note})
+        for i, (call, text) in enumerate(results, 1):
+            message = {"role": "user", "content": gathered_text(i, len(results), call, text)}
+            self._messages.append(message)
+            self._slots.append(budget.Slot(message, "content", "reply"))
+
+
+#: The name the Groq session had before OpenRouter shared it (step 2).
+GroqSession = OpenAISession
 
 
 class Groq:
@@ -560,11 +756,84 @@ class Groq:
         except (KeyError, IndexError):
             raise ProviderError("groq", "no message returned", retryable=False) from None
 
-    def start(self, system, history, message, tools) -> GroqSession:
-        return GroqSession(self, system, history, message, tools)
+    def start(self, system, history, message, tools) -> OpenAISession:
+        return OpenAISession(self, system, history, message, tools)
 
 
-PROVIDERS = {"gemini": Gemini, "groq": Groq}
+class OpenRouter:
+    """OpenRouter's OpenAI-compatible API (step 2), third in the default order: its free models
+    are a separate quota from Gemini's and Groq's. Not verified live -- no key was available
+    when it was written; every test of it is scripted HTTP."""
+
+    name = "openrouter"
+    #: Tried in order when OPENROUTER_MODEL is unset: free models (":free") that take tools; the
+    #: first the account's model list offers wins. Failing all, the free tool-calling model with
+    #: the longest context the list offers -- measured from the list, not recalled.
+    PREFERENCE = ("openai/gpt-oss-120b:free", "meta-llama/llama-3.3-70b-instruct:free",
+                  "qwen/qwen3-235b-a22b:free", "openai/gpt-oss-20b:free")
+
+    def __init__(self) -> None:
+        self._model: str | None = None
+
+    def _key(self) -> str:
+        return os.environ.get("OPENROUTER_API_KEY", "")
+
+    def _headers(self) -> dict:
+        # X-Title names the app on OpenRouter's side; optional, and no personal data.
+        return {"Authorization": f"Bearer {self._key()}", "X-Title": "analytics-agent"}
+
+    def available(self) -> bool:
+        return bool(self._key())
+
+    def model(self) -> str:
+        if self._model is None:
+            self._model = os.environ.get("OPENROUTER_MODEL") or self._discover()
+        return self._model
+
+    def _discover(self) -> str:
+        data = _request("openrouter", f"{OPENROUTER_URL}/models", self._headers())
+        free = [m for m in data.get("data", []) if isinstance(m, dict)
+                and str(m.get("id", "")).endswith(":free")
+                and "tools" in (m.get("supported_parameters") or [])]
+        offered = {m["id"] for m in free}
+        for name in self.PREFERENCE:
+            if name in offered:
+                return name
+        if free:
+            return max(free, key=lambda m: m.get("context_length") or 0)["id"]
+        raise ProviderError("openrouter", "no free model that calls tools is offered; set "
+                            "OPENROUTER_MODEL", retryable=False)
+
+    def post(self, body: dict, *, max_wait: float = MAX_WAIT_S) -> dict:
+        data = _request("openrouter", f"{OPENROUTER_URL}/chat/completions", self._headers(),
+                        {"model": self.model(), **body}, max_wait=max_wait)
+        # OpenRouter can answer 200 with an upstream provider's error in the body; read it as
+        # the HTTP error it stands for, so a busy upstream fails over like a 503.
+        error = data.get("error") if isinstance(data, dict) else None
+        if error and not data.get("choices"):
+            code = error.get("code") if isinstance(error, dict) else None
+            raise _classify("openrouter", code if isinstance(code, int) else 502,
+                            json.dumps(data))
+        return data
+
+    def complete(self, system: str, prompt: str, *, max_wait: float) -> tuple[str, str]:
+        """One request, no tools, JSON out: (text, model)."""
+        data = self.post({"messages": [{"role": "system", "content": system},
+                                       {"role": "user", "content": prompt}],
+                          "response_format": {"type": "json_object"}, "temperature": 0},
+                         max_wait=max_wait)
+        try:
+            return data["choices"][0]["message"].get("content") or "", self.model()
+        except (KeyError, IndexError, TypeError):
+            raise ProviderError("openrouter", "no message returned", retryable=False) from None
+
+    def start(self, system, history, message, tools) -> OpenAISession:
+        return OpenAISession(self, system, history, message, tools)
+
+
+PROVIDERS = {"gemini": Gemini, "groq": Groq, "openrouter": OpenRouter}
+#: Tried in this order unless ANALYTICS_LLM says otherwise; each needs its key to be tried.
+DEFAULT_ORDER = "gemini,groq,openrouter"
 
 #: What a one-shot request waits on a rate limit before trying the next provider. The contract
 #: form waits on it; the Ask screen once sat seven minutes on 60-second waits (25/09/2026).
@@ -602,7 +871,7 @@ def complete_json(providers: list, system: str, prompt: str, *,
             except ProviderError as exc:
                 failures.append(exc.summary)
                 more = getattr(provider, "has_another_model", lambda: False)()
-                if exc.kind == "daily_quota" and more:
+                if exc.kind in ("daily_quota", "model_gone") and more:
                     continue
                 break
             except (ValueError, json.JSONDecodeError) as exc:
@@ -614,15 +883,16 @@ _INSTANCES: dict[str, Provider] = {}  # one each per process, so a model is disc
 
 
 def configured() -> list[Provider]:
-    """Providers in ANALYTICS_LLM order (default gemini,groq) that have a key."""
+    """Providers in ANALYTICS_LLM order (default DEFAULT_ORDER) that have a key."""
     load_env()
-    order = [n.strip() for n in os.environ.get("ANALYTICS_LLM", "gemini,groq").split(",")]
+    order = [n.strip() for n in os.environ.get("ANALYTICS_LLM", DEFAULT_ORDER).split(",")]
     for n in order:
         if n in PROVIDERS and n not in _INSTANCES:
             _INSTANCES[n] = PROVIDERS[n]()
     return [_INSTANCES[n] for n in order if n in _INSTANCES and _INSTANCES[n].available()]
 
 
-__all__ = ["Call", "Gemini", "Groq", "Provider", "ProviderError", "QUICK_WAIT_S", "Reply",
-           "Session", "ToolSpec", "choose_gemini_model", "complete_json", "configured",
-           "gemini_ladder", "convert_schema", "load_env", "parse_json", "to_json_schema"]
+__all__ = ["DEFAULT_ORDER", "Call", "Event", "Gemini", "Groq", "OpenAISession", "OpenRouter",
+           "Provider", "ProviderError", "QUICK_WAIT_S", "Reply", "Session", "ToolSpec",
+           "choose_gemini_model", "complete_json", "configured", "gathered_text", "gemini_ladder",
+           "convert_schema", "listening", "load_env", "notify", "parse_json", "to_json_schema"]

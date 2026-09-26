@@ -39,7 +39,7 @@ from analytics_agent.state import require_contract
 from analytics_agent.util import results
 from analytics_agent.util.sql_guard import UnsafeSQL
 
-from .base import LostRows, ParamsInvalid, ScopeError, TooManyGroups, scope_for
+from .base import LostRows, ParamsInvalid, ScopeError, TooManyGroups, filter_rows, scope_for
 from . import runs
 from .registry import UnknownAnalysis, catalogue, get, narrowed
 
@@ -210,7 +210,31 @@ def _as_call(tool: str, dataset_name: str, analysis_type: str, params: dict) -> 
     return f"{tool}({', '.join(parts)})"
 
 
-def _produce(con, dataset_name: str, analysis_type: str, params: dict):
+def _with_provisional(gate, workspace_id: str | None):
+    """The gate with this workspace's approved provisional metrics among its measures (step 3),
+    and those proposals. The contract object is copied; the stored contract is untouched."""
+    import dataclasses
+
+    from analytics_agent.contract import provisional
+
+    if not workspace_id:
+        return gate, []
+    got = provisional.approved(workspace_id, gate.contract.dataset_name)
+    names = {m.name for m in gate.contract.measures}
+    got = [p for p in got if p.name not in names]
+    if not got:
+        return gate, []
+    contract = gate.contract.model_copy(
+        update={"measures": [*gate.contract.measures, *(p.measure() for p in got)]})
+    return dataclasses.replace(gate, contract=contract), got
+
+
+#: Analyses that read every declared measure, named or not.
+_ALL_MEASURES = frozenset({"summary_stats", "driver_analysis"})
+
+
+def _produce(con, dataset_name: str, analysis_type: str, params: dict,
+             workspace_id: str | None = None):
     """Gate, look up, scope, run, and check the result describes itself.
 
     Returns `(gate, output, params)` -- the parameters as stripped, because those are what was
@@ -224,6 +248,7 @@ def _produce(con, dataset_name: str, analysis_type: str, params: dict):
         gate = require_contract(con, dataset_name)
     except ContractRefused as exc:
         raise _Refused(str(exc)) from None
+    gate, extra = _with_provisional(gate, workspace_id)
 
     # The MCP wrapper declares every parameter any analysis takes, because
     # FastMCP builds the JSON schema from the signature and **params exposes
@@ -250,8 +275,12 @@ def _produce(con, dataset_name: str, analysis_type: str, params: dict):
             next_call=f'run_analysis(dataset_name="{dataset_name}")',
         ).to_text()) from None
 
+    rule = params.pop("where", None)
     try:
-        scope, run_params = narrowed(con, gate, scope_for(con, gate), analysis, params)
+        scope = scope_for(con, gate)
+        if rule:
+            scope = filter_rows(con, scope, rule)
+        scope, run_params = narrowed(con, gate, scope, analysis, params)
         output = analysis.run(con, gate, scope, **run_params)
     except LostRows as exc:
         raise _Refused(_unsound(dataset_name, str(exc))) from None
@@ -328,7 +357,11 @@ def _produce(con, dataset_name: str, analysis_type: str, params: dict):
             f"not the method note for the scope it was given. Nothing says "
             f"what these numbers were computed over.",
         ))
-    return gate, output, params
+    named = {str(v) for v in params.values() if isinstance(v, str)}
+    used = [p for p in extra if p.name in named or analysis_type in _ALL_MEASURES]
+    for i, p in enumerate(used, 1):
+        output.summary.insert(i, p.label())
+    return gate, output, ({**params, "where": rule} if rule else params)
 
 
 def compute_analysis(
@@ -345,7 +378,7 @@ def compute_analysis(
     optional, which is locked decision 20.
     """
     try:
-        gate, output, used = _produce(con, dataset_name, analysis_type, params)
+        gate, output, used = _produce(con, dataset_name, analysis_type, params, workspace_id)
     except _Refused as exc:
         return exc.text
 
@@ -405,7 +438,7 @@ def render_chart(
     from ..charts.render import ChartRefused, render
 
     try:
-        gate, output, used = _produce(con, dataset_name, analysis_type, params)
+        gate, output, used = _produce(con, dataset_name, analysis_type, params, workspace_id)
     except _Refused as exc:
         return exc.text
 
