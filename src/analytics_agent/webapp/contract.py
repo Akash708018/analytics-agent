@@ -384,6 +384,20 @@ class ChatTurn:
 
 
 @dataclass(frozen=True)
+class MetricProposal:
+    """A metric the assistant proposed and the person has not yet approved (step 3): a yes/no per
+    row from comparing two columns, e.g. recorded_delivery_minutes > promised_minutes. `measured`
+    is what the engine counted before anyone approved: rows it can judge, and how many are true."""
+
+    id: str
+    dataset_name: str
+    name: str
+    formula: str
+    definition: str
+    measured: str
+
+
+@dataclass(frozen=True)
 class ChatEvent:
     """Something the person waiting on an answer should see while it is worked out (step 2).
 
@@ -486,6 +500,13 @@ class Backend(Protocol):
         while the turn runs (step 2). Optional: a backend written before it (ui/fake_backend.py)
         takes three arguments, and the Ask screen calls it with three."""
 
+    def pending_metrics(self, workspace_id: str) -> list[MetricProposal]:
+        """Metrics the assistant proposed that wait for the person's Approve or Reject (step 3)."""
+
+    def decide_metric(self, workspace_id: str, proposal_id: str, approve: bool) -> ActionResult:
+        """The person's decision on a proposed metric. Approved, the assistant may compute with it;
+        every result then says it is provisional and not in the contract."""
+
     def list_artifacts(self, workspace_id: str) -> list[Artifact]:
         """Charts, reports and result tables in the workspace, newest first."""
 
@@ -500,7 +521,7 @@ class Backend(Protocol):
 __all__ = [
     "AGGREGATIONS", "DTYPES", "HEADER_JOINS", "ROLES",
     "ActionResult", "AnalysisMenu", "AnalysisParam", "AnalysisRun", "AnalysisSpec", "Artifact",
-    "Backend", "ChatEvent", "ChatTurn", "CleaningProposal", "CleaningStep",
+    "Backend", "ChatEvent", "ChatTurn", "MetricProposal", "CleaningProposal", "CleaningStep",
     "ColumnDraft", "ContractColumn",
     "ContractDraft", "DatasetSummary", "FieldSource", "GridPreview", "IngestDraft", "Limits",
     "MeasureSuggestion",

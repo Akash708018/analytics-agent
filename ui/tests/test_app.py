@@ -541,3 +541,16 @@ def test_a_backend_without_progress_is_called_as_before():
             return ChatTurn(reply="as before")
     assert not chat._takes_progress(Before()) and chat._takes_progress(RealBackend())
     assert chat._takes_progress(FakeBackend())
+
+
+# --- proposed metrics (step 3) --------------------------------------------------------------------
+
+def test_a_proposed_metric_waits_for_approve_and_is_approved_by_the_button():
+    at = screen("ask").run()
+    at.chat_input[0].set_value("what share of orders were late?").run()
+    assert not at.exception, at.exception
+    assert "Proposed metric: `late`" in _text(at)
+    [approve] = [b for b in at.button if b.label == "Approve"]
+    approve.click().run()
+    assert "**late** is approved." in _text(at)
+    assert not [b for b in at.button if b.label == "Approve"], "no longer pending"

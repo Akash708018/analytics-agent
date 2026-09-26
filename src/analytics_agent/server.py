@@ -816,6 +816,7 @@ def compute_analysis(
     entity: str | None = None,
     event: str | None = None,
     groups: list[str] | None = None,
+    where: str | None = None,
     confidence: float | None = None,
     alpha: float | None = None,
     power: float | None = None,
@@ -898,6 +899,10 @@ def compute_analysis(
                       which hold none -- a period with no rows cannot
                       appear in a GROUP BY, so a trend drawn over this
                       column crosses absent periods without saying so.
+      where="..."     on any analysis: only the rows this is true for, e.g.
+                      where="lower(trim(delivery_status)) = 'delivered'". The
+                      text after WHERE, on this table's columns; no subquery.
+                      The rows it leaves out are counted in the result.
       groups=[...]    on group_compare, hypothesis_test, effect_size,
                       confidence_interval, sample_adequacy: keep only
                       those members of dimension, e.g. Store and Online.
@@ -955,11 +960,74 @@ def compute_analysis(
             before_end=before_end, after_start=after_start,
             after_end=after_end, period=period, baseline=baseline, grain=grain,
             second_dimension=second_dimension, method=method, entity=entity,
-            event=event, groups=groups,
+            event=event, groups=groups, where=where,
             confidence=confidence, alpha=alpha, power=power,
         )
     finally:
         con.close()
+
+
+@mcp.tool(annotations=WRITES)
+def propose_metric(
+    dataset_name: str,
+    name: str,
+    left: str,
+    op: str,
+    definition: str,
+    right: str | None = None,
+    value: float | None = None,
+    agg: str = "mean",
+    workspace_id: str | None = None,
+) -> str:
+    """Propose a yes/no metric the contract lacks; a person approves it before it is used.
+
+    For a question that needs a yes/no per row the table does not hold -- an SLA breach is
+    left="recorded_delivery_minutes", op=">", right="promised_minutes" -- rather than refusing.
+    op is one of > >= < <= = <>; right names a column, or value gives a number instead. agg
+    "mean" makes it a rate, "sum" a count. The engine checks both sides are numbers (or both
+    dates) and counts the rows it can judge. Nothing is computed with it until the person
+    approves it (on the Ask screen, or decide_metric); then compute_analysis takes it as a
+    measure, and every result says it is provisional and not in the contract.
+    """
+    from analytics_agent.contract import provisional
+    from analytics_agent.contract import store
+
+    wid = workspace_id or DEFAULT_WORKSPACE_ID
+    con = db.connect(wid)
+    try:
+        stored = store.current(con, dataset_name)
+        contract = stored.contract if stored else None
+        try:
+            p = provisional.propose(con, wid, dataset_name, name=name, left=left, op=op,
+                                    right=right, value=value, agg=agg, definition=definition,
+                                    contract=contract)
+        except provisional.ProposalError as exc:
+            return (f"BLOCKED: the metric {name} cannot be proposed.\nWHY: {exc}\n"
+                    f"NEXT STEP: propose it again with columns of {dataset_name}.\n\n"
+                    f"reason: ANALYSIS_NOT_POSSIBLE")
+    finally:
+        con.close()
+    return (f"PROPOSED, waiting for the person's approval (id {p.id}):\n"
+            f"{provisional.describe(p)}\n\n"
+            f"Nothing has been computed with it. Tell the person what you proposed and why; "
+            f"they approve or reject it with the buttons under your answer on the Ask screen. "
+            f"Once approved, pass measure=\"{name}\" to compute_analysis.")
+
+
+@mcp.tool(annotations=WRITES)
+def decide_metric(proposal_id: str, approve: bool, workspace_id: str | None = None) -> str:
+    """Approve or reject a proposed metric, as the person decided.
+
+    Call it only when the person has said which; the web assistant is not given this tool.
+    """
+    from analytics_agent.contract import provisional
+
+    wid = workspace_id or DEFAULT_WORKSPACE_ID
+    try:
+        p = provisional.decide(wid, proposal_id, approve)
+    except provisional.ProposalError as exc:
+        return f"BLOCKED: {exc}\n\nreason: ANALYSIS_NOT_POSSIBLE"
+    return (f"{p.name} is {p.status}." + (f" {p.label()}" if approve else ""))
 
 
 @mcp.tool(annotations=READ_ONLY)
@@ -989,6 +1057,7 @@ def render_chart(
     entity: str | None = None,
     event: str | None = None,
     groups: list[str] | None = None,
+    where: str | None = None,
     confidence: float | None = None,
     alpha: float | None = None,
     power: float | None = None,
@@ -1055,7 +1124,7 @@ def render_chart(
             before_end=before_end, after_start=after_start,
             after_end=after_end, period=period, baseline=baseline, grain=grain,
             second_dimension=second_dimension, method=method, entity=entity,
-            event=event, groups=groups,
+            event=event, groups=groups, where=where,
             confidence=confidence, alpha=alpha, power=power,
         )
     finally:

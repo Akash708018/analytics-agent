@@ -87,6 +87,9 @@ EXPECTED_TOOLS = {
     "validate_dataset",
     "render_chart",
     "build_report",
+    # Step 3, 26/09/2026: a metric the contract lacks, proposed and approved apart.
+    "propose_metric",
+    "decide_metric",
 }
 
 

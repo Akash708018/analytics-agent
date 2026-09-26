@@ -57,6 +57,26 @@ def _turn(turn: ChatTurn) -> None:
                 st.code(call.result, language=None)
 
 
+def _proposals() -> None:
+    """Metrics the assistant proposed, each with Approve and Reject (step 3). Nothing is computed
+    with one until it is approved here."""
+    be, ws = ui.backend(), ui.workspace_id()
+    for p in be.pending_metrics(ws):
+        with st.container(border=True):
+            st.markdown(f"**Proposed metric: `{p.name}`** on {p.dataset_name} -- "
+                        f"`{p.formula}`  \n{p.definition}")
+            st.caption(p.measured)
+            yes, no, _ = st.columns([1, 1, 4])
+            if yes.button("Approve", key=f"approve_{p.id}", type="primary"):
+                st.session_state["metric_result"] = be.decide_metric(ws, p.id, True).message
+                st.rerun()
+            if no.button("Reject", key=f"reject_{p.id}"):
+                st.session_state["metric_result"] = be.decide_metric(ws, p.id, False).message
+                st.rerun()
+    if st.session_state.get("metric_result"):
+        st.success(st.session_state.pop("metric_result"))
+
+
 def _takes_progress(backend: Backend) -> bool:
     """Whether this backend's chat hears progress: one written before step 2 (the fake) takes
     three arguments and is called with three."""
@@ -108,3 +128,4 @@ def render() -> None:
             _turn(turn)
         log.append({"role": "assistant", "content": turn.reply or (turn.error or ""),
                     "turn": turn})
+    _proposals()

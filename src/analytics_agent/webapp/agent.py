@@ -42,6 +42,9 @@ ALLOWED: tuple[str, ...] = (
     "list_datasets", "describe_dataset", "get_workflow_state",
     "compute_analysis", "render_chart", "read_result_file", "profile_dataset", "profile_column",
     "validate_dataset", "get_cleaning_ledger", "build_report",
+    # Step 3: proposes only. Approval is the person's, on the Ask screen; decide_metric is not
+    # offered.
+    "propose_metric",
 )
 
 MAX_ROUNDS = 8
@@ -85,6 +88,16 @@ says no rows were loaded for it, not why.
 - If the question asks for cleaned or deduplicated data and a reply says rows are copies, \
 answer on the data as it is, say plainly that the figures include those rows, and that \
 cleaning is not available in the web app.
+- If the question needs a yes/no per row the contract does not have -- late against a promise, \
+over a budget, below a target -- do not refuse: call propose_metric with the two columns it \
+compares, then tell the person what you proposed and that they approve it with the button \
+under your answer. Do not compute with it this turn. Once a result says it is PROVISIONAL, use \
+it like any measure and say it is provisional in your answer.
+- Keep to the rows the question means with where= (only delivered orders, one hub) and say \
+what the filter left out.
+- For "which is worst, and why": rank the groups first, then compare the worst group across \
+the factors the table has, with group sizes. Say "is associated with", never "causes", and \
+name a factor that does NOT differ when the question suggests it.
 - Answer in plain language, briefly, and name the analysis you ran.""".format(
     screens=", ".join(SCREENS))
 
@@ -115,7 +128,10 @@ _EXTRA = {
     "compute_analysis": lambda: (
         "analysis_type and its parameters: " + _roster() + ". measure and dimension must be "
         "declared in the contract. grain is day, week, month, quarter or year (default month); "
-        'period names one, e.g. "2025-11" or "2025-Q4" with grain="quarter".'),
+        'period names one, e.g. "2025-11" or "2025-Q4" with grain="quarter". where= keeps only '
+        "the rows a condition on this table's columns is true for, e.g. "
+        "where=\"lower(trim(delivery_status)) = 'delivered'\"; the rows it leaves out are "
+        "counted in the result."),
     "render_chart": lambda: (
         "Same analysis parameters as compute_analysis, plus chart: line, bar, grouped_bar, "
         "scatter, histogram, box, heatmap or waterfall. line, bar, histogram and waterfall draw "
