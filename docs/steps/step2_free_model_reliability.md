@@ -278,3 +278,17 @@ answer lists the data-quality issues correctly but says the 2025 revenue/cost/ma
 was not computed. Resumable synthesis answers from what was gathered, never more. Model
 behaviour, not budget: a follow-up could steer the first rounds to the analyses the question
 names.
+
+7.4 The longer runs. `scripts/benchmark.py`: 1932/1932 ground-truth checks right, 394 calls,
+12 FRICTION flags (render_chart asks for y), as before. `scripts/stress_matrix.py --round all`
+first gave CRASH 1 in round 4 (time_only_column), which the stored baseline does not have. The
+cause is not step 2: measured_caveats (1408652) compared a DATE with a TIME column in M13
+(`_date_order`) and cast TIME to DATE in M11 (`_future`); DuckDB refuses both. Both now skip a
+time-of-day column (`_is_date`). My first helper tested `startswith("TIME")`, which also dropped
+TIMESTAMP; it was caught before commit and fixed. Two tests were added. After the fix, rounds
+1-4: 1777 / 1137 / 875 / 546 records, CRASH 0 everywhere (4,335 records). The WRONG lines (10, 3,
+8, 0) are the load-time text that suggested cleaning converts (CLAUDE.md). The stress and benchmark
+JSON files are rewritten by the runs and committed as the new baseline.
+
+Checks after 7.1-7.4: pytest 2197 passed; UI 55; phases 55/0/3, 0/0/1, 0/0/1, 26/0/0, 36/0/0;
+eval 76/76; scenario 30/30; three benches exit 0.

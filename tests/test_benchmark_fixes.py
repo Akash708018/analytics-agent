@@ -280,3 +280,20 @@ def test_n14_reset_workspace_removes_the_workspaces_exports(ws):
     assert any(exports.rglob("*.yaml"))
     out = server.reset_workspace(confirm=True, workspace_id=ws)
     assert "exported contract file(s)" in out and not exports.exists()
+
+
+def test_date_order_skips_a_time_of_day_column():
+    """Stress round 4, 26/09/2026: M13 compared order_date with a TIME column and DuckDB refused."""
+    import duckdb
+    from analytics_agent.contract.evidence import gather
+    from analytics_agent.contract.measured_caveats import _date_order
+    con = duckdb.connect()
+    con.execute("CREATE TABLE t AS SELECT DATE '2024-01-01' + i::INTEGER AS d, TIME '10:00:00' AS tm "
+                "FROM range(50) r(i)")
+    assert _date_order(con, "t", gather(con, "t", probe_pairs=False)) == []
+
+
+def test_a_time_of_day_is_not_a_date_but_a_timestamp_is():
+    from analytics_agent.contract.measured_caveats import _is_date
+    assert _is_date("DATE") and _is_date("TIMESTAMP") and _is_date("DATETIME")
+    assert not _is_date("TIME") and not _is_date("TIME WITH TIME ZONE")

@@ -50,8 +50,8 @@ Steps 8-16 into Phase 14 Step 14; phases 8-10 at Step 4 (21/09) -- they need the
 `olist` source, and without it their Olist clauses skip (55/0/3, 0/0/1, 0/0/1 in a container
 lacking it):
 
-    uv run pytest -q                      # 2193 passed, 1 skipped (26/09/2026, step 2; measured
-                                          # 2194/0 in a cloud box where N13's skip cannot fire)
+    uv run pytest -q                      # 2196 passed, 1 skipped (26/09/2026, step 2; measured
+                                          # 2197/0 in a cloud box where N13's skip cannot fire)
     uv run python tests/test_phase8.py    # 99 passed, 0 failed, 2 skipped
     uv run python tests/test_phase9.py    # 19 passed, 0 failed, 0 skipped
     uv run python tests/test_phase10.py   # 35 passed, 0 failed, 1 skipped
